@@ -8,7 +8,7 @@
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -122,7 +122,7 @@ function validateBlock(block, pageId, index) {
 // 校验所有内容文件
 for (const file of collectFiles(CONTENT_DIR)) {
   fileCount++
-  const mod = await import(file + '?t=' + Date.now())
+  const mod = await import(pathToFileURL(file).href + '?t=' + Date.now())
   const page = mod.default
   if (!page || !page.blocks) {
     console.error(`✗ ${file}: 缺少 blocks`)
@@ -150,7 +150,7 @@ const siteConfigs = [
 let siteCount = 0
 for (const { name, path: sitePath } of siteConfigs) {
   try {
-    const siteMod = await import(sitePath + '?t=' + Date.now())
+    const siteMod = await import(pathToFileURL(sitePath).href + '?t=' + Date.now())
     const site = siteMod.SITE_CONFIG || siteMod.CHINESE_CONFIG || siteMod.default
     if (!site || !site.units || !Array.isArray(site.units)) {
       console.error(`✗ ${name} site.js: 缺少 units`)
