@@ -139,6 +139,13 @@ jobs:
       - name: 初始化 Android 工程
         run: npm run tauri:android:init
 
+      - name: 配置 Android 签名
+        run: node scripts/setup-android-signing.mjs
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+
       - name: 构建 Android APK
         run: npm run tauri:android:build -- --apk
         env:
