@@ -1,0 +1,100 @@
+/* ============================================================
+ * 全局样式（Vue3 重构版）
+ * 说明：
+ *  - 采用 CSS 变量（Design Token）统一管理明暗主题配色
+ *  - 通过 `:root[data-theme="dark"]` 切换暗色主题
+ *  - 变量名与旧版 style.css 保持一致，便于视觉迁移
+ * ============================================================ */
+
+/* ---------- 亮色主题（默认） ---------- */
+:root {
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-muted: #eef0f6;
+  --text: #1f2430;
+  --text-muted: #5b6472;
+  --border: #e2e6ee;
+  --primary: #2f6fed;
+  --primary-soft: #e8f0ff;
+  --accent: #e8590c;
+  --success: #2f9e44;
+  --warning: #f08c00;
+  --danger: #e03131;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+  --spacer-8: 8px;
+  --spacer-12: 12px;
+  --spacer-16: 16px;
+  --spacer-24: 24px;
+  --shadow-sm: 0 1px 3px rgba(31, 36, 48, 0.08);
+  --shadow-md: 0 4px 16px rgba(31, 36, 48, 0.10);
+  --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+}
+
+/* ---------- 暗色主题 ---------- */
+:root[data-theme="dark"] {
+  --bg: #16181f;
+  --surface: #1f232c;
+  --surface-muted: #2a2f3a;
+  --text: #e6e9ef;
+  --text-muted: #aab2c0;
+  --border: #333a47;
+  --primary: #6a9bff;
+  --primary-soft: #24334d;
+  --accent: #ff8a4c;
+  --success: #69db7c;
+  --warning: #ffc078;
+  --danger: #ff6b6b;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- 基础样式复位 ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-base);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* 通用标题层级 */
+h1 { font-size: 1.6rem; font-weight: 700; }
+h2 { font-size: 1.45rem; font-weight: 700; margin: var(--spacer-24) 0 var(--spacer-12); }
+h3 { font-size: 1.15rem; font-weight: 600; margin: var(--spacer-16) 0 var(--spacer-8); }
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* 按钮基础样式 */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* 通用卡片容器 */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacer-16);
+  box-shadow: var(--shadow-sm);
+}

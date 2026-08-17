@@ -1,0 +1,33 @@
+{
+  "name": "danzhao-study-vue3",
+  "version": "0.1.0",
+  "description": "浙江单招学习应用 Vue3 + Tauri2 重构版（试点）",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:android:build": "tauri android build",
+    "validate:content": "node scripts/validate-content.mjs"
+  },
+  "dependencies": {
+    "jsxgraph": "^1.13.1",
+    "katex": "^0.18.4",
+    "mermaid": "^11.16.1",
+    "pinia": "^3.0.0",
+    "pinia-plugin-persistedstate": "^4.1.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@vitejs/plugin-vue": "^5.2.0",
+    "typescript": "^7.0.2",
+    "vite": "^6.0.0",
+    "vue-tsc": "^3.3.9"
+  }
+}

@@ -1,0 +1,19 @@
+[package]
+name = "danzhao-study-vue3"
+version = "0.1.0"
+description = "浙江单招学习应用 Vue3 + Tauri2"
+authors = ["黑糖＆菜菜"]
+edition = "2021"
+
+[lib]
+name = "danzhao_study_vue3_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

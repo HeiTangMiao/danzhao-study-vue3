@@ -1,0 +1,46 @@
+/**
+ * 路由配置
+ * 说明：使用 hash 模式（createWebHashHistory），兼容 Tauri 本地文件协议，
+ *       避免 history 模式在本地资源下刷新 404 的问题。
+ * 多学科支持：/study/:subject/:unitNum/:fileIndex?
+ */
+import { createRouter, createWebHashHistory } from 'vue-router'
+
+const routes = [
+  {
+    // 首页：学科选择 + 单元列表
+    path: '/',
+    name: 'home',
+    component: () => import('@/views/HomeView.vue')
+  },
+  {
+    // 内容页：按学科 + 单元号 + 页面索引渲染
+    path: '/study/:subject/:unitNum/:fileIndex?',
+    name: 'unit',
+    component: () => import('@/views/UnitView.vue')
+  },
+  {
+    // 兼容旧路由：/unit/:unitNum/:fileIndex? → 重定向到数学
+    path: '/unit/:unitNum/:fileIndex?',
+    redirect: (to) => ({ name: 'unit', params: { subject: 'math', unitNum: to.params.unitNum, fileIndex: to.params.fileIndex } })
+  },
+  {
+    // 低代码编辑器
+    path: '/editor',
+    name: 'editor',
+    component: () => import('@/views/editor/EditorView.vue')
+  },
+  {
+    // 学习仪表盘
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('@/views/DashboardView.vue')
+  }
+]
+
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes
+})
+
+export default router

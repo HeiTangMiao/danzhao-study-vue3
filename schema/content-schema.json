@@ -1,0 +1,64 @@
+/**
+ * 内容 Schema - 页面级内容
+ * 描述：一个学习页面（如"集合的概念与表示"）的结构定义。
+ * 页面由若干区块（block）组成，区块类型覆盖：导图、目标、知识点、公式、例题、题目、可视化。
+ * 说明：本文件为 JSON Schema，供低代码编辑器生成内容与运行时渲染组件消费。
+ */
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://danzhao.local/schemas/content-schema.json",
+  "title": "ContentPageSchema",
+  "description": "学习内容页面的区块化结构定义",
+  "type": "object",
+  "required": ["id", "unitNum", "title", "subtitle", "blocks"],
+  "properties": {
+    "id": { "type": "string", "description": "页面唯一标识，如 'math-01-01'" },
+    "unitNum": { "type": "string", "description": "所属单元编号" },
+    "subject": { "type": "string", "enum": ["math", "chinese"] },
+    "title": { "type": "string", "description": "页面标题" },
+    "subtitle": { "type": "string", "description": "页面副标题" },
+    "icon": { "type": "string", "description": "页面图标（emoji）" },
+    "blocks": {
+      "type": "array",
+      "description": "页面区块列表，按顺序渲染",
+      "items": { "$ref": "#/definitions/block" }
+    }
+  },
+  "definitions": {
+    "block": {
+      "type": "object",
+      "required": ["type"],
+      "description": "通用区块：所有区块共有 type 字段，按 type 分发到不同渲染组件",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "divider"],
+          "description": "区块类型"
+        },
+        "title": { "type": "string", "description": "区块标题" }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "mindmap" } } }, "then": { "required": ["code"], "properties": { "code": { "type": "string", "description": "Mermaid 语法代码" } } } },
+        { "if": { "properties": { "type": { "const": "objectives" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "type": "string" } } } } },
+        { "if": { "properties": { "type": { "const": "knowledge" } } }, "then": { "required": ["paragraphs"], "properties": { "paragraphs": { "type": "array", "items": { "type": "string" } } } } },
+        { "if": { "properties": { "type": { "const": "formula" } } }, "then": { "required": ["formulas"], "properties": { "formulas": { "type": "array", "items": { "type": "string" } } } } },
+        { "if": { "properties": { "type": { "const": "table" } } }, "then": { "required": ["headers", "rows"], "properties": { "headers": { "type": "array", "items": { "type": "string" } }, "rows": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } } } } },
+        { "if": { "properties": { "type": { "const": "warning" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
+        { "if": { "properties": { "type": { "const": "tip" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
+        { "if": { "properties": { "type": { "const": "example" } } }, "then": { "required": ["problem", "solution"], "properties": { "problem": { "type": "string" }, "solution": { "type": "string" }, "answer": { "type": "string" } } } },
+        { "if": { "properties": { "type": { "const": "quiz" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/quizItem" } } } } },
+        { "if": { "properties": { "type": { "const": "diagram" } } }, "then": { "required": ["boardId", "initCode"], "properties": { "boardId": { "type": "string" }, "caption": { "type": "string" }, "initCode": { "type": "string", "description": "JSXGraph 初始化代码（字符串形式）" } } } }
+      ]
+    },
+    "quizItem": {
+      "type": "object",
+      "required": ["prompt", "answer", "difficulty"],
+      "properties": {
+        "prompt": { "type": "string", "description": "题目内容" },
+        "options": { "type": "array", "items": { "type": "string" }, "description": "选择题选项（可选）" },
+        "answer": { "type": "string", "description": "答案与解析" },
+        "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced"], "description": "难度" }
+      }
+    }
+  }
+}
