@@ -10,6 +10,11 @@
 -->
 <template>
   <div class="unit-view">
+    <!-- 阅读进度条 -->
+    <div class="reading-progress">
+      <div class="reading-progress__bar" :style="{ width: readProgress + '%' }"></div>
+    </div>
+
     <!-- 面包屑导航 -->
     <nav class="breadcrumb">
       <router-link to="/">🏠 首页</router-link>
@@ -26,8 +31,9 @@
           <h1>{{ page.title }}</h1>
           <p class="page-subtitle">{{ page.subtitle }}</p>
         </div>
-        <!-- 工具按钮：书签 + 笔记 -->
+        <!-- 工具按钮：目录 + 书签 + 笔记 -->
         <div class="page-tools">
+          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" @click="showToc = !showToc">☰</button>
           <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" @click="bookmark.toggleBookmark()">
             {{ bookmark.isBookmarked.value ? '★' : '☆' }}
           </button>
@@ -42,6 +48,19 @@
         <span v-if="xpPopup" class="xp-popup">+{{ xpPopup }} XP</span>
       </transition>
     </header>
+
+    <!-- 目录导航（折叠式） -->
+    <section v-if="showToc && page && toc.length > 0" class="toc-panel card">
+      <div class="toc-head">📑 本页目录</div>
+      <ul class="toc-list">
+        <li v-for="(item, i) in toc" :key="i">
+          <button class="toc-item" @click="scrollToBlock(item.index)">
+            <span class="toc-icon">{{ item.icon }}</span>
+            <span class="toc-text">{{ item.title }}</span>
+          </button>
+        </li>
+      </ul>
+    </section>
 
     <!-- 加载中提示 -->
     <div v-if="!page && loading" class="loading-hint">
@@ -75,7 +94,17 @@
 
     <!-- 内容主体：逐块渲染 -->
     <main v-if="page" class="page-content">
-      <BlockRenderer v-for="(block, i) in page.blocks" :key="i" :block="block" />
+      <div
+        v-for="(block, i) in page.blocks"
+        :id="'block-' + i"
+        :key="i"
+        class="block-anchor"
+      >
+        <BlockRenderer
+          :block="block"
+          :context="pageContext"
+        />
+      </div>
     </main>
 
     <!-- 页面切换导航 -->
@@ -88,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 import { useProgressStore } from '@/stores/progress'
@@ -142,6 +171,62 @@ function showXPPopup(xp) {
 const pageKey = computed(() => {
   if (!unit.value || !fileMeta.value) return ''
   return `${subject.value}_${unit.value.num}_${fileMeta.value.name}`
+})
+
+// 页面上下文（供交互区块记录 XP 与错题）
+const pageContext = computed(() => ({
+  subject: subject.value,
+  unitNum: unit.value?.num || '',
+  fileKey: pageKey.value,
+  fileTitle: fileMeta.value?.title || '',
+  unitTitle: unit.value?.title || ''
+}))
+
+// ===== 目录导航（TOC）与阅读进度 =====
+
+// 目录图标映射（按区块类型）
+const TOC_ICON = {
+  mindmap: '🧠', objectives: '🎯', knowledge: '📖', formula: '🧮',
+  table: '📊', warning: '⚠️', tip: '💡', example: '📝',
+  quiz: '✏️', diagram: '📐', errorfocus: '🚨', strategy: '🎯', exam: '📝'
+}
+
+// 生成目录：仅收录有标题的区块
+const toc = computed(() => {
+  if (!page.value || !Array.isArray(page.value.blocks)) return []
+  return page.value.blocks
+    .map((b, i) => ({ index: i, type: b.type, title: b.title }))
+    .filter((b) => b.title && TOC_ICON[b.type])
+})
+
+// 目录面板显隐
+const showToc = ref(false)
+
+// 滚动到指定区块
+function scrollToBlock(index) {
+  const el = document.getElementById('block-' + index)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+// 阅读进度（0-100）
+const readProgress = ref(0)
+
+// 计算滚动阅读进度
+function updateReadProgress() {
+  const doc = document.documentElement
+  const total = doc.scrollHeight - window.innerHeight
+  if (total <= 0) { readProgress.value = 0; return }
+  const scrolled = window.scrollY
+  readProgress.value = Math.min(100, Math.round((scrolled / total) * 100))
+}
+
+// 监听滚动更新进度条
+onMounted(() => {
+  window.addEventListener('scroll', updateReadProgress, { passive: true })
+  updateReadProgress()
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateReadProgress)
 })
 
 // 笔记 composable（按页面 key 隔离）
@@ -211,11 +296,39 @@ function goNext() {
 // 监听路由变化重新加载内容（切换页面或学科时触发）
 watch(
   () => [route.params.subject, route.params.unitNum, route.params.fileIndex],
-  () => { loadPage() }
+  () => {
+    // 切换页面时重置会话连击
+    game.resetSessionStreak()
+    loadPage()
+  }
 )
 </script>
 
 <style scoped>
+/* 阅读进度条 */
+.reading-progress {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 3px; background: transparent;
+}
+.reading-progress__bar {
+  height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 0 3px 3px 0;
+  transition: width 0.1s linear;
+}
+
+/* 目录导航 */
+.toc-panel { margin-bottom: var(--spacer-16); }
+.toc-head { font-weight: 700; margin-bottom: var(--spacer-8); }
+.toc-list { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.toc-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface-muted); border: 1px solid var(--border);
+  border-radius: var(--radius-full); padding: 4px 12px;
+  font-size: 0.82rem; transition: all 0.15s ease;
+}
+.toc-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+.toc-icon { font-size: 0.85rem; }
+
 .breadcrumb { margin-bottom: var(--spacer-16); color: var(--text-muted); font-size: 0.85rem; }
 .crumb-sep { margin: 0 var(--spacer-8); }
 .page-header { margin-bottom: var(--spacer-24); position: relative; }
@@ -289,6 +402,7 @@ watch(
 .notes-save { background: var(--primary-soft); color: var(--primary); border: none; border-radius: var(--radius-full); padding: 4px 12px; cursor: pointer; }
 
 .page-content { display: flex; flex-direction: column; gap: var(--spacer-8); }
+.block-anchor { scroll-margin-top: 12px; }
 .page-nav {
   display: flex;
   align-items: center;

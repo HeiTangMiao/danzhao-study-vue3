@@ -54,6 +54,14 @@ function processBold(text) {
 }
 
 /**
+ * 处理 ==高亮== 标记为 <mark> 标签
+ * 用于突出关键结论、易错点等重点内容
+ */
+function processHighlight(text) {
+  return text.replace(/==([^=]+?)==/g, '<mark class="katex-hl">$1</mark>')
+}
+
+/**
  * 将包含 LaTeX 公式的文本渲染为 HTML
  *
  * 处理流程：
@@ -125,11 +133,12 @@ export function renderMath(text, forceBlock = false) {
 }
 
 /**
- * 处理普通文本段：HTML 转义 + 加粗 + 换行
+ * 处理普通文本段：HTML 转义 + 加粗 + 高亮 + 换行
  */
 function processSegment(text) {
   let result = escapeHTML(text)
   result = processBold(result)
+  result = processHighlight(result)
   result = result.replace(/\n/g, '<br>')
   return result
 }

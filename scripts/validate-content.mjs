@@ -17,8 +17,9 @@ const CONTENT_DIR = join(ROOT, 'src', 'content')
 /**
  * 校验 content-schema 支持的所有区块类型
  */
-const BLOCK_TYPES = ['mindmap', 'objectives', 'knowledge', 'formula', 'table', 'warning', 'tip', 'example', 'quiz', 'diagram', 'divider']
-const DIFFICULTY = ['basic', 'medium', 'advanced']
+const BLOCK_TYPES = ['mindmap', 'objectives', 'knowledge', 'formula', 'table', 'warning', 'tip', 'example', 'quiz', 'diagram', 'divider', 'errorfocus', 'strategy', 'exam']
+const DIFFICULTY = ['basic', 'medium', 'advanced', 'sprint']
+const QUESTION_TYPES = ['single', 'judge', 'fill', 'solve']
 
 let errorCount = 0
 let fileCount = 0
@@ -55,15 +56,56 @@ function validateBlock(block, pageId, index) {
     case 'table':
       if (!Array.isArray(block.rows)) errors.push(`${pageId} 表格区块缺少 rows`)
       break
-    case 'example':
-      if (!Array.isArray(block.items)) errors.push(`${pageId} 例题区块缺少 items`)
-      break
     case 'quiz':
       if (!Array.isArray(block.items)) errors.push(`${pageId} 题目区块缺少 items`)
       else {
         block.items.forEach((it, ii) => {
           if (it.difficulty && !DIFFICULTY.includes(it.difficulty)) {
             errors.push(`${pageId} 题目[${ii}] 未知难度: ${it.difficulty}`)
+          }
+          if (it.type && !QUESTION_TYPES.includes(it.type)) {
+            errors.push(`${pageId} 题目[${ii}] 未知题型: ${it.type}`)
+          }
+          if (it.options && !Array.isArray(it.options)) {
+            errors.push(`${pageId} 题目[${ii}] options 应为数组`)
+          }
+          if (it.correctIndex !== undefined && !it.options) {
+            errors.push(`${pageId} 题目[${ii}] 有 correctIndex 但缺少 options`)
+          }
+          if (it.correctIndex !== undefined && it.options && (it.correctIndex < 0 || it.correctIndex >= it.options.length)) {
+            errors.push(`${pageId} 题目[${ii}] correctIndex 越界`)
+          }
+        })
+      }
+      break
+    case 'example':
+      if (!Array.isArray(block.items)) errors.push(`${pageId} 例题区块缺少 items`)
+      else {
+        block.items.forEach((it, ii) => {
+          if (it.difficulty && !DIFFICULTY.includes(it.difficulty)) {
+            errors.push(`${pageId} 例题[${ii}] 未知难度: ${it.difficulty}`)
+          }
+        })
+      }
+      break
+    case 'errorfocus':
+      if (!Array.isArray(block.items)) errors.push(`${pageId} 易错专项区块缺少 items`)
+      break
+    case 'strategy':
+      if (!Array.isArray(block.items)) errors.push(`${pageId} 考试技巧区块缺少 items`)
+      break
+    case 'exam':
+      if (!Array.isArray(block.items)) errors.push(`${pageId} 模拟卷区块缺少 items`)
+      else {
+        block.items.forEach((it, ii) => {
+          if (it.difficulty && !DIFFICULTY.includes(it.difficulty)) {
+            errors.push(`${pageId} 模拟卷题目[${ii}] 未知难度: ${it.difficulty}`)
+          }
+          if (it.type && !QUESTION_TYPES.includes(it.type)) {
+            errors.push(`${pageId} 模拟卷题目[${ii}] 未知题型: ${it.type}`)
+          }
+          if (it.correctIndex !== undefined && !it.options) {
+            errors.push(`${pageId} 模拟卷题目[${ii}] 有 correctIndex 但缺少 options`)
           }
         })
       }

@@ -98,3 +98,12 @@ button {
   padding: var(--spacer-16);
   box-shadow: var(--shadow-sm);
 }
+
+/* 重点高亮标记（==高亮== 语法渲染结果） */
+mark.katex-hl {
+  background: linear-gradient(180deg, transparent 30%, rgba(240, 140, 0, 0.28) 30%);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 3px;
+  font-weight: 600;
+}

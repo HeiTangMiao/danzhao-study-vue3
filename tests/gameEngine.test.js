@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import { useGameEngineStore } from '@/stores/gameEngine'
+import { useGameEngineStore, calcStreakBonus } from '@/stores/gameEngine'
 
 /** 日期工具：返回 YYYY-MM-DD */
 function dateStr(offsetDays = 0) {
@@ -116,5 +116,56 @@ describe('getStreak - 连续学习天数', () => {
     const stats = []
     for (let i = 1; i <= 5; i++) stats.push(stat(dateStr(-i)))
     expect(store.getStreak(stats)).toBe(5)
+  })
+})
+
+describe('calcStreakBonus - 连击加成计算', () => {
+  it('连击 0-2 → 无加成', () => {
+    expect(calcStreakBonus(0)).toBe(0)
+    expect(calcStreakBonus(1)).toBe(0)
+    expect(calcStreakBonus(2)).toBe(0)
+  })
+
+  it('连击 3-5 → +2', () => {
+    expect(calcStreakBonus(3)).toBe(2)
+    expect(calcStreakBonus(4)).toBe(2)
+    expect(calcStreakBonus(5)).toBe(2)
+  })
+
+  it('连击 6-8 → +4', () => {
+    expect(calcStreakBonus(6)).toBe(4)
+    expect(calcStreakBonus(8)).toBe(4)
+  })
+
+  it('连击 15 → 封顶 +10', () => {
+    expect(calcStreakBonus(15)).toBe(10)
+    expect(calcStreakBonus(30)).toBe(10)
+  })
+})
+
+describe('sessionStreak - 会话连击状态', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('初始连击为 0', () => {
+    const store = useGameEngineStore()
+    expect(store.sessionStreak).toBe(0)
+    expect(store.maxSessionStreak).toBe(0)
+  })
+
+  it('连续答对递增连击并记录最大值', () => {
+    const store = useGameEngineStore()
+    store.sessionStreak = 5
+    store.maxSessionStreak = 5
+    expect(store.sessionStreak).toBe(5)
+    expect(store.maxSessionStreak).toBe(5)
+  })
+
+  it('resetSessionStreak 清零连击', () => {
+    const store = useGameEngineStore()
+    store.sessionStreak = 7
+    store.resetSessionStreak()
+    expect(store.sessionStreak).toBe(0)
   })
 })

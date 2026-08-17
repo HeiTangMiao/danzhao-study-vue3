@@ -45,6 +45,16 @@ const LEVELS = [
   { lv: 29, title: '状元', xp: 8700 }, { lv: 30, title: '状元', xp: 9300 }
 ]
 
+/**
+ * 计算连击加成 XP（纯函数，便于单元测试）
+ * 规则：每 3 连击 +2 XP，上限 +10
+ * @param {number} streak - 当前连击数
+ * @returns {number} 加成 XP
+ */
+export function calcStreakBonus(streak) {
+  return Math.min(Math.floor(streak / 3) * 2, 10)
+}
+
 // 成就定义表
 const ACHIEVEMENTS = [
   { id: 'first_step', name: '初入书海', desc: '完成第一次学习', icon: '📖' },
@@ -78,7 +88,10 @@ export const useGameEngineStore = defineStore('gameEngine', {
   state: () => ({
     // 快速统计缓存（30 秒 TTL，避免每次页面加载全量读取 IndexedDB）
     _quickStatsCache: null,
-    _quickStatsTTL: 0
+    _quickStatsTTL: 0,
+    // 会话连击（内存态，刷新即重置）：连续答对次数
+    sessionStreak: 0,
+    maxSessionStreak: 0
   }),
 
   getters: {
@@ -208,6 +221,63 @@ export const useGameEngineStore = defineStore('gameEngine', {
         console.error('[GameEngine] trackAnswer error:', e)
         return { xpGained: 0 }
       }
+    },
+
+    /**
+     * 追踪答题结果（对错感知，含连击加成）
+     *  - 答对：基础 XP + 连击加成（每 3 连击 +2，上限 +10）
+     *  - 答错：无 XP，连击清零
+     * @param {string} subject - 学科
+     * @param {string} unitNum - 单元编号
+     * @param {string} fileKey - 页面唯一标识
+     * @param {boolean} isCorrect - 是否答对
+     * @returns {Promise<{xpGained, streak, correct}>}
+     */
+    async trackAnswerResult(subject, unitNum, fileKey, isCorrect) {
+      try {
+        const db = useStudyDbStore()
+        await db.init()
+
+        // 更新会话连击
+        if (isCorrect) {
+          this.sessionStreak++
+          if (this.sessionStreak > this.maxSessionStreak) this.maxSessionStreak = this.sessionStreak
+        } else {
+          this.sessionStreak = 0
+        }
+
+        // 连击加成：每 3 连击 +2 XP，上限 +10
+        const streakBonus = isCorrect ? calcStreakBonus(this.sessionStreak) : 0
+        const xpGained = isCorrect ? XP.ANSWER_QUESTION + streakBonus : 0
+
+        let existing = await db.getPageProgress(fileKey)
+        if (!existing) {
+          existing = { key: fileKey, subject, unitNum, visited: false, questionsAnswered: 0, xpEarned: 0 }
+        }
+        existing.questionsAnswered = (existing.questionsAnswered || 0) + 1
+        if (isCorrect) existing.correctAnswered = (existing.correctAnswered || 0) + 1
+        existing.xpEarned = (existing.xpEarned || 0) + xpGained
+        await db.savePageProgress(existing)
+
+        if (xpGained > 0) {
+          await db.addStudyLog({
+            date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+            action: 'answer_correct', xp: xpGained, streak: this.sessionStreak
+          })
+          await this.updateDailyStat(xpGained, subject, 0, 1)
+          this._invalidateQuickStatsCache()
+        }
+
+        return { xpGained, streak: this.sessionStreak, correct: isCorrect }
+      } catch (e) {
+        console.error('[GameEngine] trackAnswerResult error:', e)
+        return { xpGained: 0, streak: 0, correct: isCorrect }
+      }
+    },
+
+    /** 重置会话连击（切换页面时调用） */
+    resetSessionStreak() {
+      this.sessionStreak = 0
     },
 
     /**

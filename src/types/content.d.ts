@@ -17,9 +17,15 @@ export type BlockType =
   | 'quiz'       // 练习题
   | 'diagram'    // 可视化图
   | 'divider'    // 分割线
+  | 'errorfocus' // 易错专项
+  | 'strategy'   // 考试技巧
+  | 'exam'       // 模拟卷
 
 /** 难度等级 */
-export type Difficulty = 'basic' | 'medium' | 'advanced'
+export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
+
+/** 题型 */
+export type QuestionType = 'single' | 'judge' | 'fill' | 'solve'
 
 /** 通用区块基础接口 */
 export interface BaseBlock {
@@ -43,6 +49,7 @@ export interface ObjectivesBlock extends BaseBlock {
 export interface KnowledgeBlock extends BaseBlock {
   type: 'knowledge'
   paragraphs: string[] // 段落列表
+  kind?: 'concept' | 'points' | 'error' // 子类型：概念/要点/易错
 }
 
 /** 公式区块 */
@@ -70,6 +77,7 @@ export interface ExampleItem {
   question: string      // 题干
   solution?: string     // 解答过程
   answer?: string       // 最终答案
+  difficulty?: Difficulty // 难度
 }
 
 /** 例题区块 */
@@ -80,8 +88,11 @@ export interface ExampleBlock extends BaseBlock {
 
 /** 测验题目条目 */
 export interface QuizItem {
+  type?: QuestionType   // 题型：单选/判断/填空
   difficulty?: Difficulty
   question: string      // 题目内容
+  options?: string[]    // 选择题选项
+  correctIndex?: number // 选择题正确选项索引
   answer: string        // 答案与解析
 }
 
@@ -104,6 +115,52 @@ export interface DividerBlock extends BaseBlock {
   type: 'divider'
 }
 
+/** 易错专项条目 */
+export interface ErrorFocusItem {
+  scenario: string      // 易错场景
+  commonMistake: string // 常见错误
+  correctApproach: string // 正确思路
+  tip?: string          // 避坑提示
+}
+
+/** 易错专项区块 */
+export interface ErrorFocusBlock extends BaseBlock {
+  type: 'errorfocus'
+  items: ErrorFocusItem[]
+}
+
+/** 考试技巧条目 */
+export interface StrategyItem {
+  title: string         // 技巧标题
+  content: string       // 技巧内容
+}
+
+/** 考试技巧区块 */
+export interface StrategyBlock extends BaseBlock {
+  type: 'strategy'
+  items: StrategyItem[]
+}
+
+/** 模拟卷题目条目 */
+export interface ExamItem {
+  type?: 'single' | 'judge' | 'fill' | 'solve'
+  difficulty?: Difficulty
+  question: string
+  options?: string[]
+  correctIndex?: number
+  answer: string
+  score?: number        // 本题分值
+}
+
+/** 模拟卷区块 */
+export interface ExamBlock extends BaseBlock {
+  type: 'exam'
+  duration?: number     // 考试时长（分钟）
+  totalScore?: number   // 满分
+  passingScore?: number // 及格分
+  items: ExamItem[]
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -116,6 +173,9 @@ export type Block =
   | QuizBlock
   | DiagramBlock
   | DividerBlock
+  | ErrorFocusBlock
+  | StrategyBlock
+  | ExamBlock
 
 /** 内容页面 */
 export interface ContentPage {

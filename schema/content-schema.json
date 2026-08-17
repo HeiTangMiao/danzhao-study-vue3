@@ -1,9 +1,3 @@
-/**
- * 内容 Schema - 页面级内容
- * 描述：一个学习页面（如"集合的概念与表示"）的结构定义。
- * 页面由若干区块（block）组成，区块类型覆盖：导图、目标、知识点、公式、例题、题目、可视化。
- * 说明：本文件为 JSON Schema，供低代码编辑器生成内容与运行时渲染组件消费。
- */
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://danzhao.local/schemas/content-schema.json",
@@ -32,32 +26,79 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "divider"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "divider", "errorfocus", "strategy", "exam"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
       },
       "allOf": [
-        { "if": { "properties": { "type": { "const": "mindmap" } } }, "then": { "required": ["code"], "properties": { "code": { "type": "string", "description": "Mermaid 语法代码" } } } },
+        { "if": { "properties": { "type": { "const": "mindmap" } } }, "then": { "required": ["mermaid"], "properties": { "mermaid": { "type": "string", "description": "Mermaid 语法代码" } } } },
         { "if": { "properties": { "type": { "const": "objectives" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "type": "string" } } } } },
-        { "if": { "properties": { "type": { "const": "knowledge" } } }, "then": { "required": ["paragraphs"], "properties": { "paragraphs": { "type": "array", "items": { "type": "string" } } } } },
+        { "if": { "properties": { "type": { "const": "knowledge" } } }, "then": { "required": ["paragraphs"], "properties": { "paragraphs": { "type": "array", "items": { "type": "string" } }, "kind": { "type": "string", "enum": ["concept", "points", "error"], "description": "知识点子类型：概念/要点/易错" } } } },
         { "if": { "properties": { "type": { "const": "formula" } } }, "then": { "required": ["formulas"], "properties": { "formulas": { "type": "array", "items": { "type": "string" } } } } },
         { "if": { "properties": { "type": { "const": "table" } } }, "then": { "required": ["headers", "rows"], "properties": { "headers": { "type": "array", "items": { "type": "string" } }, "rows": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } } } } },
         { "if": { "properties": { "type": { "const": "warning" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
         { "if": { "properties": { "type": { "const": "tip" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
-        { "if": { "properties": { "type": { "const": "example" } } }, "then": { "required": ["problem", "solution"], "properties": { "problem": { "type": "string" }, "solution": { "type": "string" }, "answer": { "type": "string" } } } },
+        { "if": { "properties": { "type": { "const": "example" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/exampleItem" } } } } },
         { "if": { "properties": { "type": { "const": "quiz" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/quizItem" } } } } },
-        { "if": { "properties": { "type": { "const": "diagram" } } }, "then": { "required": ["boardId", "initCode"], "properties": { "boardId": { "type": "string" }, "caption": { "type": "string" }, "initCode": { "type": "string", "description": "JSXGraph 初始化代码（字符串形式）" } } } }
+        { "if": { "properties": { "type": { "const": "diagram" } } }, "then": { "required": ["boardId", "initCode"], "properties": { "boardId": { "type": "string" }, "caption": { "type": "string" }, "initCode": { "type": "string", "description": "JSXGraph 初始化代码（字符串形式）" } } } },
+        { "if": { "properties": { "type": { "const": "errorfocus" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/errorFocusItem" } } } } },
+        { "if": { "properties": { "type": { "const": "strategy" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/strategyItem" } } } } },
+        { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } }
       ]
+    },
+    "exampleItem": {
+      "type": "object",
+      "required": ["question"],
+      "properties": {
+        "title": { "type": "string", "description": "例题标题" },
+        "question": { "type": "string", "description": "题干" },
+        "solution": { "type": "string", "description": "解答过程" },
+        "answer": { "type": "string", "description": "最终答案" },
+        "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced", "sprint"], "description": "难度：基础/中等/提高/冲刺" }
+      }
     },
     "quizItem": {
       "type": "object",
-      "required": ["prompt", "answer", "difficulty"],
+      "required": ["question", "answer"],
       "properties": {
-        "prompt": { "type": "string", "description": "题目内容" },
+        "question": { "type": "string", "description": "题目内容" },
+        "type": { "type": "string", "enum": ["single", "judge", "fill"], "description": "题型：单选/判断/填空" },
         "options": { "type": "array", "items": { "type": "string" }, "description": "选择题选项（可选）" },
+        "correctIndex": { "type": "number", "description": "选择题正确选项索引（可选）" },
         "answer": { "type": "string", "description": "答案与解析" },
-        "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced"], "description": "难度" }
+        "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced", "sprint"], "description": "难度：基础/中等/提高/冲刺" }
+      }
+    },
+    "errorFocusItem": {
+      "type": "object",
+      "required": ["scenario", "commonMistake", "correctApproach"],
+      "properties": {
+        "scenario": { "type": "string", "description": "易错场景" },
+        "commonMistake": { "type": "string", "description": "常见错误" },
+        "correctApproach": { "type": "string", "description": "正确思路" },
+        "tip": { "type": "string", "description": "避坑提示（可选）" }
+      }
+    },
+    "strategyItem": {
+      "type": "object",
+      "required": ["title", "content"],
+      "properties": {
+        "title": { "type": "string", "description": "技巧标题" },
+        "content": { "type": "string", "description": "技巧内容" }
+      }
+    },
+    "examItem": {
+      "type": "object",
+      "required": ["question", "answer"],
+      "properties": {
+        "question": { "type": "string", "description": "题目内容" },
+        "type": { "type": "string", "enum": ["single", "judge", "fill", "solve"], "description": "题型：单选/判断/填空/解答" },
+        "options": { "type": "array", "items": { "type": "string" }, "description": "选择题选项" },
+        "correctIndex": { "type": "number", "description": "选择题正确选项索引" },
+        "answer": { "type": "string", "description": "答案与解析" },
+        "score": { "type": "number", "description": "本题分值" },
+        "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced", "sprint"], "description": "难度" }
       }
     }
   }

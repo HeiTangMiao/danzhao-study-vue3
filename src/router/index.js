@@ -35,6 +35,12 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: () => import('@/views/DashboardView.vue')
+  },
+  {
+    // 错题本
+    path: '/error-book',
+    name: 'error-book',
+    component: () => import('@/views/ErrorBookView.vue')
   }
 ]
 

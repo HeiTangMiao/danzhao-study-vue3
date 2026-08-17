@@ -72,7 +72,9 @@
     <!-- 工具入口 -->
     <footer class="home-actions">
       <router-link to="/dashboard" class="btn-dashboard">📊 学习仪表盘</router-link>
-      <router-link to="/editor" class="btn-editor">✏️ 打开内容编辑器</router-link>
+      <router-link to="/error-book" class="btn-errorbook">📕 错题本</router-link>
+      <router-link :to="mockRoute" class="btn-mock">🚀 模拟冲刺</router-link>
+      <router-link to="/editor" class="btn-editor">✏️ 内容编辑器</router-link>
     </footer>
 
     <!-- 作者署名 -->
@@ -146,6 +148,15 @@ function progressPct(unit) {
 function goUnit(unit) {
   router.push({ name: 'unit', params: { subject: currentSubject.value, unitNum: unit.num, fileIndex: 0 } })
 }
+
+// 模拟冲刺入口：跳转到当前学科冲刺单元的第一个页面
+const mockRoute = computed(() => {
+  const config = currentConfig.value
+  if (!config || !config.units) return { name: 'home' }
+  const sprint = config.units.find((u) => u.sprint)
+  if (sprint) return { name: 'unit', params: { subject: currentSubject.value, unitNum: sprint.num, fileIndex: 0 } }
+  return { name: 'home' }
+})
 </script>
 
 <style scoped>
@@ -222,6 +233,24 @@ function goUnit(unit) {
   padding: 8px 20px;
 }
 .btn-editor:hover { background: var(--primary); color: #fff; }
+.btn-errorbook {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--warning);
+  color: var(--warning);
+  border-radius: var(--radius-full);
+  padding: 8px 20px;
+}
+.btn-errorbook:hover { background: var(--warning); color: #fff; }
+.btn-mock {
+  display: inline-block;
+  background: linear-gradient(135deg, #a855f7, #f43f5e);
+  color: #fff;
+  border-radius: var(--radius-full);
+  padding: 8px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.btn-mock:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
 /* 作者署名 */
 .author-credit {
