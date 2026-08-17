@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: '要发布的 tag（默认 v0.1.0）'
+        required: false
+        default: 'v0.1.0'
 
 jobs:
   release:
@@ -62,7 +67,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
+          tagName: ${{ inputs.tag || github.ref_name }}
           releaseName: '单招学习打卡 v__VERSION__'
           releaseBody: '请查看下方 Release 说明（RELEASE_NOTES.md）获取完整更新内容。'
           releaseDraft: true
