@@ -25,6 +25,7 @@ if (!existsSync(gradlePath)) {
 const base64 = process.env.ANDROID_KEYSTORE_BASE64
 const password = process.env.ANDROID_KEYSTORE_PASSWORD || 'danzhao-release'
 const alias = process.env.ANDROID_KEY_ALIAS || 'danzhao'
+const keystorePropsPath = join(genDir, 'keystore.properties')
 
 if (base64) {
   writeFileSync(keystorePath, Buffer.from(base64, 'base64'))
@@ -32,7 +33,7 @@ if (base64) {
 } else {
   if (!existsSync(keystorePath)) {
     execSync(
-      `keytool -genkey -v -keystore "${keystorePath}" -storetype JKS -keyalg RSA ` +
+      `keytool -genkeypair -v -keystore "${keystorePath}" -storetype PKCS12 -keyalg RSA ` +
         `-keysize 2048 -validity 10000 -alias "${alias}" -storepass "${password}" ` +
         `-keypass "${password}" -dname "CN=Danzhao Study, OU=Dev, O=Danzhao, L=Hangzhou, S=Zhejiang, C=CN"`,
       { stdio: 'inherit' }
@@ -42,10 +43,13 @@ if (base64) {
 }
 
 // 2. 创建 keystore.properties
-writeFileSync(
-  join(genDir, 'keystore.properties'),
-  `password=${password}\nkeyAlias=${alias}\nstoreFile=${keystorePath}\n`
-)
+// 注意：若本地已存在 keystore.properties（例如已放置正式 keystore），则保留原配置，避免覆盖正式签名密码
+if (base64 || !existsSync(keystorePropsPath)) {
+  writeFileSync(
+    keystorePropsPath,
+    `password=${password}\nkeyAlias=${alias}\nstoreFile=${keystorePath}\n`
+  )
+}
 
 // 3. 向 build.gradle.kts 注入签名配置（幂等）
 let content = readFileSync(gradlePath, 'utf8')
