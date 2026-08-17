@@ -12,6 +12,7 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "tauri:android:build": "tauri android build",
+    "tauri:android:init": "tauri android init",
     "validate:content": "node scripts/validate-content.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

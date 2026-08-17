@@ -72,3 +72,82 @@ jobs:
           releaseBody: '请查看下方 Release 说明（RELEASE_NOTES.md）获取完整更新内容。'
           releaseDraft: true
           prerelease: false
+
+  android:
+    name: 构建 Android APK
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装 Rust 工具链（含 Android 目标）
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Rust 缓存
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: 安装 Linux 系统依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev
+
+      - name: 安装 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: 安装 Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 安装 Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26d
+
+      - name: 安装 Android SDK 组件
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+
+      - name: 安装前端依赖
+        run: npm ci
+
+      - name: 内容 Schema 校验
+        run: npm run validate:content
+
+      - name: 单元测试
+        run: npm test
+
+      - name: 初始化 Android 工程
+        run: npm run tauri:android:init
+
+      - name: 构建 Android APK
+        run: npm run tauri:android:build -- --apk
+        env:
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+      - name: 上传 APK 到 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          files: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
+          draft: true
