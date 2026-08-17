@@ -145,9 +145,9 @@ jobs:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
       - name: 上传 APK 到 Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.tag || github.ref_name }}
-          files: |
-            src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
-          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --draft --title "单招学习打卡 v${TAG#v}" --notes "请查看 RELEASE_NOTES.md 获取完整更新内容。"
+          gh release upload "$TAG" src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk --clobber
