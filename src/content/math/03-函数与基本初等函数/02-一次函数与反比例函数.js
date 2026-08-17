@@ -38,11 +38,11 @@ export default {
       "title": "一次函数定义",
       "formulas": [
         "y = kx + b \\quad (k \\ne 0",
-        "k\\",
-        "b\\",
-        "y\\",
-        "b = 0\\",
-        "y = kx\\"
+        "k",
+        "b",
+        "y",
+        "b = 0",
+        "y = kx"
       ]
     },
     {
@@ -79,8 +79,8 @@ export default {
       "title": "反比例函数定义",
       "formulas": [
         "y = \\frac{k}{x} \\quad (k \\ne 0",
-        "\\{x \\mid x \\ne 0\\}\\",
-        "\\{y \\mid y \\ne 0\\}\\"
+        "\\{x \\mid x \\ne 0\\}",
+        "\\{y \\mid y \\ne 0\\}"
       ]
     },
     {
@@ -112,11 +112,11 @@ export default {
       "type": "formula",
       "title": "求交点",
       "formulas": [
-        "\\begin{cases} y = k_1 x + b \\\\ y = \\frac{k_2}{x} \\end{cases}\\",
-        "y\\",
-        "k_1 x + b = \\frac{k_2}{x}\\",
-        "k_1 x^2 + bx - k_2 = 0\\",
-        "\\Delta\\"
+        "\\begin{cases} y = k_1 x + b \\\\ y = \\frac{k_2}{x} \\end{cases}",
+        "y",
+        "k_1 x + b = \\frac{k_2}{x}",
+        "k_1 x^2 + bx - k_2 = 0",
+        "\\Delta"
       ]
     },
     {

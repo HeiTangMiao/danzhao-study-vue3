@@ -30,9 +30,9 @@ export default {
       "title": "对数定义",
       "formulas": [
         "如果 \\(a^x = N\\)（\\(a > 0\\)，\\(a \\ne 1\\)，\\(N > 0\\)），那么数 \\(x\\) 叫做以 \\(a\\) 为底 \\(N\\) 的对数。",
-        "x = \\log_a N\\",
-        "a\\",
-        "N\\"
+        "x = \\log_a N",
+        "a",
+        "N"
       ]
     },
     {
@@ -50,8 +50,8 @@ export default {
       "type": "formula",
       "title": "常用对数和自然对数",
       "formulas": [
-        "\\log_{10} N\\",
-        "\\lg N\\",
+        "\\log_{10} N",
+        "\\lg N",
         "• 自然对数：以 \\(e\\)（\\(e \\approx 2.718\\)）为底的对数，\\(\\log_e N\\) 简记为 \\(\\ln N\\)"
       ]
     },
@@ -69,7 +69,7 @@ export default {
       "title": "运算法则（a > 0, a ≠ 1, M > 0, N > 0）",
       "formulas": [
         "\\log_a(M \\cdot N",
-        "\\log_a \\frac{M}{N} = \\log_a M - \\log_a N\\",
+        "\\log_a \\frac{M}{N} = \\log_a M - \\log_a N",
         "③ 幂的对数：\\(\\log_a M^n = n \\cdot \\log_a M\\)（\\(n \\in \\mathbb{R}\\)）"
       ]
     },
@@ -97,7 +97,7 @@ export default {
       "formulas": [
         "y = \\log_a x \\quad (a > 0 \\text{ 且 } a \\ne 1",
         "(0, +\\infty",
-        "\\mathbb{R}\\"
+        "\\mathbb{R}"
       ]
     },
     {

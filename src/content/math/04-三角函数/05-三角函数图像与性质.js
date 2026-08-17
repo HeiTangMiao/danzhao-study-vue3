@@ -128,8 +128,8 @@ export default {
       "formulas": [
         "• 振幅：\\(A\\)（\\(A > 0\\)），决定函数的最大值和最小值",
         "• 角频率：\\(\\omega\\)（\\(\\omega > 0\\)），决定函数的周期",
-        "\\omega x + \\varphi\\",
-        "\\varphi\\"
+        "\\omega x + \\varphi",
+        "\\varphi"
       ]
     },
     {

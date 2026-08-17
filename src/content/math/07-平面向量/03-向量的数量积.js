@@ -69,29 +69,29 @@ export default {
       "type": "formula",
       "title": "重要性质",
       "formulas": [
-        "\\boldsymbol{a} \\perp \\boldsymbol{b} \\iff \\boldsymbol{a} \\cdot \\boldsymbol{b} = 0 \\iff x_1 x_2 + y_1 y_2 = 0\\",
-        "\\boldsymbol{a} \\cdot \\boldsymbol{a} = |\\boldsymbol{a}|^2\\",
-        "|\\boldsymbol{a}| = \\sqrt{\\boldsymbol{a} \\cdot \\boldsymbol{a}} = \\sqrt{x_1^2 + y_1^2}\\",
-        "\\theta\\",
-        "\\boldsymbol{a} \\cdot \\boldsymbol{b} > 0\\",
-        "\\boldsymbol{a} \\cdot \\boldsymbol{b} < 0\\",
-        "\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\"
+        "\\boldsymbol{a} \\perp \\boldsymbol{b} \\iff \\boldsymbol{a} \\cdot \\boldsymbol{b} = 0 \\iff x_1 x_2 + y_1 y_2 = 0",
+        "\\boldsymbol{a} \\cdot \\boldsymbol{a} = |\\boldsymbol{a}|^2",
+        "|\\boldsymbol{a}| = \\sqrt{\\boldsymbol{a} \\cdot \\boldsymbol{a}} = \\sqrt{x_1^2 + y_1^2}",
+        "\\theta",
+        "\\boldsymbol{a} \\cdot \\boldsymbol{b} > 0",
+        "\\boldsymbol{a} \\cdot \\boldsymbol{b} < 0",
+        "\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0"
       ]
     },
     {
       "type": "formula",
       "title": "夹角公式",
       "formulas": [
-        "\\boldsymbol{a}\\",
-        "\\boldsymbol{b}\\",
-        "\\theta\\"
+        "\\boldsymbol{a}",
+        "\\boldsymbol{b}",
+        "\\theta"
       ]
     },
     {
       "type": "formula",
       "title": "运算律",
       "formulas": [
-        "\\boldsymbol{a} \\cdot \\boldsymbol{b} = \\boldsymbol{b} \\cdot \\boldsymbol{a}\\",
+        "\\boldsymbol{a} \\cdot \\boldsymbol{b} = \\boldsymbol{b} \\cdot \\boldsymbol{a}",
         "(\\lambda\\boldsymbol{a}",
         "\\boldsymbol{a} \\cdot \\boldsymbol{b}",
         "\\lambda\\boldsymbol{b}",

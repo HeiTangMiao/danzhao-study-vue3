@@ -44,8 +44,8 @@ export default {
       "type": "formula",
       "title": "辅助角公式",
       "formulas": [
-        "\\tan\\varphi = \\dfrac{b}{a}\\",
-        "\\varphi\\",
+        "\\tan\\varphi = \\dfrac{b}{a}",
+        "\\varphi",
         "(a, b"
       ]
     },

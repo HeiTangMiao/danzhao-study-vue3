@@ -39,8 +39,8 @@ export default {
       "type": "formula",
       "title": "古典概型概率公式",
       "formulas": [
-        "n\\",
-        "m\\"
+        "n",
+        "m"
       ]
     },
     {

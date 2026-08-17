@@ -36,8 +36,8 @@ export default {
       "type": "formula",
       "title": "平面向量基本定理",
       "formulas": [
-        "\\boldsymbol{e_1}\\",
-        "\\boldsymbol{e_2}\\"
+        "\\boldsymbol{e_1}",
+        "\\boldsymbol{e_2}"
       ]
     },
     {
@@ -52,7 +52,7 @@ export default {
       "title": "坐标表示",
       "formulas": [
         "(x, y",
-        "\\boldsymbol{a}\\"
+        "\\boldsymbol{a}"
       ]
     },
     {
@@ -65,7 +65,7 @@ export default {
       "formulas": [
         "\\boldsymbol{a} = (x_1, y_1",
         "\\boldsymbol{b} = (x_2, y_2",
-        "\\lambda \\in \\mathbb{R}\\",
+        "\\lambda \\in \\mathbb{R}",
         "\\boldsymbol{a} + \\boldsymbol{b} = (x_1 + x_2, y_1 + y_2",
         "\\boldsymbol{a} - \\boldsymbol{b} = (x_1 - x_2, y_1 - y_2",
         "\\lambda\\boldsymbol{a} = (\\lambda x_1, \\lambda y_1"
@@ -86,8 +86,8 @@ export default {
       "formulas": [
         "A(x_1, y_1",
         "B(x_2, y_2",
-        "AB\\",
-        "M\\"
+        "AB",
+        "M"
       ]
     },
     {

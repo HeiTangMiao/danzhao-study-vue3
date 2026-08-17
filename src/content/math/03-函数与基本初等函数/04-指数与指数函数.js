@@ -48,8 +48,8 @@ export default {
       "type": "formula",
       "title": "运算法则（a > 0, b > 0）",
       "formulas": [
-        "a^m \\cdot a^n = a^{m+n}\\",
-        "\\frac{a^m}{a^n} = a^{m-n}\\",
+        "a^m \\cdot a^n = a^{m+n}",
+        "\\frac{a^m}{a^n} = a^{m-n}",
         "(a^m",
         "(ab",
         "\\left(\\frac{a}{b}\\right"
@@ -64,7 +64,7 @@ export default {
       "title": "指数函数定义",
       "formulas": [
         "y = a^x \\quad (a > 0 \\text{ 且 } a \\ne 1",
-        "\\mathbb{R}\\",
+        "\\mathbb{R}",
         "(0, +\\infty"
       ]
     },

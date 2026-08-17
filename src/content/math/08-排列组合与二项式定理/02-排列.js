@@ -46,9 +46,9 @@ export default {
       "type": "formula",
       "title": "排列数公式",
       "formulas": [
-        "m\\",
-        "n\\",
-        "n-m+1\\"
+        "m",
+        "n",
+        "n-m+1"
       ]
     },
     {

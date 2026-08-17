@@ -50,9 +50,21 @@ function validateBlock(block, pageId, index) {
     case 'knowledge':
       if (!block.paragraphs) errors.push(`${pageId} 知识点区块缺少 paragraphs`)
       break
-    case 'formula':
+    case 'formula': {
       if (!block.formulas && !block.lines) errors.push(`${pageId} 公式区块缺少 formulas`)
+      else {
+        const lines = block.formulas || block.lines
+        if (Array.isArray(lines)) {
+          lines.forEach((line, li) => {
+            // 公式行末尾不允许以反斜杠结尾（KaTeX 顶层解析错误，会以红色源码显示）
+            if (typeof line === 'string' && /\\+\s*$/.test(line)) {
+              errors.push(`${pageId} 公式区块[${index}] 第${li}行末尾有孤立反斜杠，将导致 KaTeX 渲染失败`)
+            }
+          })
+        }
+      }
       break
+    }
     case 'table':
       if (!Array.isArray(block.rows)) errors.push(`${pageId} 表格区块缺少 rows`)
       break

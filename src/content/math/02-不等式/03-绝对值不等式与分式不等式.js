@@ -43,22 +43,22 @@ export default {
       "type": "formula",
       "title": "|ax+b| ≥ c 的解法",
       "formulas": [
-        "c > 0\\",
+        "c > 0",
         "|ax+b| \\ge c \\iff ax+b \\ge c \\text{ 或 } ax+b \\le -c",
         "当 \\(c < 0\\) 时：解集为 \\(\\mathbb{R}\\)（绝对值非负，恒大于负数）",
-        "c = 0\\",
-        "\\mathbb{R}\\"
+        "c = 0",
+        "\\mathbb{R}"
       ]
     },
     {
       "type": "formula",
       "title": "|ax+b| ≤ c 的解法",
       "formulas": [
-        "c > 0\\",
+        "c > 0",
         "|ax+b| \\le c \\iff -c \\le ax+b \\le c",
         "当 \\(c < 0\\) 时：解集为 \\(\\varnothing\\)（绝对值非负，不可能小于负数）",
-        "c = 0\\",
-        "\\{x \\mid ax+b = 0\\}\\"
+        "c = 0",
+        "\\{x \\mid ax+b = 0\\}"
       ]
     },
     {

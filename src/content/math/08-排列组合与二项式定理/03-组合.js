@@ -53,10 +53,10 @@ export default {
       "type": "formula",
       "title": "性质1：对称性",
       "formulas": [
-        "n\\",
-        "m\\",
-        "n\\",
-        "n-m\\"
+        "n",
+        "m",
+        "n",
+        "n-m"
       ]
     },
     {

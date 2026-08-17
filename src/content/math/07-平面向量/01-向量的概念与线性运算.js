@@ -124,16 +124,16 @@ board.create('text', [1.4, 1.0, 'a + b'], {fontSize:16, color: colors.text});`
       "title": "数乘运算",
       "formulas": [
         "\\(\\lambda \\boldsymbol{a}\\)（\\(\\lambda \\in \\mathbb{R}\\)）是一个向量：",
-        "\\lambda > 0\\",
-        "\\lambda\\boldsymbol{a}\\",
-        "\\boldsymbol{a}\\",
-        "|\\lambda\\boldsymbol{a}| = \\lambda|\\boldsymbol{a}|\\",
-        "\\lambda < 0\\",
-        "\\lambda\\boldsymbol{a}\\",
-        "\\boldsymbol{a}\\",
-        "|\\lambda\\boldsymbol{a}| = |\\lambda||\\boldsymbol{a}|\\",
-        "\\lambda = 0\\",
-        "\\lambda\\boldsymbol{a} = \\boldsymbol{0}\\"
+        "\\lambda > 0",
+        "\\lambda\\boldsymbol{a}",
+        "\\boldsymbol{a}",
+        "|\\lambda\\boldsymbol{a}| = \\lambda|\\boldsymbol{a}|",
+        "\\lambda < 0",
+        "\\lambda\\boldsymbol{a}",
+        "\\boldsymbol{a}",
+        "|\\lambda\\boldsymbol{a}| = |\\lambda||\\boldsymbol{a}|",
+        "\\lambda = 0",
+        "\\lambda\\boldsymbol{a} = \\boldsymbol{0}"
       ]
     },
     {

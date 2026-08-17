@@ -125,7 +125,7 @@ board.create('text', [-4.5, 2.8, function(){
       "title": "点到直线的距离",
       "formulas": [
         "P(x_0, y_0",
-        "Ax + By + C = 0\\"
+        "Ax + By + C = 0"
       ]
     },
     {

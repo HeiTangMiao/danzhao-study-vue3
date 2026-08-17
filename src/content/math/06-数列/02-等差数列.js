@@ -36,11 +36,11 @@ export default {
       "type": "formula",
       "title": "等差中项",
       "formulas": [
-        "a, b, c\\",
-        "b\\",
-        "a\\",
-        "c\\",
-        "2b = a + c\\"
+        "a, b, c",
+        "b",
+        "a",
+        "c",
+        "2b = a + c"
       ]
     },
     {

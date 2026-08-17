@@ -27,14 +27,27 @@ function escapeHTML(text) {
 }
 
 /**
+ * 清理公式末尾的孤立反斜杠（历史内容数据遗留的换行符残留）
+ * 末尾的 "\\" 或 "\" 在 KaTeX 顶层解析中是语法错误，
+ * 会导致整条公式以红色源码显示（throwOnError: false 的降级表现）
+ * @param {string} latex - 原始 LaTeX 源码
+ * @returns {string} 清理后的 LaTeX 源码
+ */
+function sanitizeLatex(latex) {
+  return latex.replace(/\s*\\+\s*$/g, '').trim()
+}
+
+/**
  * 使用 KaTeX 渲染单个 LaTeX 公式为 HTML 字符串
  * @param {string} latex - LaTeX 源码
  * @param {boolean} displayMode - 是否块级展示
  * @returns {string} 渲染后的 HTML
  */
 function renderFormula(latex, displayMode = false) {
+  const cleaned = sanitizeLatex(latex)
+  if (!cleaned) return ''
   try {
-    return katex.renderToString(latex, {
+    return katex.renderToString(cleaned, {
       displayMode,
       throwOnError: false,
       strict: false,
@@ -42,7 +55,7 @@ function renderFormula(latex, displayMode = false) {
       trust: true
     })
   } catch (e) {
-    return `<span style="color:var(--danger);font-family:monospace;">${escapeHTML(latex)}</span>`
+    return `<span style="color:var(--danger);font-family:monospace;">${escapeHTML(cleaned)}</span>`
   }
 }
 

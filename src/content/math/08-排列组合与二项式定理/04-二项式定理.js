@@ -36,16 +36,16 @@ export default {
       "title": "二项式定理",
       "formulas": [
         "(a+b",
-        "n+1\\"
+        "n+1"
       ]
     },
     {
       "type": "formula",
       "title": "通项公式（第 k+1 项）",
       "formulas": [
-        "C_n^k\\",
-        "k+1\\",
-        "k\\"
+        "C_n^k",
+        "k+1",
+        "k"
       ]
     },
     {
@@ -85,14 +85,14 @@ export default {
       "type": "formula",
       "title": "赋值法（令 a=b=1）",
       "formulas": [
-        "2^n\\"
+        "2^n"
       ]
     },
     {
       "type": "formula",
       "title": "赋值法（令 a=1, b=-1）",
       "formulas": [
-        "2^{n-1}\\"
+        "2^{n-1}"
       ]
     },
     {

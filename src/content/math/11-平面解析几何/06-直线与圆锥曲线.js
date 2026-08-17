@@ -72,16 +72,16 @@ export default {
       "type": "formula",
       "title": "弦长公式",
       "formulas": [
-        "k\\",
-        "x_1, x_2\\"
+        "k",
+        "x_1, x_2"
       ]
     },
     {
       "type": "formula",
       "title": "韦达定理",
       "formulas": [
-        "Ax^2 + Bx + C = 0\\",
-        "x_1, x_2\\"
+        "Ax^2 + Bx + C = 0",
+        "x_1, x_2"
       ]
     },
     {

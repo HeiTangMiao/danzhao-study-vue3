@@ -30,9 +30,9 @@ export default {
       "title": "一般式",
       "formulas": [
         "y = ax^2 + bx + c \\quad (a \\ne 0",
-        "a\\",
-        "c\\",
-        "y\\"
+        "a",
+        "c",
+        "y"
       ]
     },
     {
@@ -41,7 +41,7 @@ export default {
       "formulas": [
         "y = a(x - h)^2 + k \\quad (a \\ne 0",
         "(h, k",
-        "x = h\\"
+        "x = h"
       ]
     },
     {
@@ -98,11 +98,11 @@ export default {
       "title": "二次函数的最值",
       "formulas": [
         "当 \\(a > 0\\)（开口向上）时：",
-        "y_{\\min} = \\frac{4ac-b^2}{4a}\\",
-        "x = -\\frac{b}{2a}\\",
+        "y_{\\min} = \\frac{4ac-b^2}{4a}",
+        "x = -\\frac{b}{2a}",
         "当 \\(a < 0\\)（开口向下）时：",
-        "y_{\\max} = \\frac{4ac-b^2}{4a}\\",
-        "x = -\\frac{b}{2a}\\"
+        "y_{\\max} = \\frac{4ac-b^2}{4a}",
+        "x = -\\frac{b}{2a}"
       ]
     },
     {
@@ -114,11 +114,11 @@ export default {
       "title": "判别式",
       "formulas": [
         "\\Delta = b^2 - 4ac",
-        "\\Delta > 0\\",
-        "x\\",
+        "\\Delta > 0",
+        "x",
         "\\(\\Delta = 0\\)：与 \\(x\\) 轴有一个交点（相切）",
-        "\\Delta < 0\\",
-        "x\\"
+        "\\Delta < 0",
+        "x"
       ]
     },
     {

@@ -30,7 +30,7 @@ export default {
       "title": "不等式1：平方非负",
       "formulas": [
         "a^2 \\ge 0 \\quad (a \\in \\mathbb{R}",
-        "a = 0\\"
+        "a = 0"
       ]
     },
     {
@@ -38,7 +38,7 @@ export default {
       "title": "不等式2：重要不等式",
       "formulas": [
         "a^2 + b^2 \\ge 2ab \\quad (a, b \\in \\mathbb{R}",
-        "a = b\\",
+        "a = b",
         "a^2 + b^2 - 2ab = (a-b"
       ]
     },
@@ -47,9 +47,9 @@ export default {
       "title": "不等式3：均值不等式（基本不等式）",
       "formulas": [
         "a + b \\ge 2\\sqrt{ab} \\quad (a > 0, b > 0",
-        "a = b\\",
-        "\\frac{a+b}{2}\\",
-        "\\sqrt{ab}\\"
+        "a = b",
+        "\\frac{a+b}{2}",
+        "\\sqrt{ab}"
       ]
     },
     {
@@ -60,10 +60,10 @@ export default {
       "type": "formula",
       "title": "常用变形",
       "formulas": [
-        "a, b > 0\\",
+        "a, b > 0",
         "• \\(ab \\le \\left(\\frac{a+b}{2}\\right)^2\\)（积不超过和的一半的平方）",
         "• \\(a + b \\ge 2\\sqrt{ab}\\)（和的最小值）",
-        "\\frac{1}{a} + \\frac{1}{b} \\ge \\frac{4}{a+b}\\",
+        "\\frac{1}{a} + \\frac{1}{b} \\ge \\frac{4}{a+b}",
         "• \\(\\frac{a}{b} + \\frac{b}{a} \\ge 2\\)（\\(a, b\\) 同号）"
       ]
     },

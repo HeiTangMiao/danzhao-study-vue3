@@ -36,13 +36,13 @@ export default {
       "type": "formula",
       "title": "正弦定理",
       "formulas": [
-        "a\\",
-        "b\\",
-        "c\\",
-        "A\\",
-        "B\\",
-        "C\\",
-        "R\\"
+        "a",
+        "b",
+        "c",
+        "A",
+        "B",
+        "C",
+        "R"
       ]
     },
     {

@@ -53,18 +53,18 @@ board.create('text', [-5.8, 3.0, function(){
       "title": "圆的标准方程",
       "formulas": [
         "C(a, b",
-        "r\\"
+        "r"
       ]
     },
     {
       "type": "formula",
       "title": "圆的一般方程",
       "formulas": [
-        "D^2 + E^2 - 4F > 0\\",
+        "D^2 + E^2 - 4F > 0",
         "\\left(-\\dfrac{D}{2}, -\\dfrac{E}{2}\\right",
-        "r = \\dfrac{1}{2}\\sqrt{D^2 + E^2 - 4F}\\",
-        "D^2 + E^2 - 4F = 0\\",
-        "D^2 + E^2 - 4F < 0\\"
+        "r = \\dfrac{1}{2}\\sqrt{D^2 + E^2 - 4F}",
+        "D^2 + E^2 - 4F = 0",
+        "D^2 + E^2 - 4F < 0"
       ]
     },
     {
@@ -111,8 +111,8 @@ board.create('text', [-5.8, 3.0, function(){
       "type": "formula",
       "title": "弦长公式",
       "formulas": [
-        "r\\",
-        "d\\"
+        "r",
+        "d"
       ]
     },
     {

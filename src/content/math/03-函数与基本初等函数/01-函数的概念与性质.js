@@ -38,7 +38,7 @@ export default {
       "title": "函数三要素",
       "formulas": [
         "• 定义域：自变量 \\(x\\) 的取值范围（集合 \\(A\\)）",
-        "f\\",
+        "f",
         "• 值域：函数值 \\(f(x)\\) 的集合（集合 \\(B\\) 的子集）"
       ]
     },
@@ -70,24 +70,24 @@ export default {
       "title": "增函数",
       "formulas": [
         "f(x",
-        "I\\",
-        "D \\subseteq I\\",
-        "\\forall x_1, x_2 \\in D\\",
-        "x_1 < x_2\\",
+        "I",
+        "D \\subseteq I",
+        "\\forall x_1, x_2 \\in D",
+        "x_1 < x_2",
         "f(x_1",
         "x_2",
         "f(x",
-        "D\\"
+        "D"
       ]
     },
     {
       "type": "formula",
       "title": "减函数",
       "formulas": [
-        "\\forall x_1, x_2 \\in D\\",
+        "\\forall x_1, x_2 \\in D",
         "x_1  f(x_2",
         "f(x",
-        "D\\"
+        "D"
       ]
     },
     {
@@ -103,9 +103,9 @@ export default {
       "formulas": [
         "f(-x",
         "x",
-        "x\\",
+        "x",
         "f(x",
-        "y\\"
+        "y"
       ]
     },
     {
@@ -114,7 +114,7 @@ export default {
       "formulas": [
         "f(-x",
         "x",
-        "x\\",
+        "x",
         "f(x",
         "图像关于原点对称。"
       ]

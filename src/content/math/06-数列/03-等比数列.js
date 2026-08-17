@@ -40,11 +40,11 @@ export default {
       "type": "formula",
       "title": "等比中项",
       "formulas": [
-        "a, b, c\\",
-        "b\\",
-        "a\\",
-        "c\\",
-        "b^2 = ac\\"
+        "a, b, c",
+        "b",
+        "a",
+        "c",
+        "b^2 = ac"
       ]
     },
     {
@@ -69,8 +69,8 @@ export default {
       "type": "formula",
       "title": "前n项和公式（需分类讨论）",
       "formulas": [
-        "q \\neq 1\\",
-        "q = 1\\"
+        "q \\neq 1",
+        "q = 1"
       ]
     },
     {

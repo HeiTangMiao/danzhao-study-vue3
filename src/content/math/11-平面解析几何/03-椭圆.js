@@ -92,10 +92,10 @@ board.create('text', [-5.8, 3.0, function(){
       "type": "formula",
       "title": "核心关系式",
       "formulas": [
-        "a\\",
-        "b\\",
-        "c\\",
-        "|PF_1| + |PF_2| = 2a\\"
+        "a",
+        "b",
+        "c",
+        "|PF_1| + |PF_2| = 2a"
       ]
     },
     {
