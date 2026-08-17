@@ -25,6 +25,30 @@ export default {
       "mermaid": "graph LR\n  N0[\"圆的方程\"]\n  N1[\"圆的方程\"]\n  N0 --> N1\n  N2[\"标准方程\"]\n  N1 --> N2\n  N3[\"一般方程\"]\n  N1 --> N3\n  N4[\"圆心与半径\"]\n  N1 --> N4\n  N5[\"点与圆位置关系\"]\n  N0 --> N5\n  N6[\"点在圆外\"]\n  N5 --> N6\n  N7[\"点在圆上\"]\n  N5 --> N7\n  N8[\"点在圆内\"]\n  N5 --> N8\n  N9[\"直线与圆位置关系\"]\n  N0 --> N9\n  N10[\"相离 d大于r\"]\n  N9 --> N10\n  N11[\"相切 d等于r\"]\n  N9 --> N11\n  N12[\"相交 d小于r\"]\n  N9 --> N12\n  N13[\"弦长公式\"]\n  N0 --> N13\n  N14[\"2倍根号下r方减d方\"]\n  N13 --> N14\n  N15[\"圆与圆位置关系\"]\n  N0 --> N15\n  N16[\"相离 外切 相交 内切 内含\"]\n  N15 --> N16"
     },
     {
+      "type": "diagram",
+      "title": "圆的标准方程演示",
+      "boardId": "circle-standard",
+      "caption": "拖动圆心 C 或半径控制点 P，实时显示圆的标准方程。",
+      "initCode": `board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
+board.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});
+const C = board.create('point', [0,0], {name:'C', size:2, color: colors.accent});
+const P = board.create('point', [2,0], {name:'P', size:2, color: colors.primary});
+board.create('circle', [C, P], {strokeColor: colors.primary, strokeWidth:2});
+board.create('segment', [C, P], {strokeColor: colors.accent, strokeWidth:1, dash:2});
+board.create('text', [-5.8, 3.6, function(){
+  const a = Math.round(C.X()*100)/100, b = Math.round(C.Y()*100)/100;
+  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;
+  const sa = a >= 0 ? '-' : '+', sb = b >= 0 ? '-' : '+';
+  return '(x' + sa + Math.abs(a) + ')² + (y' + sb + Math.abs(b) + ')² = ' + Math.round(r*r*100)/100;
+}], {fontSize:14, color: colors.text});
+board.create('text', [-5.8, 3.0, function(){
+  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;
+  return '圆心 (' + Math.round(C.X()*100)/100 + ', ' + Math.round(C.Y()*100)/100 + ')，半径 r = ' + r;
+}], {fontSize:13, color: colors.muted});`
+    },
+    {
       "type": "formula",
       "title": "圆的标准方程",
       "formulas": [

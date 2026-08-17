@@ -45,7 +45,7 @@
 
       <!-- 中栏：区块编辑 -->
       <main class="editor-main">
-        <div class="block-editor" v-for="(block, bi) in editingBlocks" :key="bi">
+        <div v-for="(block, bi) in editingBlocks" :key="bi" class="block-editor">
           <div class="block-editor__head">
             <select v-model="block.type" class="type-select">
               <option v-for="t in blockTypes" :key="t" :value="t">{{ blockTypeLabel(t) }}</option>
@@ -53,7 +53,7 @@
             <button class="del-btn" @click="removeBlock(bi)">✕</button>
           </div>
           <!-- 文本字段编辑（按类型动态渲染） -->
-          <div class="field" v-for="field in textFields(block.type)" :key="field">
+          <div v-for="field in textFields(block.type)" :key="field" class="field">
             <label>{{ fieldLabel(field) }}</label>
             <!-- 公式行使用可视化编辑器 -->
             <FormulaEditor
@@ -76,7 +76,7 @@
           <div v-if="block.items" class="field">
             <label>条目列表</label>
             <div v-for="(item, ii) in block.items" :key="ii" class="list-item">
-              <input :value="item.question || item.title" @input="e => setItem(block, ii, e.target.value)" placeholder="内容" />
+              <input :value="item.question || item.title" placeholder="内容" @input="e => setItem(block, ii, e.target.value)" />
               <button class="del-btn" @click="removeItem(block, ii)">✕</button>
             </div>
             <button class="add-item-btn" @click="addItem(block)">+ 添加条目</button>
@@ -194,8 +194,8 @@ function removeItem(block, ii) { block.items.splice(ii, 1) }
 // 编辑列表条目内容（同时写入 question 或题目标题字段）
 function setItem(block, ii, value) {
   const item = block.items[ii]
-  if (item.hasOwnProperty('question')) item.question = value
-  else if (item.hasOwnProperty('title')) item.title = value
+  if (Object.prototype.hasOwnProperty.call(item, 'question')) item.question = value
+  else if (Object.prototype.hasOwnProperty.call(item, 'title')) item.title = value
 }
 
 // 导出内容（生成 JS 文件代码）

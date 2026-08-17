@@ -32,6 +32,32 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "椭圆定义演示",
+      "boardId": "ellipse-definition",
+      "caption": "拖动点 P 沿椭圆移动，观察 |PF₁| + |PF₂| 恒等于常数 2a。",
+      "initCode": `board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
+board.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});
+const F1 = board.create('point', [-3,0], {name:'F₁', size:2, color: colors.accent, fixed:true});
+const F2 = board.create('point', [3,0], {name:'F₂', size:2, color: colors.accent, fixed:true});
+const ell = board.create('ellipse', [F1, F2, 4], {strokeColor: colors.primary, strokeWidth:2});
+const P = board.create('glider', [4,0, ell], {name:'P', size:2, color: colors.primary});
+board.create('segment', [F1, P], {strokeColor: colors.primary, strokeWidth:1.5});
+board.create('segment', [F2, P], {strokeColor: colors.primary, strokeWidth:1.5});
+board.create('text', [-5.8, 3.6, function(){
+  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());
+  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());
+  return '|PF₁| = ' + Math.round(d1*100)/100 + '，|PF₂| = ' + Math.round(d2*100)/100;
+}], {fontSize:13, color: colors.muted});
+board.create('text', [-5.8, 3.0, function(){
+  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());
+  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());
+  return '|PF₁| + |PF₂| = ' + Math.round((d1+d2)*100)/100 + ' = 2a（常数）';
+}], {fontSize:14, color: colors.primary});`
+    },
+    {
       "type": "warning",
       "text": "注意：常数必须大于 \\(|F_1F_2| = 2c\\)。若等于则轨迹为线段 \\(F_1F_2\\)；若小于则无轨迹。"
     },

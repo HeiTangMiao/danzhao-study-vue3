@@ -32,7 +32,7 @@ const setupFn = computed(() => {
   if (!code) return null
   try {
     // 内容为受信任的本地数据
-    // eslint-disable-next-line no-new-func
+     
     return new Function('board', 'colors', 'JXG', code)
   } catch (e) {
     console.error('[GeometryBlock] initCode 编译失败:', e)

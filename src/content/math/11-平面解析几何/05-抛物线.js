@@ -32,6 +32,33 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "抛物线定义演示",
+      "boardId": "parabola-definition",
+      "caption": "拖动点 P 沿抛物线移动，观察 |PF| 恒等于点 P 到准线的距离 d。",
+      "initCode": `board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});
+board.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
+board.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});
+const F = board.create('point', [1,0], {name:'F', size:2, color: colors.accent, fixed:true});
+board.create('line', [[-1,-4],[-1,4]], {strokeColor: colors.muted, strokeWidth:1.5, dash:2});
+board.create('text', [-1.4, 3.8, '准线 x = -1'], {fontSize:12, color: colors.muted});
+const par = board.create('curve', [function(t){ return t*t/4; }, function(t){ return t; }, -4, 4], {strokeColor: colors.primary, strokeWidth:2});
+const P = board.create('glider', [1,2, par], {name:'P', size:2, color: colors.primary});
+board.create('segment', [F, P], {strokeColor: colors.primary, strokeWidth:1.5});
+board.create('segment', [[-1, P.Y()], P], {strokeColor: colors.accent, strokeWidth:1.5, dash:2});
+board.create('text', [-5.8, 3.6, function(){
+  const d1 = Math.hypot(P.X()-F.X(), P.Y()-F.Y());
+  const d2 = Math.abs(P.X()+1);
+  return '|PF| = ' + Math.round(d1*100)/100 + '，d = ' + Math.round(d2*100)/100;
+}], {fontSize:13, color: colors.muted});
+board.create('text', [-5.8, 3.0, function(){
+  const d1 = Math.hypot(P.X()-F.X(), P.Y()-F.Y());
+  const d2 = Math.abs(P.X()+1);
+  return '|PF| - d = ' + Math.round((d1-d2)*100)/100 + ' ≈ 0';
+}], {fontSize:14, color: colors.primary});`
+    },
+    {
       "type": "warning",
       "text": "其中 \\(p > 0\\)，表示焦点到准线的距离。判断开口方向：一次项为正则沿该轴正方向，为负则沿负方向。"
     },

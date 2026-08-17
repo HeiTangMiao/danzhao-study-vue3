@@ -12,29 +12,29 @@
 <template>
   <div class="formula-editor">
     <!-- 模板快捷面板 -->
-    <div class="template-panel" v-if="showTemplates">
+    <div v-if="showTemplates" class="template-panel">
       <div class="template-group">
         <span class="group-label">常用公式模板</span>
         <button
           v-for="tpl in formulaTemplates"
           :key="tpl.label"
           class="tpl-btn"
-          @click="insertTemplate(tpl.latex)"
           :title="tpl.label"
+          @click="insertTemplate(tpl.latex)"
         >{{ tpl.label }}</button>
       </div>
     </div>
 
     <!-- 符号快捷面板 -->
     <div class="symbol-panel">
-      <div class="symbol-group" v-for="group in symbolGroups" :key="group.label">
+      <div v-for="group in symbolGroups" :key="group.label" class="symbol-group">
         <span class="group-label">{{ group.label }}</span>
         <button
           v-for="sym in group.symbols"
           :key="sym.latex"
           class="sym-btn"
-          @click="insertSymbol(sym.latex)"
           :title="sym.label"
+          @click="insertSymbol(sym.latex)"
         >{{ sym.display }}</button>
       </div>
       <!-- 模板切换按钮 -->
@@ -46,12 +46,12 @@
     <!-- LaTeX 输入区 -->
     <div class="input-area">
       <textarea
+        ref="textareaRef"
         :value="modelValue"
-        @input="onInput"
         class="latex-input"
         :placeholder="placeholder"
         rows="2"
-        ref="textareaRef"
+        @input="onInput"
       ></textarea>
     </div>
 

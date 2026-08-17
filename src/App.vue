@@ -8,7 +8,7 @@
     <header class="app-header">
       <div class="app-header__brand">📚 单招学习打卡</div>
       <!-- 顶部主题切换开关 -->
-      <button class="app-header__theme" @click="toggleTheme" aria-label="切换主题">
+      <button class="app-header__theme" aria-label="切换主题" @click="toggleTheme">
         {{ isDark ? '🌙' : '☀️' }}
       </button>
     </header>

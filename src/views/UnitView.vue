@@ -28,10 +28,10 @@
         </div>
         <!-- 工具按钮：书签 + 笔记 -->
         <div class="page-tools">
-          <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" @click="bookmark.toggleBookmark()" title="收藏">
+          <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" @click="bookmark.toggleBookmark()">
             {{ bookmark.isBookmarked.value ? '★' : '☆' }}
           </button>
-          <button class="tool-btn" @click="showNotes = !showNotes" title="笔记">📝</button>
+          <button class="tool-btn" title="笔记" @click="showNotes = !showNotes">📝</button>
         </div>
       </div>
       <button class="done-btn" :class="{ done: isDone }" @click="toggleDone">

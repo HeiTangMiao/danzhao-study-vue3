@@ -8,7 +8,7 @@
 <template>
   <section class="block mindmap">
     <h3 class="block-title">🧠 {{ block.title || '知识结构导图' }}</h3>
-    <div class="mindmap-content" ref="container"></div>
+    <div ref="container" class="mindmap-content"></div>
   </section>
 </template>
 

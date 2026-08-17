@@ -23,7 +23,28 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     // 关闭 sourcemap，减小打包体积（Tauri 应用体积敏感）
-    sourcemap: false
+    sourcemap: false,
+    // 超过该体积的 chunk 才告警
+    // jsxgraph(~1MB) / mermaid 图类型(~700KB) 为动态按需加载库，属正常情况，故阈值放宽
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // 函数式手动拆分：按依赖类别拆分 vendor chunk
+        //  - 主 chunk 只保留业务代码，浏览器并行加载 + 长期缓存
+        //  - mermaid / jsxgraph 保持动态 import 按需加载（chunk 间通过 import 连接）
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined
+          // 仅拆分静态导入的运行时依赖：
+          //  - vue 全家桶独立成 chunk，浏览器可并行加载且长期缓存
+          //  - katex 独立成 chunk
+          //  - mermaid / jsxgraph 通过动态 import 按需加载，交由 Rollup 自动分割
+          //    （强制合并会破坏按需加载并产生循环 chunk，故不在此处理）
+          if (id.includes('/node_modules/vue/') || id.includes('/node_modules/pinia/') || id.includes('/node_modules/vue-router/')) return 'vendor-vue'
+          if (id.includes('/node_modules/katex/')) return 'vendor-katex'
+          return undefined
+        }
+      }
+    }
   },
   server: {
     port: 5173,

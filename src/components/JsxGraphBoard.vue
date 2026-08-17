@@ -8,7 +8,7 @@
   说明：本组件为通用画板封装，具体图形由调用方通过 setup 回调定义。
 -->
 <template>
-  <div class="jxg-board" ref="container" :style="{ minHeight: height + 'px' }"></div>
+  <div ref="container" class="jxg-board" :style="{ minHeight: height + 'px' }"></div>
 </template>
 
 <script setup>

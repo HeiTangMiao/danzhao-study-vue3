@@ -31,10 +31,10 @@
           <div class="xp-bar">
             <div class="xp-fill" :style="{ width: (data.levelInfo.progress * 100) + '%' }"></div>
           </div>
-          <div class="xp-hint" v-if="data.levelInfo.next">
+          <div v-if="data.levelInfo.next" class="xp-hint">
             距 {{ data.levelInfo.next.title }} Lv.{{ data.levelInfo.next.lv }} 还需 {{ data.levelInfo.needXP }} XP
           </div>
-          <div class="xp-hint" v-else>已达满级！🎓</div>
+          <div v-else class="xp-hint">已达满级！🎓</div>
         </div>
       </section>
 

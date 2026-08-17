@@ -161,7 +161,7 @@ export const useGameEngineStore = defineStore('gameEngine', {
         })
 
         await this.updateDailyStat(xpGained, subject, isTest ? 0 : 1, 0)
-        await this.checkAchievements(subject)
+        await this.checkAchievements()
         this._invalidateQuickStatsCache()
         return { xpGained, alreadyVisited: false }
       } catch (e) {
@@ -311,8 +311,9 @@ export const useGameEngineStore = defineStore('gameEngine', {
     /**
      * 成就检测与解锁
      * 根据学习进度、连击、等级等条件自动解锁成就
+     * 注：不区分学科，遍历全部进度统一检测
      */
-    async checkAchievements(subject) {
+    async checkAchievements() {
       const db = useStudyDbStore()
       const allProgress = await db.getAllPageProgress()
       const allStats = await db.getAllDailyStats()
