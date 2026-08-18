@@ -149,7 +149,7 @@ export default {
         {
           "title": "例题1：已知一个三角函数值求其他",
           "question": "已知 \\(\\sin\\alpha = \\frac{3}{5}\\)，且 \\(\\alpha\\) 为第二象限角，求 \\(\\cos\\alpha\\) 和 \\(\\tan\\alpha\\) 的值。",
-          "solution": "解：\n\n        由平方关系 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\frac{3}{5}\\right)^2 = 1 - \\frac{9}{25} = \\frac{16}{25}\\)\n\n        \\(\\cos\\alpha = \\pm\\frac{4}{5}\\)\n\n        因为 \\(\\alpha\\) 为第二象限角，\\(\\cos\\alpha 由商数关系：\\(\\tan\\alpha = \\frac{\\sin\\alpha}{\\cos\\alpha} = \\frac{\\frac{3}{5}}{-\\frac{4}{5}} = -\\frac{3}{4}\\)\)",
+          "solution": "解：\n\n        由平方关系 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\frac{3}{5}\\right)^2 = 1 - \\frac{9}{25} = \\frac{16}{25}\\)\n\n        \\(\\cos\\alpha = \\pm\\frac{4}{5}\\)\n\n        因为 \\(\\alpha\\) 为第二象限角，\\(\\cos\\alpha < 0\\)，所以由商数关系：\\(\\tan\\alpha = \\frac{\\sin\\alpha}{\\cos\\alpha} = \\frac{\\frac{3}{5}}{-\\frac{4}{5}} = -\\frac{3}{4}\\)\)",
           "answer": ""
         },
         {
@@ -161,7 +161,7 @@ export default {
         {
           "title": "例题3：符号判断",
           "question": "确定下列三角函数值的符号：\n\n      （1）\\(\\sin\\frac{7\\pi}{6}\\)；（2）\\(\\cos\\frac{5\\pi}{4}\\)；（3）\\(\\tan\\frac{4\\pi}{3}\\)",
-          "solution": "解：\n\n        （1）\\(\\frac{7\\pi}{6} = \\pi + \\frac{\\pi}{6}\\)，是第三象限角，所以 \\(\\sin\\frac{7\\pi}{6} （2）\\(\\frac{5\\pi}{4} = \\pi + \\frac{\\pi}{4}\\)，是第三象限角，所以 \\(\\cos\\frac{5\\pi}{4} （3）\\(\\frac{4\\pi}{3} = \\pi + \\frac{\\pi}{3}\\)，是第三象限角，所以 \\(\\tan\\frac{4\\pi}{3} > 0\\)（正）\)\)",
+          "solution": "解：\n\n        （1）\\(\\frac{7\\pi}{6} = \\pi + \\frac{\\pi}{6}\\)，是第三象限角，所以 \\(\\sin\\frac{7\\pi}{6} < 0\\)（负）；\n\n        （2）\\(\\frac{5\\pi}{4} = \\pi + \\frac{\\pi}{4}\\)，是第三象限角，所以 \\(\\cos\\frac{5\\pi}{4} < 0\\)（负）；\n\n        （3）\\(\\frac{4\\pi}{3} = \\pi + \\frac{\\pi}{3}\\)，是第三象限角，所以 \\(\\tan\\frac{4\\pi}{3} > 0\\)（正）。",
           "answer": ""
         },
         {
@@ -173,7 +173,7 @@ export default {
         {
           "title": "例题5：开方漏掉象限讨论（易错型）",
           "question": "已知 \\(\\sin\\alpha = \\dfrac{3}{5}\\)，求 \\(\\cos\\alpha\\) 的值。",
-          "solution": "常见错误解：\n\n        由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\) 得 \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\dfrac{9}{25} = \\dfrac{16}{25}\\)，于是 \\(\\cos\\alpha = \\dfrac{4}{5}\\)。\n\n        这是错误的！原因：开平方时直接取了正根，忽略了 \\(\\cos\\alpha\\) 的符号由角 \\(\\alpha\\) 所在象限决定。题目未给象限，\\(\\cos\\alpha\\) 可正可负。\n\n        正确解：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\dfrac{3}{5}\\right)^2 = \\dfrac{16}{25}\\)，所以 \\(\\cos\\alpha = \\pm\\dfrac{4}{5}\\)。\n\n        需按象限讨论：\n\n        当 \\(\\alpha\\) 为第一象限角时，\\(\\cos\\alpha > 0\\)，\\(\\cos\\alpha = \\dfrac{4}{5}\\)；\n\n        当 \\(\\alpha\\) 为第二象限角时，\\(\\cos\\alpha 反思：使用平方关系由一个三角函数值求另一个时，必须先开方加绝对值（或 \\(\\pm\\)），再根据象限确定符号。\)",
+          "solution": "常见错误解：\n\n        由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\) 得 \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\dfrac{9}{25} = \\dfrac{16}{25}\\)，于是 \\(\\cos\\alpha = \\dfrac{4}{5}\\)。\n\n        这是错误的！原因：开平方时直接取了正根，忽略了 \\(\\cos\\alpha\\) 的符号由角 \\(\\alpha\\) 所在象限决定。题目未给象限，\\(\\cos\\alpha\\) 可正可负。\n\n        正确解：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\dfrac{3}{5}\\right)^2 = \\dfrac{16}{25}\\)，所以 \\(\\cos\\alpha = \\pm\\dfrac{4}{5}\\)。\n\n        需按象限讨论：\n\n        当 \\(\\alpha\\) 为第一象限角时，\\(\\cos\\alpha > 0\\)，\\(\\cos\\alpha = \\dfrac{4}{5}\\)；\n\n        当 \\(\\alpha\\) 为第二象限角时，\\(\\cos\\alpha < 0\\)，\\(\\cos\\alpha = -\\dfrac{4}{5}\\)。\n\n        反思：使用平方关系由一个三角函数值求另一个时，必须先开方加绝对值（或 \\(\\pm\\)），再根据象限确定符号。\)",
           "answer": ""
         }
       ]

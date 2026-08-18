@@ -229,18 +229,18 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', updateReadProgress)
 })
 
-// 笔记 composable（按页面 key 隔离）
-const notes = useNotes(pageKey.value, subject.value, {
+// 笔记 composable（按页面 key 隔离，key 随导航响应式变化）
+const notes = useNotes(pageKey, subject, computed(() => ({
   title: fileMeta.value?.title,
   unitTitle: unit.value?.title
-})
+})))
 
-// 书签 composable
-const bookmark = useBookmarks(pageKey.value, subject.value, {
+// 书签 composable（key 随导航响应式变化）
+const bookmark = useBookmarks(pageKey, subject, computed(() => ({
   title: fileMeta.value?.title,
   unitTitle: unit.value?.title,
   unitNum: unit.value?.num
-})
+})))
 
 // 动态加载内容数据（Vite 支持动态 import）
 const page = ref(null)

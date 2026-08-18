@@ -109,7 +109,7 @@ export default {
         {
           "difficulty": "basic",
           "question": "已知 \\(\\sin\\alpha = \\frac{3}{5}\\)，\\(\\alpha \\in \\left(\\frac{\\pi}{2}, \\pi\\right)\\)，求 \\(\\sin 2\\alpha\\) 的值。",
-          "answer": "解：因为 \\(\\alpha \\in \\left(\\frac{\\pi}{2}, \\pi\\right)\\)（第二象限），\\(\\cos\\alpha 由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)，得 \\(\\cos\\alpha = -\\sqrt{1 - \\sin^2\\alpha} = -\\sqrt{1 - \\frac{9}{25}} = -\\frac{4}{5}\\)。\n由二倍角公式：\\(\\sin 2\\alpha = 2\\sin\\alpha\\cos\\alpha = 2 \\times \\frac{3}{5} \\times \\left(-\\frac{4}{5}\\right) = -\\frac{24}{25}\\)。\)"
+          "answer": "解：因为 \\(\\alpha \\in \\left(\\frac{\\pi}{2}, \\pi\\right)\\)（第二象限），\\(\\cos\\alpha < 0\\)。\n由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)，得 \\(\\cos\\alpha = -\\sqrt{1 - \\sin^2\\alpha} = -\\sqrt{1 - \\frac{9}{25}} = -\\frac{4}{5}\\)。\n由二倍角公式：\\(\\sin 2\\alpha = 2\\sin\\alpha\\cos\\alpha = 2 \\times \\frac{3}{5} \\times \\left(-\\frac{4}{5}\\right) = -\\frac{24}{25}\\)。\)"
         },
         {
           "difficulty": "medium",

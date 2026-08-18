@@ -1,23 +1,18 @@
 <!--
-  QuizBlock —— 快速检测 / 练习题区块（交互升级版）
+  QuizBlock —— 快速检测 / 练习题区块（自主学习版）
   职责：
-   - 选择题：点击选项即时判定对错，绿色/红色反馈 + 自动展开解析
-   - 非选择题：提供「我答对了 / 我答错了」自评按钮 + 查看答案
-   - 答对奖励 XP（含连击加成），答错自动记录到错题本
-   - 区块级答题统计（已答/正确率）与连击展示
-   - 支持难度标签（基础/中等/提高/冲刺）
+   - 选择题：点击选项标记所选，不判定对错，直接展开答案/解析
+   - 非选择题：仅提供「查看答案 / 隐藏答案」，不对作答情况判定
+   - 不做对错判断：无绿/红对错反馈，不发放 XP、不记错题本、不计正确率
+   - 区块级答题进度（已选 X/Y）与难度标签展示
 -->
 <template>
   <section class="block quiz">
     <div class="quiz-head">
       <h2 class="block-title">{{ block.title || '快速检测' }}</h2>
-      <!-- 答题统计 -->
+      <!-- 答题进度（仅统计已选选择题） -->
       <div v-if="stats.answered > 0" class="quiz-stats">
-        <span class="stat-chip">已答 {{ stats.answered }}/{{ block.items.length }}</span>
-        <span class="stat-chip" :class="stats.accuracy >= 60 ? 'stat-good' : 'stat-bad'">
-          正确率 {{ stats.accuracy }}%
-        </span>
-        <span v-if="game.sessionStreak >= 2" class="stat-chip stat-streak">🔥 连击 {{ game.sessionStreak }}</span>
+        <span class="stat-chip">已选 {{ stats.answered }}/{{ stats.total }}</span>
       </div>
     </div>
 
@@ -26,7 +21,7 @@
         v-for="(item, i) in block.items"
         :key="i"
         class="exercise-item"
-        :class="{ 'is-answered': states[i]?.answered }"
+        :class="{ 'is-answered': states[i]?.selected !== undefined }"
       >
         <!-- 题目标题行：难度 + 题号 -->
         <div class="exercise-head">
@@ -44,51 +39,30 @@
           <MathJaxRender :text="item.question" />
         </div>
 
-        <!-- 选择题选项（可点击作答） -->
+        <!-- 选择题选项（点击标记所选，不判定对错） -->
         <div v-if="isChoice(item)" class="option-list">
           <button
             v-for="(opt, oi) in item.options"
             :key="oi"
             class="option-btn"
-            :class="optionClass(item, oi, states[i])"
-            :disabled="states[i]?.answered"
-            @click="answerChoice(item, i, oi)"
+            :class="{ 'option-selected': states[i]?.selected === oi }"
+            @click="pickChoice(i, oi)"
           >
             <span class="option-letter">{{ 'ABCDEFGH'[oi] }}</span>
             <span class="option-text"><MathJaxRender :text="opt" /></span>
-            <span v-if="states[i]?.answered && oi === item.correctIndex" class="option-mark ok">✓</span>
-            <span v-else-if="states[i]?.answered && states[i]?.selected === oi" class="option-mark no">✗</span>
           </button>
         </div>
 
-        <!-- 非选择题：自评作答 -->
+        <!-- 非选择题：仅查看答案 -->
         <div v-else class="self-assess">
-          <template v-if="!states[i]?.answered">
-            <span class="self-label">我的作答：</span>
-            <button class="self-btn self-ok" @click="selfAssess(item, i, true)">✓ 我答对了</button>
-            <button class="self-btn self-no" @click="selfAssess(item, i, false)">✗ 我答错了</button>
-            <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看答案' }}</button>
-          </template>
-          <template v-else>
-            <span class="self-result" :class="states[i].correct ? 'result-ok' : 'result-no'">
-              {{ states[i].correct ? '✅ 答对了！' : '❌ 答错了，看看解析吧' }}
-            </span>
-            <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看解析' }}</button>
-          </template>
+          <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看答案' }}</button>
         </div>
 
-        <!-- 作答反馈 + 解析 -->
+        <!-- 答案 / 解析（不判定对错，仅展示参考答案） -->
         <transition name="fade">
-          <div v-if="states[i]?.answered" class="answer-panel">
-            <div class="feedback-line" :class="states[i].correct ? 'fb-ok' : 'fb-no'">
-              <span class="fb-icon">{{ states[i].correct ? '🎉' : '💡' }}</span>
-              <span class="fb-text">
-                {{ states[i].correct ? '回答正确' : '回答错误' }}
-                <template v-if="states[i].xpGained > 0">，获得 +{{ states[i].xpGained }} XP</template>
-              </span>
-            </div>
-            <div v-show="opened[i]" class="answer-text">
-              <div class="answer-label">📖 解析</div>
+          <div v-if="opened[i]" class="answer-panel">
+            <div class="answer-text">
+              <div class="answer-label">📖 答案 / 解析</div>
               <MathJaxRender :text="item.answer" />
             </div>
           </div>
@@ -101,35 +75,25 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
-import { useGameEngineStore } from '@/stores/gameEngine'
 
 const props = defineProps({
   // 区块数据：{ type:'quiz', title, items:[{type,difficulty,question,options,correctIndex,answer}] }
   block: { type: Object, required: true },
-  // 页面上下文：{ subject, unitNum, fileKey, fileTitle, unitTitle }
+  // 页面上下文（仅透传，练习不再参与游戏化奖励）
   context: { type: Object, default: () => ({}) }
 })
 
-const game = useGameEngineStore()
-
-// 每道题的作答状态
+// 每道选择题的所选选项索引
 const states = reactive({})
 // 答案展开状态
 const opened = reactive({})
 
-// 区块统计
+// 区块进度统计（仅统计已选的选择题，不涉及对错）
 const stats = computed(() => {
   const items = props.block.items || []
-  let answered = 0
-  let correct = 0
-  items.forEach((_, i) => {
-    if (states[i]?.answered) {
-      answered++
-      if (states[i].correct) correct++
-    }
-  })
-  const accuracy = answered ? Math.round((correct / answered) * 100) : 0
-  return { answered, correct, accuracy }
+  const total = items.filter((_, i) => isChoice(items[i])).length
+  const answered = items.filter((_, i) => states[i]?.selected !== undefined).length
+  return { answered, total }
 })
 
 // 是否选择题（有 options 且含正确索引）
@@ -144,72 +108,13 @@ const DIFF_CLASS = { basic: 'difficulty-basic', medium: 'difficulty-medium', adv
 function diffLabel(d) { return DIFF_LABEL[d] || '基础' }
 function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
 
-// 选项样式：正确/错误/选中/未选
-function optionClass(item, oi, st) {
-  if (!st?.answered) return ''
-  if (oi === item.correctIndex) return 'option-correct'
-  if (st.selected === oi) return 'option-wrong'
-  return 'option-dim'
-}
-
-// 记录错题到错题本
-async function recordToErrorBook(item, i, userAnswer) {
-  try {
-    const c = props.context || {}
-    const selectedText = isChoice(item) && userAnswer !== undefined
-      ? `选项 ${'ABCDEFGH'[userAnswer]}`
-      : userAnswer || ''
-    await game.recordError(
-      c.subject || 'math',
-      c.unitNum || '',
-      item.question,
-      item.answer,
-      selectedText,
-      `题目解析：${item.answer}`,
-      {
-        fileKey: c.fileKey || '',
-        fileTitle: c.fileTitle || '',
-        unitTitle: c.unitTitle || '',
-        difficulty: item.difficulty || ''
-      }
-    )
-  } catch (e) {
-    console.error('[QuizBlock] 记录错题失败:', e)
-  }
-}
-
-// 选择题作答
-async function answerChoice(item, i, oi) {
-  if (states[i]?.answered) return
-  const correct = oi === item.correctIndex
-  states[i] = { answered: true, selected: oi, correct, xpGained: 0 }
-  opened[i] = true // 自动展开解析
-
-  const c = props.context || {}
-  const result = await game.trackAnswerResult(c.subject || 'math', c.unitNum || '', c.fileKey || '', correct)
-  states[i].xpGained = result.xpGained || 0
-
-  if (!correct) {
-    await recordToErrorBook(item, i, oi)
-  }
-}
-
-// 非选择题自评
-async function selfAssess(item, i, correct) {
-  if (states[i]?.answered) return
-  states[i] = { answered: true, selected: null, correct, xpGained: 0 }
+// 标记选择题所选选项，并展开答案/解析（不做对错判定）
+function pickChoice(i, oi) {
+  states[i] = { selected: oi }
   opened[i] = true
-
-  const c = props.context || {}
-  const result = await game.trackAnswerResult(c.subject || 'math', c.unitNum || '', c.fileKey || '', correct)
-  states[i].xpGained = result.xpGained || 0
-
-  if (!correct) {
-    await recordToErrorBook(item, i, '自评答错')
-  }
 }
 
-// 切换解析显隐
+// 切换答案/解析显隐
 function toggle(i) { opened[i] = !opened[i] }
 </script>
 
@@ -220,9 +125,6 @@ function toggle(i) { opened[i] = !opened[i] }
   font-size: 0.75rem; padding: 2px 10px; border-radius: var(--radius-full);
   background: var(--surface-muted); color: var(--text-muted);
 }
-.stat-good { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.stat-bad { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.stat-streak { background: rgba(240, 140, 0, 0.15); color: var(--warning); font-weight: 600; }
 
 .exercise-list { list-style: none; }
 .exercise-item {
@@ -267,41 +169,21 @@ function toggle(i) { opened[i] = !opened[i] }
   border-radius: var(--radius-md);
   padding: 10px 14px;
   transition: all 0.15s ease;
+  cursor: pointer;
 }
-.option-btn:not(:disabled):hover { border-color: var(--primary); background: var(--primary-soft); }
-.option-btn:disabled { cursor: default; }
+.option-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+.option-selected { border-color: var(--primary); background: var(--primary-soft); }
 .option-letter {
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--border);
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 0.8rem; font-weight: 700; color: var(--text-muted);
 }
+.option-selected .option-letter { background: var(--primary); color: #fff; border-color: var(--primary); }
 .option-text { flex: 1; }
-.option-correct {
-  border-color: var(--success); background: rgba(47, 158, 68, 0.10);
-}
-.option-correct .option-letter { background: var(--success); color: #fff; border-color: var(--success); }
-.option-wrong {
-  border-color: var(--danger); background: rgba(224, 49, 49, 0.08);
-}
-.option-wrong .option-letter { background: var(--danger); color: #fff; border-color: var(--danger); }
-.option-dim { opacity: 0.55; }
-.option-mark { font-weight: 700; font-size: 1rem; }
-.option-mark.ok { color: var(--success); }
-.option-mark.no { color: var(--danger); }
 
-/* 非选择题自评 */
+/* 非选择题操作区 */
 .self-assess { display: flex; align-items: center; gap: var(--spacer-8); flex-wrap: wrap; }
-.self-label { font-size: 0.85rem; color: var(--text-muted); }
-.self-btn {
-  padding: 5px 14px; border-radius: var(--radius-full); font-size: 0.85rem;
-  border: 1px solid var(--border); background: var(--surface);
-}
-.self-ok:hover { border-color: var(--success); color: var(--success); background: rgba(47, 158, 68, 0.08); }
-.self-no:hover { border-color: var(--danger); color: var(--danger); background: rgba(224, 49, 49, 0.08); }
-.self-result { font-weight: 600; font-size: 0.9rem; }
-.result-ok { color: var(--success); }
-.result-no { color: var(--danger); }
 
 .answer-toggle {
   background: var(--primary-soft); color: var(--primary);
@@ -310,20 +192,16 @@ function toggle(i) { opened[i] = !opened[i] }
 }
 .answer-toggle:hover { background: var(--primary); color: #fff; }
 
-/* 作答反馈面板 */
+/* 答案面板 */
 .answer-panel {
   margin-top: var(--spacer-10);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
-.feedback-line { display: flex; align-items: center; gap: var(--spacer-8); padding: 8px 12px; font-size: 0.9rem; font-weight: 600; }
-.fb-ok { background: rgba(47, 158, 68, 0.12); color: var(--success); }
-.fb-no { background: rgba(224, 49, 49, 0.10); color: var(--danger); }
 .answer-text {
-  background: rgba(47, 158, 68, 0.06);
-  border: 1px solid var(--success);
-  border-top: none;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: var(--spacer-12);
 }
 .answer-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }

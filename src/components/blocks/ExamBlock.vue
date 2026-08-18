@@ -27,8 +27,8 @@
       <div class="exam-toolbar">
         <span class="exam-timer" :class="{ 'timer-warn': timeLeft <= 300 }">⏱ {{ fmtTime(timeLeft) }}</span>
         <span class="exam-progress">已答 {{ answeredCount }}/{{ block.items.length }}</span>
-        <button class="exam-submit-btn" :disabled="answeredCount < block.items.length" @click="submitExam">
-          交卷
+        <button class="exam-submit-btn" :disabled="answeredCount < block.items.length || submitting" @click="submitExam">
+          {{ submitting ? '提交中…' : '交卷' }}
         </button>
       </div>
 
@@ -121,6 +121,8 @@ const answers = ref({})
 // 得分 / XP
 const score = ref(0)
 const xpGained = ref(0)
+// 交卷中标记：防止连点/并发触发重复记分与错题（刷 XP / 双倍加分）
+const submitting = ref(false)
 // 计时器句柄
 let timer = null
 
@@ -192,41 +194,49 @@ function selfAssess(i, correct) {
 
 // 交卷
 async function submitExam() {
+  // 防重复交卷：已提交或正在提交时直接返回，避免并发造成重复记分/错题入本
+  if (submitting.value || phase.value !== 'running') return
+  submitting.value = true
   if (timer) { clearInterval(timer); timer = null }
-  // 计算得分
-  let total = 0
-  props.block.items.forEach((item, i) => {
-    if (answers.value[i]?.correct) total += item.score || 0
-  })
-  score.value = total
 
-  // 记录测验成绩（XP + 成就）
-  const c = props.context || {}
-  const result = await game.recordTest(
-    c.subject || 'math',
-    c.unitNum || '',
-    total,
-    props.block.totalScore || 100
-  )
-  xpGained.value = result.xpGained || 0
+  try {
+    // 计算得分
+    let total = 0
+    props.block.items.forEach((item, i) => {
+      if (answers.value[i]?.correct) total += item.score || 0
+    })
+    score.value = total
 
-  // 错题入本
-  props.block.items.forEach((item, i) => {
-    if (answers.value[i]?.answered && !answers.value[i]?.correct) {
-      const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
-      game.recordError(
-        c.subject || 'math',
-        c.unitNum || '',
-        item.question,
-        item.answer,
-        selectedText,
-        `模拟卷解析：${item.answer}`,
-        { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
-      )
-    }
-  })
+    // 记录测验成绩（XP + 成就）
+    const c = props.context || {}
+    const result = await game.recordTest(
+      c.subject || 'math',
+      c.unitNum || '',
+      total,
+      props.block.totalScore || 100
+    )
+    xpGained.value = result.xpGained || 0
 
-  phase.value = 'result'
+    // 错题入本
+    props.block.items.forEach((item, i) => {
+      if (answers.value[i]?.answered && !answers.value[i]?.correct) {
+        const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
+        game.recordError(
+          c.subject || 'math',
+          c.unitNum || '',
+          item.question,
+          item.answer,
+          selectedText,
+          `模拟卷解析：${item.answer}`,
+          { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
+        )
+      }
+    })
+
+    phase.value = 'result'
+  } finally {
+    submitting.value = false
+  }
 }
 
 // 重新作答

@@ -8,13 +8,19 @@
  * 替代旧版 assets/js/notes.js
  * 依赖：studyDb store
  */
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, toValue, watch } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
 
 const AUTOSAVE_DELAY = 1500 // 自动保存延迟（毫秒）
 
+// 兼容传入普通值或 ref：页面切换时 pageKey 变化，笔记需跟随新页面
+function toComputed(v) { return computed(() => toValue(v)) }
+
 export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
   const db = useStudyDbStore()
+  const key = toComputed(pageKey)
+  const subj = toComputed(subject)
+  const info = toComputed(pageInfo)
 
   // 响应式状态
   const content = ref('')           // 笔记内容
@@ -38,11 +44,11 @@ export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
 
   /** 加载笔记 */
   async function loadNote() {
-    if (!pageKey) return
+    if (!key.value) return
     setStatus('加载中…', 'loading')
     try {
       await db.init()
-      const note = await db.getNote(pageKey)
+      const note = await db.getNote(key.value)
       content.value = (note && note.content) || ''
       isLoaded.value = true
       updateWordCount()
@@ -60,7 +66,7 @@ export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
 
   /** 保存笔记 */
   async function saveNote(manual = false) {
-    if (!pageKey) return
+    if (!key.value) return
     const trimmed = content.value.trim()
 
     if (manual) setStatus('保存中…', 'saving')
@@ -68,16 +74,16 @@ export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
     try {
       // 内容为空则删除笔记
       if (!trimmed) {
-        await db.deleteNote(pageKey)
+        await db.deleteNote(key.value)
         setStatus(manual ? '已清空' : '已自动保存（空）', 'saved')
         return
       }
 
       await db.saveNote({
-        pageKey,
-        subject,
-        title: pageInfo.title || '',
-        unitTitle: pageInfo.unitTitle || '',
+        pageKey: key.value,
+        subject: subj.value,
+        title: info.value?.title || '',
+        unitTitle: info.value?.unitTitle || '',
         content: content.value, // 保留原始内容（含空格）
         updatedAt: Date.now()
       })
@@ -107,6 +113,18 @@ export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
 
   // 初始加载
   loadNote()
+
+  // 页面切换时（pageKey 变化）自动切换并加载新页面的笔记
+  watch(key, (nk, ok) => {
+    if (nk && nk !== ok) {
+      // 先丢弃未保存的旧笔记，重置状态，再加载新页笔记
+      if (saveTimer) { clearTimeout(saveTimer); saveTimer = null }
+      content.value = ''
+      isLoaded.value = false
+      updateWordCount()
+      loadNote()
+    }
+  })
 
   // 组件卸载时保存未持久化的内容
   onUnmounted(() => {

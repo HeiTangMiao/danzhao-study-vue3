@@ -136,7 +136,7 @@ export default {
       "type": "knowledge",
       "title": "五、图像变换",
       "paragraphs": [
-        "由 \\(y = \\sin x\\) 变换得到 \\(y = A\\sin(\\omega x + \\varphi)\\)：\n\n      • 平移变换（相位变换）：\\(y = \\sin x \\to y = \\sin(x + \\varphi)\\)，左加右减，\\(\\varphi > 0\\) 左移 \\(|\\varphi|\\)，\\(\\varphi • 伸缩变换（周期变换）：\\(y = \\sin x \\to y = \\sin(\\omega x)\\)，横坐标变为原来的 \\(\\frac{1}{\\omega}\\) 倍\n\n      • 振幅变换：\\(y = \\sin x \\to y = A\\sin x\\)，纵坐标变为原来的 \\(A\\) 倍\)"
+        "由 \\(y = \\sin x\\) 变换得到 \\(y = A\\sin(\\omega x + \\varphi)\\)：\n\n      • 平移变换（相位变换）：\\(y = \\sin x \\to y = \\sin(x + \\varphi)\\)，左加右减，\\(\\varphi > 0\\) 左移 \\(|\\varphi|\\)，\\(\\varphi < 0\\) 右移 \\(|\\varphi|\\)。\n\n      • 伸缩变换（周期变换）：\\(y = \\sin x \\to y = \\sin(\\omega x)\\)，横坐标变为原来的 \\(\\frac{1}{\\omega}\\) 倍\n\n      • 振幅变换：\\(y = \\sin x \\to y = A\\sin x\\)，纵坐标变为原来的 \\(A\\) 倍。"
       ]
     },
     {
@@ -169,7 +169,7 @@ export default {
         {
           "title": "例题3：由图像求解析式",
           "question": "已知函数 \\(y = A\\sin(\\omega x + \\varphi)\\)（\\(A > 0, \\omega > 0, 0 < \\varphi < \\pi\\)）的图像最高点为 \\(\\left(\\frac{\\pi}{6}, 2\\right)\\)，由该点到相邻最低点时图像与 \\(x\\) 轴交于点 \\(\\left(\\frac{2\\pi}{3}, 0\\right)\\)，求该函数的解析式。",
-          "solution": "解：\n\n        由最高点纵坐标为 \\(2\\)，得 \\(A = 2\\)。\n\n        从最高点到与 \\(x\\) 轴交点，经过 \\(\\frac{1}{4}\\) 周期，即 \\(\\frac{T}{4} = \\frac{2\\pi}{3} - \\frac{\\pi}{6} = \\frac{\\pi}{2}\\)，所以 \\(T = 2\\pi\\)，\\(\\omega = \\frac{2\\pi}{T} = 1\\)。\n\n        当 \\(x = \\frac{\\pi}{6}\\) 时取最大值，即 \\(\\sin\\left(\\frac{\\pi}{6} + \\varphi\\right) = 1\\)，所以 \\(\\frac{\\pi}{6} + \\varphi = \\frac{\\pi}{2} + 2k\\pi\\)。\n\n        \\(\\varphi = \\frac{\\pi}{2} - \\frac{\\pi}{6} = \\frac{\\pi}{3}\\)（满足 \\(0 所以 \\(y = 2\\sin\\left(x + \\frac{\\pi}{3}\\right)\\)\)",
+          "solution": "解：\n\n        由最高点纵坐标为 \\(2\\)，得 \\(A = 2\\)。\n\n        从最高点到与 \\(x\\) 轴交点，经过 \\(\\frac{1}{4}\\) 周期，即 \\(\\frac{T}{4} = \\frac{2\\pi}{3} - \\frac{\\pi}{6} = \\frac{\\pi}{2}\\)，所以 \\(T = 2\\pi\\)，\\(\\omega = \\frac{2\\pi}{T} = 1\\)。\n\n        当 \\(x = \\frac{\\pi}{6}\\) 时取最大值，即 \\(\\sin\\left(\\frac{\\pi}{6} + \\varphi\\right) = 1\\)，所以 \\(\\frac{\\pi}{6} + \\varphi = \\frac{\\pi}{2} + 2k\\pi\\)。\n\n        \\(\\varphi = \\frac{\\pi}{2} - \\frac{\\pi}{6} = \\frac{\\pi}{3}\\)（满足 \\(0 < \\varphi < \\pi\\)）\n\n        所以 \\(y = 2\\sin\\left(x + \\frac{\\pi}{3}\\right)\\)\)",
           "answer": ""
         },
         {

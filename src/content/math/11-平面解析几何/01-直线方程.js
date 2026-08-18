@@ -28,7 +28,7 @@ export default {
       "type": "knowledge",
       "title": "一、倾斜角与斜率",
       "paragraphs": [
-        "倾斜角 \\(\\alpha\\)：直线向上的方向与 \\(x\\) 轴正方向所成的最小正角，范围 \\(0^\\circ \\leq \\alpha 斜率 \\(k\\)：当 \\(\\alpha \\neq 90^\\circ\\) 时，\\(k = \\tan\\alpha\\)。当 \\(\\alpha = 90^\\circ\\) 时，斜率不存在（直线垂直于 \\(x\\) 轴）。\)"
+        "倾斜角 \\(\\alpha\\)：直线向上的方向与 \\(x\\) 轴正方向所成的最小正角，范围 \\(0^\\circ \\leq \\alpha < 180^\\circ\\)。斜率 \\(k\\)：当 \\(\\alpha \\neq 90^\\circ\\) 时，\\(k = \\tan\\alpha\\)。当 \\(\\alpha = 90^\\circ\\) 时，斜率不存在（直线垂直于 \\(x\\) 轴）。"
       ]
     },
     {

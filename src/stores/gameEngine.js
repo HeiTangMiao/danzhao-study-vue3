@@ -292,29 +292,36 @@ export const useGameEngineStore = defineStore('gameEngine', {
         const db = useStudyDbStore()
         await db.init()
         const percent = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0
-        let xpGained = XP.COMPLETE_TEST
-        if (percent >= 90) xpGained += XP.HIGH_SCORE_BONUS
-        if (percent === 100) xpGained += XP.PERFECT_SCORE_BONUS
 
         const fileKey = `${subject}_unit_${unitNum}_test`
         let existing = await db.getPageProgress(fileKey)
         if (!existing) {
           existing = { key: fileKey, subject, unitNum, visited: false, questionsAnswered: 0, xpEarned: 0 }
         }
+
+        // 仅首次完成发放奖励 XP；重复作答不再发放，防止“重答刷 XP”
+        const isFirstCompletion = existing.testScore === undefined || existing.testScore === null
+        let xpGained = 0
+        if (isFirstCompletion) {
+          xpGained = XP.COMPLETE_TEST
+          if (percent >= 90) xpGained += XP.HIGH_SCORE_BONUS
+          if (percent === 100) xpGained += XP.PERFECT_SCORE_BONUS
+        }
+
         existing.visited = true
         existing.testScore = percent
         existing.testPoints = `${earnedPoints}/${totalPoints}`
-        existing.xpEarned = (existing.xpEarned || 0) + xpGained
+        if (xpGained > 0) {
+          existing.xpEarned = (existing.xpEarned || 0) + xpGained
+          await db.addStudyLog({
+            date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+            action: 'complete_test', xp: xpGained, testScore: percent
+          })
+          await this.updateDailyStat(xpGained, subject, 0, 0)
+        }
         await db.savePageProgress(existing)
 
-        await db.addStudyLog({
-          date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
-          action: 'complete_test', xp: xpGained, testScore: percent
-        })
-
-        await this.updateDailyStat(xpGained, subject, 0, 0)
-
-        // 满分成就
+        // 满分成就（重复作答达到满分也解锁）
         if (percent === 100) {
           const def = ACHIEVEMENTS.find((a) => a.id === 'perfect_test')
           if (def) await db.saveAchievement({ ...def, unlockedDate: getDateStr() })
@@ -370,11 +377,15 @@ export const useGameEngineStore = defineStore('gameEngine', {
       stat.filesVisited = (stat.filesVisited || 0) + fileInc
       stat.questionsAnswered = (stat.questionsAnswered || 0) + qInc
       if (!stat.checkin) stat.checkin = true
-      if (!stat.subjects) stat.subjects = {}
-      if (!stat.subjects[subject]) stat.subjects[subject] = { xp: 0, files: 0, questions: 0 }
-      stat.subjects[subject].xp += xp
-      stat.subjects[subject].files += fileInc
-      stat.subjects[subject].questions += qInc
+      // 仅对已知学科归集；未知学科（如番茄钟默认 'general'）只计入总量，
+      // 避免在 subjects 中产生仪表盘可见不到、又反复累加的“幽灵学科”数据
+      if (subject && (subject === 'math' || subject === 'chinese')) {
+        if (!stat.subjects) stat.subjects = {}
+        if (!stat.subjects[subject]) stat.subjects[subject] = { xp: 0, files: 0, questions: 0 }
+        stat.subjects[subject].xp += xp
+        stat.subjects[subject].files += fileInc
+        stat.subjects[subject].questions += qInc
+      }
       await db.saveDailyStat(stat)
     },
 
