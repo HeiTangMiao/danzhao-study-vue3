@@ -1,6 +1,6 @@
 [package]
 name = "danzhao-study-vue3"
-version = "0.1.0"
+version = "0.1.1"
 description = "浙江单招学习应用 Vue3 + Tauri2"
 authors = ["黑糖＆菜菜"]
 edition = "2021"

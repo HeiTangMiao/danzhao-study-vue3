@@ -22,6 +22,16 @@ export const SUBJECT_LIST = [
 ]
 
 /**
+ * 学科展示元信息（名称/图标）
+ * 供仪表盘、错题本等跨学科界面统一使用，避免各处二元判断把 computer 误显示为语文
+ */
+export const SUBJECT_META = {
+  math: { name: '数学', icon: '📐' },
+  chinese: { name: '语文', icon: '✍️' },
+  computer: { name: '计算机', icon: '💻' }
+}
+
+/**
  * 根据学科 key 获取配置
  * @param {string} subject - 'math' | 'chinese' | 'computer'
  * @returns {object} 学科配置

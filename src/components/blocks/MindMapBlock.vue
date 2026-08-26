@@ -178,7 +178,12 @@ onMounted(async () => {
   window.addEventListener('pointerup', onPointerUp)
 })
 
-onBeforeUnmount(() => { dragging = false })
+onBeforeUnmount(() => {
+  viewport.value?.removeEventListener('pointerdown', onPointerDown)
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
+  dragging = false
+})
 </script>
 
 <style scoped>

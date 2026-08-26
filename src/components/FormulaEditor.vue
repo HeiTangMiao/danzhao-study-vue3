@@ -6,7 +6,7 @@
    - 实时预览 LaTeX 渲染效果
    - 双向绑定 LaTeX 字符串（v-model）
    - 支持在低代码编辑器中嵌入使用
-  说明：不依赖 MathQuill 第三方库，使用纯 LaTeX 文本 + MathJax 预览实现，
+  说明：不依赖 MathQuill 第三方库，使用纯 LaTeX 文本 + KaTeX 预览实现，
        避免引入额外依赖，同时保持与渲染端的一致性。
 -->
 <template>

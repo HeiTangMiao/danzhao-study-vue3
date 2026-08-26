@@ -4,7 +4,7 @@
  *  - 由旧版 `assets/js/config.js` 的 `SITE_CONFIG` 迁移而来
  *  - 采用 ES Module 导出，供路由 / 首页 / 侧边栏统一消费
  *  - 数据结构与 `schema/site-schema.json` 保持一致，可被校验脚本检查
- *  - 已注册全部 11 个数学单元（55 个页面）
+ *  - 已注册全部 12 个数学单元（含冲刺阶段）
  */
 
 export const SITE_CONFIG = {

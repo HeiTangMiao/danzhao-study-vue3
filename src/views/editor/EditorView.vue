@@ -55,13 +55,7 @@
           <!-- 文本字段编辑（按类型动态渲染） -->
           <div v-for="field in textFields(block.type)" :key="field" class="field">
             <label>{{ fieldLabel(field) }}</label>
-            <!-- 公式行使用可视化编辑器 -->
-            <FormulaEditor
-              v-if="field === 'lines' && block.type === 'formula'"
-              :modelValue="block[field] || ''"
-              @update:modelValue="v => block[field] = v"
-            />
-            <textarea v-else v-model="block[field]" rows="3" placeholder="在此输入内容..."></textarea>
+            <textarea v-model="block[field]" rows="3" placeholder="在此输入内容..."></textarea>
           </div>
           <!-- 公式区块的多行公式编辑 -->
           <div v-if="block.type === 'formula' && block.formulas" class="field">

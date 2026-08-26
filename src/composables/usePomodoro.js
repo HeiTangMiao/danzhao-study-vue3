@@ -82,7 +82,7 @@ export function usePomodoro() {
           running.value = true
           mode.value = saved.mode
           timeLeft.value = remaining
-          sessionsCompleted.value = saved.sessionsCompleted || 0
+          // 今日番茄数不从此恢复：统一以 daily_stats.studyMinutes 计算（见 loadTodaySessions）
           cycleCount.value = saved.cycleCount || 0
           // 恢复计时
           startInterval()
@@ -178,21 +178,26 @@ export function usePomodoro() {
     }
   }
 
-  /** 完成当前阶段（专注→休息 或 休息→专注） */
-  async function completePhase() {
+  /** 完成当前阶段（专注→休息 或 休息→专注）
+   *  @param {boolean} rewarded - 是否按真实完成计（跳过时不发放 XP / 不计学习时长）
+   */
+  async function completePhase(rewarded = true) {
     stopInterval()
     running.value = false
-    playBeep()
+    if (rewarded) playBeep()
 
     if (mode.value === 'focus') {
       // 专注完成
-      sessionsCompleted.value++
       cycleCount.value++
-      await recordStudyMinutes(FOCUS_DURATION / 60)
-      // 奖励 XP
-      await game.updateDailyStat(10, 'general', 0, 0)
-      game._invalidateQuickStatsCache()
-      notify('番茄钟完成！', '专注了25分钟，休息一下吧 🎉')
+      if (rewarded) {
+        await recordStudyMinutes(FOCUS_DURATION / 60)
+        // 奖励 XP
+        await game.updateDailyStat(10, 'general', 0, 0)
+        game._invalidateQuickStatsCache()
+        // 以 daily_stats 为单一数据源刷新今日番茄数
+        await loadTodaySessions()
+        notify('番茄钟完成！', '专注了25分钟，休息一下吧 🎉')
+      }
 
       // 切换到休息模式
       if (cycleCount.value >= 4) {
@@ -241,11 +246,11 @@ export function usePomodoro() {
     clearState()
   }
 
-  /** 跳过当前阶段 */
+  /** 跳过当前阶段（不发放 XP、不记录学习时长，直接进入下一阶段） */
   function skip() {
     if (running.value || timeLeft.value < totalDuration.value) {
       timeLeft.value = 0
-      completePhase()
+      completePhase(false)
     }
   }
 

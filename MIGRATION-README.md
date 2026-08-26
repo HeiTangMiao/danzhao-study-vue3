@@ -37,16 +37,19 @@ vue3-refactor/
 │   │   └── composable.d.ts     # Composable 类型（7 个组合式函数）
 │   ├── content/                # 内容数据（Schema 实例，多学科）
 │   │   ├── index.js            # 多学科内容索引（SUBJECTS / getSubjectConfig）
-│   │   ├── site.js             # 数学站点配置（11 单元 55 页）
-│   │   ├── math/               # 数学内容（11 单元 55 页）
+│   │   ├── site.js             # 数学站点配置（12 单元）
+│   │   ├── math/               # 数学内容（12 单元）
 │   │   │   └── 01-集合与逻辑/   # 各单元文件夹
-│   │   └── chinese/            # 语文内容（5 单元 26 页）
-│   │       ├── site.js         # 语文站点配置
-│   │       └── 01-语言文字运用/ # 各单元文件夹
+│   │   ├── chinese/            # 语文内容（6 单元）
+│   │   │   ├── site.js         # 语文站点配置
+│   │   │   └── 01-语言文字运用/ # 各单元文件夹
+│   │   └── computer/           # 计算机内容（5 单元）
+│   │       ├── site.js         # 计算机站点配置
+│   │       └── 01-职业素养/     # 各单元文件夹
 │   ├── components/             # Vue 组件
 │   │   ├── BlockRenderer.vue   # 区块分发器
 │   │   ├── FormulaEditor.vue   # 公式可视化编辑器（含模板面板）
-│   │   ├── MathJaxRender.vue   # 公式渲染
+│   │   ├── MathJaxRender.vue   # 公式渲染（KaTeX 引擎）
 │   │   ├── JsxGraphBoard.vue   # 几何画板
 │   │   └── blocks/             # 区块渲染组件（9 个）
 │   ├── composables/            # 组合式函数（7 个）
@@ -87,9 +90,9 @@ vue3-refactor/
 | 文件 | 覆盖范围 |
 |------|----------|
 | `src/types/content.d.ts` | 内容 Schema 类型（区块、页面结构） |
-| `src/types/site.d.ts` | 站点配置类型（含 `Subject = 'math' \| 'chinese'` 联合类型） |
+| `src/types/site.d.ts` | 站点配置类型（含 `Subject = 'math' \| 'chinese' \| 'computer'` 联合类型） |
 | `src/types/store.d.ts` | Store 类型：`ProgressStore`（含多学科 API）、`GameEngine`（含 `DashboardData`、`Achievement` 等）、`StudyDB`（含 `NoteRecord`、`ErrorRecord` 等） |
-| `src/types/composable.d.ts` | 7 个 Composable 类型：`useNotes`、`useBookmarks`、`useTheme`、`useMathJax`、`useMermaid`、`usePomodoro`、`useSpacedReview` |
+| `src/types/composable.d.ts` | Composable 类型：`useNotes`、`useBookmarks`、`useTheme`、`usePomodoro`、`useSpacedReview`（另含 `useKatex` / `useMermaid` 模块级函数） |
 
 ### 状态管理
 
@@ -203,10 +206,11 @@ npm run tauri:android:build  # 构建 APK
 |------|------|------|
 | 内容 Schema 化 | ✅ 完成 | content-schema + site-schema |
 | Vue3 工程骨架 | ✅ 完成 | Vite + Pinia + Router + Tauri |
-| 多学科架构 | ✅ 完成 | 数学 + 语文双学科，统一索引与路由 |
-| 数学内容迁移 | ✅ 完成 | 11 单元 55 页全部迁移 + 校验通过 |
-| 语文内容迁移 | ✅ 完成 | 5 单元 26 页全部迁移 + 校验通过 |
-| 可视化组件 | ✅ 完成 | JSXGraph / Mermaid / MathJax |
+| 多学科架构 | ✅ 完成 | 数学 + 语文 + 计算机三学科，统一索引与路由 |
+| 数学内容迁移 | ✅ 完成 | 12 单元全部迁移 + 校验通过 |
+| 语文内容迁移 | ✅ 完成 | 6 单元全部迁移 + 校验通过 |
+| 计算机内容迁移 | ✅ 完成 | 5 单元全部迁移 + 校验通过 |
+| 可视化组件 | ✅ 完成 | JSXGraph / Mermaid / KaTeX |
 | 逻辑层迁移 | ✅ 完成 | studyDb + gameEngine + 7 composables |
 | 仪表盘 | ✅ 完成 | 等级 / 热力图 / 成就墙 / 学科进度 |
 | 低代码编辑器 | ✅ 完成 | 三栏布局 + 公式可视化编辑 + 模板面板 |

@@ -102,7 +102,7 @@ vue3-refactor/
 │   │   └── chinese/            # 语文内容（6 单元）
 │   ├── components/             # Vue 组件
 │   │   ├── BlockRenderer.vue   # 区块分发器
-│   │   ├── MathJaxRender.vue   # 公式渲染
+│   │   ├── MathJaxRender.vue   # 公式渲染（KaTeX 引擎）
 │   │   ├── JsxGraphBoard.vue   # 几何画板
 │   │   └── blocks/             # 14 个区块渲染组件
 │   ├── composables/            # 组合式函数（笔记/书签/主题/番茄钟/间隔复习等）

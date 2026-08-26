@@ -110,12 +110,13 @@ export function useSpacedReview() {
       const today = getDateStr()
       const stats = {
         total: errors.length, dueToday: 0, reviewed: 0, mastered: 0, newCards: 0,
-        bySubject: { math: 0, chinese: 0 }
+        bySubject: { math: 0, chinese: 0, computer: 0 }
       }
 
       errors.forEach((e) => {
         if (e.subject === 'math') stats.bySubject.math++
         else if (e.subject === 'chinese') stats.bySubject.chinese++
+        else if (e.subject === 'computer') stats.bySubject.computer++
 
         if (e.reviewed === false && !e.lastReviewedAt) {
           stats.newCards++
@@ -133,7 +134,7 @@ export function useSpacedReview() {
       return stats
     } catch (e) {
       console.warn('[SpacedReview] 加载统计失败:', e)
-      return { total: 0, dueToday: 0, reviewed: 0, mastered: 0, newCards: 0, bySubject: { math: 0, chinese: 0 } }
+      return { total: 0, dueToday: 0, reviewed: 0, mastered: 0, newCards: 0, bySubject: { math: 0, chinese: 0, computer: 0 } }
     }
   }
 

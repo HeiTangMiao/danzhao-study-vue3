@@ -99,7 +99,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { useGameEngineStore } from '@/stores/gameEngine'
 
@@ -111,6 +112,9 @@ const props = defineProps({
 })
 
 const game = useGameEngineStore()
+
+// 考试作答中状态：注入父级 UnitView（页内翻页/跳页前统一确认，防误触丢失作答）
+const examState = inject('examState', null)
 
 // 阶段：intro 介绍 / running 进行 / result 结果
 const phase = ref('intro')
@@ -217,11 +221,11 @@ async function submitExam() {
     )
     xpGained.value = result.xpGained || 0
 
-    // 错题入本
-    props.block.items.forEach((item, i) => {
+    // 错题入本（gameEngine 内部会按 题干+页面 去重，重复答错不重复收录）
+    for (const [i, item] of props.block.items.entries()) {
       if (answers.value[i]?.answered && !answers.value[i]?.correct) {
         const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
-        game.recordError(
+        await game.recordError(
           c.subject || 'math',
           c.unitNum || '',
           item.question,
@@ -231,7 +235,7 @@ async function submitExam() {
           { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
         )
       }
-    })
+    }
 
     phase.value = 'result'
   } finally {
@@ -247,8 +251,32 @@ function restartExam() {
   answers.value = {}
 }
 
+// ===== 作答离开保护（三层） =====
+// 作答中 = 进行中且已有作答
+const isRunning = computed(() => phase.value === 'running' && answeredCount.value > 0)
+
+// 1. 同步给父级 UnitView：页内翻页/跳页/切单元前弹确认
+watch(isRunning, (v) => { if (examState) examState.active = v })
+
+// 2. 路由级离开保护：离开学习页路由（返回首页/仪表盘等）前确认
+onBeforeRouteLeave(() => {
+  if (isRunning.value && !window.confirm('测验尚未交卷，离开将丢失作答记录。确定离开吗？')) return false
+  return true
+})
+
+// 3. 刷新/关闭页面前提醒
+function onBeforeUnload(e) {
+  if (isRunning.value) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+}
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
+
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer)
+  if (examState) examState.active = false
+  window.removeEventListener('beforeunload', onBeforeUnload)
 })
 </script>
 

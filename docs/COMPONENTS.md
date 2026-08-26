@@ -12,7 +12,7 @@ src/
 │   ├── BlockRenderer.vue        # 区块分发器
 │   ├── FormulaEditor.vue        # 公式可视化编辑器（含模板面板）
 │   ├── JsxGraphBoard.vue        # JSXGraph 几何画板
-│   ├── MathJaxRender.vue        # MathJax 公式渲染
+│   ├── MathJaxRender.vue        # 公式渲染（KaTeX 引擎）
 │   └── blocks/                  # 区块渲染组件
 │       ├── MindMapBlock.vue     # 思维导图
 │       ├── ObjectivesBlock.vue  # 学习目标
@@ -25,7 +25,7 @@ src/
 │       └── QuizBlock.vue        # 练习题
 ├── composables/
 │   ├── useTheme.js              # 主题切换
-│   ├── useMathJax.js            # MathJax 加载
+│   ├── useKatex.js              # KaTeX 公式渲染
 │   ├── useMermaid.js            # Mermaid 渲染
 │   ├── usePomodoro.js           # 番茄钟
 │   ├── useNotes.js              # 笔记
@@ -34,9 +34,10 @@ src/
 ├── content/                     # 多学科内容数据
 │   ├── index.js                 # 多学科索引（SUBJECTS / getSubjectConfig）
 │   ├── site.js                  # 数学站点配置
-│   ├── math/                    # 数学内容（11 单元 55 页）
-│   └── chinese/                 # 语文内容（5 单元 26 页）
-│       └── site.js              # 语文站点配置
+│   ├── math/                    # 数学内容（12 单元）
+│   ├── chinese/                 # 语文内容（6 单元）
+│   ├── computer/                # 计算机内容（5 单元）
+│   └── site.js                  # 各学科站点配置
 ├── stores/
 │   ├── progress.js              # 学习进度（多学科隔离）
 │   ├── studyDb.js               # IndexedDB 数据层
@@ -68,7 +69,7 @@ src/
 
 ### MathJaxRender
 
-渲染 LaTeX 数学公式，支持行内 `\(...\)` 和块级 `$$...$$`。
+基于 KaTeX 同步渲染 LaTeX 数学公式，支持行内 `\(...\)` 和块级 `$$...$$`。
 
 ```vue
 <MathJaxRender :text="content" />
@@ -77,7 +78,7 @@ src/
 | Prop | 类型 | 默认 | 说明 |
 |------|------|------|------|
 | text | String | '' | 含 LaTeX 的文本 |
-| className | String | '' | 附加 CSS 类名 |
+| block | Boolean | false | 块级居中展示（用于公式卡片） |
 
 ### JsxGraphBoard
 

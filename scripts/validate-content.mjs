@@ -6,8 +6,8 @@
  *  - 确保数据驱动渲染的合法性，防止运行时错误
  * 用法：node scripts/validate-content.mjs
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { join, dirname, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -136,19 +136,86 @@ function validateBlock(block, pageId, index) {
   return errors
 }
 
+// 校验站点配置（数学 + 语文 + 计算机），先于内容文件校验以建立注册关系
+const siteConfigs = [
+  { name: '数学', key: 'math', path: join(ROOT, 'src', 'content', 'site.js') },
+  { name: '语文', key: 'chinese', path: join(ROOT, 'src', 'content', 'chinese', 'site.js') },
+  { name: '计算机', key: 'computer', path: join(ROOT, 'src', 'content', 'computer', 'site.js') }
+]
+
+let siteCount = 0
+/** 已注册的内容文件绝对路径集合（用于反向检查"孤儿"文件） */
+const registeredFiles = new Set()
+/** 全局 id → 文件 映射（用于 id 唯一性检查） */
+const pageIds = new Map()
+
+for (const { name, key, path: sitePath } of siteConfigs) {
+  try {
+    const siteMod = await import(pathToFileURL(sitePath).href + '?t=' + Date.now())
+    const site = siteMod.SITE_CONFIG || siteMod.CHINESE_CONFIG || siteMod.default
+    if (!site || !site.units || !Array.isArray(site.units)) {
+      console.error(`✗ ${name} site.js: 缺少 units`)
+      errorCount++
+      continue
+    }
+    siteCount++
+    if (site.subject && site.subject !== key) {
+      console.error(`✗ ${name} site.js: subject 应为 "${key}"，实际为 "${site.subject}"`)
+      errorCount++
+    }
+    site.units.forEach((u) => {
+      if (!u.num || !u.title || !u.folder) {
+        console.error(`✗ ${name} 单元 ${u.num}: 缺少 num/title/folder`)
+        errorCount++
+      }
+      // 注册的页面文件必须真实存在于磁盘
+      ;(u.files || []).forEach((f) => {
+        const expected = join(CONTENT_DIR, key, u.folder, f.name + '.js')
+        registeredFiles.add(expected)
+        if (!existsSync(expected)) {
+          console.error(`✗ ${name} ${u.title} 注册的页面 ${f.name} 不存在: ${expected}`)
+          errorCount++
+        }
+      })
+    })
+  } catch (e) {
+    console.error(`✗ ${name} site.js 加载失败: ${e.message}`)
+    errorCount++
+  }
+}
+
 // 校验所有内容文件
 for (const file of collectFiles(CONTENT_DIR)) {
   fileCount++
   const mod = await import(pathToFileURL(file).href + '?t=' + Date.now())
   const page = mod.default
+  // 从磁盘路径推导学科目录（content/<subject>/...）
+  const dirSubject = relative(CONTENT_DIR, file).split(sep)[0]
   if (!page || !page.blocks) {
     console.error(`✗ ${file}: 缺少 blocks`)
     errorCount++
     continue
   }
-  // 校验 id 唯一性基础
+  // 页面级必填字段
   if (!page.id) {
     console.error(`✗ ${file}: 缺少 id`)
+    errorCount++
+  } else {
+    if (pageIds.has(page.id)) {
+      console.error(`✗ ${file}: id "${page.id}" 与 ${pageIds.get(page.id)} 重复`)
+      errorCount++
+    }
+    pageIds.set(page.id, file)
+  }
+  ;['unitNum', 'title', 'subtitle', 'subject'].forEach((field) => {
+    if (!page[field]) {
+      console.error(`✗ ${file}: 缺少 ${field}`)
+      errorCount++
+    }
+  })
+  // 学科一致性：页面 subject 必须与其所在目录一致
+  if (page.subject && page.subject !== dirSubject) {
+    console.error(`✗ ${file}: subject "${page.subject}" 与所在目录 "${dirSubject}" 不一致`)
     errorCount++
   }
   // 校验每个区块
@@ -158,32 +225,10 @@ for (const file of collectFiles(CONTENT_DIR)) {
   })
 }
 
-// 校验站点配置（数学 + 语文 + 计算机）
-const siteConfigs = [
-  { name: '数学', path: join(ROOT, 'src', 'content', 'site.js') },
-  { name: '语文', path: join(ROOT, 'src', 'content', 'chinese', 'site.js') },
-  { name: '计算机', path: join(ROOT, 'src', 'content', 'computer', 'site.js') }
-]
-
-let siteCount = 0
-for (const { name, path: sitePath } of siteConfigs) {
-  try {
-    const siteMod = await import(pathToFileURL(sitePath).href + '?t=' + Date.now())
-    const site = siteMod.SITE_CONFIG || siteMod.CHINESE_CONFIG || siteMod.default
-    if (!site || !site.units || !Array.isArray(site.units)) {
-      console.error(`✗ ${name} site.js: 缺少 units`)
-      errorCount++
-    } else {
-      siteCount++
-      site.units.forEach((u) => {
-        if (!u.num || !u.title || !u.folder) {
-          console.error(`✗ ${name} 单元 ${u.num}: 缺少 num/title/folder`)
-          errorCount++
-        }
-      })
-    }
-  } catch (e) {
-    console.error(`✗ ${name} site.js 加载失败: ${e.message}`)
+// 反向检查：磁盘上存在但未在任何 site.js 注册的内容文件（孤儿文件）
+for (const file of collectFiles(CONTENT_DIR)) {
+  if (!registeredFiles.has(file)) {
+    console.error(`✗ 未注册的内容文件（孤儿）：${file}`)
     errorCount++
   }
 }

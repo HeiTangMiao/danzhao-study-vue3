@@ -91,8 +91,8 @@
         <div class="subject-progress-list">
           <div v-for="(subj, key) in data.subjects" :key="key" class="subject-progress-item">
             <div class="subject-progress-head">
-              <span class="subject-progress-icon">{{ key === 'math' ? '📐' : '✍️' }}</span>
-              <span class="subject-progress-name">{{ key === 'math' ? '数学' : '语文' }}</span>
+              <span class="subject-progress-icon">{{ (SUBJECT_META[key] && SUBJECT_META[key].icon) || '�' }}</span>
+              <span class="subject-progress-name">{{ (SUBJECT_META[key] && SUBJECT_META[key].name) || key }}</span>
               <span class="subject-progress-pct">{{ subjPct(subj) }}%</span>
             </div>
             <div class="subject-progress-bar">
@@ -114,10 +114,19 @@
             v-for="(day, i) in data.heatmap"
             :key="i"
             class="heat-cell"
-            :class="heatLevel(day.xp)"
+            :class="[heatLevel(day.xp), { selected: activeHeat === i }]"
             :title="`${day.date}：${day.xp} XP${day.checkin ? ' ✓' : ''}`"
+            @click="activeHeat = activeHeat === i ? null : i"
           ></div>
         </div>
+        <!-- 点击格子查看详情（触屏替代 hover 提示） -->
+        <p v-if="activeHeat !== null && data.heatmap[activeHeat]" class="heat-tip">
+          <span class="heat-tip__date">📅 {{ data.heatmap[activeHeat].date }}</span>
+          <strong>{{ data.heatmap[activeHeat].xp }} XP</strong>
+          <span :class="data.heatmap[activeHeat].checkin ? 'heat-tip__on' : 'heat-tip__off'">
+            {{ data.heatmap[activeHeat].checkin ? '已打卡 ✓' : '未学习' }}
+          </span>
+        </p>
         <div class="heatmap-legend">
           <span>少</span>
           <span class="heat-cell heat-0"></span>
@@ -157,6 +166,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useGameEngineStore } from '@/stores/gameEngine'
+import { SUBJECT_META } from '@/content/index'
 
 const game = useGameEngineStore()
 
@@ -166,6 +176,9 @@ const loading = ref(true)
 
 // 已解锁成就 ID 集合
 const unlockedIds = ref(new Set())
+
+// 热力图选中格子（触屏点击查看当日详情，替代 hover title）
+const activeHeat = ref(null)
 
 // 判断某成就是否已解锁
 function isUnlocked(id) {
@@ -251,12 +264,22 @@ onMounted(async () => {
   display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px;
   margin-top: var(--spacer-12);
 }
-.heat-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; }
+.heat-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; cursor: pointer; }
+.heat-cell.selected { outline: 2px solid var(--primary); outline-offset: 1px; }
 .heat-0 { background: var(--surface-muted); }
 .heat-1 { background: rgba(79, 70, 229, 0.25); }
 .heat-2 { background: rgba(79, 70, 229, 0.45); }
 .heat-3 { background: rgba(79, 70, 229, 0.7); }
 .heat-4 { background: var(--primary); }
+/* 触屏点击详情 */
+.heat-tip {
+  display: flex; align-items: center; gap: var(--spacer-12);
+  margin: var(--spacer-10) 0 0;
+  font-size: 0.85rem; color: var(--text-muted);
+}
+.heat-tip strong { color: var(--text); }
+.heat-tip__on { color: var(--success); }
+.heat-tip__off { color: var(--text-muted); }
 .heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: var(--spacer-8); font-size: 0.75rem; color: var(--text-muted); }
 .heatmap-legend .heat-cell { width: 12px; height: 12px; }
 
@@ -275,6 +298,8 @@ onMounted(async () => {
 @media (max-width: 600px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .today-grid { grid-template-columns: repeat(2, 1fr); }
+  /* 热力图改为 10 列，格子更大便于触屏点选 */
+  .heatmap-grid { grid-template-columns: repeat(10, 1fr); gap: 5px; }
 }
 .dashboard-credit {
   margin-top: var(--spacer-24);

@@ -1,8 +1,4 @@
-/**
- * 内容 Schema - 站点级配置
- * 描述：学科站点配置（导航、主题、阶段），驱动 Vue 应用的站点级渲染。
- * 说明：本文件为 JSON Schema，用于校验内容数据合法性，供低代码编辑器与运行时共用。
- */
+
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://danzhao.local/schemas/site-schema.json",
@@ -13,7 +9,7 @@
   "properties": {
     "title": { "type": "string", "description": "站点标题" },
     "subtitle": { "type": "string", "description": "站点副标题" },
-    "subject": { "type": "string", "enum": ["math", "chinese"], "description": "学科标识" },
+    "subject": { "type": "string", "enum": ["math", "chinese", "computer"], "description": "学科标识" },
     "themeKey": { "type": "string", "description": "localStorage 主题键名" },
     "progressKey": { "type": "string", "description": "localStorage 进度键名" },
     "breadcrumbHome": { "type": "string", "description": "面包屑首页文本" },
@@ -28,7 +24,7 @@
           "num": { "type": "string", "description": "单元编号，如 '01'" },
           "title": { "type": "string", "description": "单元标题" },
           "folder": { "type": "string", "description": "内容文件夹名" },
-          "phase": { "type": "integer", "minimum": 1, "maximum": 4, "description": "所属阶段" },
+          "phase": { "type": "integer", "minimum": 1, "maximum": 5, "description": "所属阶段" },
           "color": { "type": "string", "description": "主题色（十六进制）" },
           "icon": { "type": "string", "description": "单元图标（emoji）" },
           "files": {
@@ -50,7 +46,7 @@
     },
     "phases": {
       "type": "object",
-      "description": "阶段配置（1-4）",
+      "description": "阶段配置（1-5）",
       "additionalProperties": {
         "type": "object",
         "required": ["name", "color", "icon"],

@@ -15,6 +15,15 @@
       <div class="reading-progress__bar" :style="{ width: readProgress + '%' }"></div>
     </div>
 
+    <!-- 移动端迷你顶栏：滚动离开页面头部后出现（返回首页 + 标题 + 阅读进度） -->
+    <transition name="topbar">
+      <div v-if="showTopbar && page" class="mobile-topbar">
+        <button class="topbar-back" title="返回首页" @click="router.push('/')">←</button>
+        <span class="topbar-title">{{ fileMeta?.title }}</span>
+        <span class="topbar-progress">{{ readProgress }}%</span>
+      </div>
+    </transition>
+
     <!-- 面包屑导航 -->
     <nav class="breadcrumb">
       <router-link to="/">🏠 首页</router-link>
@@ -114,26 +123,28 @@
       <button class="nav-btn" :disabled="!hasNext" @click="goNext">下一页 →</button>
     </nav>
 
-    <!-- 固定侧边栏：快捷导航 + 快捷操作 -->
+    <!-- 固定侧边栏：快捷导航 + 快捷操作（移动端为底部栏 + 答题卡抽屉） -->
     <ContentSidebar
       v-if="page"
       :unit="unit"
       :toc="toc"
       :file-index="fileIndex"
-      :subject="subject"
       :unit-num="route.params.unitNum"
       :site="site"
       :is-done="isDone"
       :is-math="subject === 'math'"
+      :done-files="doneFiles"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
       @toggle-done="toggleDone"
       @toggle-bookmark="bookmark.toggleBookmark()"
       @toggle-notes="showNotes = !showNotes"
       @toggle-toc="showToc = !showToc"
-      @open-desmos="showDesmos = true"
+      @open-geogebra="showDesmos = true"
       @go-file="goFile"
       @go-unit="goUnit"
+      @go-prev="goPrev"
+      @go-next="goNext"
     />
 
     <!-- Desmos 演练场浮层 -->
@@ -141,10 +152,10 @@
       <div v-if="showDesmos" class="desmos-overlay" @click.self="showDesmos = false">
         <div class="desmos-overlay__panel">
           <div class="desmos-overlay__head">
-            <span>🧮 Desmos 图形计算器演练场</span>
+            <span>🧮 GeoGebra 图形计算器演练场</span>
             <button class="desmos-overlay__close" title="关闭" @click="showDesmos = false">✕</button>
           </div>
-          <DesmosPlayground />
+          <GeoGebraPlayground />
         </div>
       </div>
     </transition>
@@ -152,7 +163,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 import { useProgressStore } from '@/stores/progress'
@@ -161,7 +172,7 @@ import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import ContentSidebar from '@/components/ContentSidebar.vue'
-import DesmosPlayground from '@/components/DesmosPlayground.vue'
+import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -251,13 +262,17 @@ function scrollToBlock(index) {
 // 阅读进度（0-100）
 const readProgress = ref(0)
 
+// 移动端迷你顶栏：滚动超过一屏后出现（返回 + 标题 + 进度百分比）
+const showTopbar = ref(false)
+
 // 计算滚动阅读进度
 function updateReadProgress() {
   const doc = document.documentElement
   const total = doc.scrollHeight - window.innerHeight
-  if (total <= 0) { readProgress.value = 0; return }
+  if (total <= 0) { readProgress.value = 0; showTopbar.value = false; return }
   const scrolled = window.scrollY
   readProgress.value = Math.min(100, Math.round((scrolled / total) * 100))
+  showTopbar.value = scrolled > 200
 }
 
 // 监听滚动更新进度条
@@ -304,6 +319,8 @@ async function loadPage() {
       fileMeta.value.isTest || false
     )
     if (result.xpGained > 0) showXPPopup(result.xpGained)
+    // 记录最近学习位置（首页「继续学习」直达）
+    saveLastStudy()
   } catch (e) {
     console.error('[UnitView] 内容加载失败:', e)
     page.value = null
@@ -312,14 +329,45 @@ async function loadPage() {
   }
 }
 
+// 写入最近学习位置（localStorage，轻量同步读取）
+function saveLastStudy() {
+  if (!unit.value || !fileMeta.value) return
+  try {
+    localStorage.setItem('last_study', JSON.stringify({
+      subject: subject.value,
+      unitNum: unit.value.num,
+      fileIndex: fileIndex.value,
+      unitTitle: unit.value.title,
+      fileTitle: fileMeta.value.title,
+      time: Date.now()
+    }))
+  } catch (e) { /* 存储不可用时静默忽略 */ }
+}
+
 loadPage()
 
 // 完成状态（按学科隔离）
 const isDone = computed(() => progress.isCompleted(subject.value, unit.value?.num, fileIndex.value))
 
+// 单元内各页面完成状态（供移动端答题卡网格）
+const doneFiles = computed(() => {
+  if (!unit.value) return []
+  return unit.value.files.map((_, i) => progress.isCompleted(subject.value, unit.value.num, i))
+})
+
 // 标记完成
 function toggleDone() {
   progress.toggleComplete(subject.value, unit.value?.num, fileIndex.value)
+}
+
+// ===== 考试作答保护 =====
+// ExamBlock 注入此状态；作答中导航离开前统一弹确认，防误触丢失作答
+const examState = reactive({ active: false })
+provide('examState', examState)
+
+function confirmLeaveExam() {
+  if (!examState.active) return true
+  return window.confirm('测验尚未交卷，离开将丢失作答记录。确定离开吗？')
 }
 
 // 翻页导航
@@ -327,9 +375,11 @@ const hasPrev = computed(() => fileIndex.value > 0)
 const hasNext = computed(() => unit.value && fileIndex.value < unit.value.files.length - 1)
 
 function goPrev() {
+  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value - 1 } })
 }
 function goNext() {
+  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value + 1 } })
 }
 
@@ -341,12 +391,14 @@ function scrollTop() {
 // 跳转到同单元指定页
 function goFile(i) {
   if (i === fileIndex.value) return
+  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: i } })
 }
 
 // 跳转到指定单元（默认第一页）
 function goUnit(u) {
   if (!u) return
+  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: u.num, fileIndex: 0 } })
 }
 
@@ -465,6 +517,51 @@ watch(
 @media (min-width: 1151px) and (max-width: 1456px) {
   .unit-view { padding-right: 250px; }
 }
+/* 移动端迷你顶栏（桌面端隐藏） */
+.mobile-topbar { display: none; }
+.topbar-enter-active, .topbar-leave-active { transition: transform 0.25s ease, opacity 0.25s ease; }
+.topbar-enter-from, .topbar-leave-to { transform: translateY(-100%); opacity: 0; }
+
+/* 移动端：底部操作栏为内容预留空间；头部去重（工具/完成按钮收入底部栏与更多面板） */
+@media (max-width: 1150px) {
+  .unit-view { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+  .page-tools { display: none; }
+  .done-btn { display: none; }
+
+  /* 迷你顶栏：返回首页 + 页面标题 + 阅读进度百分比 */
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 10px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    padding: calc(6px + var(--sat)) 12px 6px;
+    background: var(--surface);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .topbar-back {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+  .topbar-title {
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-weight: 700; font-size: 0.95rem;
+  }
+  .topbar-progress {
+    flex: 0 0 auto;
+    min-width: 44px; text-align: right;
+    font-size: 0.8rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+}
 .page-nav {
   display: flex;
   align-items: center;
@@ -513,7 +610,29 @@ watch(
   display: flex; align-items: center; justify-content: center;
 }
 .desmos-overlay__close:hover { color: var(--danger); border-color: var(--danger); }
-.desmos-overlay__panel :deep(.desmos-playground) { margin-bottom: 0; border: none; border-radius: 0; }
-.desmos-overlay__panel :deep(.dp-body) { min-height: 60vh; }
-.desmos-overlay__panel :deep(.dp-calculator) { height: 60vh; }
+
+/* 浮层内 GeoGebra 演练场样式透传 */
+.desmos-overlay__panel :deep(.ggb-playground) { margin-bottom: 0; border: none; border-radius: 0; }
+.desmos-overlay__panel :deep(.ggb-body) { min-height: min(62vh, 640px); }
+.desmos-overlay__panel :deep(.ggb-container) { min-height: min(62vh, 640px); }
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  .page-header h1 { font-size: 1.35rem; }
+  .tool-btn { width: 40px; height: 40px; }
+  .done-btn { width: 100%; }
+  .nav-btn { flex: 1; }
+  .desmos-overlay {
+    padding: var(--spacer-8);
+    align-items: flex-end;
+  }
+  .desmos-overlay__panel {
+    width: 100%;
+    max-height: 96vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .desmos-overlay__panel :deep(.ggb-body) { min-height: min(70vh, 560px); }
+  .desmos-overlay__panel :deep(.ggb-container) { min-height: min(70vh, 560px); }
+}
 </style>

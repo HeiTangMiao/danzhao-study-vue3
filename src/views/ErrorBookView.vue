@@ -85,8 +85,8 @@
         >
           <div class="error-head">
             <span class="error-index">{{ i + 1 }}</span>
-            <span class="subject-tag" :class="err.subject === 'math' ? 'tag-math' : 'tag-chinese'">
-              {{ err.subject === 'math' ? '📐 数学' : '✍️ 语文' }}
+            <span class="subject-tag" :class="'tag-' + err.subject">
+              {{ (SUBJECT_META[err.subject] && SUBJECT_META[err.subject].icon) || '' }} {{ (SUBJECT_META[err.subject] && SUBJECT_META[err.subject].name) || err.subject }}
             </span>
             <span v-if="err.difficulty" class="difficulty-tag" :class="diffClass(err.difficulty)">
               {{ diffLabel(err.difficulty) }}
@@ -145,7 +145,8 @@
 import { ref, computed, onMounted } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { useStudyDbStore } from '@/stores/studyDb'
-import { getSubjectConfig } from '@/content/index'
+import { getSubjectConfig, SUBJECT_META } from '@/content/index'
+import { calculateSM2 } from '@/composables/useSpacedReview'
 
 const db = useStudyDbStore()
 
@@ -159,8 +160,7 @@ const statusFilter = ref('all')
 
 const subjectFilters = [
   { key: 'all', label: '全部' },
-  { key: 'math', label: '数学' },
-  { key: 'chinese', label: '语文' }
+  ...Object.entries(SUBJECT_META).map(([key, meta]) => ({ key, label: meta.name }))
 ]
 const statusFilters = [
   { key: 'all', label: '全部' },
@@ -219,29 +219,15 @@ function sourceRoute(err) {
   return { name: 'unit', params: { subject, unitNum, fileIndex } }
 }
 
-// SM-2 复习更新（标记为已掌握）
-function sm2Review(err) {
-  const now = new Date()
-  const reps = (err.repetitions || 0) + 1
-  let interval
-  if (reps === 1) interval = 1
-  else if (reps === 2) interval = 6
-  else interval = Math.round((err.interval || 0) * (err.easeFactor || 2.5))
-  const next = new Date(now)
-  next.setDate(next.getDate() + interval)
-  return {
+// 标记为已掌握（复用 useSpacedReview 的 SM-2 算法，统一难度评估口径）
+async function markMastered(err) {
+  const updated = {
+    ...err,
+    ...calculateSM2(err, 4),
     reviewed: true,
     reviewCount: (err.reviewCount || 0) + 1,
-    repetitions: reps,
-    interval,
-    nextReviewDate: fmtDate(next.getTime()),
     lastReviewedAt: Date.now()
   }
-}
-
-// 标记为已掌握
-async function markMastered(err) {
-  const updated = { ...err, ...sm2Review(err) }
   await db.updateError(updated)
   const idx = errors.value.findIndex((e) => e.id === err.id)
   if (idx >= 0) errors.value[idx] = updated
@@ -343,6 +329,8 @@ onMounted(async () => {
 .subject-tag { font-size: 0.75rem; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 600; }
 .tag-math { background: rgba(79, 70, 229, 0.12); color: #4f46e5; }
 .tag-chinese { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
+.tag-computer { background: rgba(14, 165, 233, 0.12); color: #0ea5e9; }
+.tag-undefined { background: var(--surface-muted); color: var(--text-muted); }
 .difficulty-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); }
 .difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
 .difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }

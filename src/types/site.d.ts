@@ -4,7 +4,7 @@
  */
 
 /** 学科类型 */
-export type Subject = 'math' | 'chinese'
+export type Subject = 'math' | 'chinese' | 'computer'
 
 /** 文件（页面）配置 */
 export interface SiteFile {

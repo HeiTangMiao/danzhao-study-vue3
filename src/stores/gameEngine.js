@@ -339,12 +339,21 @@ export const useGameEngineStore = defineStore('gameEngine', {
 
     /**
      * 记录错题到错题本（含 SM-2 间隔复习初始字段）
-     * @returns {Promise<{id, success}>}
+     * 去重：同一页面同一题干重复答错不重复入本（防止重做模拟卷时堆积重复错题）
+     * @returns {Promise<{id, success, duplicated?}>}
      */
     async recordError(subject, unitNum, question, correctAnswer, userAnswer, explanation, extra) {
       try {
         const db = useStudyDbStore()
         await db.init()
+        // 去重：同页面 + 同题干视为同一条错题
+        const fileKey = (extra && extra.fileKey) || ''
+        const existing = await db.getAllErrors()
+        const dup = existing.find(
+          (e) => e.subject === subject && e.question === question &&
+            (fileKey ? e.fileKey === fileKey : e.unitNum === unitNum)
+        )
+        if (dup) return { id: dup.id, success: true, duplicated: true }
         const error = {
           subject, unitNum, question, correctAnswer, userAnswer,
           explanation: explanation || '',

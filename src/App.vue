@@ -38,7 +38,7 @@ const { isDark, toggleTheme } = useTheme()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacer-16) var(--spacer-24);
+  padding: calc(var(--spacer-12) + var(--sat)) var(--spacer-16);
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
@@ -58,6 +58,12 @@ const { isDark, toggleTheme } = useTheme()
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
-  padding: var(--spacer-24);
+  padding: var(--spacer-24) var(--spacer-24) calc(var(--spacer-24) + var(--sab));
+}
+
+/* 移动端紧凑布局 */
+@media (max-width: 600px) {
+  .app-header { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
+  .app-main { padding: var(--spacer-16) var(--spacer-16) calc(var(--spacer-16) + var(--sab)); }
 }
 </style>
