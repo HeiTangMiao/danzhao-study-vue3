@@ -80,10 +80,35 @@ let applet = null // GGBApplet 实例
 let ggbApi = null // 应用 API（appletOnLoad 回调提供）
 let scriptLoaded = false
 let loadTimer = null
+let resizeTimer = null
+let sizeObserver = null
 
-/** 是否窄屏（决定计算器基准尺寸） */
-function isNarrow() {
-  return typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(max-width: 600px)').matches
+/** 依据容器实际尺寸计算画布尺寸（移动端核心适配：真实测量而非固定基准） */
+function computeSize() {
+  const el = ggbEl.value
+  if (!el) return null
+  const cw = el.clientWidth
+  if (!cw || cw <= 0) return null
+  // 宽度紧跟容器（设合理上限）；高度沿用容器既有 min-height（桌面 480 / 移动 300 / 浮层按 vh），不破坏原有响应式
+  const width = Math.min(Math.max(Math.floor(cw), 280), 1200)
+  const height = Math.min(Math.max(el.clientHeight || 480, 300), 720)
+  return { width, height }
+}
+
+/** 将计算器尺寸与当前容器同步，避免固定尺寸在移动端溢出或留白 */
+function applySize() {
+  const size = computeSize()
+  if (!size) return
+  if (ggbApi) {
+    try { ggbApi.setSize(size.width, size.height) } catch (e) { /* ignore */ }
+  }
+  if (ggbEl.value) ggbEl.value.style.height = size.height + 'px'
+}
+
+/** 视口/容器尺寸变化（旋转屏幕、面板开合等）时重新适配 */
+function onContainerResize() {
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(applySize, 150)
 }
 
 /** 加载 GeoGebra 部署脚本（幂等：已加载直接返回，加载中复用节点等待，失败清理节点） */
@@ -141,13 +166,12 @@ async function loadCalculator() {
       ggbApi = null
     }
 
+    // 按容器实际尺寸注入，移动端不再依赖固定基准 + CSS 硬缩放
+    const size = computeSize() || { width: 980, height: 480 }
     const params = {
       appName: 'graphing',
-      // 窄屏采用更紧凑的基准尺寸，避免大幅留白
-      width: isNarrow() ? 480 : 980,
-      height: isNarrow() ? 300 : 480,
-      // 随容器宽度自动缩放，适配移动端
-      scaleContainerClass: 'ggb-container',
+      width: size.width,
+      height: size.height,
       showToolBar: false,
       showMenuBar: false,
       showAlgebraInput: true,
@@ -158,6 +182,8 @@ async function loadCalculator() {
       language: 'zh',
       appletOnLoad: (api) => {
         ggbApi = api
+        // 加载完成后再同步一次容器尺寸，消除首屏误差
+        applySize()
         // 载入初始表达式
         const exprs = props.initialExpressions
         exprs.forEach((expr) => {
@@ -211,9 +237,26 @@ function onFsChange() {
   fullscreen.value = !!document.fullscreenElement
 }
 
-onMounted(() => { loadCalculator(); document.addEventListener('fullscreenchange', onFsChange) })
+onMounted(() => {
+  loadCalculator()
+  document.addEventListener('fullscreenchange', onFsChange)
+  window.addEventListener('resize', onContainerResize)
+  window.addEventListener('orientationchange', onContainerResize)
+  // 容器尺寸变化（面板开合、折叠卡展开等）也能触发重新适配
+  if (typeof ResizeObserver !== 'undefined' && ggbEl.value) {
+    sizeObserver = new ResizeObserver(() => onContainerResize())
+    sizeObserver.observe(ggbEl.value)
+  }
+})
 onBeforeUnmount(() => {
   clearTimeout(loadTimer)
+  clearTimeout(resizeTimer)
+  if (sizeObserver) {
+    try { sizeObserver.disconnect() } catch (e) { /* ignore */ }
+    sizeObserver = null
+  }
+  window.removeEventListener('resize', onContainerResize)
+  window.removeEventListener('orientationchange', onContainerResize)
   if (applet) { try { applet.remove() } catch (e) { /* ignore */ } }
   applet = null
   ggbApi = null
@@ -287,7 +330,12 @@ onBeforeUnmount(() => {
 /* 移动端适配 */
 @media (max-width: 600px) {
   .ggb-body, .ggb-container { min-height: 300px; }
-  .ggb-example, .ggb-clear, .ggb-full { padding: 8px 14px; }
   .ggb-title { width: 100%; }
+  .ggb-tools { width: 100%; }
+  .ggb-example, .ggb-clear, .ggb-full {
+    min-height: 44px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
 }
 </style>

@@ -593,6 +593,7 @@ watch(
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
+  overflow-y: auto; /* 内容超高（短屏/横屏）时可滚动，避免画布被裁切 */
 }
 .desmos-overlay__head {
   display: flex; align-items: center; justify-content: space-between;
@@ -600,6 +601,7 @@ watch(
   border-bottom: 1px solid var(--border);
   background: var(--surface-muted);
   font-weight: 700;
+  position: sticky; top: 0; z-index: 1; /* 滚动时保证关闭按钮始终可见 */
 }
 .desmos-overlay__close {
   width: 30px; height: 30px;
