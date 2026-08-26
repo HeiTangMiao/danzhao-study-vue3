@@ -122,7 +122,7 @@ const groupedUnits = computed(() => {
 
 // 学科图标映射（当配置中没有 icon 字段时使用）
 function subjectIcon(key) {
-  const icons = { math: '📐', chinese: '✍️' }
+  const icons = { math: '📐', chinese: '✍️', computer: '💻' }
   return icons[key] || '📖'
 }
 

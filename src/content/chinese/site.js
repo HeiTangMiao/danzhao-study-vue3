@@ -43,7 +43,7 @@ export const CHINESE_CONFIG = {
       num: "03", title: "古诗文阅读", folder: "03-古诗文阅读", phase: 2, color: "#059669", icon: "🏮",
       files: [
         { name: "01-古诗词鉴赏", title: "古诗词鉴赏", subtitle: "八大题材、意象、表现手法" },
-        { name: "02-文言文实词与虚词", title: "文言文实词与虚词", subtitle: "120个实词、12个虚词、一词多义" },
+        { name: "02-文言文实词与虚词", title: "文言文实词与虚词", subtitle: "120个实词、18个虚词、一词多义" },
         { name: "03-文言文特殊句式与翻译", title: "文言文特殊句式与翻译", subtitle: "判断句、被动句、倒装句、翻译标准" },
         { name: "04-古代文化常识", title: "古代文化常识", subtitle: "称谓、官职、历法、科举制度" },
         { name: "05-复习测验", title: "古诗文阅读 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },

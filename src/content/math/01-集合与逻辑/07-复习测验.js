@@ -7,7 +7,7 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-01-05",
+  id: "math-01-07",
   unitNum: "01",
   subject: "math",
   title: "集合与逻辑 · 复习测验",

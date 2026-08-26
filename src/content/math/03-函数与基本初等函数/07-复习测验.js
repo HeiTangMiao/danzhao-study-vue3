@@ -3,10 +3,10 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "math-07-04",
-  "unitNum": "07",
+  "id": "math-03-07",
+  "unitNum": "03",
   "subject": "math",
-  "title": "平面向量 · 复习测验",
+  "title": "函数与基本初等函数 · 复习测验",
   "subtitle": "本单元知识综合检测",
   "blocks": [
     {
@@ -20,13 +20,13 @@ export default {
           "answer": ""
         },
         {
-          "title": "第2题（14分）",
+          "title": "第2题（13分）",
           "question": "",
           "solution": "",
           "answer": ""
         },
         {
-          "title": "第3题（14分）",
+          "title": "第3题（15分）",
           "question": "",
           "solution": "",
           "answer": ""

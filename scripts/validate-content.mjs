@@ -153,10 +153,11 @@ for (const file of collectFiles(CONTENT_DIR)) {
   })
 }
 
-// 校验站点配置（数学 + 语文）
+// 校验站点配置（数学 + 语文 + 计算机）
 const siteConfigs = [
   { name: '数学', path: join(ROOT, 'src', 'content', 'site.js') },
-  { name: '语文', path: join(ROOT, 'src', 'content', 'chinese', 'site.js') }
+  { name: '语文', path: join(ROOT, 'src', 'content', 'chinese', 'site.js') },
+  { name: '计算机', path: join(ROOT, 'src', 'content', 'computer', 'site.js') }
 ]
 
 let siteCount = 0

@@ -6,7 +6,7 @@
  *  - quiz 区块：冲刺拔高题（可点击作答 + 即时反馈 + 错题入本）
  */
 export default {
-  id: "math-11-08",
+  id: "math-11-09",
   unitNum: "11",
   subject: "math",
   title: "平面解析几何 · 易错专项与冲刺",

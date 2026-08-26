@@ -3,10 +3,10 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "math-09-03",
+  "id": "math-09-10",
   "unitNum": "09",
   "subject": "math",
-  "title": "概率 · 复习测验",
+  "title": "概率与统计 · 复习测验",
   "subtitle": "本单元知识综合检测",
   "blocks": [
     {

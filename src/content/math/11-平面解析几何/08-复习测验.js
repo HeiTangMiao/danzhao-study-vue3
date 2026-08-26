@@ -3,7 +3,7 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "math-11-07",
+  "id": "math-11-08",
   "unitNum": "11",
   "subject": "math",
   "title": "平面解析几何 · 复习测验",

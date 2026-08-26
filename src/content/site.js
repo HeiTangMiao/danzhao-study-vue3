@@ -23,8 +23,10 @@ export const SITE_CONFIG = {
         { name: "02-集合间的基本关系", title: "集合间的基本关系", subtitle: "子集、真子集、集合相等与空集" },
         { name: "03-集合的基本运算", title: "集合的基本运算", subtitle: "交集、并集、补集与德摩根定律" },
         { name: "04-充分条件与必要条件", title: "充分条件与必要条件", subtitle: "充分条件、必要条件、充要条件" },
-        { name: "05-复习测验", title: "集合与逻辑 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
-        { name: "06-易错专项与冲刺", title: "集合与逻辑 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
+        { name: "05-命题与逻辑联结词", title: "命题与逻辑联结词", subtitle: "四种命题、且或非、复合命题真值判断" },
+        { name: "06-量词与命题否定", title: "量词与命题否定", subtitle: "全称量词、存在量词与命题否定规则" },
+        { name: "07-复习测验", title: "集合与逻辑 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "08-易错专项与冲刺", title: "集合与逻辑 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
     {
@@ -46,8 +48,9 @@ export const SITE_CONFIG = {
         { name: "03-二次函数", title: "二次函数", subtitle: "三种解析式、图像性质、闭区间最值" },
         { name: "04-指数与指数函数", title: "指数与指数函数", subtitle: "指数幂运算与指数函数图像性质" },
         { name: "05-对数与对数函数", title: "对数与对数函数", subtitle: "对数运算、换底公式与对数函数" },
-        { name: "06-复习测验", title: "函数与基本初等函数 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
-        { name: "07-易错专项与冲刺", title: "函数与基本初等函数 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
+        { name: "06-幂函数", title: "幂函数", subtitle: "幂函数定义、5类常见幂函数图像与性质" },
+        { name: "07-复习测验", title: "函数与基本初等函数 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "08-易错专项与冲刺", title: "函数与基本初等函数 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
     {
@@ -88,8 +91,9 @@ export const SITE_CONFIG = {
         { name: "01-向量的概念与线性运算", title: "向量的概念与线性运算", subtitle: "向量定义、加减法与数乘运算" },
         { name: "02-向量的坐标表示", title: "向量的坐标表示", subtitle: "坐标运算、模公式与共线条件" },
         { name: "03-向量的数量积", title: "向量的数量积", subtitle: "数量积定义、坐标运算与夹角公式" },
-        { name: "04-复习测验", title: "平面向量 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
-        { name: "05-易错专项与冲刺", title: "平面向量 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
+        { name: "04-空间向量", title: "空间向量", subtitle: "空间向量运算、建系求角与距离" },
+        { name: "05-复习测验", title: "平面向量 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "06-易错专项与冲刺", title: "平面向量 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
     {
@@ -104,12 +108,19 @@ export const SITE_CONFIG = {
       ]
     },
     {
-      num: "09", title: "概率", folder: "09-概率", phase: 3, color: "#dc2626", icon: "🎲",
+      num: "09", title: "概率与统计", folder: "09-概率", phase: 3, color: "#dc2626", icon: "🎲",
       files: [
         { name: "01-随机事件与概率", title: "随机事件与概率", subtitle: "事件关系、概率加法公式与对立事件" },
         { name: "02-古典概型", title: "古典概型", subtitle: "古典概型两个特征与概率计算" },
-        { name: "03-复习测验", title: "概率 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
-        { name: "04-易错专项与冲刺", title: "概率 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
+        { name: "03-几何概型", title: "几何概型", subtitle: "长度型、面积型、体积型概率计算" },
+        { name: "04-条件概率与独立性", title: "条件概率与独立性", subtitle: "条件概率公式与相互独立事件" },
+        { name: "05-随机变量及其分布", title: "随机变量及其分布", subtitle: "分布列、二项分布、期望与方差" },
+        { name: "06-抽样方法", title: "抽样方法", subtitle: "简单随机抽样、系统抽样、分层抽样" },
+        { name: "07-统计图表与数据分布", title: "统计图表与数据分布", subtitle: "频率分布表、直方图、茎叶图" },
+        { name: "08-样本数字特征", title: "样本数字特征", subtitle: "平均数、中位数、方差与标准差" },
+        { name: "09-统计案例", title: "统计案例", subtitle: "线性回归与独立性检验" },
+        { name: "10-复习测验", title: "概率与统计 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "11-易错专项与冲刺", title: "概率与统计 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
     {
@@ -132,8 +143,9 @@ export const SITE_CONFIG = {
         { name: "04-双曲线", title: "双曲线", subtitle: "定义、标准方程与渐近线" },
         { name: "05-抛物线", title: "抛物线", subtitle: "定义、四种标准方程与焦点准线" },
         { name: "06-直线与圆锥曲线", title: "直线与圆锥曲线", subtitle: "位置关系判定与弦长公式" },
-        { name: "07-复习测验", title: "平面解析几何 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
-        { name: "08-易错专项与冲刺", title: "平面解析几何 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
+        { name: "07-曲线与方程", title: "曲线与方程", subtitle: "轨迹方程求法：直译法、定义法、代入法" },
+        { name: "08-复习测验", title: "平面解析几何 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "09-易错专项与冲刺", title: "平面解析几何 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
     {

@@ -6,7 +6,7 @@
  *  - quiz 区块：冲刺拔高题（可点击作答 + 即时反馈 + 错题入本）
  */
 export default {
-  id: "math-03-07",
+  id: "math-03-08",
   unitNum: "03",
   subject: "math",
   title: "函数与基本初等函数 · 易错专项与冲刺",

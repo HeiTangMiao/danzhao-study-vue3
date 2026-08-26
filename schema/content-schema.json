@@ -8,7 +8,7 @@
   "properties": {
     "id": { "type": "string", "description": "页面唯一标识，如 'math-01-01'" },
     "unitNum": { "type": "string", "description": "所属单元编号" },
-    "subject": { "type": "string", "enum": ["math", "chinese"] },
+    "subject": { "type": "string", "enum": ["math", "chinese", "computer"] },
     "title": { "type": "string", "description": "页面标题" },
     "subtitle": { "type": "string", "description": "页面副标题" },
     "icon": { "type": "string", "description": "页面图标（emoji）" },

@@ -6,7 +6,7 @@
  *  - quiz 区块：冲刺拔高题（可点击作答 + 即时反馈 + 错题入本）
  */
 export default {
-  id: "math-07-05",
+  id: "math-07-06",
   unitNum: "07",
   subject: "math",
   title: "平面向量 · 易错专项与冲刺",

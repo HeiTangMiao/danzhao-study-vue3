@@ -63,8 +63,10 @@ const ACHIEVEMENTS = [
   { id: 'streak_100', name: '百日筑基', desc: '连续学习100天', icon: '🏆' },
   { id: 'math_unit_1', name: '集合达人', desc: '完成数学第1单元', icon: '📐' },
   { id: 'chinese_unit_1', name: '文字达人', desc: '完成语文第1单元', icon: '✍️' },
+  { id: 'computer_unit_1', name: '素养标兵', desc: '完成计算机第1单元', icon: '🧭' },
   { id: 'all_math', name: '数学通关', desc: '完成数学全部单元', icon: '🎓' },
   { id: 'all_chinese', name: '语文通关', desc: '完成语文全部单元', icon: '🎓' },
+  { id: 'all_computer', name: '计算机通关', desc: '完成计算机全部单元', icon: '💻' },
   { id: 'dual_study', name: '双修先锋', desc: '同日学习数学和语文', icon: '⚔️' },
   { id: 'perfect_test', name: '满分测验', desc: '复习测验正确率100%', icon: '💯' },
   { id: 'fast_learner', name: '速度之星', desc: '10分钟内完成一个知识点', icon: '⭐' },
@@ -379,7 +381,7 @@ export const useGameEngineStore = defineStore('gameEngine', {
       if (!stat.checkin) stat.checkin = true
       // 仅对已知学科归集；未知学科（如番茄钟默认 'general'）只计入总量，
       // 避免在 subjects 中产生仪表盘可见不到、又反复累加的“幽灵学科”数据
-      if (subject && (subject === 'math' || subject === 'chinese')) {
+      if (subject && (subject === 'math' || subject === 'chinese' || subject === 'computer')) {
         if (!stat.subjects) stat.subjects = {}
         if (!stat.subjects[subject]) stat.subjects[subject] = { xp: 0, files: 0, questions: 0 }
         stat.subjects[subject].xp += xp
@@ -523,7 +525,8 @@ export const useGameEngineStore = defineStore('gameEngine', {
       // 学科进度汇总（total 从学科配置动态计算）
       const subjects = {
         math: { total: this._getSubjectTotalFiles('math'), visited: 0, xp: 0, units: {} },
-        chinese: { total: this._getSubjectTotalFiles('chinese'), visited: 0, xp: 0, units: {} }
+        chinese: { total: this._getSubjectTotalFiles('chinese'), visited: 0, xp: 0, units: {} },
+        computer: { total: this._getSubjectTotalFiles('computer'), visited: 0, xp: 0, units: {} }
       }
       allProgress.forEach((p) => {
         if (!subjects[p.subject]) return
