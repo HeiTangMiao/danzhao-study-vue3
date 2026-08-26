@@ -29,7 +29,7 @@ export default {
       "type": "formula",
       "title": "一般式",
       "formulas": [
-        "y = ax^2 + bx + c \\quad (a \\ne 0",
+        "y = ax^2 + bx + c \\quad (a \\ne 0)",
         "a",
         "c",
         "y"
@@ -39,8 +39,8 @@ export default {
       "type": "formula",
       "title": "顶点式",
       "formulas": [
-        "y = a(x - h)^2 + k \\quad (a \\ne 0",
-        "(h, k",
+        "y = a(x - h)^2 + k \\quad (a \\ne 0)",
+        "(h, k)",
         "x = h"
       ]
     },
@@ -48,7 +48,7 @@ export default {
       "type": "formula",
       "title": "零点式（交点式）",
       "formulas": [
-        "y = a(x - x_1)(x - x_2) \\quad (a \\ne 0",
+        "y = a(x - x_1)(x - x_2) \\quad (a \\ne 0)",
         "其中 \\(x_1, x_2\\) 为函数图像与 \\(x\\) 轴的交点横坐标（即方程 \\(ax^2+bx+c=0\\) 的两根）。"
       ]
     },
@@ -87,10 +87,22 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "二次函数图像演示",
+      "boardId": "quadratic-func",
+      "caption": "拖动滑块改变 a、b、c，观察抛物线开口方向、对称轴与顶点变化。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst a = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [-2, 1, 2]], {name:'a', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nconst b = board.create('slider', [[-5.6, 2.2], [-2.6, 2.2], [-3, 0, 3]], {name:'b', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nconst c = board.create('slider', [[-5.6, 1.4], [-2.6, 1.4], [-3, 0, 3]], {name:'c', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return a.Value()*x*x + b.Value()*x + c.Value(); }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, function(){\n  const av = a.Value(), bv = b.Value(), cv = c.Value();\n  return 'y = ' + av.toFixed(1) + 'x² ' + (bv>=0?'+ ':'- ') + Math.abs(bv).toFixed(1) + 'x ' + (cv>=0?'+ ':'- ') + Math.abs(cv).toFixed(1);\n}], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const av = a.Value();\n  return 'a = ' + av.toFixed(1) + '，开口' + (av>0?'向上':'向下') + '；对称轴 x = ' + (-b.Value()/(2*av)).toFixed(2);\n}], {fontSize:13, color: colors.muted});"
+    },
+    {
+      "type": "desmos",
+      "title": "🖊 动手演练：二次函数（Desmos）",
+      "initialExpressions": ["y = x^2 - 2x - 3", "y = -(x+1)^2 + 4"]
+    },
+    {
       "type": "knowledge",
       "title": "三、最值问题",
       "paragraphs": [
-        "闭区间 \\([m, n]\\) 上二次函数最值的求法（\\(a > 0\\)）：\n\n      设对称轴 \\(x = -\\frac{b}{2a}\\)：\n\n      ① 若对称轴在区间左侧（\\(-\\frac{b}{2a} \\le m\\)）：最小值在 \\(x = m\\) 处，最大值在 \\(x = n\\) 处\n\n      ② 若对称轴在区间内（\\(m < -\\frac{b}{2a} < n\\)：最小值在 \\(x = -\\frac{b}{2a}\\) 处。③ 若对称轴在区间右侧（\\(-\\frac{b}{2a} \\ge n\\)）：最小值在 \\(x = n\\) 处，最大值在 \\(x = m\\) 处\\)"
+        "闭区间 \\([m, n]\\) 上二次函数最值的求法（\\(a > 0\\)）：\n\n      设对称轴 \\(x = -\\frac{b}{2a}\\)：\n\n      ① 若对称轴在区间左侧（\\(-\\frac{b}{2a} \\le m\\)）：最小值在 \\(x = m\\) 处，最大值在 \\(x = n\\) 处\n\n      ② 若对称轴在区间内（\\(m < -\\frac{b}{2a} < n\\)）：最小值在 \\(x = -\\frac{b}{2a}\\) 处。③ 若对称轴在区间右侧（\\(-\\frac{b}{2a} \\ge n\\)）：最小值在 \\(x = n\\) 处，最大值在 \\(x = m\\) 处"
       ]
     },
     {
@@ -125,7 +137,7 @@ export default {
       "type": "knowledge",
       "title": "五、\"三个二次\"的关系",
       "paragraphs": [
-        "二次函数 \\(y = ax^2+bx+c\\)、一元二次方程 \\(ax^2+bx+c=0\\)、一元二次不等式 \\(ax^2+bx+c > 0\\)（或 \\(ax^2+bx+c < 0\\)）。\n\n      • 方程的解 \\(\\Leftrightarrow\\) 函数图像与 \\(x\\) 轴交点的横坐标\n\n      • 不等式的解集 \\(\\Leftrightarrow\\) 函数图像在 \\(x\\) 轴上方（或下方）对应的 \\(x\\) 范围\)"
+        "二次函数 \\(y = ax^2+bx+c\\)、一元二次方程 \\(ax^2+bx+c=0\\)、一元二次不等式 \\(ax^2+bx+c > 0\\)（或 \\(ax^2+bx+c < 0\\)）。\n\n      • 方程的解 \\(\\Leftrightarrow\\) 函数图像与 \\(x\\) 轴交点的横坐标\n\n      • 不等式的解集 \\(\\Leftrightarrow\\) 函数图像在 \\(x\\) 轴上方（或下方）对应的 \\(x\\) 范围"
       ]
     },
     {
@@ -147,7 +159,7 @@ export default {
         {
           "title": "例题3：含参数最值讨论",
           "question": "求函数 \\(f(x) = x^2 - 2ax + 1\\) 在 \\([0, 2]\\) 上的最小值。",
-          "solution": "解：\n\n        \\(f(x) = x^2 - 2ax + 1\\)，\\(a = 1 > 0\\)，开口向上。\n\n        对称轴：\\(x = -\\frac{-2a}{2} = a\\)。\n\n        需分三种情况讨论对称轴与区间 \\([0, 2]\\) 的关系：\n\n        情况1：当 \\(a < 0\\)（对称轴在区间左侧）时：\n\n        函数在 \\([0, 2]\\) 上单调递增，最小值在 \\(x = 0\\) 处：\\(f(0) = 1\\)。\n\n        情况2：当 \\(0 \\le a \\le 2\\)（对称轴在区间内）时：\n\n        最小值在顶点处：\\(f(a) = a^2 - 2a \\cdot a + 1 = 1 - a^2\\)。\n\n        情况3：当 \\(a > 2\\)（对称轴在区间右侧）时：\n\n        函数在 \\([0, 2]\\) 上单调递减，最小值在 \\(x = 2\\) 处：\\(f(2) = 4 - 4a + 1 = 5 - 4a\\)。\)",
+          "solution": "解：\n\n        \\(f(x) = x^2 - 2ax + 1\\)，\\(a = 1 > 0\\)，开口向上。\n\n        对称轴：\\(x = -\\frac{-2a}{2} = a\\)。\n\n        需分三种情况讨论对称轴与区间 \\([0, 2]\\) 的关系：\n\n        情况1：当 \\(a < 0\\)（对称轴在区间左侧）时：\n\n        函数在 \\([0, 2]\\) 上单调递增，最小值在 \\(x = 0\\) 处：\\(f(0) = 1\\)。\n\n        情况2：当 \\(0 \\le a \\le 2\\)（对称轴在区间内）时：\n\n        最小值在顶点处：\\(f(a) = a^2 - 2a \\cdot a + 1 = 1 - a^2\\)。\n\n        情况3：当 \\(a > 2\\)（对称轴在区间右侧）时：\n\n        函数在 \\([0, 2]\\) 上单调递减，最小值在 \\(x = 2\\) 处：\\(f(2) = 4 - 4a + 1 = 5 - 4a\\)。",
           "answer": "答案：最小值 \\(g(a) = \\begin{cases} 1, & a < 2\\\\1 - a^2, & 0 \\le a \\le 2\\\\5 - 4a, & a > 2 \\end{cases}\\)。"
         },
         {

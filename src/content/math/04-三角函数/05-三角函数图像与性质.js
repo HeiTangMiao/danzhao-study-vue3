@@ -56,6 +56,15 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "正弦与余弦函数图像",
+      "boardId": "trig-func",
+      "caption": "蓝色为 y = sin x，橙色为 y = cos x，二者周期均为 2π，值域为 [-1,1]。",
+      "boundingbox": [-6.5, 2, 6.5, -2],
+      "height": 280,
+      "initCode": "board.create('segment', [[-6.5,0],[6.5,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-2],[0,2]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [6.3,-0.3, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.2,1.9, 'y'], {fontSize:14, color: colors.muted});\nboard.create('functiongraph', [function(x){ return Math.sin(x); }, -6.5, 6.5], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('functiongraph', [function(x){ return Math.cos(x); }, -6.5, 6.5], {strokeColor: colors.accent, strokeWidth:2});\nboard.create('text', [-6.3, 1.8, 'y = sin x（蓝）'], {fontSize:13, color: colors.text});\nboard.create('text', [-6.3, 1.5, 'y = cos x（橙）'], {fontSize:13, color: colors.muted});"
+    },
+    {
       "type": "table",
       "title": "二、余弦函数 \\(y = \\cos x\\) 的性质",
       "headers": [
@@ -169,7 +178,7 @@ export default {
         {
           "title": "例题3：由图像求解析式",
           "question": "已知函数 \\(y = A\\sin(\\omega x + \\varphi)\\)（\\(A > 0, \\omega > 0, 0 < \\varphi < \\pi\\)）的图像最高点为 \\(\\left(\\frac{\\pi}{6}, 2\\right)\\)，由该点到相邻最低点时图像与 \\(x\\) 轴交于点 \\(\\left(\\frac{2\\pi}{3}, 0\\right)\\)，求该函数的解析式。",
-          "solution": "解：\n\n        由最高点纵坐标为 \\(2\\)，得 \\(A = 2\\)。\n\n        从最高点到与 \\(x\\) 轴交点，经过 \\(\\frac{1}{4}\\) 周期，即 \\(\\frac{T}{4} = \\frac{2\\pi}{3} - \\frac{\\pi}{6} = \\frac{\\pi}{2}\\)，所以 \\(T = 2\\pi\\)，\\(\\omega = \\frac{2\\pi}{T} = 1\\)。\n\n        当 \\(x = \\frac{\\pi}{6}\\) 时取最大值，即 \\(\\sin\\left(\\frac{\\pi}{6} + \\varphi\\right) = 1\\)，所以 \\(\\frac{\\pi}{6} + \\varphi = \\frac{\\pi}{2} + 2k\\pi\\)。\n\n        \\(\\varphi = \\frac{\\pi}{2} - \\frac{\\pi}{6} = \\frac{\\pi}{3}\\)（满足 \\(0 < \\varphi < \\pi\\)）\n\n        所以 \\(y = 2\\sin\\left(x + \\frac{\\pi}{3}\\right)\\)\)",
+          "solution": "解：\n\n        由最高点纵坐标为 \\(2\\)，得 \\(A = 2\\)。\n\n        从最高点到与 \\(x\\) 轴交点，经过 \\(\\frac{1}{4}\\) 周期，即 \\(\\frac{T}{4} = \\frac{2\\pi}{3} - \\frac{\\pi}{6} = \\frac{\\pi}{2}\\)，所以 \\(T = 2\\pi\\)，\\(\\omega = \\frac{2\\pi}{T} = 1\\)。\n\n        当 \\(x = \\frac{\\pi}{6}\\) 时取最大值，即 \\(\\sin\\left(\\frac{\\pi}{6} + \\varphi\\right) = 1\\)，所以 \\(\\frac{\\pi}{6} + \\varphi = \\frac{\\pi}{2} + 2k\\pi\\)。\n\n        \\(\\varphi = \\frac{\\pi}{2} - \\frac{\\pi}{6} = \\frac{\\pi}{3}\\)（满足 \\(0 < \\varphi < \\pi\\)）\n\n        所以 \\(y = 2\\sin\\left(x + \\frac{\\pi}{3}\\right)\\)",
           "answer": ""
         },
         {

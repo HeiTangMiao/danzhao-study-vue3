@@ -17,7 +17,7 @@ const CONTENT_DIR = join(ROOT, 'src', 'content')
 /**
  * 校验 content-schema 支持的所有区块类型
  */
-const BLOCK_TYPES = ['mindmap', 'objectives', 'knowledge', 'formula', 'table', 'warning', 'tip', 'example', 'quiz', 'diagram', 'divider', 'errorfocus', 'strategy', 'exam']
+const BLOCK_TYPES = ['mindmap', 'objectives', 'knowledge', 'formula', 'table', 'warning', 'tip', 'example', 'quiz', 'diagram', 'divider', 'errorfocus', 'strategy', 'exam', 'desmos']
 const DIFFICULTY = ['basic', 'medium', 'advanced', 'sprint']
 const QUESTION_TYPES = ['single', 'judge', 'fill', 'solve']
 
@@ -124,6 +124,11 @@ function validateBlock(block, pageId, index) {
       break
     case 'mindmap':
       if (!block.mermaid) errors.push(`${pageId} 思维导图区块缺少 mermaid 源码`)
+      break
+    case 'desmos':
+      if (block.initialExpressions !== undefined && (!Array.isArray(block.initialExpressions) || block.initialExpressions.some((e) => typeof e !== 'string'))) {
+        errors.push(`${pageId} Desmos 区块 initialExpressions 需为字符串数组`)
+      }
       break
     default:
       break

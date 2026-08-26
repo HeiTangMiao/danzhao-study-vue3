@@ -92,6 +92,13 @@ export default {
       ]
     },
     {
+      type: "diagram",
+      title: "幂函数图像演示",
+      boardId: "power-func",
+      caption: "拖动滑块改变指数 α，观察不同幂函数的图像特征（过定点 (1,1)）。",
+      initCode: "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst n = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [-2, 1, 3]], {name:'α', snapWidth:1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return Math.pow(x, n.Value()); }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('point', [1, 1], {name:'(1,1)', size:2, color: colors.accent, fixed:true});\nboard.create('text', [-5.6, 3.8, function(){ return 'y = x^' + n.Value().toFixed(0); }], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const nv = n.Value();\n  return 'α = ' + nv.toFixed(0) + '，' + (nv > 0 ? '过原点，单调递增' : '双曲线，单调递减') + '；过定点 (1,1)';\n}], {fontSize:13, color: colors.muted});"
+    },
+    {
       type: "table",
       title: "5 类常见幂函数性质对比",
       headers: ["函数", "定义域", "值域", "单调性", "奇偶性"],

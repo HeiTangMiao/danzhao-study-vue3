@@ -77,9 +77,9 @@ export default {
       "type": "formula",
       "title": "概率基本性质",
       "formulas": [
-        "0 \\leq P(A",
-        "P(\\Omega",
-        "P(\\varnothing"
+        "0 \\leq P(A)",
+        "P(\\Omega)",
+        "P(\\varnothing)"
       ]
     },
     {

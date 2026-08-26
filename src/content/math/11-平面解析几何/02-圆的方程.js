@@ -29,30 +29,13 @@ export default {
       "title": "圆的标准方程演示",
       "boardId": "circle-standard",
       "caption": "拖动圆心 C 或半径控制点 P，实时显示圆的标准方程。",
-      "initCode": `board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
-board.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});
-const C = board.create('point', [0,0], {name:'C', size:2, color: colors.accent});
-const P = board.create('point', [2,0], {name:'P', size:2, color: colors.primary});
-board.create('circle', [C, P], {strokeColor: colors.primary, strokeWidth:2});
-board.create('segment', [C, P], {strokeColor: colors.accent, strokeWidth:1, dash:2});
-board.create('text', [-5.8, 3.6, function(){
-  const a = Math.round(C.X()*100)/100, b = Math.round(C.Y()*100)/100;
-  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;
-  const sa = a >= 0 ? '-' : '+', sb = b >= 0 ? '-' : '+';
-  return '(x' + sa + Math.abs(a) + ')² + (y' + sb + Math.abs(b) + ')² = ' + Math.round(r*r*100)/100;
-}], {fontSize:14, color: colors.text});
-board.create('text', [-5.8, 3.0, function(){
-  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;
-  return '圆心 (' + Math.round(C.X()*100)/100 + ', ' + Math.round(C.Y()*100)/100 + ')，半径 r = ' + r;
-}], {fontSize:13, color: colors.muted});`
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst C = board.create('point', [0,0], {name:'C', size:2, color: colors.accent});\nconst P = board.create('point', [2,0], {name:'P', size:2, color: colors.primary});\nboard.create('circle', [C, P], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('segment', [C, P], {strokeColor: colors.accent, strokeWidth:1, dash:2});\nboard.create('text', [-5.8, 3.6, function(){\n  const a = Math.round(C.X()*100)/100, b = Math.round(C.Y()*100)/100;\n  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;\n  const sa = a >= 0 ? '-' : '+', sb = b >= 0 ? '-' : '+';\n  return '(x' + sa + Math.abs(a) + ')² + (y' + sb + Math.abs(b) + ')² = ' + Math.round(r*r*100)/100;\n}], {fontSize:14, color: colors.text});\nboard.create('text', [-5.8, 3.0, function(){\n  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;\n  return '圆心 (' + Math.round(C.X()*100)/100 + ', ' + Math.round(C.Y()*100)/100 + ')，半径 r = ' + r;\n}], {fontSize:13, color: colors.muted});"
     },
     {
       "type": "formula",
       "title": "圆的标准方程",
       "formulas": [
-        "C(a, b",
+        "C(a, b)",
         "r"
       ]
     },
@@ -102,7 +85,7 @@ board.create('text', [-5.8, 3.0, function(){
         ],
         [
           "相交",
-          "\\(d < r\)",
+          "\\(d < r\\)",
           "2 个"
         ]
       ]
@@ -140,7 +123,7 @@ board.create('text', [-5.8, 3.0, function(){
         ],
         [
           "相交",
-          "\\(|R - r| < d < R + r\)"
+          "\\(|R - r| < d < R + r\\)"
         ],
         [
           "内切",
@@ -148,7 +131,7 @@ board.create('text', [-5.8, 3.0, function(){
         ],
         [
           "内含",
-          "\\(d < r\)"
+          "\\(d < r\\)"
         ]
       ]
     },
@@ -165,7 +148,7 @@ board.create('text', [-5.8, 3.0, function(){
         {
           "title": "例题2：判断直线与圆位置关系",
           "question": "判断直线 \\(x - y + 1 = 0\\) 与圆 \\(x^2 + y^2 = 2\\) 的位置关系。",
-          "solution": "解：圆心 \\((0,0)\\)，半径 \\(r = \\sqrt{2}\\)。\n\n        圆心到直线的距离：\n\n        $$d = \\frac{|0 - 0 + 1|}{\\sqrt{1^2 + (-1)^2}} = \\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}$$\n\n        因为 \\(d = \\dfrac{\\sqrt{2}}{2} 相交。\)",
+          "solution": "解：圆心 \\((0,0)\\)，半径 \\(r = \\sqrt{2}\\)。\n\n        圆心到直线的距离：\n\n        $$d = \\frac{|0 - 0 + 1|}{\\sqrt{1^2 + (-1)^2}} = \\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}$$\n\n        因为 \\(d = \\dfrac{\\sqrt{2}}{2} < r\\)，所以直线与圆相交。",
           "answer": "答：直线与圆相交。"
         },
         {

@@ -51,7 +51,7 @@ export default {
       "type": "formula",
       "title": "坐标表示",
       "formulas": [
-        "(x, y",
+        "(x, y)",
         "\\boldsymbol{a}"
       ]
     },
@@ -63,29 +63,29 @@ export default {
       "type": "formula",
       "title": "坐标运算公式",
       "formulas": [
-        "\\boldsymbol{a} = (x_1, y_1",
-        "\\boldsymbol{b} = (x_2, y_2",
+        "\\boldsymbol{a} = (x_1, y_1)",
+        "\\boldsymbol{b} = (x_2, y_2)",
         "\\lambda \\in \\mathbb{R}",
-        "\\boldsymbol{a} + \\boldsymbol{b} = (x_1 + x_2, y_1 + y_2",
-        "\\boldsymbol{a} - \\boldsymbol{b} = (x_1 - x_2, y_1 - y_2",
-        "\\lambda\\boldsymbol{a} = (\\lambda x_1, \\lambda y_1"
+        "\\boldsymbol{a} + \\boldsymbol{b} = (x_1 + x_2, y_1 + y_2)",
+        "\\boldsymbol{a} - \\boldsymbol{b} = (x_1 - x_2, y_1 - y_2)",
+        "\\lambda\\boldsymbol{a} = (\\lambda x_1, \\lambda y_1)"
       ]
     },
     {
       "type": "formula",
       "title": "模的公式",
       "formulas": [
-        "\\boldsymbol{a} = (x, y",
-        "A(x_1, y_1",
-        "B(x_2, y_2"
+        "\\boldsymbol{a} = (x, y)",
+        "A(x_1, y_1)",
+        "B(x_2, y_2)"
       ]
     },
     {
       "type": "formula",
       "title": "中点坐标公式",
       "formulas": [
-        "A(x_1, y_1",
-        "B(x_2, y_2",
+        "A(x_1, y_1)",
+        "B(x_2, y_2)",
         "AB",
         "M"
       ]

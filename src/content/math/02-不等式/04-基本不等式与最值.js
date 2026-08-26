@@ -29,7 +29,7 @@ export default {
       "type": "formula",
       "title": "不等式1：平方非负",
       "formulas": [
-        "a^2 \\ge 0 \\quad (a \\in \\mathbb{R}",
+        "a^2 \\ge 0 \\quad (a \\in \\mathbb{R})",
         "a = 0"
       ]
     },
@@ -37,16 +37,16 @@ export default {
       "type": "formula",
       "title": "不等式2：重要不等式",
       "formulas": [
-        "a^2 + b^2 \\ge 2ab \\quad (a, b \\in \\mathbb{R}",
+        "a^2 + b^2 \\ge 2ab \\quad (a, b \\in \\mathbb{R})",
         "a = b",
-        "a^2 + b^2 - 2ab = (a-b"
+        "a^2 + b^2 - 2ab = (a-b)"
       ]
     },
     {
       "type": "formula",
       "title": "不等式3：均值不等式（基本不等式）",
       "formulas": [
-        "a + b \\ge 2\\sqrt{ab} \\quad (a > 0, b > 0",
+        "a + b \\ge 2\\sqrt{ab} \\quad (a > 0, b > 0)",
         "a = b",
         "\\frac{a+b}{2}",
         "\\sqrt{ab}"

@@ -36,13 +36,9 @@ export default {
       "type": "formula",
       "title": "正弦定理",
       "formulas": [
-        "a",
-        "b",
-        "c",
-        "A",
-        "B",
-        "C",
-        "R"
+        "\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R",
+        "其中 \\(R\\) 为 \\(\\triangle ABC\\) 外接圆的半径",
+        "变形：\\(a = 2R\\sin A\\)，\\(b = 2R\\sin B\\)，\\(c = 2R\\sin C\\)"
       ]
     },
     {
@@ -108,32 +104,32 @@ export default {
         {
           "title": "例题1：正弦定理解三角形",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\(a = 6\\)，\\(B = 45°\\)，\\(C = 75°\\)，求 \\(b\\)、\\(c\\) 和 \\(A\\)。",
-          "solution": "解：\n\n        由内角和定理：\\(A = 180° - B - C = 180° - 45° - 75° = 60°\\)\n\n        由正弦定理 \\(\\frac{a}{\\sin A} = \\frac{b}{\\sin B}\\)：\n\n        \\(b = \\frac{a \\sin B}{\\sin A} = \\frac{6 \\sin 45°}{\\sin 60°} = \\frac{6 \\times \\frac{\\sqrt{2}}{2}}{\\frac{\\sqrt{3}}{2}} = \\frac{3\\sqrt{2}}{\\frac{\\sqrt{3}}{2}} = \\frac{6\\sqrt{2}}{\\sqrt{3}} = 2\\sqrt{6}\\)\n\n        由正弦定理 \\(\\frac{a}{\\sin A} = \\frac{c}{\\sin C}\\)：\n\n        \\(\\sin 75° = \\sin(45° + 30°) = \\frac{\\sqrt{6} + \\sqrt{2}}{4}\\)\n\n        \\(c = \\frac{a \\sin C}{\\sin A} = \\frac{6 \\times \\frac{\\sqrt{6}+\\sqrt{2}}{4}}{\\frac{\\sqrt{3}}{2}} = \\frac{6(\\sqrt{6}+\\sqrt{2})}{4} \\times \\frac{2}{\\sqrt{3}} = \\frac{3(\\sqrt{6}+\\sqrt{2})}{\\sqrt{3}} = 3(√2 + \\frac{\\sqrt{2}}{\\sqrt{3}}) \\)\n\n        化简：\\(c = \\frac{6 \\sin 75°}{\\sin 60°} = \\frac{6 \\times \\frac{\\sqrt{6}+\\sqrt{2}}{4}}{\\frac{\\sqrt{3}}{2}} = \\frac{3(\\sqrt{6}+\\sqrt{2})}{2} \\times \\frac{2}{\\sqrt{3}} = \\frac{3(\\sqrt{6}+\\sqrt{2})}{\\sqrt{3}} = 3\\sqrt{2} + \\sqrt{6}\\)",
-          "answer": ""
+          "solution": "解：\n\n        由内角和定理：\\(A = 180° - B - C = 180° - 45° - 75° = 60°\\)\n\n        由正弦定理 \\(\\frac{a}{\\sin A} = \\frac{b}{\\sin B}\\)：\n\n        \\(b = \\frac{a \\sin B}{\\sin A} = \\frac{6 \\sin 45°}{\\sin 60°} = \\frac{6 \\times \\frac{\\sqrt{2}}{2}}{\\frac{\\sqrt{3}}{2}} = \\frac{3\\sqrt{2}}{\\frac{\\sqrt{3}}{2}} = \\frac{6\\sqrt{2}}{\\sqrt{3}} = 2\\sqrt{6}\\)\n\n        由正弦定理 \\(\\frac{a}{\\sin A} = \\frac{c}{\\sin C}\\)：\n\n        \\(\\sin 75° = \\sin(45° + 30°) = \\frac{\\sqrt{6} + \\sqrt{2}}{4}\\)\n\n        \\(c = \\frac{a \\sin C}{\\sin A} = \\frac{6 \\times \\frac{\\sqrt{6}+\\sqrt{2}}{4}}{\\frac{\\sqrt{3}}{2}} = \\frac{6(\\sqrt{6}+\\sqrt{2})}{4} \\times \\frac{2}{\\sqrt{3}} = \\frac{3(\\sqrt{6}+\\sqrt{2})}{\\sqrt{3}} = 3\\sqrt{2} + \\sqrt{6}\\)",
+          "answer": "答案：\\(A = 60°\\)，\\(b = 2\\sqrt{6}\\)，\\(c = 3\\sqrt{2} + \\sqrt{6}\\)。"
         },
         {
           "title": "例题2：余弦定理解三角形",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\(a = 3\\)，\\(b = 5\\)，\\(C = 60°\\)，求 \\(c\\) 和 \\(A\\)。",
           "solution": "解：\n\n        由余弦定理求 \\(c\\)：\n\n        \\(c^2 = a^2 + b^2 - 2ab\\cos C = 9 + 25 - 2 \\times 3 \\times 5 \\times \\cos 60° = 34 - 30 \\times \\frac{1}{2} = 34 - 15 = 19\\)\n\n        \\(c = \\sqrt{19}\\)\n\n        由余弦定理求 \\(A\\)：\n\n        \\(\\cos A = \\frac{b^2 + c^2 - a^2}{2bc} = \\frac{25 + 19 - 9}{2 \\times 5 \\times \\sqrt{19}} = \\frac{35}{10\\sqrt{19}} = \\frac{7}{2\\sqrt{19}} = \\frac{7\\sqrt{19}}{38}\\)\n\n        \\(A = \\arccos\\frac{7\\sqrt{19}}{38}\\)",
-          "answer": ""
+          "answer": "答案：\\(c = \\sqrt{19}\\)，\\(A = \\arccos\\frac{7\\sqrt{19}}{38}\\)。"
         },
         {
           "title": "例题3：判断三角形形状",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\((a^2 + b^2 - c^2)\\tan C = ab\\)，判断三角形的形状。",
           "solution": "解：\n\n        由余弦定理：\\(\\cos C = \\frac{a^2 + b^2 - c^2}{2ab}\\)，即 \\(a^2 + b^2 - c^2 = 2ab\\cos C\\)\n\n        代入已知条件：\\(2ab\\cos C \\cdot \\tan C = ab\\)\n\n        因为 \\(ab \\neq 0\\)，两边同除以 \\(ab\\)：\n\n        \\(2\\cos C \\cdot \\tan C = 1\\)\n\n        \\(2\\cos C \\cdot \\frac{\\sin C}{\\cos C} = 1\\)\n\n        \\(2\\sin C = 1\\)，即 \\(\\sin C = \\frac{1}{2}\\)\n\n        因为 \\(C \\in (0, \\pi)\\)，所以 \\(C = \\frac{\\pi}{6}\\) 或 \\(C = \\frac{5\\pi}{6}\\)\n\n        但需验证 \\(\\cos C \\neq 0\\)（\\(\\tan C\\) 有意义），两种情况都满足。\n\n        但由于原式中有 \\(\\tan C\\)，当 \\(C = \\frac{5\\pi}{6}\\) 时，\\(\\tan C < 0\\)，可以成立。\n\n        但进一步检验：\\(\\sin C = \\frac{1}{2}\\)，\\(C = 30°\\) 或 \\(150°\\)。\n\n        所以三角形为含 \\(30°\\) 或 \\(150°\\) 角的三角形，但仅由角度无法确定唯一形状。\n\n        实际上，更准确地说，本题条件只能确定 \\(C = 30°\\) 或 \\(C = 150°\\)。",
-          "answer": ""
+          "answer": "答案：\\(C = 30°\\) 或 \\(C = 150°\\)，仅由角度无法唯一确定三角形形状。"
         },
         {
           "title": "例题4：推导射影定理",
           "question": "在 \\(\\triangle ABC\\) 中，证明：射影定理 \\(a = b\\cos C + c\\cos B\\)。",
           "solution": "证明：利用余弦定理的变形形式（用三边表示余弦）。\n\n        由余弦定理：\\(\\cos C = \\dfrac{a^2 + b^2 - c^2}{2ab}\\)，\\(\\cos B = \\dfrac{a^2 + c^2 - b^2}{2ac}\\)。\n\n        于是：\n\n        \\(b\\cos C + c\\cos B = b \\cdot \\dfrac{a^2 + b^2 - c^2}{2ab} + c \\cdot \\dfrac{a^2 + c^2 - b^2}{2ac}\\)\n\n        \\(= \\dfrac{a^2 + b^2 - c^2}{2a} + \\dfrac{a^2 + c^2 - b^2}{2a}\\)\n\n        \\(= \\dfrac{a^2 + b^2 - c^2 + a^2 + c^2 - b^2}{2a} = \\dfrac{2a^2}{2a} = a\\)\n\n        故 \\(a = b\\cos C + c\\cos B\\)。同理可证 \\(b = a\\cos C + c\\cos A\\)，\\(c = a\\cos B + b\\cos A\\)，射影定理得证。",
-          "answer": ""
+          "answer": "答案：射影定理 \\(a = b\\cos C + c\\cos B\\) 得证。"
         },
         {
           "title": "例题5：SSA 漏解（易错题）",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\(a = 4\\)，\\(b = 4\\sqrt{2}\\)，\\(A = 30°\\)，求 \\(B\\)。",
           "solution": "常见错误：由正弦定理 \\(\\sin B = \\dfrac{b\\sin A}{a} = \\dfrac{4\\sqrt{2} \\times \\frac{1}{2}}{4} = \\dfrac{\\sqrt{2}}{2}\\)，直接得 \\(B = 45°\\)。\n\n        错误分析：\\(\\sin B = \\dfrac{\\sqrt{2}}{2}\\) 时，\\(B\\) 可为锐角或钝角。题中 \\(b = 4\\sqrt{2} > a = 4\\)，故 \\(B > A = 30°\\)，\\(B\\) 可能为钝角，不能只取锐角解。\n\n        正确解法：由 \\(\\sin B = \\dfrac{\\sqrt{2}}{2}\\)，得 \\(B = 45°\\) 或 \\(B = 135°\\)。\n\n        检验：\\(B = 45°\\) 时，\\(A + B = 75° < 180°\\)；\\(B = 135°\\) 时，\\(A + B = 165° < 180°\\)，故 \\(B = 45°\\) 或 \\(B = 135°\\)。",
-          "answer": ""
+          "answer": "答案：\\(B = 45°\\) 或 \\(B = 135°\\)（SSA 情况有两解）。"
         }
       ]
     },

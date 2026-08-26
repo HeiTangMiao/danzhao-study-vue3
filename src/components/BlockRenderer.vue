@@ -25,6 +25,7 @@ import GeometryBlock from './blocks/GeometryBlock.vue'
 import ErrorFocusBlock from './blocks/ErrorFocusBlock.vue'
 import StrategyBlock from './blocks/StrategyBlock.vue'
 import ExamBlock from './blocks/ExamBlock.vue'
+import DesmosBlock from './blocks/DesmosBlock.vue'
 
 const props = defineProps({
   // 单个区块数据（content-schema 的 block）
@@ -47,7 +48,8 @@ const BLOCK_MAP = {
   diagram: GeometryBlock,    // 几何演示（JSXGraph）
   errorfocus: ErrorFocusBlock, // 易错专项
   strategy: StrategyBlock,     // 考试技巧
-  exam: ExamBlock              // 模拟卷
+  exam: ExamBlock,              // 模拟卷
+  desmos: DesmosBlock           // Desmos 图形计算器演练场
 }
 
 // 解析当前区块对应的组件；未知类型返回 null（安全降级）

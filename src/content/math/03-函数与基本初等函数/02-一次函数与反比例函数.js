@@ -34,10 +34,17 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "一次函数图像演示",
+      "boardId": "linear-func",
+      "caption": "拖动滑块改变斜率 k 和截距 b，观察直线位置与单调性的变化。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst k = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [-3, 1, 3]], {name:'k', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nconst b = board.create('slider', [[-5.6, 2.2], [-2.6, 2.2], [-3, 0, 3]], {name:'b', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return k.Value()*x + b.Value(); }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, function(){\n  const kv = k.Value(), bv = b.Value();\n  const kStr = (kv === 1 ? '' : kv === -1 ? '-' : kv.toFixed(1));\n  const bStr = bv >= 0 ? '+ ' + bv.toFixed(1) : '- ' + Math.abs(bv).toFixed(1);\n  return 'y = ' + kStr + 'x ' + bStr;\n}], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const kv = k.Value();\n  return 'k = ' + kv.toFixed(1) + '，' + (kv > 0 ? '增函数' : kv < 0 ? '减函数' : '');\n}], {fontSize:13, color: colors.muted});"
+    },
+    {
       "type": "formula",
       "title": "一次函数定义",
       "formulas": [
-        "y = kx + b \\quad (k \\ne 0",
+        "y = kx + b \\quad (k \\ne 0)",
         "k",
         "b",
         "y",
@@ -60,7 +67,7 @@ export default {
           "从左下到右上（上升）"
         ],
         [
-          "\\(k < 0\)",
+          "\\(k < 0\\)",
           "减函数",
           "从左上到右下（下降）"
         ]
@@ -75,10 +82,17 @@ export default {
       ]
     },
     {
+      "type": "diagram",
+      "title": "反比例函数图像演示",
+      "boardId": "inverse-func",
+      "caption": "拖动滑块改变比例系数 k，观察双曲线所在象限与渐近线。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst k = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [-5, 2, 5]], {name:'k', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('curve', [function(t){ return t; }, function(t){ return k.Value()/t; }, -6, -0.05], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('curve', [function(t){ return t; }, function(t){ return k.Value()/t; }, 0.05, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, function(){ return 'y = ' + k.Value().toFixed(1) + ' / x'; }], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const kv = k.Value();\n  return 'k = ' + kv.toFixed(1) + '，' + (kv > 0 ? '一、三象限' : '二、四象限');\n}], {fontSize:13, color: colors.muted});"
+    },
+    {
       "type": "formula",
       "title": "反比例函数定义",
       "formulas": [
-        "y = \\frac{k}{x} \\quad (k \\ne 0",
+        "y = \\frac{k}{x} \\quad (k \\ne 0)",
         "\\{x \\mid x \\ne 0\\}",
         "\\{y \\mid y \\ne 0\\}"
       ]
@@ -102,7 +116,7 @@ export default {
           "在 \\((0,+\\infty)\\) 和 \\((-\\infty,0)\\) 上分别递减"
         ],
         [
-          "\\(k < 0\)",
+          "\\(k < 0\\)",
           "第二、四象限",
           "在 \\((0,+\\infty)\\) 和 \\((-\\infty,0)\\) 上分别递增"
         ]

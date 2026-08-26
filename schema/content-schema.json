@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "divider", "errorfocus", "strategy", "exam"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "divider", "errorfocus", "strategy", "exam", "desmos"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -44,7 +44,8 @@
         { "if": { "properties": { "type": { "const": "diagram" } } }, "then": { "required": ["boardId", "initCode"], "properties": { "boardId": { "type": "string" }, "caption": { "type": "string" }, "initCode": { "type": "string", "description": "JSXGraph 初始化代码（字符串形式）" } } } },
         { "if": { "properties": { "type": { "const": "errorfocus" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/errorFocusItem" } } } } },
         { "if": { "properties": { "type": { "const": "strategy" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/strategyItem" } } } } },
-        { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } }
+        { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } },
+        { "if": { "properties": { "type": { "const": "desmos" } } }, "then": { "properties": { "initialExpressions": { "type": "array", "items": { "type": "string" }, "description": "初始表达式列表（LaTeX）" } } } }
       ]
     },
     "exampleItem": {

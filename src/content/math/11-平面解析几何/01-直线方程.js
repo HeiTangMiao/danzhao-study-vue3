@@ -36,22 +36,7 @@ export default {
       "title": "倾斜角与斜率演示",
       "boardId": "line-slope-angle",
       "caption": "拖动点 P 改变直线方向，实时显示斜率 k 与倾斜角 α。",
-      "initCode": `board.create('segment', [[-5,0],[5,0]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('segment', [[0,-3],[0,3]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('text', [4.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
-board.create('text', [0.3,2.8, 'y'], {fontSize:14, color: colors.muted});
-const O = board.create('point', [0,0], {name:'O', size:2, color: colors.text, fixed:true});
-const P = board.create('point', [2,2], {name:'P', size:2, color: colors.accent});
-board.create('line', [O, P], {strokeColor: colors.primary, strokeWidth:2});
-board.create('angle', [[4,0], O, P], {radius:0.7, fillColor: colors.accent, fillOpacity:0.3});
-board.create('text', [1.2, 3.2, function(){
-  const dx = P.X()-O.X(), dy = P.Y()-O.Y();
-  if (Math.abs(dx) < 1e-6) return 'α = 90°，斜率不存在';
-  const k = dy/dx;
-  let alpha = Math.atan2(dy, dx)*180/Math.PI;
-  if (alpha < 0) alpha += 180;
-  return '斜率 k = ' + k.toFixed(2) + '，倾斜角 α = ' + alpha.toFixed(1) + '°';
-}], {fontSize:14, color: colors.text});`
+      "initCode": "board.create('segment', [[-5,0],[5,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-3],[0,3]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [4.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,2.8, 'y'], {fontSize:14, color: colors.muted});\nconst O = board.create('point', [0,0], {name:'O', size:2, color: colors.text, fixed:true});\nconst P = board.create('point', [2,2], {name:'P', size:2, color: colors.accent});\nboard.create('line', [O, P], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('angle', [[4,0], O, P], {radius:0.7, fillColor: colors.accent, fillOpacity:0.3});\nboard.create('text', [1.2, 3.2, function(){\n  const dx = P.X()-O.X(), dy = P.Y()-O.Y();\n  if (Math.abs(dx) < 1e-6) return 'α = 90°，斜率不存在';\n  const k = dy/dx;\n  let alpha = Math.atan2(dy, dx)*180/Math.PI;\n  if (alpha < 0) alpha += 180;\n  return '斜率 k = ' + k.toFixed(2) + '，倾斜角 α = ' + alpha.toFixed(1) + '°';\n}], {fontSize:14, color: colors.text});"
     },
     {
       "type": "warning",
@@ -98,20 +83,7 @@ board.create('text', [1.2, 3.2, function(){
       "title": "点斜式演示",
       "boardId": "line-point-slope",
       "caption": "过定点 A(1,2) 的直线，拖动点 B 改变斜率，实时显示直线方程。",
-      "initCode": `board.create('segment', [[-5,0],[5,0]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('segment', [[0,-3],[0,3]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('text', [4.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
-board.create('text', [0.3,2.8, 'y'], {fontSize:14, color: colors.muted});
-const A = board.create('point', [1,2], {name:'A(1,2)', size:2, color: colors.accent, fixed:true});
-const B = board.create('point', [3,0], {name:'B', size:2, color: colors.primary});
-board.create('line', [A, B], {strokeColor: colors.primary, strokeWidth:2});
-board.create('text', [-4.5, 2.8, function(){
-  const dx = B.X()-A.X(), dy = B.Y()-A.Y();
-  if (Math.abs(dx) < 1e-6) return '斜率不存在';
-  const k = dy/dx;
-  const b = A.Y()-k*A.X();
-  return 'k = ' + k.toFixed(2) + '，y = ' + k.toFixed(2) + 'x ' + (b>=0?'+ ':'- ') + Math.abs(b).toFixed(2);
-}], {fontSize:14, color: colors.text});`
+      "initCode": "board.create('segment', [[-5,0],[5,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-3],[0,3]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [4.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,2.8, 'y'], {fontSize:14, color: colors.muted});\nconst A = board.create('point', [1,2], {name:'A(1,2)', size:2, color: colors.accent, fixed:true});\nconst B = board.create('point', [3,0], {name:'B', size:2, color: colors.primary});\nboard.create('line', [A, B], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('text', [-4.5, 2.8, function(){\n  const dx = B.X()-A.X(), dy = B.Y()-A.Y();\n  if (Math.abs(dx) < 1e-6) return '斜率不存在';\n  const k = dy/dx;\n  const b = A.Y()-k*A.X();\n  return 'k = ' + k.toFixed(2) + '，y = ' + k.toFixed(2) + 'x ' + (b>=0?'+ ':'- ') + Math.abs(b).toFixed(2);\n}], {fontSize:14, color: colors.text});"
     },
     {
       "type": "knowledge",
@@ -124,7 +96,7 @@ board.create('text', [-4.5, 2.8, function(){
       "type": "formula",
       "title": "点到直线的距离",
       "formulas": [
-        "P(x_0, y_0",
+        "P(x_0, y_0)",
         "Ax + By + C = 0"
       ]
     },

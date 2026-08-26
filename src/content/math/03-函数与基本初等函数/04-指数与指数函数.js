@@ -36,8 +36,8 @@ export default {
       "type": "formula",
       "title": "分数指数幂",
       "formulas": [
-        "a^{\\frac{m}{n}} = \\sqrt[n]{a^m} \\quad (a > 0, m, n \\in \\mathbb{N}^*, n > 1",
-        "a^{-\\frac{m}{n}} = \\frac{1}{\\sqrt[n]{a^m}} \\quad (a > 0"
+        "a^{\\frac{m}{n}} = \\sqrt[n]{a^m} \\quad (a > 0, m, n \\in \\mathbb{N}^*, n > 1)",
+        "a^{-\\frac{m}{n}} = \\frac{1}{\\sqrt[n]{a^m}} \\quad (a > 0)"
       ]
     },
     {
@@ -63,10 +63,17 @@ export default {
       "type": "formula",
       "title": "指数函数定义",
       "formulas": [
-        "y = a^x \\quad (a > 0 \\text{ 且 } a \\ne 1",
+        "y = a^x \\quad (a > 0 \\text{ 且 } a \\ne 1)",
         "\\mathbb{R}",
-        "(0, +\\infty"
+        "(0, +\\infty)"
       ]
+    },
+    {
+      "type": "diagram",
+      "title": "指数函数图像演示",
+      "boardId": "exp-func",
+      "caption": "拖动滑块改变底数 a，观察指数函数单调性与过定点 (0,1)。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst a = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [0.1, 2, 4]], {name:'a', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return Math.pow(a.Value(), x); }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('point', [0, 1], {name:'(0,1)', size:2, color: colors.accent, fixed:true});\nboard.create('text', [-5.6, 3.8, function(){ return 'y = ' + a.Value().toFixed(1) + '^x'; }], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const av = a.Value();\n  return 'a = ' + av.toFixed(1) + '，' + (av > 1 ? '单调递增' : '单调递减') + '；过定点 (0,1)';\n}], {fontSize:13, color: colors.muted});"
     },
     {
       "type": "tip",

@@ -38,7 +38,7 @@ export default {
       "title": "函数三要素",
       "formulas": [
         "• 定义域：自变量 \\(x\\) 的取值范围（集合 \\(A\\)）",
-        "f",
+        "• 对应法则：\\(f\\)（从 \\(A\\) 到 \\(B\\) 的对应关系）",
         "• 值域：函数值 \\(f(x)\\) 的集合（集合 \\(B\\) 的子集）"
       ]
     },
@@ -61,33 +61,33 @@ export default {
       "type": "knowledge",
       "title": "四、单调性",
       "paragraphs": [
-        "判断单调性的方法（定义法）：\n\n      ① 取值：任取 \\(x_1, x_2 \\in D\\)，且 \\(x_1 < x_2\\)。② 作差：计算 \\(f(x_1) - f(x_2)\\)；\n\n      ③ 变形：因式分解、通分等；\n\n      ④ 定号：判断 \\(f(x_1) - f(x_2)\\) 的正负；\n\n      ⑤ 结论：若 \\(f(x_1) - f(x_2) < 0\\)，则减。\)",
+        "判断单调性的方法（定义法）：\n\n      ① 取值：任取 \\(x_1, x_2 \\in D\\)，且 \\(x_1 < x_2\\)。② 作差：计算 \\(f(x_1) - f(x_2)\\)；\n\n      ③ 变形：因式分解、通分等；\n\n      ④ 定号：判断 \\(f(x_1) - f(x_2)\\) 的正负；\n\n      ⑤ 结论：若 \\(f(x_1) - f(x_2) < 0\\)，则减。",
         "推导过程（作差法的原理）：\n\n      由增函数定义，\\(x_1 < x_2\\) 时 \\(f(x_1) < f(x_2)\\)，即 \\(f(x_1) - f(x_2) > 0\\)。因此判断 \\(f(x_1) - f(x_2)\\) 的符号等价于比较两个函数值的大小，这正是\"作差比较法\"的理论依据。\n\n      关键在于因式分解：以 \\(f(x) = x + \\dfrac{1}{x}\\) 为例，作差后提取公因式 \\((x_1 - x_2)\\)：\n\n      $$f(x_1) - f(x_2) = \\left(x_1 + \\frac{1}{x_1}\\right) - \\left(x_2 + \\frac{1}{x_2}\\right) = (x_1 - x_2) + \\frac{x_2 - x_1}{x_1 x_2} = (x_1 - x_2)\\left(1 - \\frac{1}{x_1 x_2}\\right)$$\n\n      由 \\(x_1 < x_2\\) 知 \\(x_1 - x_2 < 0\\) 已确定符号，只需再判定第二个因子 \\(\\left(1 - \\dfrac{1}{x_1 x_2}\\right)\\) 的符号即可\"定号\"，从而化繁为简得出 \\(f(x_1) - f(x_2)\\) 的正负。"
       ]
+    },
+    {
+      "type": "diagram",
+      "title": "单调性图像演示",
+      "boardId": "monotonic-func",
+      "caption": "蓝色为 y = x²（在 (-∞,0) 递减、(0,+∞) 递增），橙色为 y = x³（在 R 上单调递增）。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nboard.create('functiongraph', [function(x){ return x*x; }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('functiongraph', [function(x){ return x*x*x; }, -6, 6], {strokeColor: colors.accent, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, 'y = x²（蓝）在 (-∞,0) 递减、(0,+∞) 递增'], {fontSize:13, color: colors.text});\nboard.create('text', [-5.6, 3.5, 'y = x³（橙）在 R 上单调递增'], {fontSize:13, color: colors.muted});"
     },
     {
       "type": "formula",
       "title": "增函数",
       "formulas": [
-        "f(x",
-        "I",
-        "D \\subseteq I",
-        "\\forall x_1, x_2 \\in D",
-        "x_1 < x_2",
-        "f(x_1",
-        "x_2",
-        "f(x",
-        "D"
+        "设函数 \\(f(x)\\) 的定义域为 \\(I\\)，区间 \\(D \\subseteq I\\)",
+        "\\(\\forall x_1, x_2 \\in D\\)，当 \\(x_1 < x_2\\) 时，都有 \\(f(x_1) < f(x_2)\\)",
+        "则称 \\(f(x)\\) 在区间 \\(D\\) 上是增函数"
       ]
     },
     {
       "type": "formula",
       "title": "减函数",
       "formulas": [
-        "\\forall x_1, x_2 \\in D",
-        "x_1 < x_2 \\Rightarrow f(x_1) > f(x_2)",
-        "f(x",
-        "D"
+        "设函数 \\(f(x)\\) 的定义域为 \\(I\\)，区间 \\(D \\subseteq I\\)",
+        "\\(\\forall x_1, x_2 \\in D\\)，当 \\(x_1 < x_2\\) 时，都有 \\(f(x_1) > f(x_2)\\)",
+        "则称 \\(f(x)\\) 在区间 \\(D\\) 上是减函数"
       ]
     },
     {
@@ -101,22 +101,18 @@ export default {
       "type": "formula",
       "title": "偶函数",
       "formulas": [
-        "f(-x",
-        "x",
-        "x",
-        "f(x",
-        "y"
+        "设函数 \\(f(x)\\) 的定义域为 \\(D\\)，且 \\(D\\) 关于原点对称",
+        "若对任意 \\(x \\in D\\)，都有 \\(f(-x) = f(x)\\)",
+        "则称 \\(f(x)\\) 为偶函数，其图像关于 \\(y\\) 轴对称"
       ]
     },
     {
       "type": "formula",
       "title": "奇函数",
       "formulas": [
-        "f(-x",
-        "x",
-        "x",
-        "f(x",
-        "图像关于原点对称。"
+        "设函数 \\(f(x)\\) 的定义域为 \\(D\\)，且 \\(D\\) 关于原点对称",
+        "若对任意 \\(x \\in D\\)，都有 \\(f(-x) = -f(x)\\)",
+        "则称 \\(f(x)\\) 为奇函数，其图像关于原点对称"
       ]
     },
     {
@@ -141,7 +137,7 @@ export default {
         {
           "title": "例题1：求函数的定义域",
           "question": "求函数 \\(f(x) = \\frac{\\sqrt{x+2}}{x-1} + \\ln(3-x)\\) 的定义域。",
-          "solution": "解：\n\n        需要满足以下条件：\n\n        ① 偶次根号下非负：\\(x + 2 \\ge 0 \\Rightarrow x \\ge -2\\)\n\n        ② 分母不为零：\\(x - 1 \\ne 0 \\Rightarrow x \\ne 1\\)\n\n        ③ 对数真数为正：\\(3 - x > 0 \\Rightarrow x < 3\\)。取三个条件的交集：\n\n        $$\\begin{cases} x \\ge -2 \\\\ x \\ne 1 \\\\ x < 3 \\end{cases}$$\n\n        所以定义域为 \\(\\{x \\mid -2 \\le x < 3 \\text{ 且 } x \\ne 1\\}\\)，即 \\([-2, 1) \\cup (1, 3)\\)。\)",
+          "solution": "解：\n\n        需要满足以下条件：\n\n        ① 偶次根号下非负：\\(x + 2 \\ge 0 \\Rightarrow x \\ge -2\\)\n\n        ② 分母不为零：\\(x - 1 \\ne 0 \\Rightarrow x \\ne 1\\)\n\n        ③ 对数真数为正：\\(3 - x > 0 \\Rightarrow x < 3\\)。取三个条件的交集：\n\n        $$\\begin{cases} x \\ge -2 \\\\ x \\ne 1 \\\\ x < 3 \\end{cases}$$\n\n        所以定义域为 \\(\\{x \\mid -2 \\le x < 3 \\text{ 且 } x \\ne 1\\}\\)，即 \\([-2, 1) \\cup (1, 3)\\)。",
           "answer": "答案：定义域为 \\([-2, 1) \\cup (1, 3)\\)。"
         },
         {
@@ -164,8 +160,8 @@ export default {
         },
         {
           "title": "例题5：利用奇偶性求解析式（综合应用型）",
-          "question": "已知 \\(f(x)\\) 是定义在 \\(\\mathbb{R}\\) 上的奇函数，当 \\(x > 0\\) 时，\\(f(x) = x^2 - 2x\\)。\n\n      （1）求 \\(x < 0\\) 时 \\(f(x)\\) 的解析式；（2）求 \\(f(0)\\) 的值。\)",
-          "solution": "解：\n\n        （1）当 \\(x < 0\\) 时，\\(-x > 0\\)，可利用 \\(x > 0\\) 的解析式计算 \\(f(-x)\\)：\n\n        $$f(-x) = (-x)^2 - 2(-x) = x^2 + 2x$$\n\n        因为 \\(f(x)\\) 是奇函数，满足 \\(f(-x) = -f(x)\\)，所以：\n\n        $$-f(x) = x^2 + 2x \\Rightarrow f(x) = -x^2 - 2x$$\n\n        所以当 \\(x < 0\\) 时 \\(f(x) = -x^2 - 2x\\)。（2）因为 \\(f(x)\\) 是定义在 \\(\\mathbb{R}\\) 上的奇函数，所以 \\(f(0) = 0\\)（奇函数在原点处若有定义，则函数值必为0）。\n\n        综上：\\(f(x) = \\begin{cases} x^2 - 2x, & x > 0 \\\\ 0, & x = 0 \\\\ -x^2 - 2x, & x < 0 \\end{cases}\\)\)",
+          "question": "已知 \\(f(x)\\) 是定义在 \\(\\mathbb{R}\\) 上的奇函数，当 \\(x > 0\\) 时，\\(f(x) = x^2 - 2x\\)。\n\n      （1）求 \\(x < 0\\) 时 \\(f(x)\\) 的解析式；（2）求 \\(f(0)\\) 的值。",
+          "solution": "解：\n\n        （1）当 \\(x < 0\\) 时，\\(-x > 0\\)，可利用 \\(x > 0\\) 的解析式计算 \\(f(-x)\\)：\n\n        $$f(-x) = (-x)^2 - 2(-x) = x^2 + 2x$$\n\n        因为 \\(f(x)\\) 是奇函数，满足 \\(f(-x) = -f(x)\\)，所以：\n\n        $$-f(x) = x^2 + 2x \\Rightarrow f(x) = -x^2 - 2x$$\n\n        所以当 \\(x < 0\\) 时 \\(f(x) = -x^2 - 2x\\)。（2）因为 \\(f(x)\\) 是定义在 \\(\\mathbb{R}\\) 上的奇函数，所以 \\(f(0) = 0\\)（奇函数在原点处若有定义，则函数值必为0）。\n\n        综上：\\(f(x) = \\begin{cases} x^2 - 2x, & x > 0 \\\\ 0, & x = 0 \\\\ -x^2 - 2x, & x < 0 \\end{cases}\\)",
           "answer": "答案：（1）\\(x < 0\\) 时 \\(f(x) = -x^2 - 2x\\)；（2）\\(f(0) = 0\\)。"
         }
       ]

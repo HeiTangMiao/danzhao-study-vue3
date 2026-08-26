@@ -54,8 +54,8 @@ export default {
       "type": "formula",
       "title": "坐标运算公式",
       "formulas": [
-        "\\boldsymbol{a} = (x_1, y_1",
-        "\\boldsymbol{b} = (x_2, y_2"
+        "\\boldsymbol{a} = (x_1, y_1)",
+        "\\boldsymbol{b} = (x_2, y_2)"
       ]
     },
     {
@@ -92,10 +92,10 @@ export default {
       "title": "运算律",
       "formulas": [
         "\\boldsymbol{a} \\cdot \\boldsymbol{b} = \\boldsymbol{b} \\cdot \\boldsymbol{a}",
-        "(\\lambda\\boldsymbol{a}",
+        "(\\lambda\\boldsymbol{a})",
         "\\boldsymbol{a} \\cdot \\boldsymbol{b}",
         "\\lambda\\boldsymbol{b}",
-        "(\\boldsymbol{a} + \\boldsymbol{b}"
+        "(\\boldsymbol{a} + \\boldsymbol{b})"
       ]
     },
     {

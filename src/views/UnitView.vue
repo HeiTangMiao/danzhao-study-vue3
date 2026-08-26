@@ -113,6 +113,41 @@
       <span class="nav-index">{{ fileIndex + 1 }} / {{ unit.files.length }}</span>
       <button class="nav-btn" :disabled="!hasNext" @click="goNext">下一页 →</button>
     </nav>
+
+    <!-- 固定侧边栏：快捷导航 + 快捷操作 -->
+    <ContentSidebar
+      v-if="page"
+      :unit="unit"
+      :toc="toc"
+      :file-index="fileIndex"
+      :subject="subject"
+      :unit-num="route.params.unitNum"
+      :site="site"
+      :is-done="isDone"
+      :is-math="subject === 'math'"
+      @scroll-to="scrollToBlock"
+      @scroll-top="scrollTop"
+      @toggle-done="toggleDone"
+      @toggle-bookmark="bookmark.toggleBookmark()"
+      @toggle-notes="showNotes = !showNotes"
+      @toggle-toc="showToc = !showToc"
+      @open-desmos="showDesmos = true"
+      @go-file="goFile"
+      @go-unit="goUnit"
+    />
+
+    <!-- Desmos 演练场浮层 -->
+    <transition name="fade">
+      <div v-if="showDesmos" class="desmos-overlay" @click.self="showDesmos = false">
+        <div class="desmos-overlay__panel">
+          <div class="desmos-overlay__head">
+            <span>🧮 Desmos 图形计算器演练场</span>
+            <button class="desmos-overlay__close" title="关闭" @click="showDesmos = false">✕</button>
+          </div>
+          <DesmosPlayground />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -125,6 +160,8 @@ import { useGameEngineStore } from '@/stores/gameEngine'
 import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
 import BlockRenderer from '@/components/BlockRenderer.vue'
+import ContentSidebar from '@/components/ContentSidebar.vue'
+import DesmosPlayground from '@/components/DesmosPlayground.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -151,6 +188,9 @@ const fileMeta = computed(() => unit.value?.files[fileIndex.value])
 
 // 笔记面板显隐
 const showNotes = ref(false)
+
+// Desmos 演练场浮层显隐
+const showDesmos = ref(false)
 
 // 加载状态
 const loading = ref(false)
@@ -293,6 +333,23 @@ function goNext() {
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value + 1 } })
 }
 
+// 滚动到顶部
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 跳转到同单元指定页
+function goFile(i) {
+  if (i === fileIndex.value) return
+  router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: i } })
+}
+
+// 跳转到指定单元（默认第一页）
+function goUnit(u) {
+  if (!u) return
+  router.push({ name: 'unit', params: { subject: subject.value, unitNum: u.num, fileIndex: 0 } })
+}
+
 // 监听路由变化重新加载内容（切换页面或学科时触发）
 watch(
   () => [route.params.subject, route.params.unitNum, route.params.fileIndex],
@@ -403,6 +460,11 @@ watch(
 
 .page-content { display: flex; flex-direction: column; gap: var(--spacer-8); }
 .block-anchor { scroll-margin-top: 12px; }
+
+/* 侧边栏可见时，为内容区右侧预留空间，避免被固定侧边栏遮挡 */
+@media (min-width: 1151px) and (max-width: 1456px) {
+  .unit-view { padding-right: 250px; }
+}
 .page-nav {
   display: flex;
   align-items: center;
@@ -418,4 +480,40 @@ watch(
 .nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
 .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .nav-index { color: var(--text-muted); font-size: 0.85rem; }
+
+/* Desmos 演练场浮层 */
+.desmos-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--spacer-24);
+}
+.desmos-overlay__panel {
+  width: min(920px, 100%);
+  max-height: 92vh;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+.desmos-overlay__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+  font-weight: 700;
+}
+.desmos-overlay__close {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.desmos-overlay__close:hover { color: var(--danger); border-color: var(--danger); }
+.desmos-overlay__panel :deep(.desmos-playground) { margin-bottom: 0; border: none; border-radius: 0; }
+.desmos-overlay__panel :deep(.dp-body) { min-height: 60vh; }
+.desmos-overlay__panel :deep(.dp-calculator) { height: 60vh; }
 </style>

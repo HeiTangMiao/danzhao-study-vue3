@@ -19,6 +19,7 @@
     <div v-if="enabled" class="mm-toolbar">
       <button class="mm-btn" type="button" title="放大" @click="zoomIn">＋</button>
       <button class="mm-btn" type="button" title="缩小" @click="zoomOut">－</button>
+      <button class="mm-btn" type="button" title="适应窗口" @click="fitToView">⤢</button>
       <button class="mm-btn" type="button" title="复位" @click="resetView">⟳</button>
       <span class="mm-hint">滚轮缩放 · 拖拽移动 · 点击节点跳转正文</span>
     </div>
@@ -60,22 +61,46 @@ let dragging = false, startX = 0, startY = 0
 const DRAG_THRESHOLD = 5
 let movedDist = 0
 
-function zoomIn() { transform.scale = Math.min(MAX, +(transform.scale + STEP).toFixed(2)) }
-function zoomOut() { transform.scale = Math.max(MIN, +(transform.scale - STEP).toFixed(2)) }
-function resetView() { transform.scale = 1; transform.x = 0; transform.y = 0 }
+function zoomIn() { transform.scale = Math.min(MAX, +(transform.scale + STEP).toFixed(2)); clampPan() }
+function zoomOut() { transform.scale = Math.max(MIN, +(transform.scale - STEP).toFixed(2)); clampPan() }
+
+/**
+ * 适应窗口：将思维导图整体缩放到视口内并居中（固定边界核心逻辑）
+ * 内容小于视口时居中显示；大于视口时按比例缩小到刚好容纳。
+ */
+function fitToView() {
+  if (!viewport.value || !container.value) return
+  const vw = viewport.value.clientWidth
+  const vh = viewport.value.clientHeight
+  const cw = container.value.scrollWidth
+  const ch = container.value.scrollHeight
+  if (!cw || !ch) return
+  const scale = Math.min(vw / cw, vh / ch, 1)
+  transform.scale = Math.max(MIN, +(scale).toFixed(2))
+  transform.x = (vw - cw * transform.scale) / 2
+  transform.y = (vh - ch * transform.scale) / 2
+}
+
+function resetView() { fitToView() }
 
 function onWheel(e) {
   const dir = e.deltaY < 0 ? 1 : -1
   const ns = Math.max(MIN, Math.min(MAX, +(transform.scale + dir * STEP).toFixed(2)))
-  clampPan(); transform.scale = ns
+  transform.scale = ns
+  clampPan()
 }
 
+/**
+ * 边界约束：内容始终被限制在固定视口内，无法被拖出边界。
+ * 内容小于视口时居中；大于视口时限制平移范围，保证内容覆盖视口且不越界。
+ */
 function clampPan() {
-  if (!viewport.value || !canvas.value) return
+  if (!viewport.value || !container.value) return
   const vw = viewport.value.clientWidth, vh = viewport.value.clientHeight
-  const cw = canvas.value.scrollWidth, ch = canvas.value.scrollHeight
-  transform.x = Math.max(-cw * transform.scale, Math.min(vw, transform.x))
-  transform.y = Math.max(-ch * transform.scale, Math.min(vh, transform.y))
+  const cw = container.value.scrollWidth * transform.scale
+  const ch = container.value.scrollHeight * transform.scale
+  transform.x = cw <= vw ? (vw - cw) / 2 : Math.max(vw - cw, Math.min(0, transform.x))
+  transform.y = ch <= vh ? (vh - ch) / 2 : Math.max(vh - ch, Math.min(0, transform.y))
 }
 
 // 拖拽平移
@@ -145,6 +170,8 @@ onMounted(async () => {
   await renderMermaidTo(container.value, props.block.mermaid, { decorate: true })
   bindNodeClick()
   enabled.value = true
+  // 渲染完成后自动适应窗口（固定边界）
+  requestAnimationFrame(() => fitToView())
   // 绑定视口拖拽
   viewport.value.addEventListener('pointerdown', onPointerDown)
   window.addEventListener('pointermove', onPointerMove)
@@ -176,12 +203,13 @@ onBeforeUnmount(() => { dragging = false })
 .mm-hint { font-size: 12px; color: var(--text-muted, #94a3b8); margin-left: 6px; }
 .mindmap-viewport {
   position: relative; overflow: hidden;
+  height: 460px; /* 固定边界：思维导图始终在固定高度的容器内 */
   border: 1px solid var(--border, #e2e8f0); border-radius: 12px;
   background: var(--surface, #fff); cursor: grab; touch-action: none;
 }
 .mindmap-viewport:active { cursor: grabbing; }
 .mindmap-canvas { width: 100%; will-change: transform; }
-.mindmap-content { padding: 16px; min-height: 100px; }
+.mindmap-content { padding: 16px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
 .mindmap-content svg { max-width: none; height: auto; display: block; }
 .mindmap-content svg .node { transition: filter .15s; }
 .mindmap-content svg .node:hover { filter: brightness(1.04); }

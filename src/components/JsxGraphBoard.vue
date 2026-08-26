@@ -22,7 +22,9 @@ const props = defineProps({
   // 画板初始化回调 (board, colors) => void
   setup: { type: Function, default: null },
   // 边界框 [xMin, yMax, xMax, yMin]
-  boundingbox: { type: Array, default: () => [-5, 4, 5, -4] }
+  boundingbox: { type: Array, default: () => [-5, 4, 5, -4] },
+  // 固定模式：仅作为图形示例时开启，禁止拖拽/缩放/平移
+  fixed: { type: Boolean, default: false }
 })
 
 const container = ref(null)
@@ -54,13 +56,15 @@ onMounted(async () => {
     muted: isDark ? '#aab2c0' : '#5b6472'
   }
 
-  // 初始化画板
+  // 初始化画板（固定模式禁用平移与缩放）
   board = JXG.JSXGraph.initBoard(container.value, {
     boundingbox: props.boundingbox,
     axis: false,
     showCopyright: false,
     grid: false,
-    backgroundColor: colors.bg
+    backgroundColor: colors.bg,
+    pan: props.fixed ? { enabled: false } : { enabled: true },
+    zoom: props.fixed ? { enabled: false } : { enabled: true }
   })
 
   // 调用业务方回调绘制图形
@@ -69,6 +73,19 @@ onMounted(async () => {
       props.setup(board, colors, JXG)
     } catch (e) {
       console.error('[JsxGraphBoard] setup 回调执行失败:', e)
+    }
+  }
+
+  // 固定模式：冻结所有可拖拽元素（图形示例保持固定不变）
+  if (props.fixed) {
+    try {
+      board.objectsList.forEach((el) => {
+        if (el && typeof el.setAttribute === 'function') {
+          el.setAttribute({ fixed: true })
+        }
+      })
+    } catch (e) {
+      console.warn('[JsxGraphBoard] 固定元素失败:', e)
     }
   }
 })

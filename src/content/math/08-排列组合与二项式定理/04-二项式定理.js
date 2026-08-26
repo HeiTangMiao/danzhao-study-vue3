@@ -35,7 +35,7 @@ export default {
       "type": "formula",
       "title": "二项式定理",
       "formulas": [
-        "(a+b",
+        "(a+b)",
         "n+1"
       ]
     },

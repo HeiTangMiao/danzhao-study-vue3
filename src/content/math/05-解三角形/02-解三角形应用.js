@@ -94,31 +94,31 @@ export default {
           "title": "例题1：求面积",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\(a = 6\\)，\\(b = 8\\)，\\(C = 60°\\)，求三角形的面积 \\(S\\)。",
           "solution": "解：\n\n        由面积公式 \\(S = \\frac{1}{2}ab\\sin C\\)：\n\n        \\(S = \\frac{1}{2} \\times 6 \\times 8 \\times \\sin 60° = \\frac{1}{2} \\times 48 \\times \\frac{\\sqrt{3}}{2} = 12\\sqrt{3}\\)",
-          "answer": ""
+          "answer": "答案：\\(S = 12\\sqrt{3}\\)。"
         },
         {
           "title": "例题2：实际测量问题",
-          "question": "如图，为测量河对岸 \\(A\\)、\\(B\\) 两点间的距离，在河岸边选取两点 \\(C\\)、\\(D\\)，测得 \\(CD = 100\\) m，\\(\\angle ACD = 60°\\)，\\(\\angle BCD = 30°\\)，\\(\\angle ADC = 45°\\)，\\(\\angle BDC = 75°\\)。求 \\(A\\)、\\(B\\) 两点间的距离。\n\n      \n        \n          \n            .rv-bank{stroke:var(--border);stroke-width:2;fill:none}\n            .rv-water{fill:var(--info);fill-opacity:0.13;stroke:none}\n            .rv-sight{stroke:var(--primary);stroke-width:1.6;fill:none}\n            .rv-base{stroke:var(--accent);stroke-width:3;fill:none}\n            .rv-arc{stroke:var(--accent);stroke-width:1.5;fill:none}\n            .rv-pt{fill:var(--danger);stroke:var(--card-bg);stroke-width:1.5}\n            .rv-letter{fill:var(--primary);font-weight:700;font-size:15px}\n            .rv-ang{fill:var(--accent);font-weight:700;font-size:13px}\n            .rv-cd{fill:var(--accent);font-weight:700;font-size:13px}\n            .rv-banklabel{fill:var(--text-light);font-size:13px}\n          \n          \n          \n          \n          \n          \n          河对岸（目标 A、B）\n          河岸（测量点 C、D）\n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          60°\n          30°\n          45°\n          75°\n          \n          \n          \n          \n          \n          \n          A\n          B\n          C\n          D\n          \n          CD = 100 m\n        \n        示意图：C、D 为河岸测量点，A、B 为河对岸目标点，基线 CD = 100 m",
+          "question": "如图，为测量河对岸 \\(A\\)、\\(B\\) 两点间的距离，在河岸边选取两点 \\(C\\)、\\(D\\)，测得 \\(CD = 100\\) m，\\(\\angle ACD = 60°\\)，\\(\\angle BCD = 30°\\)，\\(\\angle ADC = 45°\\)，\\(\\angle BDC = 75°\\)。求 \\(A\\)、\\(B\\) 两点间的距离。\n\n      示意图：\\(C\\)、\\(D\\) 为河岸测量点，\\(A\\)、\\(B\\) 为河对岸目标点，基线 \\(CD = 100\\) m。",
           "solution": "解：\n\n        在 \\(\\triangle ACD\\) 中：\n\n        \\(\\angle CAD = 180° - 60° - 45° = 75°\\)\n\n        由正弦定理：\\(\\frac{AC}{\\sin 45°} = \\frac{CD}{\\sin 75°}\\)\n\n        \\(AC = \\frac{100\\sin 45°}{\\sin 75°} = \\frac{100 \\times \\frac{\\sqrt{2}}{2}}{\\frac{\\sqrt{6}+\\sqrt{2}}{4}} = \\frac{50\\sqrt{2} \\times 4}{\\sqrt{6}+\\sqrt{2}} = \\frac{200\\sqrt{2}}{\\sqrt{6}+\\sqrt{2}}\\)\n\n        分母有理化：\\(\\frac{200\\sqrt{2}(\\sqrt{6}-\\sqrt{2})}{6-2} = \\frac{200\\sqrt{2}(\\sqrt{6}-\\sqrt{2})}{4} = 50\\sqrt{2}(\\sqrt{6}-\\sqrt{2}) = 50(2\\sqrt{3}-2) = 100(\\sqrt{3}-1)\\)\n\n        在 \\(\\triangle BCD\\) 中：\n\n        \\(\\angle CBD = 180° - 30° - 75° = 75°\\)\n\n        由正弦定理：\\(\\frac{BC}{\\sin 75°} = \\frac{CD}{\\sin 75°}\\)，所以 \\(BC = CD = 100\\) m\n\n        在 \\(\\triangle ABC\\) 中，\\(\\angle ACB = \\angle ACD - \\angle BCD = 60° - 30° = 30°\\)\n\n        由余弦定理：\n\n        \\(AB^2 = AC^2 + BC^2 - 2 \\cdot AC \\cdot BC \\cdot \\cos 30°\\)\n\n        \\(= [100(\\sqrt{3}-1)]^2 + 100^2 - 2 \\times 100(\\sqrt{3}-1) \\times 100 \\times \\frac{\\sqrt{3}}{2}\\)\n\n        \\(= 10000(4-2\\sqrt{3}) + 10000 - 10000\\sqrt{3}(\\sqrt{3}-1)\\)\n\n        \\(= 10000(4-2\\sqrt{3}) + 10000 - 10000(3-\\sqrt{3})\\)\n\n        \\(= 10000(4-2\\sqrt{3}+1-3+\\sqrt{3}) = 10000(2-\\sqrt{3})\\)\n\n        \\(AB = 100\\sqrt{2-\\sqrt{3}} \\approx 100 \\times 0.5176 \\approx 51.76\\) m",
-          "answer": ""
+          "answer": "答案：\\(AB = 100\\sqrt{2-\\sqrt{3}} \\approx 51.76\\) m。"
         },
         {
           "title": "例题3：综合应用",
           "question": "在 \\(\\triangle ABC\\) 中，\\(a + b = 10\\)，\\(C = 60°\\)，求 \\(\\triangle ABC\\) 面积的最大值。",
           "solution": "解：\n\n        面积 \\(S = \\frac{1}{2}ab\\sin C = \\frac{1}{2}ab\\sin 60° = \\frac{\\sqrt{3}}{4}ab\\)\n\n        要使面积最大，需要 \\(ab\\) 最大。\n\n        由 \\(a + b = 10\\)，根据基本不等式 \\(ab \\leq \\left(\\frac{a+b}{2}\\right)^2 = 25\\)，当且仅当 \\(a = b = 5\\) 时取等号。\n\n        所以 \\(ab\\) 的最大值为 \\(25\\)。\n\n        \\(S_{\\max} = \\frac{\\sqrt{3}}{4} \\times 25 = \\frac{25\\sqrt{3}}{4}\\)",
-          "answer": ""
+          "answer": "答案：面积最大值为 \\(\\frac{25\\sqrt{3}}{4}\\)，当 \\(a = b = 5\\) 时取得。"
         },
         {
           "title": "例题4：推导面积公式 S = abc/(4R)",
           "question": "在 \\(\\triangle ABC\\) 中，\\(a\\)、\\(b\\)、\\(c\\) 为三边，\\(R\\) 为外接圆半径，证明：\\(S = \\dfrac{abc}{4R}\\)。",
           "solution": "证明：把正弦定理与面积公式结合起来。\n\n        由正弦定理 \\(\\dfrac{a}{\\sin A} = 2R\\)，可得 \\(\\sin A = \\dfrac{a}{2R}\\)。\n\n        由三角形面积公式 \\(S = \\dfrac{1}{2}bc\\sin A\\)，\n\n        代入 \\(\\sin A\\)：\\(S = \\dfrac{1}{2}bc \\cdot \\dfrac{a}{2R} = \\dfrac{abc}{4R}\\)。\n\n        故 \\(S = \\dfrac{abc}{4R}\\)，得证。",
-          "answer": ""
+          "answer": "答案：\\(S = \\dfrac{abc}{4R}\\) 得证。"
         },
         {
           "title": "例题5：解三角形漏解（易错题）",
           "question": "在 \\(\\triangle ABC\\) 中，已知 \\(b = 3\\)，\\(c = 3\\sqrt{3}\\)，\\(B = 30°\\)，求角 \\(C\\) 和边 \\(a\\)。",
           "solution": "常见错误：由正弦定理 \\(\\sin C = \\dfrac{c\\sin B}{b} = \\dfrac{3\\sqrt{3} \\times \\frac{1}{2}}{3} = \\dfrac{\\sqrt{3}}{2}\\)，直接得 \\(C = 60°\\)，再算 \\(A = 90°\\)，\\(a = \\dfrac{b\\sin A}{\\sin B} = 6\\)。\n\n        错误分析：\\(\\sin C = \\dfrac{\\sqrt{3}}{2}\\) 时，\\(C\\) 可为 \\(60°\\) 或 \\(120°\\)。题中 \\(c = 3\\sqrt{3} > b = 3\\)，故 \\(C > B = 30°\\)，两种情况均可能，不能只取一解。\n\n        正确解法：由 \\(\\sin C = \\dfrac{\\sqrt{3}}{2}\\)，得 \\(C = 60°\\) 或 \\(C = 120°\\)。\n\n        当 \\(C = 60°\\) 时，\\(A = 180° - 30° - 60° = 90°\\)，由正弦定理 \\(a = \\dfrac{b\\sin A}{\\sin B} = \\dfrac{3 \\times 1}{\\frac{1}{2}} = 6\\)；\n\n        当 \\(C = 120°\\) 时，\\(A = 180° - 30° - 120° = 30°\\)，由正弦定理 \\(a = \\dfrac{b\\sin A}{\\sin B} = \\dfrac{3 \\times \\frac{1}{2}}{\\frac{1}{2}} = 3\\)。\n\n        故 \\(C = 60°, a = 6\\) 或 \\(C = 120°, a = 3\\)。",
-          "answer": ""
+          "answer": "答案：\\(C = 60°, a = 6\\) 或 \\(C = 120°, a = 3\\)（SSA 情况有两解）。"
         }
       ]
     },

@@ -36,28 +36,7 @@ export default {
       "title": "双曲线定义演示",
       "boardId": "hyperbola-definition",
       "caption": "拖动点 P 沿双曲线移动，观察 ||PF₁| - |PF₂|| 恒等于 2a，虚线为渐近线。",
-      "initCode": `board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});
-board.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});
-board.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});
-const F1 = board.create('point', [-3,0], {name:'F₁', size:2, color: colors.accent, fixed:true});
-const F2 = board.create('point', [3,0], {name:'F₂', size:2, color: colors.accent, fixed:true});
-const hyp = board.create('hyperbola', [F1, F2, 2], {strokeColor: colors.primary, strokeWidth:2});
-const P = board.create('glider', [4,1.5, hyp], {name:'P', size:2, color: colors.primary});
-board.create('segment', [F1, P], {strokeColor: colors.primary, strokeWidth:1.5});
-board.create('segment', [F2, P], {strokeColor: colors.primary, strokeWidth:1.5});
-board.create('line', [[0,0], [1, 1.118]], {strokeColor: colors.muted, strokeWidth:1, dash:2});
-board.create('line', [[0,0], [1, -1.118]], {strokeColor: colors.muted, strokeWidth:1, dash:2});
-board.create('text', [-5.8, 3.6, function(){
-  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());
-  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());
-  return '|PF₁| = ' + Math.round(d1*100)/100 + '，|PF₂| = ' + Math.round(d2*100)/100;
-}], {fontSize:13, color: colors.muted});
-board.create('text', [-5.8, 3.0, function(){
-  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());
-  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());
-  return '||PF₁| - |PF₂|| = ' + Math.round(Math.abs(d1-d2)*100)/100 + ' = 2a（常数）';
-}], {fontSize:14, color: colors.primary});`
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst F1 = board.create('point', [-3,0], {name:'F₁', size:2, color: colors.accent, fixed:true});\nconst F2 = board.create('point', [3,0], {name:'F₂', size:2, color: colors.accent, fixed:true});\nconst hyp = board.create('hyperbola', [F1, F2, 2], {strokeColor: colors.primary, strokeWidth:2});\nconst P = board.create('glider', [4,1.5, hyp], {name:'P', size:2, color: colors.primary});\nboard.create('segment', [F1, P], {strokeColor: colors.primary, strokeWidth:1.5});\nboard.create('segment', [F2, P], {strokeColor: colors.primary, strokeWidth:1.5});\nboard.create('line', [[0,0], [1, 1.118]], {strokeColor: colors.muted, strokeWidth:1, dash:2});\nboard.create('line', [[0,0], [1, -1.118]], {strokeColor: colors.muted, strokeWidth:1, dash:2});\nboard.create('text', [-5.8, 3.6, function(){\n  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());\n  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());\n  return '|PF₁| = ' + Math.round(d1*100)/100 + '，|PF₂| = ' + Math.round(d2*100)/100;\n}], {fontSize:13, color: colors.muted});\nboard.create('text', [-5.8, 3.0, function(){\n  const d1 = Math.hypot(P.X()-F1.X(), P.Y()-F1.Y());\n  const d2 = Math.hypot(P.X()-F2.X(), P.Y()-F2.Y());\n  return '||PF₁| - |PF₂|| = ' + Math.round(Math.abs(d1-d2)*100)/100 + ' = 2a（常数）';\n}], {fontSize:14, color: colors.primary});"
     },
     {
       "type": "warning",
@@ -67,16 +46,16 @@ board.create('text', [-5.8, 3.0, function(){
       "type": "formula",
       "title": "焦点在 x 轴上",
       "formulas": [
-        "F_1(-c, 0",
-        "F_2(c, 0"
+        "F_1(-c, 0)",
+        "F_2(c, 0)"
       ]
     },
     {
       "type": "formula",
       "title": "焦点在 y 轴上",
       "formulas": [
-        "F_1(0, -c",
-        "F_2(0, c"
+        "F_1(0, -c)",
+        "F_2(0, c)"
       ]
     },
     {

@@ -10,7 +10,7 @@
   <section class="block diagram">
     <h3 v-if="block.title" class="block-title">{{ block.title }}</h3>
     <div class="diagram-box">
-      <JsxGraphBoard :setup="setupFn" :boundingbox="boundingbox" :height="height" />
+      <JsxGraphBoard :setup="setupFn" :boundingbox="boundingbox" :height="height" :fixed="block.fixed" />
       <p v-if="block.caption" class="diagram-caption">{{ block.caption }}</p>
       <p v-if="!setupFn" class="diagram-error">⚠️ 图形初始化代码无效，无法渲染。</p>
     </div>

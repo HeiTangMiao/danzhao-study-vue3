@@ -39,7 +39,7 @@ export default {
       "type": "formula",
       "title": "指数式与对数式的互化",
       "formulas": [
-        "a^x = N \\iff \\log_a N = x \\quad (a > 0, a \\ne 1, N > 0"
+        "a^x = N \\iff \\log_a N = x \\quad (a > 0, a \\ne 1, N > 0)"
       ]
     },
     {
@@ -68,7 +68,7 @@ export default {
       "type": "formula",
       "title": "运算法则（a > 0, a ≠ 1, M > 0, N > 0）",
       "formulas": [
-        "\\log_a(M \\cdot N",
+        "\\log_a(M \\cdot N)",
         "\\log_a \\frac{M}{N} = \\log_a M - \\log_a N",
         "③ 幂的对数：\\(\\log_a M^n = n \\cdot \\log_a M\\)（\\(n \\in \\mathbb{R}\\)）"
       ]
@@ -88,17 +88,24 @@ export default {
       "type": "formula",
       "title": "换底公式",
       "formulas": [
-        "\\log_a b = \\frac{\\log_c b}{\\log_c a} \\quad (a > 0, a \\ne 1, b > 0, c > 0, c \\ne 1"
+        "\\log_a b = \\frac{\\log_c b}{\\log_c a} \\quad (a > 0, a \\ne 1, b > 0, c > 0, c \\ne 1)"
       ]
     },
     {
       "type": "formula",
       "title": "对数函数定义",
       "formulas": [
-        "y = \\log_a x \\quad (a > 0 \\text{ 且 } a \\ne 1",
-        "(0, +\\infty",
+        "y = \\log_a x \\quad (a > 0 \\text{ 且 } a \\ne 1)",
+        "(0, +\\infty)",
         "\\mathbb{R}"
       ]
+    },
+    {
+      "type": "diagram",
+      "title": "对数函数图像演示",
+      "boardId": "log-func",
+      "caption": "拖动滑块改变底数 a，观察对数函数单调性与过定点 (1,0)。",
+      "initCode": "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst a = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [0.1, 2, 4]], {name:'a', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return Math.log(x)/Math.log(a.Value()); }, 0.01, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('point', [1, 0], {name:'(1,0)', size:2, color: colors.accent, fixed:true});\nboard.create('text', [-5.6, 3.8, function(){ return 'y = log_' + a.Value().toFixed(1) + '(x)'; }], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const av = a.Value();\n  return 'a = ' + av.toFixed(1) + '，' + (av > 1 ? '单调递增' : '单调递减') + '；过定点 (1,0)';\n}], {fontSize:13, color: colors.muted});"
     },
     {
       "type": "tip",
