@@ -125,10 +125,11 @@ function dbGetAll(storeName) {
   })
 }
 
-/** 写入 / 更新记录（按 keyPath 覆盖） */
+/** 写入 / 更新记录（按 keyPath 覆盖）。正常业务写入 = 本地变更，自动盖上 updatedAt 供同步比较 */
 function dbPut(storeName, data) {
+  const stamped = { ...data, updatedAt: new Date().toISOString() }
   return new Promise((resolve, reject) => {
-    const r = getStore(storeName, 'readwrite').put(data)
+    const r = getStore(storeName, 'readwrite').put(stamped)
     r.onsuccess = () => resolve()
     r.onerror = () => reject(r.error)
   })
@@ -136,9 +137,19 @@ function dbPut(storeName, data) {
 
 /** 新增记录（autoIncrement key 由 DB 分配） */
 function dbAdd(storeName, data) {
+  const stamped = { ...data, updatedAt: new Date().toISOString() }
   return new Promise((resolve, reject) => {
-    const r = getStore(storeName, 'readwrite').add(data)
+    const r = getStore(storeName, 'readwrite').add(stamped)
     r.onsuccess = () => resolve(r.result)
+    r.onerror = () => reject(r.error)
+  })
+}
+
+/** 同步引擎专用：按服务器时间戳落库（不覆盖 updatedAt，避免把远端时间改成本地） */
+function putSynced(storeName, data) {
+  return new Promise((resolve, reject) => {
+    const r = getStore(storeName, 'readwrite').put(data)
+    r.onsuccess = () => resolve()
     r.onerror = () => reject(r.error)
   })
 }
@@ -168,6 +179,22 @@ export const useStudyDbStore = defineStore('studyDb', {
     /** 初始化数据库连接（幂等，多次调用安全） */
     async init() {
       await openDB()
+    },
+
+    /**
+     * 同步引擎专用：按服务器时间戳落库（保留 updatedAt）
+     * @param {string} storeName - 仓库名
+     * @param {Object} data - 来自服务器的完整业务记录
+     */
+    async applySynced(storeName, data) {
+      await this.init()
+      return putSynced(storeName, data)
+    },
+
+    /** 同步引擎专用：按 key 删除本地记录（墓碑应用） */
+    async removeSynced(storeName, key) {
+      await this.init()
+      return dbDelete(storeName, key)
     },
 
     // ===== 学习日志 =====

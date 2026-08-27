@@ -7,10 +7,21 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="app-header__brand">📚 单招学习打卡</div>
-      <!-- 顶部主题切换开关 -->
-      <button class="app-header__theme" aria-label="切换主题" @click="toggleTheme">
-        {{ isDark ? '🌙' : '☀️' }}
-      </button>
+      <div class="app-header__right">
+        <!-- 已登录：同步状态 + 退出 -->
+        <template v-if="auth.isLoggedIn">
+          <button class="app-header__sync" :disabled="syncing" @click="doSync">
+            {{ syncMsg || `👤 ${auth.user?.username || '已登录'}` }}
+          </button>
+          <button class="app-header__logout" @click="logout">退出</button>
+        </template>
+        <!-- 未登录：登录入口 -->
+        <router-link v-else to="/login" class="app-header__login">登录</router-link>
+        <!-- 顶部主题切换开关 -->
+        <button class="app-header__theme" aria-label="切换主题" @click="toggleTheme">
+          {{ isDark ? '🌙' : '☀️' }}
+        </button>
+      </div>
     </header>
     <main class="app-main">
       <router-view />
@@ -22,15 +33,49 @@
 /**
  * 根组件逻辑
  * 使用 useTheme composable 管理明暗主题，主题状态持久化到 localStorage。
+ * 已登录时启动同步：进入即同步一次 + 每 5 分钟后台增量同步。
  */
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useTheme } from './composables/useTheme'
 import { useProgressStore } from '@/stores/progress'
+import { useAuthStore } from '@/stores/auth'
+import { useSyncEngine } from '@/sync/engine'
 
 const { isDark, toggleTheme } = useTheme()
+const auth = useAuthStore()
+const { runSync } = useSyncEngine()
 
 // 应用启动时预加载统一进度（IndexedDB + 旧数据迁移）
 const progress = useProgressStore()
 progress.init()
+
+// 同步状态
+const syncing = ref(false)
+const syncMsg = ref('')
+async function doSync() {
+  if (syncing.value) return
+  syncing.value = true
+  syncMsg.value = '同步中…'
+  const r = await runSync()
+  syncMsg.value = r.ok ? `已同步 ↑${r.pushed} ↓${r.pulled}` : '同步失败'
+  setTimeout(() => { syncMsg.value = '' }, 3000)
+  syncing.value = false
+}
+
+let syncTimer = null
+onMounted(() => {
+  if (auth.isLoggedIn) {
+    doSync()
+    syncTimer = setInterval(() => {
+      if (auth.isLoggedIn) runSync()
+    }, 5 * 60 * 1000)
+  }
+})
+onBeforeUnmount(() => { if (syncTimer) clearInterval(syncTimer) })
+
+function logout() {
+  auth.logout()
+}
 </script>
 
 <style scoped>
@@ -49,6 +94,29 @@ progress.init()
 }
 .app-header__brand {
   font-weight: 600;
+}
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacer-8);
+}
+.app-header__login,
+.app-header__sync,
+.app-header__logout {
+  min-height: 36px;
+  padding: 0 var(--spacer-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface-muted);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.app-header__sync:disabled {
+  opacity: 0.6;
 }
 .app-header__theme {
   background: var(--surface-muted);
@@ -70,5 +138,12 @@ progress.init()
 @media (max-width: 600px) {
   .app-header { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
   .app-main { padding: var(--spacer-16) var(--spacer-16) calc(var(--spacer-16) + var(--sab)); }
+  .app-header__login,
+  .app-header__sync,
+  .app-header__logout {
+    min-height: 40px;
+    font-size: 0.8rem;
+    padding: 0 var(--spacer-8);
+  }
 }
 </style>

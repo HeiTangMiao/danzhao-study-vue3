@@ -59,6 +59,13 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: '0.0.0.0',
+    // 开发期把 /api 代理到本地后端（生产由 Nginx 反代）
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true
+      }
+    },
     watch: {
       // 忽略 Rust 构建产物等重型目录，避免超出系统文件监听上限
       ignored: ['**/src-tauri/target/**', '**/dist/**', '**/node_modules/**']

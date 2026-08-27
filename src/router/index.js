@@ -8,6 +8,12 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
   {
+    // 账号登录 / 注册
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue')
+  },
+  {
     // 首页：学科选择 + 单元列表
     path: '/',
     name: 'home',
