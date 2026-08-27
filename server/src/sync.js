@@ -7,15 +7,10 @@
  * 客户端按 (entity, key) 对应业务记录，payload 为原样业务对象。
  */
 import { query } from './db.js'
+import { toDate, shouldAccept } from './sync-core.js'
 
 const PULL_LIMIT = 5000
 const MIN_DATE = '1970-01-01T00:00:00.000Z'
-
-/** 归一化为合法 Date（非法输入退回最早时间，避免崩溃） */
-function toDate(v) {
-  const d = v instanceof Date ? v : new Date(v)
-  return Number.isNaN(d.getTime()) ? new Date(MIN_DATE) : d
-}
 
 export async function syncRoutes(app) {
   app.post('/api/sync', { preHandler: app.authenticate }, async (req, reply) => {
@@ -52,8 +47,8 @@ export async function syncRoutes(app) {
         'SELECT updated_at FROM sync_items WHERE user_id=$1 AND entity=$2 AND item_key=$3',
         [userId, entity, key]
       )
-      if (existing.length > 0 && new Date(existing[0].updated_at).getTime() >= updatedAt.getTime()) {
-        continue // 服务端已更新，丢弃本推送
+      if (existing.length > 0 && !shouldAccept(existing[0].updated_at, updatedAt)) {
+        continue // 服务端已更新或相同，丢弃本推送
       }
 
       await query(

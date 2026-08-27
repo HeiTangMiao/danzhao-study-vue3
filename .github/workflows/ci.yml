@@ -81,6 +81,28 @@ jobs:
       - name: Rust 编译检查
         run: cargo check --manifest-path src-tauri/Cargo.toml
 
+  server:
+    name: 后端 校验 · 测试
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: 安装依赖
+        working-directory: server
+        run: npm ci
+
+      - name: 单元测试
+        working-directory: server
+        run: npm test
+
   deploy:
     name: 部署到线上服务器（rsync）
     # 仅在 push 到 main（非 PR）时部署；复用 quality 的构建产物
@@ -125,3 +147,28 @@ jobs:
           USER: ${{ secrets.DEPLOY_USER }}
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
+
+  deploy-backend:
+    name: 部署后端到服务器
+    # 仅在 push 到 main（非 PR）时部署；复用 server 的校验结果
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [server]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 SSH 密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: 运行一键部署脚本
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: bash scripts/deploy-backend.sh
