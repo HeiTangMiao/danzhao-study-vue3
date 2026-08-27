@@ -5,6 +5,9 @@ node_modules/
 dist/
 dist-ssr/
 
+# Generated search index（prebuild 按需生成，不入库）
+public/search-index.json
+
 # Rust / Tauri build outputs
 src-tauri/target/
 src-tauri/gen/

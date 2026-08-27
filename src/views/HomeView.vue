@@ -34,6 +34,11 @@
       </button>
     </section>
 
+    <!-- 全文搜索 -->
+    <section class="home-search">
+      <SearchPanel />
+    </section>
+
     <!-- 学科选择卡片 -->
     <section class="subject-tabs">
       <button
@@ -165,6 +170,7 @@ import { useProgressStore } from '@/stores/progress'
 import { useGameEngineStore } from '@/stores/gameEngine'
 import { SUBJECT_LIST, getSubjectConfig } from '@/content/index'
 import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
+import SearchPanel from '@/components/SearchPanel.vue'
 
 const router = useRouter()
 const progress = useProgressStore()
@@ -306,6 +312,9 @@ const mockRoute = computed(() => {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .continue-go { font-size: 1rem; }
+
+/* 全文搜索 */
+.home-search { margin-bottom: var(--spacer-20); }
 
 /* 学科选择卡片 */
 .subject-tabs {

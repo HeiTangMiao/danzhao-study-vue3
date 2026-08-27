@@ -138,6 +138,29 @@
         </div>
       </section>
 
+      <!-- 学情分析与复习建议（基于错题本聚合的薄弱点洞察） -->
+      <section v-if="weakAreas.length > 0" class="card insight-card">
+        <h2>📋 学情分析与复习建议</h2>
+        <div v-if="todayDue > 0" class="insight-due">
+          🔔 今日有 <strong>{{ todayDue }}</strong> 道错题到期待复习
+          <router-link to="/error-book" class="insight-link">去复习 →</router-link>
+        </div>
+        <div v-else class="insight-due insight-clear">✅ 今日没有到期错题，可以学习新内容</div>
+        <p v-if="weakest" class="insight-tip">
+          薄弱点集中在
+          <strong>{{ weakest.icon }} {{ weakest.name }} · {{ weakest.unitTitle }}</strong
+          >（{{ weakest.count }} 道错题），建议优先回看该单元并重做错题。
+        </p>
+        <div class="insight-list">
+          <div v-for="(w, i) in weakAreas" :key="i" class="insight-item">
+            <span class="insight-rank">{{ i + 1 }}</span>
+            <span class="insight-icon">{{ w.icon }}</span>
+            <span class="insight-name">{{ w.name }} · {{ w.unitTitle }}</span>
+            <span class="insight-count" :class="{ 'count-warn': i === 0 }">{{ w.count }} 题</span>
+          </div>
+        </div>
+      </section>
+
       <!-- 成就墙 -->
       <section class="card achievements-card">
         <h2>🏆 成就墙（{{ data.achievements.length }}/{{ game.ACHIEVEMENTS.length }}）</h2>
@@ -164,9 +187,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useGameEngineStore } from '@/stores/gameEngine'
-import { SUBJECT_META } from '@/content/index'
+import { SUBJECT_META, getSubjectConfig } from '@/content/index'
 
 const game = useGameEngineStore()
 
@@ -199,6 +222,50 @@ function subjPct(subj) {
   if (!subj.total || subj.total === 0) return 0
   return Math.round((subj.visited / subj.total) * 100)
 }
+
+// ===== 学情分析：薄弱知识点 + 复习建议（基于错题本聚合） =====
+
+// 今日到期待复习数（SM-2：未掌握且到期）
+const todayDue = computed(() => {
+  const errs = data.value?.allErrors || []
+  const d = new Date()
+  const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return errs.filter((e) => !e.reviewed && e.nextReviewDate <= ds).length
+})
+
+// 把 (subject, unitNum) 解析成单元标题（配置缺失时兜底）
+function getUnitTitle(subject, unitNum) {
+  try {
+    const cfg = getSubjectConfig(subject)
+    const u = cfg.units.find((x) => x.num === unitNum)
+    return u ? u.title : `单元 ${unitNum}`
+  } catch (e) {
+    return `单元 ${unitNum}`
+  }
+}
+
+// 薄弱知识点：按「学科+单元」归集错题数，降序取前 5
+const weakAreas = computed(() => {
+  const errs = data.value?.allErrors || []
+  const map = new Map()
+  for (const e of errs) {
+    const k = `${e.subject}|${e.unitNum}`
+    if (!map.has(k)) map.set(k, { subject: e.subject, unitNum: e.unitNum, count: 0 })
+    map.get(k).count++
+  }
+  return [...map.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+    .map((w) => ({
+      ...w,
+      unitTitle: getUnitTitle(w.subject, w.unitNum),
+      name: SUBJECT_META[w.subject]?.name || w.subject,
+      icon: SUBJECT_META[w.subject]?.icon || '📘'
+    }))
+})
+
+// 最高频薄弱点（供建议文案）
+const weakest = computed(() => weakAreas.value[0] || null)
 
 // 加载仪表盘数据
 onMounted(async () => {
@@ -282,6 +349,48 @@ onMounted(async () => {
 .heat-tip__off { color: var(--text-muted); }
 .heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: var(--spacer-8); font-size: 0.75rem; color: var(--text-muted); }
 .heatmap-legend .heat-cell { width: 12px; height: 12px; }
+
+/* 学情分析与复习建议 */
+.insight-card h2 { margin-bottom: var(--spacer-12); }
+.insight-due {
+  display: flex; align-items: center; gap: var(--spacer-8); flex-wrap: wrap;
+  padding: var(--spacer-10) var(--spacer-12);
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem; margin-bottom: var(--spacer-10);
+}
+.insight-due strong { color: var(--warning); }
+.insight-clear { background: rgba(47, 158, 68, 0.1); }
+.insight-link {
+  margin-left: auto; color: var(--primary); font-weight: 600;
+  padding: 4px 12px; border: 1px solid var(--primary); border-radius: var(--radius-full);
+}
+.insight-tip {
+  font-size: 0.88rem; color: var(--text-muted);
+  padding: var(--spacer-6) 0 var(--spacer-10);
+  line-height: 1.6;
+}
+.insight-tip strong { color: var(--text); }
+.insight-list { display: flex; flex-direction: column; gap: var(--spacer-6); }
+.insight-item {
+  display: flex; align-items: center; gap: var(--spacer-10);
+  padding: var(--spacer-8) var(--spacer-10);
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+}
+.insight-rank {
+  flex: 0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-full);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--primary-soft); color: var(--primary);
+  font-size: 0.78rem; font-weight: 700;
+}
+.insight-icon { font-size: 1.05rem; }
+.insight-name { flex: 1; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.insight-count {
+  flex: 0 0 auto; font-size: 0.78rem; color: var(--text-muted);
+  padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface);
+}
+.count-warn { color: var(--danger); font-weight: 700; }
 
 /* 成就墙 */
 .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--spacer-12); margin-top: var(--spacer-12); }
