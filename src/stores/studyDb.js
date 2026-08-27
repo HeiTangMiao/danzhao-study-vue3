@@ -21,7 +21,7 @@ import { defineStore } from 'pinia'
 
 // IndexedDB 配置（与旧版 db.js 保持一致，确保数据兼容）
 const DB_NAME = 'study_game_db'
-const DB_VERSION = 3
+const DB_VERSION = 4
 
 // 单例数据库连接
 let dbInstance = null
@@ -84,6 +84,12 @@ function openDB() {
           s7.createIndex('subject', 'subject', { unique: false })
           s7.createIndex('createdAt', 'createdAt', { unique: false })
         }
+      }
+
+      // v4：学习进度统一入库（原 localStorage 双轨数据收敛到 IndexedDB）
+      // 仓库结构：{ id: 'main', completed: {...}, lastStudiedAt: number|null }
+      if (oldVersion < 4 && !d.objectStoreNames.contains('user_progress')) {
+        d.createObjectStore('user_progress', { keyPath: 'id' })
       }
     }
   })
@@ -326,6 +332,21 @@ export const useStudyDbStore = defineStore('studyDb', {
       return dbGetAll('bookmarks')
     },
 
+    // ===== 学习进度（原 localStorage 双轨收敛至此） =====
+
+    /** 获取统一学习进度（不存在则返回默认结构） */
+    async getProgress() {
+      await this.init()
+      const r = await dbGet('user_progress', 'main')
+      return r || { id: 'main', completed: {}, lastStudiedAt: null }
+    },
+
+    /** 保存学习进度（completed 结构 + 最近学习时间戳） */
+    async saveProgress(progress) {
+      await this.init()
+      return dbPut('user_progress', progress)
+    },
+
     // ===== 数据导出 / 导入 =====
 
     /**
@@ -334,14 +355,15 @@ export const useStudyDbStore = defineStore('studyDb', {
      */
     async exportAllData() {
       await this.init()
-      const [studyLogs, dailyStats, achievements, pageProgress, errors, notes, bookmarks] = await Promise.all([
+      const [studyLogs, dailyStats, achievements, pageProgress, errors, notes, bookmarks, progress] = await Promise.all([
         this.getAllStudyLogs(),
         this.getAllDailyStats(),
         this.getAllAchievements(),
         this.getAllPageProgress(),
         this.getAllErrors(),
         this.getAllNotes(),
-        this.getAllBookmarks()
+        this.getAllBookmarks(),
+        this.getProgress()
       ])
 
       // 收集 localStorage 中与应用相关的数据
@@ -364,6 +386,7 @@ export const useStudyDbStore = defineStore('studyDb', {
         error_book: errors,
         notes,
         bookmarks,
+        user_progress: progress,
         localStorage: lsData
       }
     },
@@ -375,10 +398,12 @@ export const useStudyDbStore = defineStore('studyDb', {
     async importAllData(data) {
       if (!data || typeof data !== 'object') throw new Error('无效的数据格式')
 
-      const stores = ['study_log', 'daily_stats', 'achievements', 'page_progress', 'error_book', 'notes', 'bookmarks']
+      // 注意：user_progress 为单条记录对象而非数组，单独处理
+      const stores = ['study_log', 'daily_stats', 'achievements', 'page_progress', 'error_book', 'notes', 'bookmarks', 'user_progress']
 
-      // 数据格式校验
+      // 数据格式校验（数组类仓库要求为数组）
       for (const key of stores) {
+        if (key === 'user_progress') continue
         if (data[key] !== undefined && data[key] !== null && !Array.isArray(data[key])) {
           throw new Error('数据格式错误：' + key + ' 应为数组')
         }
@@ -386,8 +411,12 @@ export const useStudyDbStore = defineStore('studyDb', {
 
       await this.init()
 
-      // 筛选有数据的仓库
-      const storeNames = stores.filter((name) => data[name] && Array.isArray(data[name]) && data[name].length > 0)
+      // 筛选有数据的仓库；user_progress 为单对象单独判断
+      const hasProgress = !!(data.user_progress && typeof data.user_progress === 'object')
+      const storeNames = stores.filter((name) => {
+        if (name === 'user_progress') return hasProgress
+        return data[name] && Array.isArray(data[name]) && data[name].length > 0
+      })
       if (storeNames.length === 0) return { imported: 0, skipped: stores.length }
 
       // 单事务原子写入
@@ -413,6 +442,12 @@ export const useStudyDbStore = defineStore('studyDb', {
           const s = transaction.objectStore(storeName)
           s.clear()
           counts[storeName] = 0
+          if (storeName === 'user_progress') {
+            // 单对象仓库：直接写入主记录
+            s.put(data.user_progress)
+            counts[storeName]++
+            return
+          }
           data[storeName].forEach((item) => {
             if (!item || typeof item !== 'object') return
             // autoIncrement 仓库移除 id，由 DB 重新分配

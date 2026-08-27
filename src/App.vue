@@ -24,8 +24,13 @@
  * 使用 useTheme composable 管理明暗主题，主题状态持久化到 localStorage。
  */
 import { useTheme } from './composables/useTheme'
+import { useProgressStore } from '@/stores/progress'
 
 const { isDark, toggleTheme } = useTheme()
+
+// 应用启动时预加载统一进度（IndexedDB + 旧数据迁移）
+const progress = useProgressStore()
+progress.init()
 </script>
 
 <style scoped>
