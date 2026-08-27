@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 // 引入全部区块渲染组件
 import ObjectivesBlock from './blocks/ObjectivesBlock.vue'
 import KnowledgeBlock from './blocks/KnowledgeBlock.vue'
@@ -21,11 +21,12 @@ import TipBlock from './blocks/TipBlock.vue'
 import ExampleBlock from './blocks/ExampleBlock.vue'
 import QuizBlock from './blocks/QuizBlock.vue'
 import MindMapBlock from './blocks/MindMapBlock.vue'
-import GeometryBlock from './blocks/GeometryBlock.vue'
 import ErrorFocusBlock from './blocks/ErrorFocusBlock.vue'
 import StrategyBlock from './blocks/StrategyBlock.vue'
 import ExamBlock from './blocks/ExamBlock.vue'
 import DesmosBlock from './blocks/DesmosBlock.vue'
+// 几何演示（JSXGraph）体积大且仅个别页面使用，异步按需加载避免进主 chunk
+const GeometryBlock = defineAsyncComponent(() => import('./blocks/GeometryBlock.vue'))
 
 const props = defineProps({
   // 单个区块数据（content-schema 的 block）

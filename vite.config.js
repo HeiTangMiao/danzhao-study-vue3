@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { fileURLToPath, URL } from 'node:url'
 
 /**
@@ -10,7 +11,13 @@ import { fileURLToPath, URL } from 'node:url'
  * - server.port 固定端口，供 Tauri devUrl 引用
  */
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // 体积分析开关：`ANALYZE=1` 时输出 bundle 明细到 dist/stats.html（网络图，便于人工排查大块）
+    ...(process.env.ANALYZE === '1'
+      ? [visualizer({ filename: 'dist/stats.html', gzipSize: true })]
+      : [])
+  ],
   // 相对路径基础，兼容 Tauri 打包后的本地资源加载
   base: './',
   resolve: {
@@ -41,6 +48,8 @@ export default defineConfig({
           //    （强制合并会破坏按需加载并产生循环 chunk，故不在此处理）
           if (id.includes('/node_modules/vue/') || id.includes('/node_modules/pinia/') || id.includes('/node_modules/vue-router/')) return 'vendor-vue'
           if (id.includes('/node_modules/katex/')) return 'vendor-katex'
+          // jsxgraph（几何画板，~1MB）仅被 GeometryBlock 动态引用；强制独立 chunk，避免被提升进主包
+          if (id.includes('/node_modules/jsxgraph/')) return 'vendor-jsxgraph'
           return undefined
         }
       }
