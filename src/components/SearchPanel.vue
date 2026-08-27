@@ -45,6 +45,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { matchSearch } from '@/utils/search'
 
 const router = useRouter()
 
@@ -77,26 +78,10 @@ function debounced() {
 }
 onBeforeUnmount(() => clearTimeout(timer))
 
-// 过滤匹配：标题 / 单元标题 / 副标题 / 正文关键词
+// 过滤匹配：标题 / 单元标题 / 副标题 / 正文关键词（纯函数，见 src/utils/search.js）
 const results = computed(() => {
-  const kw = q.value.trim().toLowerCase()
-  if (!kw) return []
-  const hits = []
-  for (const item of index.value) {
-    const hay = [item.title, item.unitTitle, item.subtitle, item.keywords].join(' ').toLowerCase()
-    if (hay.includes(kw)) {
-      const pos = (item.keywords || '').toLowerCase().indexOf(kw)
-      hits.push({
-        ...item,
-        name: SUBJECT_NAME[item.subject] || item.subject,
-        snippet: pos >= 0
-          ? (item.keywords || '').slice(Math.max(0, pos - 12), pos + 40) + '…'
-          : ''
-      })
-      if (hits.length >= 30) break
-    }
-  }
-  return hits
+  const hits = matchSearch(index.value, q.value)
+  return hits.map((r) => ({ ...r, name: SUBJECT_NAME[r.subject] || r.subject }))
 })
 
 const hasMore = computed(() => results.value.length >= 30)
