@@ -66,6 +66,18 @@ jobs:
       - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@stable
 
+      # 缓存 Cargo 依赖与编译产物，避免每次冷编译（Tauri 依赖树大，冷编译可达数小时）
+      - name: 缓存 Cargo 依赖
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: tauri-cargo-${{ runner.os }}-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            tauri-cargo-${{ runner.os }}-
+
       - name: Rust 编译检查
         run: cargo check --manifest-path src-tauri/Cargo.toml
 
