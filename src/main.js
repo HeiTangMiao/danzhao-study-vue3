@@ -8,10 +8,17 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router'
+import { initErrorCapture, vueErrorHandler } from './utils/errorCapture'
 import './assets/css/main.css'
+
+// 前端可观测性：全局错误采集
+initErrorCapture()
 
 // 创建应用实例
 const app = createApp(App)
+
+// Vue 组件错误捕获
+app.config.errorHandler = vueErrorHandler
 
 // 创建 Pinia 实例并注册持久化插件（store 状态自动同步到 localStorage）
 const pinia = createPinia()

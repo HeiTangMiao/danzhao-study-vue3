@@ -39,6 +39,25 @@
       <SearchPanel />
     </section>
 
+    <!-- 今日任务提醒：待复习错题 + 快捷入口 -->
+    <section v-if="dueCount !== null" class="today-task card" :class="{ 'has-due': dueCount > 0 }">
+      <router-link v-if="dueCount > 0" to="/error-book" class="today-task__due">
+        <span class="due-icon">🔔</span>
+        <span class="due-text">
+          <span class="due-title">今日待复习 <strong>{{ dueCount }}</strong> 道错题</span>
+          <span class="due-sub">按遗忘曲线安排复习，点击前往错题本</span>
+        </span>
+        <span class="due-go">→</span>
+      </router-link>
+      <div v-else class="today-task__clear">
+        <span class="due-icon">✅</span>
+        <span class="due-text">
+          <span class="due-title">今日无待复习错题</span>
+          <span class="due-sub">可以安心学习新内容</span>
+        </span>
+      </div>
+    </section>
+
     <!-- 学科选择卡片 -->
     <section class="subject-tabs">
       <button
@@ -194,6 +213,24 @@ onMounted(async () => {
   try { quickStats.value = await game.getQuickStats() } catch { /* 数据库不可用时静默 */ }
 })
 
+// 今日待复习错题数（SM-2 到期）：首页复习提醒
+const dueCount = ref(null)
+onMounted(async () => {
+  try {
+    const db = (await import('@/stores/studyDb')).useStudyDbStore()
+    await db.init()
+    const errors = await db.getAllErrors()
+    const d = new Date()
+    const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    // 从未复习的新错题视为到期；否则按 SM-2 nextReviewDate 判断
+    dueCount.value = errors.filter((e) => {
+      if (e.reviewed) return false
+      if (e.reviewed === false && !e.lastReviewedAt) return true
+      return (e.nextReviewDate || '') <= ds
+    }).length
+  } catch { dueCount.value = 0 }
+})
+
 // 一键回到上次学习页面
 function continueStudy() {
   const s = lastStudy.value
@@ -315,6 +352,26 @@ const mockRoute = computed(() => {
 
 /* 全文搜索 */
 .home-search { margin-bottom: var(--spacer-20); }
+
+/* 今日任务提醒 */
+.today-task { padding: 0; overflow: hidden; margin-bottom: var(--spacer-20); }
+.today-task__due, .today-task__clear {
+  display: flex; align-items: center; gap: var(--spacer-12);
+  padding: var(--spacer-14) var(--spacer-16);
+  min-height: 60px;
+}
+.today-task__due {
+  color: var(--text);
+  transition: background 0.15s;
+}
+.today-task__due:hover { background: var(--surface-muted); }
+.today-task.has-due { border-color: var(--warning); border-left-width: 4px; }
+.due-icon { font-size: 1.5rem; flex: 0 0 auto; }
+.due-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.due-title { font-weight: 700; font-size: 0.95rem; }
+.due-title strong { color: var(--warning); font-size: 1.1rem; }
+.due-sub { font-size: 0.78rem; color: var(--text-muted); }
+.due-go { font-size: 1.1rem; color: var(--text-muted); flex: 0 0 auto; }
 
 /* 学科选择卡片 */
 .subject-tabs {
