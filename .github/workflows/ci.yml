@@ -82,19 +82,28 @@ jobs:
           name: dist
           path: dist
 
-      - name: 部署到服务器
-        uses: easingthemes/ssh-deploy@v5
-        with:
+      - name: 配置 SSH 密钥
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
-          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
-          TARGET: /var/www/danzhao-study/
-          SOURCE: dist/
-          # 部署前先清空旧文件，避免残留失效资源
-          ARGS: -avz --delete
-          EXCLUDE: ""
-          SCRIPT_BEFORE: |
-            ls -la /var/www/danzhao-study/ | head -3
-          SCRIPT_AFTER: |
-            sudo systemctl reload nginx || true
-            curl -s -o /dev/null -w "部署后 HTTP %{http_code}\n" http://127.0.0.1/
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: rsync 同步到服务器
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          # 首次连接自动接受 host key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          # 清空旧文件避免残留失效资源，再同步新产物
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$USER@$HOST" "rm -rf /var/www/danzhao-study/*"
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" ./dist/ "$USER@$HOST:/var/www/danzhao-study/"
+
+      - name: 部署后验证
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$USER@$HOST" "sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
