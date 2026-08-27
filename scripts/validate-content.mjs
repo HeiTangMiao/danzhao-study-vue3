@@ -41,6 +41,8 @@ function collectFiles(dir, acc = []) {
  */
 function validateBlock(block, pageId, index) {
   const errors = []
+  // 判空：undefined / null / 纯空白 均视为空
+  const isEmpty = (v) => v === undefined || v === null || String(v).trim() === ''
   if (!block || typeof block !== 'object') return [`${pageId} 区块[${index}] 不是对象`]
   if (!block.type) errors.push(`${pageId} 区块[${index}] 缺少 type`)
   else if (!BLOCK_TYPES.includes(block.type)) errors.push(`${pageId} 区块[${index}] 未知类型: ${block.type}`)
@@ -87,6 +89,9 @@ function validateBlock(block, pageId, index) {
           if (it.correctIndex !== undefined && it.options && (it.correctIndex < 0 || it.correctIndex >= it.options.length)) {
             errors.push(`${pageId} 题目[${ii}] correctIndex 越界`)
           }
+          // 练习/测验题必须给出题干与答案，防止空白占位
+          if (isEmpty(it.question)) errors.push(`${pageId} 题目[${ii}] question 为空`)
+          if (isEmpty(it.answer)) errors.push(`${pageId} 题目[${ii}] answer 为空`)
         })
       }
       break
@@ -97,6 +102,9 @@ function validateBlock(block, pageId, index) {
           if (it.difficulty && !DIFFICULTY.includes(it.difficulty)) {
             errors.push(`${pageId} 例题[${ii}] 未知难度: ${it.difficulty}`)
           }
+          // 例题必须有题干，且 solution / answer 至少其一非空（answer 可省略但二者不能皆空）
+          if (isEmpty(it.question)) errors.push(`${pageId} 例题[${ii}] question 为空`)
+          if (isEmpty(it.solution) && isEmpty(it.answer)) errors.push(`${pageId} 例题[${ii}] solution 与 answer 均为空`)
         })
       }
       break
@@ -119,15 +127,35 @@ function validateBlock(block, pageId, index) {
           if (it.correctIndex !== undefined && !it.options) {
             errors.push(`${pageId} 模拟卷题目[${ii}] 有 correctIndex 但缺少 options`)
           }
+          // 与 quiz 一致：模拟卷题目必须给出题干与答案，防止空白占位
+          if (isEmpty(it.question)) errors.push(`${pageId} 模拟卷题目[${ii}] question 为空`)
+          if (isEmpty(it.answer)) errors.push(`${pageId} 模拟卷题目[${ii}] answer 为空`)
         })
       }
       break
     case 'mindmap':
       if (!block.mermaid) errors.push(`${pageId} 思维导图区块缺少 mermaid 源码`)
       break
+    // 文本提示类：必须有实际内容，防止渲染出空白警示/提示框
+    case 'warning':
+    case 'tip':
+      if (isEmpty(block.text)) errors.push(`${pageId} ${block.type} 区块 text 为空`)
+      break
+    case 'objectives':
+      if (!Array.isArray(block.items) || block.items.length === 0) errors.push(`${pageId} 目标区块缺少 items`)
+      else if (block.items.some((t) => isEmpty(t))) errors.push(`${pageId} 目标区块存在空 items 元素`)
+      break
+    case 'diagram':
+      if (isEmpty(block.boardId)) errors.push(`${pageId} 图形区块缺少 boardId`)
+      if (isEmpty(block.initCode)) errors.push(`${pageId} 图形区块缺少 initCode`)
+      break
     case 'desmos':
-      if (block.initialExpressions !== undefined && (!Array.isArray(block.initialExpressions) || block.initialExpressions.some((e) => typeof e !== 'string'))) {
-        errors.push(`${pageId} Desmos 区块 initialExpressions 需为字符串数组`)
+      if (block.initialExpressions !== undefined) {
+        if (!Array.isArray(block.initialExpressions) || block.initialExpressions.length === 0) {
+          errors.push(`${pageId} Desmos 区块 initialExpressions 需为非空字符串数组`)
+        } else if (block.initialExpressions.some((e) => isEmpty(e))) {
+          errors.push(`${pageId} Desmos 区块 initialExpressions 存在空元素`)
+        }
       }
       break
     default:

@@ -103,31 +103,31 @@ export default {
           "title": "例题1：角度与弧度互化",
           "question": "将以下角度化为弧度，弧度化为角度：\n\n      （1）\\(67°30'\\)；（2）\\(\\frac{7\\pi}{6}\\) rad",
           "solution": "解：\n\n        （1）\\(67°30' = 67.5°\\)\n\n        \\(67.5° = 67.5 \\times \\frac{\\pi}{180} = \\frac{135}{2} \\times \\frac{\\pi}{180} = \\frac{3\\pi}{8}\\) rad\n\n        （2）\\(\\frac{7\\pi}{6} \\text{ rad} = \\frac{7\\pi}{6} \\times \\frac{180°}{\\pi} = \\frac{7}{6} \\times 180° = 210°\\)",
-          "answer": ""
+          "answer": "（1）\\(67°30' = \\frac{3\\pi}{8}\\) rad；（2）\\(\\frac{7\\pi}{6}\\) rad \\(= 210°\\)"
         },
         {
           "title": "例题2：求弧长和扇形面积",
           "question": "已知扇形的半径 \\(r = 10\\) cm，圆心角 \\(\\alpha = \\frac{\\pi}{3}\\) rad，求该扇形的弧长 \\(l\\) 和面积 \\(S\\)。",
           "solution": "解：\n\n        由弧长公式 \\(l = |\\alpha| \\cdot r\\)：\n\n        \\(l = \\frac{\\pi}{3} \\times 10 = \\frac{10\\pi}{3}\\) cm\n\n        由扇形面积公式 \\(S = \\frac{1}{2}|\\alpha| r^2\\)：\n\n        \\(S = \\frac{1}{2} \\times \\frac{\\pi}{3} \\times 10^2 = \\frac{1}{2} \\times \\frac{\\pi}{3} \\times 100 = \\frac{50\\pi}{3}\\) cm²",
-          "answer": ""
+          "answer": "弧长 \\(l = \\frac{10\\pi}{3}\\) cm，面积 \\(S = \\frac{50\\pi}{3}\\) cm²"
         },
         {
           "title": "例题3：终边相同角的表示",
           "question": "写出与 \\(-\\frac{17\\pi}{6}\\) 终边相同的角的集合，并求出在 \\([0, 2\\pi)\\) 范围内的角。",
           "solution": "解：\n\n        与 \\(-\\frac{17\\pi}{6}\\) 终边相同的角的集合为：\n\n        \\(\\{\\beta \\mid \\beta = -\\frac{17\\pi}{6} + 2k\\pi, k \\in \\mathbb{Z}\\}\\)\n\n        将 \\(-\\frac{17\\pi}{6}\\) 加上 \\(2\\pi = \\frac{12\\pi}{6}\\)：\n\n        \\(-\\frac{17\\pi}{6} + 2\\pi = -\\frac{17\\pi}{6} + \\frac{12\\pi}{6} = -\\frac{5\\pi}{6}\\)\n\n        再加上 \\(2\\pi\\)：\n\n        \\(-\\frac{5\\pi}{6} + 2\\pi = -\\frac{5\\pi}{6} + \\frac{12\\pi}{6} = \\frac{7\\pi}{6}\\)\n\n        因为 \\(\\frac{7\\pi}{6} \\in [0, 2\\pi)\\)，所以在 \\([0, 2\\pi)\\) 范围内的角为 \\(\\frac{7\\pi}{6}\\)。",
-          "answer": ""
+          "answer": "终边相同角的集合为 \\(\\{\\beta \\mid \\beta = -\\frac{17\\pi}{6} + 2k\\pi, k \\in \\mathbb{Z}\\}\\)，在 \\([0, 2\\pi)\\) 内为 \\(\\frac{7\\pi}{6}\\)"
         },
         {
           "title": "例题4：扇形面积公式的推导（证明型）",
           "question": "已知半径为 \\(r\\) 的圆中，圆心角 \\(\\alpha\\)（弧度）所对的扇形面积为 \\(S = \\frac{1}{2}|\\alpha|r^2\\)。试由圆的面积公式推导该结论，并说明弧长公式 \\(l = |\\alpha|r\\) 在推导中的作用。",
           "solution": "证明：\n\n        圆的面积为 \\(\\pi r^2\\)，对应的圆心角为 \\(2\\pi\\) 弧度。\n\n        故单位弧度对应的扇形面积为 \\(\\dfrac{\\pi r^2}{2\\pi} = \\dfrac{r^2}{2}\\)。\n\n        当圆心角为 \\(|\\alpha|\\) 弧度时，扇形面积为：\n\n        \\(S = |\\alpha| \\cdot \\dfrac{r^2}{2} = \\frac{1}{2}|\\alpha|r^2\\)\n\n        又由弧长公式 \\(l = |\\alpha|r\\)，代入上式：\n\n        \\(S = \\frac{1}{2} \\cdot (|\\alpha|r) \\cdot r = \\frac{1}{2}lr\\)\n\n        即扇形面积也可表示为 \\(S = \\frac{1}{2}lr\\)，二者本质一致，弧长公式起到连接 \\(\\alpha\\) 与 \\(l\\) 的桥梁作用。",
-          "answer": ""
+          "answer": "由圆的面积按圆心角比例分割得 \\(S = \\frac{1}{2}|\\alpha|r^2\\)，代入 \\(l = |\\alpha|r\\) 得 \\(S = \\frac{1}{2}lr\\)，得证"
         },
         {
           "title": "例题5：弧长计算中的单位陷阱（易错型）",
           "question": "已知扇形半径 \\(r = 6\\) cm，圆心角为 \\(60°\\)，求该扇形的弧长 \\(l\\)。",
           "solution": "常见错误解：\n\n        直接代入 \\(l = |\\alpha| \\cdot r = 60 \\times 6 = 360\\)（cm）。\n\n        这是错误的！原因：弧长公式 \\(l = |\\alpha|r\\) 中 \\(\\alpha\\) 必须用弧度制，而 \\(60°\\) 是角度制，不能直接代入。\n\n        正确解：\n\n        先将圆心角化为弧度：\\(\\alpha = 60° \\times \\dfrac{\\pi}{180°} = \\dfrac{\\pi}{3}\\) rad\n\n        再代入弧长公式：\\(l = |\\alpha| \\cdot r = \\dfrac{\\pi}{3} \\times 6 = 2\\pi\\) cm\n\n        反思：凡使用弧长公式 \\(l = |\\alpha|r\\) 或扇形面积公式 \\(S = \\frac{1}{2}|\\alpha|r^2\\)，圆心角必须先化为弧度制，这是最常见的易错点。",
-          "answer": ""
+          "answer": "弧长 \\(l = 2\\pi\\) cm（圆心角须先化弧度 \\(60° = \\frac{\\pi}{3}\\)）"
         }
       ]
     },

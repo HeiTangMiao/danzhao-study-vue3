@@ -110,19 +110,19 @@ export default {
           "title": "例题1：求数量积",
           "question": "已知 \\(\\boldsymbol{a} = (2, 1)\\)，\\(\\boldsymbol{b} = (3, -4)\\)，求 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b}\\) 和 \\(|\\boldsymbol{a}|\\)、\\(|\\boldsymbol{b}|\\)。",
           "solution": "解：\n\n        \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 2 \\times 3 + 1 \\times (-4) = 6 - 4 = 2\\)\n\n        \\(|\\boldsymbol{a}| = \\sqrt{2^2 + 1^2} = \\sqrt{5}\\)\n\n        \\(|\\boldsymbol{b}| = \\sqrt{3^2 + (-4)^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5\\)",
-          "answer": ""
+          "answer": "\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 2\\)，\\(|\\boldsymbol{a}| = \\sqrt{5}\\)，\\(|\\boldsymbol{b}| = 5\\)"
         },
         {
           "title": "例题2：判断垂直",
           "question": "已知 \\(\\boldsymbol{a} = (1, 2)\\)，\\(\\boldsymbol{b} = (m, -1)\\)，若 \\(\\boldsymbol{a} \\perp \\boldsymbol{b}\\)，求 \\(m\\) 的值。",
           "solution": "解：\n\n        由垂直条件 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\)：\n\n        \\(1 \\times m + 2 \\times (-1) = 0\\)\n\n        \\(m - 2 = 0\\)\n\n        \\(m = 2\\)",
-          "answer": ""
+          "answer": "\\(m = 2\\)"
         },
         {
           "title": "例题3：求夹角",
           "question": "已知 \\(\\boldsymbol{a} = (1, \\sqrt{3})\\)，\\(\\boldsymbol{b} = (\\sqrt{3}, 1)\\)，求 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 的夹角 \\(\\theta\\)。",
           "solution": "解：\n\n        \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 1 \\times \\sqrt{3} + \\sqrt{3} \\times 1 = 2\\sqrt{3}\\)\n\n        \\(|\\boldsymbol{a}| = \\sqrt{1 + 3} = 2\\)\n\n        \\(|\\boldsymbol{b}| = \\sqrt{3 + 1} = 2\\)\n\n        \\(\\cos\\theta = \\frac{\\boldsymbol{a} \\cdot \\boldsymbol{b}}{|\\boldsymbol{a}||\\boldsymbol{b}|} = \\frac{2\\sqrt{3}}{2 \\times 2} = \\frac{2\\sqrt{3}}{4} = \\frac{\\sqrt{3}}{2}\\)\n\n        因为 \\(0 \\leq \\theta \\leq \\pi\\)，所以 \\(\\theta = \\frac{\\pi}{6}\\)（即 \\(30°\\)）",
-          "answer": ""
+          "answer": "\\(\\theta = \\frac{\\pi}{6}\\)（\\(30°\\)）"
         }
       ]
     },

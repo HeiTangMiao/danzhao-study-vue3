@@ -116,19 +116,19 @@ export default {
           "title": "例题1：坐标运算",
           "question": "已知 \\(\\boldsymbol{a} = (2, 3)\\)，\\(\\boldsymbol{b} = (-1, 4)\\)，求 \\(\\boldsymbol{a} + \\boldsymbol{b}\\)、\\(\\boldsymbol{a} - \\boldsymbol{b}\\) 和 \\(2\\boldsymbol{a} - 3\\boldsymbol{b}\\)。",
           "solution": "解：\n\n        \\(\\boldsymbol{a} + \\boldsymbol{b} = (2 + (-1), 3 + 4) = (1, 7)\\)\n\n        \\(\\boldsymbol{a} - \\boldsymbol{b} = (2 - (-1), 3 - 4) = (3, -1)\\)\n\n        \\(2\\boldsymbol{a} - 3\\boldsymbol{b} = 2(2, 3) - 3(-1, 4) = (4, 6) - (-3, 12) = (4+3, 6-12) = (7, -6)\\)",
-          "answer": ""
+          "answer": "\\(\\boldsymbol{a}+\\boldsymbol{b}=(1,7)\\)，\\(\\boldsymbol{a}-\\boldsymbol{b}=(3,-1)\\)，\\(2\\boldsymbol{a}-3\\boldsymbol{b}=(7,-6)\\)"
         },
         {
           "title": "例题2：判断共线",
           "question": "已知 \\(\\boldsymbol{a} = (3, 6)\\)，\\(\\boldsymbol{b} = (1, 2)\\)，判断 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 是否共线。若共线，求 \\(\\boldsymbol{a} = \\lambda\\boldsymbol{b}\\) 中的 \\(\\lambda\\)。",
           "solution": "解：\n\n        由共线条件：\\(x_1 y_2 - x_2 y_1 = 3 \\times 2 - 1 \\times 6 = 6 - 6 = 0\\)\n\n        所以 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 共线。\n\n        设 \\(\\boldsymbol{a} = \\lambda\\boldsymbol{b}\\)，即 \\((3, 6) = \\lambda(1, 2) = (\\lambda, 2\\lambda)\\)\n\n        所以 \\(\\lambda = 3\\)（且 \\(2\\lambda = 6\\)，一致）",
-          "answer": ""
+          "answer": "\\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 共线，\\(\\lambda = 3\\)"
         },
         {
           "title": "例题3：求坐标",
           "question": "已知点 \\(A(1, 2)\\)，\\(B(3, -2)\\)，点 \\(P\\) 满足 \\(\\overrightarrow{AP} = 2\\overrightarrow{PB}\\)，求点 \\(P\\) 的坐标。",
           "solution": "解：\n\n        设 \\(P(x, y)\\)，则 \\(\\overrightarrow{AP} = (x - 1, y - 2)\\)，\\(\\overrightarrow{PB} = (3 - x, -2 - y)\\)\n\n        由 \\(\\overrightarrow{AP} = 2\\overrightarrow{PB}\\)：\n\n        \\((x - 1, y - 2) = 2(3 - x, -2 - y)\\)\n\n        即：\\(x - 1 = 2(3 - x) = 6 - 2x\\)，解得 \\(3x = 7\\)，\\(x = \\frac{7}{3}\\)\n\n        \\(y - 2 = 2(-2 - y) = -4 - 2y\\)，解得 \\(3y = -2\\)，\\(y = -\\frac{2}{3}\\)\n\n        所以 \\(P\\left(\\frac{7}{3}, -\\frac{2}{3}\\right)\\)",
-          "answer": ""
+          "answer": "\\(P\\left(\\frac{7}{3}, -\\frac{2}{3}\\right)\\)"
         }
       ]
     },

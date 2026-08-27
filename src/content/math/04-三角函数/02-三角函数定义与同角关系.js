@@ -150,31 +150,31 @@ export default {
           "title": "例题1：已知一个三角函数值求其他",
           "question": "已知 \\(\\sin\\alpha = \\frac{3}{5}\\)，且 \\(\\alpha\\) 为第二象限角，求 \\(\\cos\\alpha\\) 和 \\(\\tan\\alpha\\) 的值。",
           "solution": "解：\n\n        由平方关系 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\frac{3}{5}\\right)^2 = 1 - \\frac{9}{25} = \\frac{16}{25}\\)\n\n        \\(\\cos\\alpha = \\pm\\frac{4}{5}\\)\n\n        因为 \\(\\alpha\\) 为第二象限角，\\(\\cos\\alpha < 0\\)，所以由商数关系：\\(\\tan\\alpha = \\frac{\\sin\\alpha}{\\cos\\alpha} = \\frac{\\frac{3}{5}}{-\\frac{4}{5}} = -\\frac{3}{4}\\)",
-          "answer": ""
+          "answer": "\\(\\cos\\alpha = -\\frac{4}{5}\\)，\\(\\tan\\alpha = -\\frac{3}{4}\\)"
         },
         {
           "title": "例题2：化简求值",
           "question": "化简：\\(\\frac{\\sin\\alpha - \\cos\\alpha}{\\sin\\alpha + \\cos\\alpha}\\)，其中 \\(\\tan\\alpha = 2\\)。",
           "solution": "解：\n\n        将分子分母同时除以 \\(\\cos\\alpha\\)（\\(\\cos\\alpha \\neq 0\\)）：\n\n        \\(\\frac{\\sin\\alpha - \\cos\\alpha}{\\sin\\alpha + \\cos\\alpha} = \\frac{\\frac{\\sin\\alpha}{\\cos\\alpha} - 1}{\\frac{\\sin\\alpha}{\\cos\\alpha} + 1} = \\frac{\\tan\\alpha - 1}{\\tan\\alpha + 1}\\)\n\n        代入 \\(\\tan\\alpha = 2\\)：\n\n        \\(\\frac{2 - 1}{2 + 1} = \\frac{1}{3}\\)",
-          "answer": ""
+          "answer": "原式 \\(= \\frac{1}{3}\\)"
         },
         {
           "title": "例题3：符号判断",
           "question": "确定下列三角函数值的符号：\n\n      （1）\\(\\sin\\frac{7\\pi}{6}\\)；（2）\\(\\cos\\frac{5\\pi}{4}\\)；（3）\\(\\tan\\frac{4\\pi}{3}\\)",
           "solution": "解：\n\n        （1）\\(\\frac{7\\pi}{6} = \\pi + \\frac{\\pi}{6}\\)，是第三象限角，所以 \\(\\sin\\frac{7\\pi}{6} < 0\\)（负）；\n\n        （2）\\(\\frac{5\\pi}{4} = \\pi + \\frac{\\pi}{4}\\)，是第三象限角，所以 \\(\\cos\\frac{5\\pi}{4} < 0\\)（负）；\n\n        （3）\\(\\frac{4\\pi}{3} = \\pi + \\frac{\\pi}{3}\\)，是第三象限角，所以 \\(\\tan\\frac{4\\pi}{3} > 0\\)（正）。",
-          "answer": ""
+          "answer": "（1）\\(\\sin\\frac{7\\pi}{6} < 0\\)（负）；（2）\\(\\cos\\frac{5\\pi}{4} < 0\\)（负）；（3）\\(\\tan\\frac{4\\pi}{3} > 0\\)（正）"
         },
         {
           "title": "例题4：平方关系的证明（推导型）",
           "question": "设角 \\(\\alpha\\) 的终边上任意一点 \\(P(x, y)\\)（异于原点），\\(r = \\sqrt{x^2+y^2}\\)。试由三角函数的坐标定义证明同角平方关系 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)。",
           "solution": "证明：\n\n        由坐标定义：\\(\\sin\\alpha = \\dfrac{y}{r}\\)，\\(\\cos\\alpha = \\dfrac{x}{r}\\)。\n\n        所以：\n\n        \\(\\sin^2\\alpha + \\cos^2\\alpha = \\left(\\dfrac{y}{r}\\right)^2 + \\left(\\dfrac{x}{r}\\right)^2 = \\dfrac{y^2}{r^2} + \\dfrac{x^2}{r^2} = \\dfrac{x^2+y^2}{r^2}\\)\n\n        又因为 \\(r = \\sqrt{x^2+y^2}\\)，即 \\(r^2 = x^2 + y^2\\)，代入上式：\n\n        \\(\\sin^2\\alpha + \\cos^2\\alpha = \\dfrac{x^2+y^2}{x^2+y^2} = 1\\)\n\n        特别地，当 \\(P\\) 在单位圆上时 \\(r = 1\\)，此时 \\(\\sin\\alpha = y\\)，\\(\\cos\\alpha = x\\)，由 \\(x^2+y^2=1\\) 直接得 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)。",
-          "answer": ""
+          "answer": "由坐标定义 \\(\\sin\\alpha = \\frac{y}{r}\\)、\\(\\cos\\alpha = \\frac{x}{r}\\) 及 \\(r^2 = x^2+y^2\\) 得 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)，得证"
         },
         {
           "title": "例题5：开方漏掉象限讨论（易错型）",
           "question": "已知 \\(\\sin\\alpha = \\dfrac{3}{5}\\)，求 \\(\\cos\\alpha\\) 的值。",
           "solution": "常见错误解：\n\n        由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\) 得 \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\dfrac{9}{25} = \\dfrac{16}{25}\\)，于是 \\(\\cos\\alpha = \\dfrac{4}{5}\\)。\n\n        这是错误的！原因：开平方时直接取了正根，忽略了 \\(\\cos\\alpha\\) 的符号由角 \\(\\alpha\\) 所在象限决定。题目未给象限，\\(\\cos\\alpha\\) 可正可负。\n\n        正确解：\n\n        \\(\\cos^2\\alpha = 1 - \\sin^2\\alpha = 1 - \\left(\\dfrac{3}{5}\\right)^2 = \\dfrac{16}{25}\\)，所以 \\(\\cos\\alpha = \\pm\\dfrac{4}{5}\\)。\n\n        需按象限讨论：\n\n        当 \\(\\alpha\\) 为第一象限角时，\\(\\cos\\alpha > 0\\)，\\(\\cos\\alpha = \\dfrac{4}{5}\\)；\n\n        当 \\(\\alpha\\) 为第二象限角时，\\(\\cos\\alpha < 0\\)，\\(\\cos\\alpha = -\\dfrac{4}{5}\\)。\n\n        反思：使用平方关系由一个三角函数值求另一个时，必须先开方加绝对值（或 \\(\\pm\\)），再根据象限确定符号。",
-          "answer": ""
+          "answer": "开方得 \\(\\cos\\alpha = \\pm\\frac{4}{5}\\)：第一象限角时 \\(\\cos\\alpha = \\frac{4}{5}\\)，第二象限角时 \\(\\cos\\alpha = -\\frac{4}{5}\\)"
         }
       ]
     },

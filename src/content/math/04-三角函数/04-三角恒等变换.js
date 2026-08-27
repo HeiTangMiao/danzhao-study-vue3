@@ -69,31 +69,31 @@ export default {
           "title": "例题1：化简求值",
           "question": "求值：\\(\\sin 75° - \\sin 15°\\)",
           "solution": "解：\n\n        利用和差化积或直接用和角公式：\n\n        \\(\\sin 75° = \\sin(45° + 30°) = \\sin 45°\\cos 30° + \\cos 45°\\sin 30°\\)\n\n        \\(= \\frac{\\sqrt{2}}{2} \\times \\frac{\\sqrt{3}}{2} + \\frac{\\sqrt{2}}{2} \\times \\frac{1}{2} = \\frac{\\sqrt{6}}{4} + \\frac{\\sqrt{2}}{4}\\)\n\n        \\(\\sin 15° = \\sin(45° - 30°) = \\sin 45°\\cos 30° - \\cos 45°\\sin 30°\\)\n\n        \\(= \\frac{\\sqrt{6}}{4} - \\frac{\\sqrt{2}}{4}\\)\n\n        原式 \\(= \\left(\\frac{\\sqrt{6}}{4} + \\frac{\\sqrt{2}}{4}\\right) - \\left(\\frac{\\sqrt{6}}{4} - \\frac{\\sqrt{2}}{4}\\right) = \\frac{2\\sqrt{2}}{4} = \\frac{\\sqrt{2}}{2}\\)",
-          "answer": ""
+          "answer": "原式 \\(= \\frac{\\sqrt{2}}{2}\\)"
         },
         {
           "title": "例题2：利用二倍角公式",
           "question": "已知 \\(\\cos\\alpha = \\frac{4}{5}\\)，\\(\\alpha \\in \\left(0, \\frac{\\pi}{2}\\right)\\)，求 \\(\\sin 2\\alpha\\) 和 \\(\\cos 2\\alpha\\) 的值。",
           "solution": "解：\n\n        因为 \\(\\alpha \\in \\left(0, \\frac{\\pi}{2}\\right)\\)，所以 \\(\\sin\\alpha > 0\\)。\n\n        \\(\\sin\\alpha = \\sqrt{1 - \\cos^2\\alpha} = \\sqrt{1 - \\frac{16}{25}} = \\sqrt{\\frac{9}{25}} = \\frac{3}{5}\\)\n\n        \\(\\sin 2\\alpha = 2\\sin\\alpha\\cos\\alpha = 2 \\times \\frac{3}{5} \\times \\frac{4}{5} = \\frac{24}{25}\\)\n\n        \\(\\cos 2\\alpha = 2\\cos^2\\alpha - 1 = 2 \\times \\frac{16}{25} - 1 = \\frac{32}{25} - 1 = \\frac{7}{25}\\)",
-          "answer": ""
+          "answer": "\\(\\sin 2\\alpha = \\frac{24}{25}\\)，\\(\\cos 2\\alpha = \\frac{7}{25}\\)"
         },
         {
           "title": "例题3：辅助角公式应用",
           "question": "将函数 \\(f(x) = \\sin x - \\sqrt{3}\\cos x\\) 化为 \\(A\\sin(x + \\varphi)\\) 的形式，并求其最大值和最小值。",
           "solution": "解：\n\n        这里 \\(a = 1\\)，\\(b = -\\sqrt{3}\\)\n\n        振幅 \\(A = \\sqrt{a^2 + b^2} = \\sqrt{1 + 3} = 2\\)\n\n        \\(\\tan\\varphi = \\frac{b}{a} = \\frac{-\\sqrt{3}}{1} = -\\sqrt{3}\\)，且点 \\((1, -\\sqrt{3})\\) 在第四象限\n\n        所以 \\(\\varphi = -\\frac{\\pi}{3}\\)\n\n        故 \\(f(x) = 2\\sin\\left(x - \\frac{\\pi}{3}\\right)\\)\n\n        最大值为 \\(f(x)_{\\max} = 2\\)，最小值为 \\(f(x)_{\\min} = -2\\)",
-          "answer": ""
+          "answer": "\\(f(x) = 2\\sin\\left(x - \\frac{\\pi}{3}\\right)\\)，最大值 \\(2\\)，最小值 \\(-2\\)"
         },
         {
           "title": "例题4：公式推导",
           "question": "利用二倍角公式推导半角公式 \\(\\sin\\frac{\\alpha}{2} = \\pm\\sqrt{\\frac{1 - \\cos\\alpha}{2}}\\)。",
           "solution": "推导：\n\n        在二倍角公式 \\(\\cos 2\\theta = 1 - 2\\sin^2\\theta\\) 中，令 \\(\\theta = \\frac{\\alpha}{2}\\)，则 \\(2\\theta = \\alpha\\)。\n\n        代入得：\\(\\cos\\alpha = 1 - 2\\sin^2\\frac{\\alpha}{2}\\)\n\n        移项得：\\(2\\sin^2\\frac{\\alpha}{2} = 1 - \\cos\\alpha\\)，即 \\(\\sin^2\\frac{\\alpha}{2} = \\frac{1 - \\cos\\alpha}{2}\\)\n\n        两边开平方：\\(\\sin\\frac{\\alpha}{2} = \\pm\\sqrt{\\frac{1 - \\cos\\alpha}{2}}\\)\n\n        其中\"±\"号由 \\(\\frac{\\alpha}{2}\\) 所在象限确定：若 \\(\\frac{\\alpha}{2}\\) 在第一、二象限取\"+\"，在第三、四象限取\"−\"。\n\n        同理，由 \\(\\cos 2\\theta = 2\\cos^2\\theta - 1\\) 可推得 \\(\\cos\\frac{\\alpha}{2} = \\pm\\sqrt{\\frac{1 + \\cos\\alpha}{2}}\\)，说明半角公式本质上是二倍角公式的逆用。",
-          "answer": ""
+          "answer": "由 \\(\\cos\\alpha = 1 - 2\\sin^2\\frac{\\alpha}{2}\\) 得 \\(\\sin\\frac{\\alpha}{2} = \\pm\\sqrt{\\frac{1 - \\cos\\alpha}{2}}\\)，得证"
         },
         {
           "title": "例题5：易错辨析",
           "question": "将 \\(f(x) = -\\sin x - \\cos x\\) 化为 \\(A\\sin(x + \\varphi)\\) 的形式。",
           "solution": "常见错误解法：\n\n        这里 \\(a = -1\\)，\\(b = -1\\)，振幅 \\(A = \\sqrt{(-1)^2 + (-1)^2} = \\sqrt{2}\\)。\n\n        由 \\(\\tan\\varphi = \\frac{b}{a} = \\frac{-1}{-1} = 1\\)，得 \\(\\varphi = \\arctan 1 = \\frac{\\pi}{4}\\)。\n\n        于是错误地写 \\(f(x) = \\sqrt{2}\\sin\\left(x + \\frac{\\pi}{4}\\right)\\)（错误！）。\n\n        错误原因：仅由 \\(\\tan\\varphi = 1\\) 得 \\(\\varphi = \\frac{\\pi}{4}\\) 忽略了象限。辅助角 \\(\\varphi\\) 的终边由点 \\((a, b) = (-1, -1)\\) 确定，该点在第三象限，故 \\(\\varphi\\) 应为第三象限角，而非第一象限角。\\(\\arctan\\) 只能返回 \\(\\left(-\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right)\\) 内的值，必须结合象限修正。\n\n        正确解法：\n\n        点 \\((a, b) = (-1, -1)\\) 在第三象限，\\(\\tan\\varphi = 1\\) 且 \\(\\varphi\\) 为第三象限角，故 \\(\\varphi = \\pi + \\frac{\\pi}{4} = \\frac{5\\pi}{4}\\)。\n\n        所以 \\(f(x) = \\sqrt{2}\\sin\\left(x + \\frac{5\\pi}{4}\\right)\\)。\n\n        验证：\\(\\sqrt{2}\\sin\\left(x + \\frac{5\\pi}{4}\\right) = \\sqrt{2}\\left[\\sin x\\cos\\frac{5\\pi}{4} + \\cos x\\sin\\frac{5\\pi}{4}\\right] = \\sqrt{2}\\left[\\sin x \\cdot \\left(-\\frac{\\sqrt{2}}{2}\\right) + \\cos x \\cdot \\left(-\\frac{\\sqrt{2}}{2}\\right)\\right] = -\\sin x - \\cos x\\)，与原式一致。",
-          "answer": ""
+          "answer": "\\(f(x) = \\sqrt{2}\\sin\\left(x + \\frac{5\\pi}{4}\\right)\\)"
         }
       ]
     },

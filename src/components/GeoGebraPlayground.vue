@@ -78,7 +78,6 @@ const ggbEl = ref(null)
 const fullscreen = ref(false)
 let applet = null // GGBApplet 实例
 let ggbApi = null // 应用 API（appletOnLoad 回调提供）
-let scriptLoaded = false
 let loadTimer = null
 let resizeTimer = null
 let sizeObserver = null
@@ -115,7 +114,7 @@ function onContainerResize() {
 function loadGGBScript() {
   return new Promise((resolve, reject) => {
     // 已加载完成：直接返回
-    if (window.GGBApplet) { scriptLoaded = true; return resolve(window.GGBApplet) }
+    if (window.GGBApplet) { return resolve(window.GGBApplet) }
 
     // 已存在脚本节点（加载中）：等待其完成，避免重复添加
     const existing = document.getElementById('geogebra-deploy-script')
@@ -139,7 +138,7 @@ function loadGGBScript() {
     const s = document.createElement('script')
     s.id = 'geogebra-deploy-script'
     s.src = GGB_URL
-    s.onload = () => { scriptLoaded = true; resolve(window.GGBApplet) }
+    s.onload = () => { resolve(window.GGBApplet) }
     s.onerror = () => {
       // 移除失败节点，避免残留节点导致后续重试永远等待
       try { s.remove() } catch (e) { /* ignore */ }

@@ -167,13 +167,13 @@ board.create('text', [-5.2, -1.0, '-0.5a'], {fontSize:16, color: colors.accent})
           "title": "例题1：向量运算",
           "question": "化简以下向量表达式：\\(\\overrightarrow{AB} - \\overrightarrow{AC} + \\overrightarrow{BD} - \\overrightarrow{CD}\\)",
           "solution": "解：\n\n        \\(\\overrightarrow{AB} - \\overrightarrow{AC} + \\overrightarrow{BD} - \\overrightarrow{CD}\\)\n\n        \\(= (\\overrightarrow{AB} + \\overrightarrow{BD}) - (\\overrightarrow{AC} + \\overrightarrow{CD})\\)\n\n        \\(= \\overrightarrow{AD} - \\overrightarrow{AD}\\)\n\n        \\(= \\boldsymbol{0}\\)",
-          "answer": ""
+          "answer": "\\(\\boldsymbol{0}\\)（零向量）"
         },
         {
           "title": "例题2：化简",
           "question": "已知 \\(\\boldsymbol{a}\\)、\\(\\boldsymbol{b}\\) 为向量，化简：\\(3(\\boldsymbol{a} - 2\\boldsymbol{b}) - 2(2\\boldsymbol{a} + \\boldsymbol{b})\\)",
           "solution": "解：\n\n        \\(3(\\boldsymbol{a} - 2\\boldsymbol{b}) - 2(2\\boldsymbol{a} + \\boldsymbol{b})\\)\n\n        \\(= 3\\boldsymbol{a} - 6\\boldsymbol{b} - 4\\boldsymbol{a} - 2\\boldsymbol{b}\\)\n\n        \\(= (3 - 4)\\boldsymbol{a} + (-6 - 2)\\boldsymbol{b}\\)\n\n        \\(= -\\boldsymbol{a} - 8\\boldsymbol{b}\\)",
-          "answer": ""
+          "answer": "\\(-\\boldsymbol{a} - 8\\boldsymbol{b}\\)"
         }
       ]
     },
