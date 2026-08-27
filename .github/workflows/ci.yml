@@ -97,13 +97,15 @@ jobs:
         run: |
           # 首次连接自动接受 host key
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          # BatchMode=yes：禁止交互提示，私钥认证失败立即报错而非挂起等待
+          SSH_ARGS="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes"
           # 清空旧文件避免残留失效资源，再同步新产物
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$USER@$HOST" "rm -rf /var/www/danzhao-study/*"
-          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" ./dist/ "$USER@$HOST:/var/www/danzhao-study/"
+          ssh $SSH_ARGS "$USER@$HOST" "rm -rf /var/www/danzhao-study/*"
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes" ./dist/ "$USER@$HOST:/var/www/danzhao-study/"
 
       - name: 部署后验证
         env:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$USER@$HOST" "sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
