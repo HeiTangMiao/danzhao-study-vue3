@@ -38,11 +38,13 @@
  * 已登录时启动同步：进入即同步一次 + 每 5 分钟后台增量同步。
  */
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { useTheme } from './composables/useTheme'
 import { useProgressStore } from '@/stores/progress'
 import { useAuthStore } from '@/stores/auth'
 import { useSyncEngine } from '@/sync/engine'
 
+const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
 const auth = useAuthStore()
 const { runSync } = useSyncEngine()
@@ -77,6 +79,7 @@ onBeforeUnmount(() => { if (syncTimer) clearInterval(syncTimer) })
 
 function logout() {
   auth.logout()
+  router.replace('/login')
 }
 </script>
 
