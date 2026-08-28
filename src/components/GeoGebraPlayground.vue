@@ -65,7 +65,9 @@ const GGB_URLS = [
   'https://www.geogebra.org/apps/deployggb.js'
 ]
 // 自托管 codebase：web 模块（web.nocache.js + 主编译模块）本地路径；官方模式使用 deployggb 内置默认地址
-const LOCAL_CODEBASE = './vendor/geogebra/'
+// 注意：必须指向 vendor/geogebra/web/ 子目录（web.nocache.js 与 cache.js 均位于其中），
+//       否则 deployggb 会请求 vendor/geogebra/web.nocache.js 而 404，导致计算器无法加载
+const LOCAL_CODEBASE = './vendor/geogebra/web/'
 // 当前生效的 codebase（'' 表示使用官方默认）
 let ggbCodebase = LOCAL_CODEBASE
 // deployggb 脚本加载 Promise（幂等缓存，失败后重置以便重试）

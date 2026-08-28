@@ -147,6 +147,37 @@
       @go-next="goNext"
     />
 
+    <!-- 番茄钟悬浮计时器（学习时随时开启，状态自动持久化） -->
+    <div class="pomodoro-fab">
+      <transition name="fade">
+        <div v-if="pomodoroOpen" class="pomodoro-card card" @click.stop>
+          <div class="pomodoro-card__head">
+            <span class="pomodoro-mode" :class="'mode-' + pomodoro.mode.value">🍅 {{ pomodoro.modeLabel.value }}</span>
+            <span v-if="pomodoro.running.value" class="pomodoro-running">进行中</span>
+          </div>
+          <div class="pomodoro-time">{{ pomodoro.display.value }}</div>
+          <div class="pomodoro-progress">
+            <div class="pomodoro-progress__bar" :style="{ width: pomodoro.progress.value * 100 + '%' }"></div>
+          </div>
+          <div class="pomodoro-today">今日已完成 {{ pomodoro.sessionsCompleted.value }} 个番茄</div>
+          <div class="pomodoro-actions">
+            <button class="pomodoro-btn pomodoro-btn--primary" @click="pomodoro.running.value ? pomodoro.pause() : pomodoro.start()">
+              {{ pomodoro.running.value ? '⏸ 暂停' : '▶ 开始' }}
+            </button>
+            <button class="pomodoro-btn" @click="pomodoro.reset()">↺ 重置</button>
+            <button class="pomodoro-btn" @click="pomodoro.skip()">⏭ 跳过</button>
+          </div>
+        </div>
+      </transition>
+      <button
+        class="pomodoro-fab__btn"
+        :class="{ open: pomodoroOpen }"
+        :aria-label="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
+        :title="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
+        @click="pomodoroOpen = !pomodoroOpen"
+      >🍅</button>
+    </div>
+
     <!-- Desmos 演练场浮层 -->
     <transition name="fade">
       <div v-if="showDesmos" class="desmos-overlay" @click.self="showDesmos = false">
@@ -184,6 +215,7 @@ import { useProgressStore } from '@/stores/progress'
 import { useGameEngineStore } from '@/stores/gameEngine'
 import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
+import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import ContentSidebar from '@/components/ContentSidebar.vue'
 import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
@@ -192,6 +224,10 @@ const route = useRoute()
 const router = useRouter()
 const progress = useProgressStore()
 const game = useGameEngineStore()
+
+// 番茄钟（学习页悬浮计时器）
+const pomodoro = usePomodoro()
+const pomodoroOpen = ref(false)
 
 // 当前学科（从路由参数获取，默认 math）
 const subject = computed(() => route.params.subject || 'math')
@@ -704,4 +740,53 @@ watch(
 }
 .leave-confirm__cancel { background: var(--surface-muted); color: var(--text); border: 1px solid var(--border); }
 .leave-confirm__ok { background: var(--danger); color: #fff; }
+
+/* 番茄钟悬浮计时器 */
+.pomodoro-fab {
+  position: fixed; right: 24px; bottom: 24px; z-index: 150;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+}
+.pomodoro-fab__btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--primary); color: #fff; border: none;
+  font-size: 1.5rem; cursor: pointer;
+  box-shadow: var(--shadow-md);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease;
+}
+.pomodoro-fab__btn:active { transform: scale(0.92); }
+.pomodoro-card {
+  width: 250px; padding: 14px 16px;
+  box-shadow: var(--shadow-md);
+}
+.pomodoro-card__head { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+.pomodoro-mode { font-weight: 700; }
+.pomodoro-mode.mode-focus { color: var(--danger); }
+.pomodoro-mode.mode-break, .pomodoro-mode.mode-long_break { color: var(--success); }
+.pomodoro-running { color: var(--warning); font-size: 0.75rem; }
+.pomodoro-time {
+  text-align: center; font-size: 2.3rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; margin: 6px 0;
+}
+.pomodoro-progress { height: 6px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
+.pomodoro-progress__bar {
+  height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius-full); transition: width 1s linear;
+}
+.pomodoro-today { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; }
+.pomodoro-actions { display: flex; gap: 8px; margin-top: 10px; }
+.pomodoro-btn {
+  flex: 1; min-height: 40px;
+  border: 1px solid var(--border); background: var(--surface-muted);
+  color: var(--text); border-radius: var(--radius-full);
+  font-size: 0.78rem; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pomodoro-btn--primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+/* 移动端：悬浮在底部操作栏上方，触控目标 ≥44px */
+@media (max-width: 1150px) {
+  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + 76px); }
+  .pomodoro-btn { min-height: 44px; }
+}
 </style>
