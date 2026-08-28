@@ -133,13 +133,15 @@ jobs:
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
           # BatchMode=yes：禁止交互提示，私钥认证失败立即报错而非挂起等待
           SSH_ARGS="-i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes"
-          # 零停机部署：先传 assets（新旧 hash 文件共存），最后切换 index.html
-          # 第 1 步：上传 assets，不删旧文件，期间旧页面仍可正常访问
+          # 零停机部署：先传 assets 与 vendor（新旧 hash 文件共存），最后切换 index.html
+          # 第 1 步：上传 assets + vendor（含 GeoGebra 自托管资源），不删旧文件，期间旧页面仍可正常访问
           rsync -avz -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
-          # 第 2 步：切换 index.html + 搜索索引（指向新 assets，无 404 窗口）
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
+          # 第 2 步：切换 index.html + 搜索索引（指向新资源，无 404 窗口）
           rsync -avz -e "ssh $SSH_ARGS" ./dist/index.html ./dist/search-index.json "$USER@$HOST:/var/www/danzhao-study/"
-          # 第 3 步：清理已被新版本替换的旧 assets，避免累积占用磁盘
+          # 第 3 步：清理已被新版本替换的旧 assets / vendor，避免累积占用磁盘
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
+          rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
 
       - name: 部署后验证
         env:

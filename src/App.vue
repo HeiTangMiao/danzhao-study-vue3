@@ -60,10 +60,17 @@ async function doSync() {
   if (syncing.value) return
   syncing.value = true
   syncMsg.value = '同步中…'
-  const r = await runSync()
-  syncMsg.value = r.ok ? `已同步 ↑${r.pushed} ↓${r.pulled}` : '同步失败'
+  try {
+    const r = await runSync()
+    syncMsg.value = r.ok ? `已同步 ↑${r.pushed} ↓${r.pulled}` : '同步失败'
+  } catch (e) {
+    console.error('[App] 同步失败:', e)
+    syncMsg.value = '同步失败'
+  } finally {
+    // finally 兜底：无论成功/失败都复位按钮状态，避免永久卡在「同步中…」
+    syncing.value = false
+  }
   setTimeout(() => { syncMsg.value = '' }, 3000)
-  syncing.value = false
 }
 
 let syncTimer = null
@@ -71,13 +78,14 @@ onMounted(() => {
   if (auth.isLoggedIn) {
     doSync()
     syncTimer = setInterval(() => {
-      if (auth.isLoggedIn) runSync()
+      if (auth.isLoggedIn) runSync().catch((e) => console.error('[App] 后台同步失败:', e))
     }, 5 * 60 * 1000)
   }
 })
 onBeforeUnmount(() => { if (syncTimer) clearInterval(syncTimer) })
 
 function logout() {
+  if (!window.confirm('确定要退出登录吗？')) return
   auth.logout()
   router.replace('/login')
 }
@@ -110,7 +118,7 @@ function logout() {
 .app-header__link,
 .app-header__logout {
   min-height: 36px;
-  padding: 0 var(--spacer-10);
+  padding: 0 var(--spacer-12);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   background: var(--surface-muted);
@@ -148,9 +156,22 @@ function logout() {
   .app-header__sync,
   .app-header__link,
   .app-header__logout {
-    min-height: 40px;
+    min-height: 44px;
     font-size: 0.8rem;
     padding: 0 var(--spacer-8);
+  }
+  /* 触控目标 ≥44px：主题切换按钮 */
+  .app-header__theme {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* 横屏：刘海屏左右安全区适配 */
+@media (orientation: landscape) {
+  .app-header {
+    padding-left: calc(var(--spacer-16) + var(--sal));
+    padding-right: calc(var(--spacer-16) + var(--sar));
   }
 }
 </style>

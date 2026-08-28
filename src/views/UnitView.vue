@@ -18,7 +18,7 @@
     <!-- 移动端迷你顶栏：滚动离开页面头部后出现（返回首页 + 标题 + 阅读进度） -->
     <transition name="topbar">
       <div v-if="showTopbar && page" class="mobile-topbar">
-        <button class="topbar-back" title="返回首页" @click="router.push('/')">←</button>
+        <button class="topbar-back" title="返回首页" aria-label="返回首页" @click="router.push('/')">←</button>
         <span class="topbar-title">{{ fileMeta?.title }}</span>
         <span class="topbar-progress">{{ readProgress }}%</span>
       </div>
@@ -42,11 +42,11 @@
         </div>
         <!-- 工具按钮：目录 + 书签 + 笔记 -->
         <div class="page-tools">
-          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" @click="showToc = !showToc">☰</button>
-          <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" @click="bookmark.toggleBookmark()">
+          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" aria-label="目录" @click="showToc = !showToc">☰</button>
+          <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" aria-label="收藏" @click="bookmark.toggleBookmark()">
             {{ bookmark.isBookmarked.value ? '★' : '☆' }}
           </button>
-          <button class="tool-btn" title="笔记" @click="showNotes = !showNotes">📝</button>
+          <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes">📝</button>
         </div>
       </div>
       <button class="done-btn" :class="{ done: isDone }" @click="toggleDone">
@@ -153,9 +153,23 @@
         <div class="desmos-overlay__panel">
           <div class="desmos-overlay__head">
             <span>🧮 GeoGebra 图形计算器演练场</span>
-            <button class="desmos-overlay__close" title="关闭" @click="showDesmos = false">✕</button>
+            <button class="desmos-overlay__close" title="关闭" aria-label="关闭" @click="showDesmos = false">✕</button>
           </div>
           <GeoGebraPlayground />
+        </div>
+      </div>
+    </transition>
+
+    <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
+    <transition name="fade">
+      <div v-if="confirmLeave" class="leave-confirm-overlay" @click.self="handleLeaveConfirm(false)">
+        <div class="leave-confirm card">
+          <div class="leave-confirm__title">⚠️ 确定离开？</div>
+          <p class="leave-confirm__msg">{{ confirmMsg }}</p>
+          <div class="leave-confirm__actions">
+            <button class="leave-confirm__btn leave-confirm__cancel" @click="handleLeaveConfirm(false)">继续作答</button>
+            <button class="leave-confirm__btn leave-confirm__ok" @click="handleLeaveConfirm(true)">离开</button>
+          </div>
         </div>
       </div>
     </transition>
@@ -164,7 +178,7 @@
 
 <script setup>
 import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 import { useProgressStore } from '@/stores/progress'
 import { useGameEngineStore } from '@/stores/gameEngine'
@@ -275,13 +289,22 @@ function updateReadProgress() {
   showTopbar.value = scrolled > 200
 }
 
-// 监听滚动更新进度条
+// 监听滚动更新进度条（rAF 合并，避免每帧触发 Vue 渲染）
+let scrollRaf = 0
+function onScroll() {
+  if (scrollRaf) return
+  scrollRaf = requestAnimationFrame(() => {
+    scrollRaf = 0
+    updateReadProgress()
+  })
+}
 onMounted(() => {
-  window.addEventListener('scroll', updateReadProgress, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
   updateReadProgress()
 })
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', updateReadProgress)
+  window.removeEventListener('scroll', onScroll)
+  if (scrollRaf) cancelAnimationFrame(scrollRaf)
 })
 
 // 笔记 composable（按页面 key 隔离，key 随导航响应式变化）
@@ -304,7 +327,7 @@ const page = ref(null)
 async function loadPage() {
   if (!unit.value || !fileMeta.value) return
   loading.value = true
-  page.value = null
+  // 注意：不在此清空 page —— 翻页时保留旧内容直到新内容就绪，避免整块闪空
   try {
     // 根据学科动态导入对应内容文件
     const m = await import(`@/content/${subject.value}/${unit.value.folder}/${fileMeta.value.name}.js`)
@@ -361,25 +384,41 @@ function toggleDone() {
 }
 
 // ===== 考试作答保护 =====
-// ExamBlock 注入此状态；作答中导航离开前统一弹确认，防误触丢失作答
+// ExamBlock 注入此状态；作答中导航离开前统一确认，防误触丢失作答
 const examState = reactive({ active: false })
 provide('examState', examState)
 
-function confirmLeaveExam() {
-  if (!examState.active) return true
-  return window.confirm('测验尚未交卷，离开将丢失作答记录。确定离开吗？')
+// 应用内确认弹层（替代 window.confirm，规避部分 Android WebView 不支持 confirm 导致无法离开的隐患）
+const confirmLeave = ref(false)
+const confirmMsg = ref('')
+let resolveLeave = null
+function requestLeaveConfirm() {
+  confirmMsg.value = '测验尚未交卷，离开将丢失作答记录。确定离开吗？'
+  confirmLeave.value = true
+  return new Promise((resolve) => { resolveLeave = resolve })
 }
+function handleLeaveConfirm(ok) {
+  confirmLeave.value = false
+  if (resolveLeave) { resolveLeave(ok); resolveLeave = null }
+}
+
+// 统一离开保护：页内翻页（onBeforeRouteUpdate）+ 跨路由离开（onBeforeRouteLeave）都走同一确认，
+// 覆盖底部翻页、迷你顶栏返回、面包屑、答题卡抽屉、浏览器返回等所有出口
+async function guardLeave() {
+  if (!examState.active) return true
+  return requestLeaveConfirm()
+}
+onBeforeRouteLeave(guardLeave)
+onBeforeRouteUpdate(guardLeave)
 
 // 翻页导航
 const hasPrev = computed(() => fileIndex.value > 0)
 const hasNext = computed(() => unit.value && fileIndex.value < unit.value.files.length - 1)
 
 function goPrev() {
-  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value - 1 } })
 }
 function goNext() {
-  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value + 1 } })
 }
 
@@ -391,14 +430,12 @@ function scrollTop() {
 // 跳转到同单元指定页
 function goFile(i) {
   if (i === fileIndex.value) return
-  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: i } })
 }
 
 // 跳转到指定单元（默认第一页）
 function goUnit(u) {
   if (!u) return
-  if (!confirmLeaveExam()) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: u.num, fileIndex: 0 } })
 }
 
@@ -511,7 +548,7 @@ watch(
 .notes-save { background: var(--primary-soft); color: var(--primary); border: none; border-radius: var(--radius-full); padding: 4px 12px; cursor: pointer; }
 
 .page-content { display: flex; flex-direction: column; gap: var(--spacer-8); }
-.block-anchor { scroll-margin-top: 12px; }
+.block-anchor { scroll-margin-top: 16px; }
 
 /* 侧边栏可见时，为内容区右侧预留空间，避免被固定侧边栏遮挡 */
 @media (min-width: 1151px) and (max-width: 1456px) {
@@ -542,7 +579,7 @@ watch(
   }
   .topbar-back {
     flex: 0 0 auto;
-    width: 40px; height: 40px;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     background: var(--surface-muted);
     border: 1px solid var(--border);
@@ -624,6 +661,13 @@ watch(
   .tool-btn { width: 40px; height: 40px; }
   .done-btn { width: 100%; }
   .nav-btn { flex: 1; }
+
+  /* 触控目标 ≥44px */
+  .toc-item { min-height: 44px; }
+  .nav-btn { min-height: 44px; }
+  .notes-save { min-height: 44px; padding: 0 16px; }
+  /* 锚点跳转偏移补上迷你顶栏高度 + 安全区 */
+  .block-anchor { scroll-margin-top: calc(56px + var(--sat)); }
   .desmos-overlay {
     padding: var(--spacer-8);
     align-items: flex-end;
@@ -637,4 +681,27 @@ watch(
   .desmos-overlay__panel :deep(.ggb-body) { min-height: min(70vh, 560px); }
   .desmos-overlay__panel :deep(.ggb-container) { min-height: min(70vh, 560px); }
 }
+
+/* 离开确认弹层 */
+.leave-confirm-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--spacer-24);
+}
+.leave-confirm {
+  width: min(360px, 100%);
+  padding: var(--spacer-24);
+}
+.leave-confirm__title { font-weight: 700; font-size: 1.05rem; margin-bottom: var(--spacer-12); }
+.leave-confirm__msg { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: var(--spacer-20); }
+.leave-confirm__actions { display: flex; gap: var(--spacer-12); }
+.leave-confirm__btn {
+  flex: 1; min-height: 44px;
+  border-radius: var(--radius-full);
+  font-weight: 600; font-size: 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.leave-confirm__cancel { background: var(--surface-muted); color: var(--text); border: 1px solid var(--border); }
+.leave-confirm__ok { background: var(--danger); color: #fff; }
 </style>

@@ -19,6 +19,12 @@
     <!-- 加载状态 -->
     <div v-if="loading" class="loading">加载中…</div>
 
+    <!-- 加载失败 -->
+    <div v-else-if="error" class="error-hint card">
+      <p>⚠️ {{ error }}</p>
+      <button class="retry-btn" @click="load">🔄 重试</button>
+    </div>
+
     <template v-else-if="data">
       <!-- 等级与 XP 概览 -->
       <section class="card level-card">
@@ -91,7 +97,7 @@
         <div class="subject-progress-list">
           <div v-for="(subj, key) in data.subjects" :key="key" class="subject-progress-item">
             <div class="subject-progress-head">
-              <span class="subject-progress-icon">{{ (SUBJECT_META[key] && SUBJECT_META[key].icon) || '�' }}</span>
+              <span class="subject-progress-icon">{{ (SUBJECT_META[key] && SUBJECT_META[key].icon) || '📘' }}</span>
               <span class="subject-progress-name">{{ (SUBJECT_META[key] && SUBJECT_META[key].name) || key }}</span>
               <span class="subject-progress-pct">{{ subjPct(subj) }}%</span>
             </div>
@@ -196,6 +202,8 @@ const game = useGameEngineStore()
 // 仪表盘数据
 const data = ref(null)
 const loading = ref(true)
+// 加载失败提示
+const error = ref('')
 
 // 已解锁成就 ID 集合
 const unlockedIds = ref(new Set())
@@ -268,16 +276,20 @@ const weakAreas = computed(() => {
 const weakest = computed(() => weakAreas.value[0] || null)
 
 // 加载仪表盘数据
-onMounted(async () => {
+async function load() {
+  loading.value = true
+  error.value = ''
   try {
     data.value = await game.getDashboardData()
     unlockedIds.value = new Set(data.value.achievements.map((a) => a.id))
   } catch (e) {
     console.error('[Dashboard] 加载失败:', e)
+    error.value = '加载失败，请稍后重试'
   } finally {
     loading.value = false
   }
-})
+}
+onMounted(load)
 </script>
 
 <style scoped>
@@ -285,6 +297,17 @@ onMounted(async () => {
 .breadcrumb { color: var(--text-muted); font-size: 0.85rem; }
 .crumb-sep { margin: 0 var(--spacer-8); }
 .loading { text-align: center; padding: var(--spacer-48); color: var(--text-muted); }
+
+/* 加载失败 */
+.error-hint { text-align: center; padding: var(--spacer-24); }
+.error-hint p { margin-bottom: var(--spacer-12); color: var(--text-muted); }
+.retry-btn {
+  min-height: 44px; padding: 0 var(--spacer-20);
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-full);
+  font-weight: 600; font-size: 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 
 /* 等级卡片 */
 .level-card { display: flex; align-items: center; gap: var(--spacer-24); }
@@ -338,6 +361,10 @@ onMounted(async () => {
 .heat-2 { background: rgba(79, 70, 229, 0.45); }
 .heat-3 { background: rgba(79, 70, 229, 0.7); }
 .heat-4 { background: var(--primary); }
+/* 暗色模式下热力图改用主题蓝，保证层级区分度 */
+:root[data-theme="dark"] .heat-1 { background: rgba(106, 155, 255, 0.25); }
+:root[data-theme="dark"] .heat-2 { background: rgba(106, 155, 255, 0.45); }
+:root[data-theme="dark"] .heat-3 { background: rgba(106, 155, 255, 0.7); }
 /* 触屏点击详情 */
 .heat-tip {
   display: flex; align-items: center; gap: var(--spacer-12);

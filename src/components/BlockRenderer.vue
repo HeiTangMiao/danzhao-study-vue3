@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent, h } from 'vue'
 // 引入全部区块渲染组件
 import ObjectivesBlock from './blocks/ObjectivesBlock.vue'
 import KnowledgeBlock from './blocks/KnowledgeBlock.vue'
@@ -26,7 +26,18 @@ import StrategyBlock from './blocks/StrategyBlock.vue'
 import ExamBlock from './blocks/ExamBlock.vue'
 import DesmosBlock from './blocks/DesmosBlock.vue'
 // 几何演示（JSXGraph）体积大且仅个别页面使用，异步按需加载避免进主 chunk
-const GeometryBlock = defineAsyncComponent(() => import('./blocks/GeometryBlock.vue'))
+// 配置 loading/error 占位，避免加载期间页面空白
+const GeometryBlock = defineAsyncComponent({
+  loader: () => import('./blocks/GeometryBlock.vue'),
+  loadingComponent: {
+    render: () => h('div', { class: 'block-async-loading' }, [h('span', { class: 'block-spinner' }), h('span', ' 正在加载图形…')])
+  },
+  errorComponent: {
+    render: () => h('div', { class: 'block-async-error' }, '⚠️ 区块加载失败，请刷新重试')
+  },
+  delay: 150,
+  timeout: 15000
+})
 
 const props = defineProps({
   // 单个区块数据（content-schema 的 block）
@@ -56,3 +67,18 @@ const BLOCK_MAP = {
 // 解析当前区块对应的组件；未知类型返回 null（安全降级）
 const resolver = computed(() => BLOCK_MAP[props.block.type] || null)
 </script>
+
+<style>
+/* 异步区块占位（GeometryBlock 懒加载期间 / 失败时） */
+.block-async-loading {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 32px; color: var(--text-muted); font-size: 0.9rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); margin-bottom: var(--spacer-12);
+}
+.block-async-error {
+  padding: 24px; text-align: center; color: var(--danger);
+  font-size: 0.9rem; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); margin-bottom: var(--spacer-12);
+}
+</style>

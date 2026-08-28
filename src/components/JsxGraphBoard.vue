@@ -8,7 +8,18 @@
   说明：本组件为通用画板封装，具体图形由调用方通过 setup 回调定义。
 -->
 <template>
-  <div ref="container" class="jxg-board" :style="{ minHeight: height + 'px' }"></div>
+  <div ref="container" class="jxg-board" :style="{ minHeight: height + 'px' }">
+    <!-- 加载中 / 失败占位 -->
+    <div v-if="state !== 'ready'" class="jxg-status">
+      <div v-if="state === 'loading'" class="jxg-status__inner">
+        <span class="block-spinner"></span> 正在加载图形…
+      </div>
+      <div v-else class="jxg-status__inner">
+        <p class="jxg-error-msg">⚠️ 图形组件加载失败</p>
+        <button class="jxg-retry" type="button" @click="init">🔄 重试</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -28,6 +39,8 @@ const props = defineProps({
 })
 
 const container = ref(null)
+// 加载状态：loading 加载中 / ready 就绪 / error 失败
+const state = ref('loading')
 let board = null
 
 // 加载 JSXGraph 库（幂等，通过 npm 动态导入）
@@ -42,9 +55,15 @@ async function loadJsxGraph() {
   }
 }
 
-onMounted(async () => {
+async function init() {
+  state.value = 'loading'
+  if (container.value) container.value.innerHTML = ''
+
   const JXG = await loadJsxGraph()
-  if (!JXG || !container.value) return
+  if (!JXG || !container.value) {
+    state.value = 'error'
+    return
+  }
 
   const isDark = document.documentElement.dataset.theme === 'dark'
   // 主题配色
@@ -88,7 +107,11 @@ onMounted(async () => {
       console.warn('[JsxGraphBoard] 固定元素失败:', e)
     }
   }
-})
+
+  state.value = 'ready'
+}
+
+onMounted(init)
 
 onUnmounted(() => {
   // 清理画板资源
@@ -100,4 +123,21 @@ onUnmounted(() => {
 
 <style scoped>
 .jxg-board { width: 100%; border-radius: var(--radius-md); overflow: hidden; }
+.jxg-status {
+  display: flex; align-items: center; justify-content: center;
+  min-height: inherit; /* 继承画板高度，占位铺满 */
+}
+.jxg-status__inner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; color: var(--text-muted); font-size: 0.85rem;
+  padding: 24px;
+}
+.jxg-error-msg { color: var(--danger); }
+.jxg-retry {
+  min-height: 40px; padding: 0 18px;
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 </style>

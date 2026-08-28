@@ -1,11 +1,12 @@
 <!--
   GeoGebraPlayground —— GeoGebra 图形计算器演练场
   职责：
-   - 通过官方 GeoGebra Apps API（deployggb.js，www.geogebra.org）在线嵌入图形计算器
+   - 通过 GeoGebra Apps API（deployggb.js）嵌入图形计算器
+   - 优先加载本地自托管资源（public/vendor/geogebra，离线可用、国内访问不受影响），
+     加载失败时自动回退官方在线 API（www.geogebra.org）
    - 提供可复用网格：示例表达式一键载入
    - 自动回填当前页面上下文（可为空），支持中文界面
-   - 说明：需要联网加载 https://www.geogebra.org/apps/deployggb.js。
-       若离线或加载失败，展示友好降级提示并可重试。
+   - 说明：核心计算器完全离线可用；CAS 符号引擎（giac）为可选增强，未内置时图形功能不受影响。
 -->
 <template>
   <div class="ggb-playground">
@@ -37,8 +38,8 @@
         <span class="spinner"></span> 正在加载 GeoGebra 计算器…
       </div>
       <div v-else-if="state === 'error'" class="ggb-state ggb-error">
-        <div>⚠️ 无法加载 GeoGebra 计算器（可能处于离线状态）。</div>
-        <div class="ggb-error-sub">本演练场采用 GeoGebra 官方在线 API，联网后即可使用。当前学到的内容仍可正常阅读。</div>
+        <div>⚠️ 无法加载 GeoGebra 计算器。</div>
+        <div class="ggb-error-sub">计算器资源已随应用内置（离线可用）。若仍无法加载，点击下方重试；当前学到的内容仍可正常阅读。</div>
         <button class="ggb-retry" @click="loadCalculator">🔄 重新加载</button>
       </div>
 
@@ -58,8 +59,17 @@ const props = defineProps({
   initialExpressions: { type: Array, default: () => [] }
 })
 
-// 官方 GeoGebra Apps 部署脚本地址
-const GGB_URL = 'https://www.geogebra.org/apps/deployggb.js'
+// GeoGebra Apps 部署脚本地址：优先本地自托管（离线可用），失败时回退官方 CDN
+const GGB_URLS = [
+  './vendor/geogebra/deployggb.js',
+  'https://www.geogebra.org/apps/deployggb.js'
+]
+// 自托管 codebase：web 模块（web.nocache.js + 主编译模块）本地路径；官方模式使用 deployggb 内置默认地址
+const LOCAL_CODEBASE = './vendor/geogebra/'
+// 当前生效的 codebase（'' 表示使用官方默认）
+let ggbCodebase = LOCAL_CODEBASE
+// deployggb 脚本加载 Promise（幂等缓存，失败后重置以便重试）
+let deployPromise = null
 
 // 可复用示例（配合当前数学教材主题，使用 GeoGebra 命令语法）
 const examples = [
@@ -110,42 +120,39 @@ function onContainerResize() {
   resizeTimer = setTimeout(applySize, 150)
 }
 
-/** 加载 GeoGebra 部署脚本（幂等：已加载直接返回，加载中复用节点等待，失败清理节点） */
-function loadGGBScript() {
+/** 注入单个 <script> 并等待其加载完成（加载后移除节点，避免重复残留） */
+function injectScript(src) {
   return new Promise((resolve, reject) => {
-    // 已加载完成：直接返回
-    if (window.GGBApplet) { return resolve(window.GGBApplet) }
-
-    // 已存在脚本节点（加载中）：等待其完成，避免重复添加
-    const existing = document.getElementById('geogebra-deploy-script')
-    if (existing) {
-      const onLoad = () => { cleanup(); resolve(window.GGBApplet) }
-      const onError = () => {
-        cleanup()
-        // 移除失败节点，避免残留节点导致后续重试永远等待（事件只触发一次）
-        try { existing.remove() } catch (e) { /* ignore */ }
-        reject(new Error('geogebra script error'))
-      }
-      const cleanup = () => {
-        existing.removeEventListener('load', onLoad)
-        existing.removeEventListener('error', onError)
-      }
-      existing.addEventListener('load', onLoad)
-      existing.addEventListener('error', onError)
-      return
-    }
-
     const s = document.createElement('script')
-    s.id = 'geogebra-deploy-script'
-    s.src = GGB_URL
-    s.onload = () => { resolve(window.GGBApplet) }
-    s.onerror = () => {
-      // 移除失败节点，避免残留节点导致后续重试永远等待
-      try { s.remove() } catch (e) { /* ignore */ }
-      reject(new Error('无法加载 GeoGebra 脚本'))
-    }
+    s.src = src
+    s.onload = () => { try { s.remove() } catch (e) { /* ignore */ }; resolve() }
+    s.onerror = () => { try { s.remove() } catch (e) { /* ignore */ }; reject(new Error('脚本加载失败: ' + src)) }
     document.head.appendChild(s)
   })
+}
+
+/** 加载 GeoGebra 部署脚本（幂等：按 本地自托管 → 官方 CDN 顺序尝试） */
+function loadGGBScript() {
+  if (window.GGBApplet) return Promise.resolve(window.GGBApplet)
+  if (deployPromise) return deployPromise
+  deployPromise = (async () => {
+    for (const url of GGB_URLS) {
+      try {
+        await injectScript(url)
+        if (window.GGBApplet) {
+          // 本地源 → 用本地 codebase；官方源 → 用内置默认 codebase
+          ggbCodebase = url === GGB_URLS[0] ? LOCAL_CODEBASE : ''
+          return window.GGBApplet
+        }
+      } catch (e) {
+        console.warn('[GeoGebraPlayground] 脚本加载失败，尝试下一个源:', url, e)
+      }
+    }
+    throw new Error('GeoGebra 脚本全部加载失败')
+  })()
+  // 失败后重置缓存，允许再次重试
+  deployPromise.catch(() => { deployPromise = null })
+  return deployPromise
 }
 
 /** 创建/重新加载计算器 */
@@ -199,9 +206,11 @@ async function loadCalculator() {
         console.warn('[GeoGebraPlayground] 加载超时')
         state.value = 'error'
       }
-    }, 30000)
+    }, 15000)
 
     applet = new GGBApplet(params, true)
+    // 自托管模式：将 web 模块（nocache + 主编译程序）指向本地，实现完全离线
+    if (ggbCodebase) applet.setHTML5Codebase(ggbCodebase)
     applet.inject(ggbEl.value)
   } catch (e) {
     console.error('[GeoGebraPlayground] 加载失败:', e)

@@ -86,6 +86,8 @@ function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
 .difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
 .difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
 .difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+/* 暗色模式下提高冲刺难度标签对比度 */
+:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
 
 .ex-question { margin-bottom: var(--spacer-10); }
 .ex-solution-wrap, .ex-answer-wrap { margin-top: var(--spacer-8); }
@@ -95,6 +97,8 @@ function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
   padding: 4px 14px; font-size: 0.85rem;
 }
 .ex-toggle:hover { background: var(--primary); color: #fff; }
+/* 触屏按压反馈 */
+.ex-toggle:active { transform: scale(0.97); }
 .ex-solution {
   background: var(--surface-muted);
   border-left: 3px solid var(--success);
@@ -111,4 +115,12 @@ function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
 }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* 移动端触控目标 ≥44px */
+@media (max-width: 600px) {
+  .ex-toggle {
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+}
 </style>

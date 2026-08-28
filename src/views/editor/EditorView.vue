@@ -50,7 +50,7 @@
             <select v-model="block.type" class="type-select">
               <option v-for="t in blockTypes" :key="t" :value="t">{{ blockTypeLabel(t) }}</option>
             </select>
-            <button class="del-btn" @click="removeBlock(bi)">✕</button>
+            <button class="del-btn" aria-label="删除区块" @click="removeBlock(bi)">✕</button>
           </div>
           <!-- 文本字段编辑（按类型动态渲染） -->
           <div v-for="field in textFields(block.type)" :key="field" class="field">
@@ -71,7 +71,7 @@
             <label>条目列表</label>
             <div v-for="(item, ii) in block.items" :key="ii" class="list-item">
               <input :value="item.question || item.title" placeholder="内容" @input="e => setItem(block, ii, e.target.value)" />
-              <button class="del-btn" @click="removeItem(block, ii)">✕</button>
+              <button class="del-btn" aria-label="删除条目" @click="removeItem(block, ii)">✕</button>
             </div>
             <button class="add-item-btn" @click="addItem(block)">+ 添加条目</button>
           </div>
@@ -219,7 +219,7 @@ selectPage(0)
 </script>
 
 <style scoped>
-.editor { display: flex; flex-direction: column; height: calc(100vh - 60px); }
+.editor { display: flex; flex-direction: column; height: calc(100dvh - 60px - var(--sat)); }
 .editor-toolbar {
   display: flex; align-items: center; gap: var(--spacer-16);
   padding: var(--spacer-12) var(--spacer-16);

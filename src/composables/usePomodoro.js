@@ -19,6 +19,9 @@ const BREAK_DURATION = 5 * 60       // 短休息 5 分钟
 const LONG_BREAK_DURATION = 15 * 60 // 长休息 15 分钟
 const STORAGE_KEY = 'pomodoro_state'
 
+// 全局复用的音频上下文（避免每次提示音都新建 AudioContext）
+let audioCtx = null
+
 /** 格式化秒数为 mm:ss */
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60)
@@ -43,6 +46,8 @@ export function usePomodoro() {
   const cycleCount = ref(0)           // 当前周期番茄数（0-3）
 
   let intervalId = null
+  // 当前阶段开始的时间戳（秒/毫秒），用于时间戳基准校准计时
+  let startedAtTs = 0
 
   // 当前模式总时长
   const totalDuration = computed(() => {
@@ -82,6 +87,7 @@ export function usePomodoro() {
           running.value = true
           mode.value = saved.mode
           timeLeft.value = remaining
+          startedAtTs = saved.startedAt
           // 今日番茄数不从此恢复：统一以 daily_stats.studyMinutes 计算（见 loadTodaySessions）
           cycleCount.value = saved.cycleCount || 0
           // 恢复计时
@@ -123,30 +129,31 @@ export function usePomodoro() {
     if (intervalId) { clearInterval(intervalId); intervalId = null }
   }
 
-  /** 每秒触发：递减剩余时间，到零则完成当前阶段 */
+  /** 每秒触发：按时间戳校准剩余时间，到零则完成当前阶段 */
   function tick() {
-    timeLeft.value--
+    const remaining = totalDuration.value - Math.floor((Date.now() - startedAtTs) / 1000)
+    timeLeft.value = Math.max(0, remaining)
     if (timeLeft.value <= 0) {
       completePhase()
-    } else {
-      saveState()
     }
+    // 不在此持久化：剩余时间由 startedAt 时间戳恢复，避免每秒 JSON 序列化写入 localStorage
   }
 
-  /** 播放完成音效（Web Audio API 正弦波） */
-  function playBeep() {
+  /** 播放完成音效（Web Audio API 正弦波，复用单例 AudioContext） */
+  async function playBeep() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      if (audioCtx.state === 'suspended') await audioCtx.resume()
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
       osc.connect(gain)
-      gain.connect(ctx.destination)
+      gain.connect(audioCtx.destination)
       osc.frequency.value = 800
       osc.type = 'sine'
-      gain.gain.setValueAtTime(0.3, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5)
       osc.start()
-      osc.stop(ctx.currentTime + 0.5)
+      osc.stop(audioCtx.currentTime + 0.5)
     } catch (e) { /* 忽略音频异常 */ }
   }
 
@@ -183,8 +190,9 @@ export function usePomodoro() {
    */
   async function completePhase(rewarded = true) {
     stopInterval()
+    startedAtTs = 0
     running.value = false
-    if (rewarded) playBeep()
+    if (rewarded) await playBeep()
 
     if (mode.value === 'focus') {
       // 专注完成
@@ -225,6 +233,7 @@ export function usePomodoro() {
     if (running.value) return
     running.value = true
     if (mode.value === 'focus') requestNotificationPermission()
+    startedAtTs = Date.now()
     startInterval()
     saveState()
   }
@@ -234,6 +243,8 @@ export function usePomodoro() {
     if (!running.value) return
     running.value = false
     stopInterval()
+    // 暂停前用时间戳校准剩余秒数，保证持久化的是准确值
+    timeLeft.value = Math.max(0, totalDuration.value - Math.floor((Date.now() - startedAtTs) / 1000))
     saveState()
   }
 

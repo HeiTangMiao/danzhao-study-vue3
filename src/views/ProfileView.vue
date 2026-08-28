@@ -12,6 +12,12 @@
 
     <div v-if="loading" class="loading">加载中…</div>
 
+    <!-- 加载失败 -->
+    <div v-else-if="error" class="error-hint card">
+      <p>⚠️ {{ error }}</p>
+      <button class="retry-btn" @click="load">🔄 重试</button>
+    </div>
+
     <template v-else>
       <!-- 账号卡片 -->
       <section class="card account-card">
@@ -90,6 +96,8 @@ const loading = ref(true)
 const data = ref(null)
 const noteCount = ref(0)
 const registerDate = ref('')
+// 加载失败提示
+const error = ref('')
 
 const avatarEmoji = computed(() => {
   const n = (auth.user?.username || '?').charCodeAt(0) || 0
@@ -100,6 +108,8 @@ const SUBJECT_NAMES = { math: '数学', chinese: '语文', computer: '计算机'
 const subjectName = (k) => SUBJECT_NAMES[k] || k
 
 async function load() {
+  loading.value = true
+  error.value = ''
   try {
     // 拉取最新用户信息（含注册时间与 role）
     const me = await api.me()
@@ -113,6 +123,7 @@ async function load() {
     noteCount.value = (await db.getAllNotes()).length
   } catch (e) {
     console.warn('[Profile] 加载失败:', e)
+    error.value = '加载失败，请稍后重试'
   } finally {
     loading.value = false
   }
@@ -121,6 +132,7 @@ async function load() {
 onMounted(load)
 
 function logout() {
+  if (!window.confirm('确定要退出登录吗？')) return
   auth.logout()
   router.replace('/login')
 }
@@ -132,6 +144,17 @@ function logout() {
 .crumb-sep { margin: 0 6px; }
 .card { padding: var(--spacer-16); border-radius: var(--radius, 12px); background: var(--surface); border: 1px solid var(--border); }
 .loading { padding: var(--spacer-32); text-align: center; color: var(--text-secondary, #666); }
+
+/* 加载失败 */
+.error-hint { text-align: center; padding: var(--spacer-24); }
+.error-hint p { margin-bottom: var(--spacer-12); color: var(--text-muted); }
+.retry-btn {
+  min-height: 44px; padding: 0 var(--spacer-20);
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-full);
+  font-weight: 600; font-size: 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 
 .account-card { display: flex; align-items: center; gap: var(--spacer-14); }
 .avatar {

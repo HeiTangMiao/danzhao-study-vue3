@@ -32,6 +32,13 @@ const html = computed(() => {
 </script>
 
 <style scoped>
-.mathjax-render { line-height: 1.8; }
-.mathjax-block { display: block; text-align: center; margin: 8px 0; font-size: 1.15em; }
+.mathjax-render { line-height: 1.8; max-width: 100%; min-width: 0; overflow-wrap: break-word; }
+.mathjax-block {
+  display: block; text-align: center; margin: 8px 0; font-size: 1.15em;
+  /* 长公式在窄屏横向滚动，避免整页横向溢出/被裁切 */
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
+}
 </style>

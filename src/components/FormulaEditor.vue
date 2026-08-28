@@ -297,7 +297,7 @@ function onInput(e) {
   margin-right: 2px; white-space: nowrap;
 }
 .sym-btn {
-  min-width: 28px; height: 28px;
+  min-width: 40px; height: 40px;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   cursor: pointer; font-size: 0.85rem;

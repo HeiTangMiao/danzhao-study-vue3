@@ -3,12 +3,24 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- 移动端适配：主题色 / 刘海屏安全区（Tauri 手机端） -->
     <meta name="theme-color" content="#2f6fed" />
     <meta name="format-detection" content="telephone=no" />
     <!-- 应用标题，Tauri 打包时会作为窗口/应用名称展示 -->
     <title>单招学习打卡</title>
+    <script>
+      // 首帧前应用主题，避免暗色用户加载时白屏闪烁（与 useTheme 的 THEME_KEY 保持一致）
+      (function () {
+        try {
+          var t = localStorage.getItem('math_theme')
+          if (t !== 'light' && t !== 'dark') {
+            t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
+          document.documentElement.setAttribute('data-theme', t)
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <!-- Vue 应用挂载点 -->

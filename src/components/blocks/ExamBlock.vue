@@ -27,15 +27,28 @@
       <div class="exam-toolbar">
         <span class="exam-timer" :class="{ 'timer-warn': timeLeft <= 300 }">⏱ {{ fmtTime(timeLeft) }}</span>
         <span class="exam-progress">已答 {{ answeredCount }}/{{ block.items.length }}</span>
-        <button class="exam-submit-btn" :disabled="answeredCount < block.items.length || submitting" @click="submitExam">
-          {{ submitting ? '提交中…' : '交卷' }}
-        </button>
+        <span class="exam-toolbar__actions">
+          <button class="exam-jump-btn" :disabled="!hasUnanswered" title="跳转到下一道未答题" @click="jumpToNextUnanswered">⬇ 下一未答</button>
+          <button class="exam-submit-btn" :disabled="submitting" @click="handleSubmitClick">
+            {{ submitting ? '提交中…' : '交卷' }}
+          </button>
+        </span>
       </div>
 
-      <div v-for="(item, i) in block.items" :key="i" class="exam-question" :class="{ 'exam-answered': answers[i]?.answered }">
+      <!-- 交卷失败提示 -->
+      <div v-if="submitError" class="exam-error" role="alert">⚠️ {{ submitError }}</div>
+
+      <div
+        v-for="(item, i) in block.items"
+        :key="i"
+        :ref="(el) => (questionEls[i] = el)"
+        :class="{ 'exam-answered': answers[i]?.answered, 'exam-unanswered': !answers[i]?.answered, 'exam-jump-flash': jumpTarget === i }"
+        class="exam-question"
+      >
         <div class="exam-q-head">
           <span class="q-index">{{ i + 1 }}</span>
           <span class="difficulty-tag" :class="diffClass(item.difficulty)">{{ diffLabel(item.difficulty) }}</span>
+          <span v-if="!answers[i]?.answered" class="exam-unanswered-tag">未答</span>
           <span class="exam-score">({{ item.score || 0 }} 分)</span>
         </div>
         <div class="exam-q-body">
@@ -93,14 +106,31 @@
           <span class="review-label">正确答案：</span>
           <MathJaxRender :text="item.answer" />
         </div>
+        <div v-if="answers[i]" class="review-user">
+          <span class="review-label">你的作答：</span>
+          <MathJaxRender :text="userAnswer(i)" />
+        </div>
       </div>
     </div>
+
+    <!-- 提前交卷二次确认 -->
+    <transition name="fade">
+      <div v-if="confirmSubmit" class="submit-confirm-overlay" @click.self="confirmSubmit = false">
+        <div class="submit-confirm card">
+          <div class="submit-confirm__title">⚠️ 还有 {{ unansweredCount }} 题未作答</div>
+          <p class="submit-confirm__msg">确定现在交卷吗？未作答的题目将按答错计分。</p>
+          <div class="submit-confirm__actions">
+            <button class="submit-confirm__btn submit-confirm__cancel" @click="confirmSubmit = false">继续作答</button>
+            <button class="submit-confirm__btn submit-confirm__ok" @click="doEarlySubmit">确定交卷</button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { useGameEngineStore } from '@/stores/gameEngine'
 
@@ -127,8 +157,12 @@ const score = ref(0)
 const xpGained = ref(0)
 // 交卷中标记：防止连点/并发触发重复记分与错题（刷 XP / 双倍加分）
 const submitting = ref(false)
+// 交卷失败提示
+const submitError = ref('')
 // 计时器句柄
 let timer = null
+// 交卷截止时间戳（毫秒），用于时间戳基准校准倒计时
+let deadline = 0
 
 const usedTime = computed(() => {
   const total = (props.block.duration || 90) * 60
@@ -139,11 +173,40 @@ const answeredCount = computed(() => {
   return props.block.items.filter((_, i) => answers.value[i]?.answered).length
 })
 
+// ===== 未答跳转 =====
+// 是否还有未答题（有未答题时交卷按钮保持禁用）
+const hasUnanswered = computed(() => answeredCount.value < props.block.items.length)
+// 题目卡片 DOM 引用（v-for :ref 收集）
+const questionEls = ref([])
+// 最近一次跳转的题号（用于从其后继续找下一未答）
+let lastJumpIndex = -1
+// 跳转高亮的目标题号
+const jumpTarget = ref(-1)
+let jumpTimer = null
+
+// 跳转到下一道未答题：平滑滚动居中 + 短暂闪烁提示
+function jumpToNextUnanswered() {
+  if (!hasUnanswered.value) return
+  const unanswered = props.block.items
+    .map((_, i) => i)
+    .filter((i) => !answers.value[i]?.answered)
+  if (!unanswered.length) return
+  // 优先找当前题之后的第一个未答，否则回到第一道未答
+  const next = unanswered.find((i) => i > lastJumpIndex) ?? unanswered[0]
+  lastJumpIndex = next
+  jumpTarget.value = next
+  if (jumpTimer) clearTimeout(jumpTimer)
+  jumpTimer = setTimeout(() => { jumpTarget.value = -1 }, 1400)
+  const el = questionEls.value[next]
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 const correctCount = computed(() => {
   return props.block.items.filter((_, i) => answers.value[i]?.correct).length
 })
 const wrongCount = computed(() => {
-  return props.block.items.filter((_, i) => answers.value[i]?.answered && !answers.value[i]?.correct).length
+  // 未作答按答错计（提前交卷时保证 答对 + 答错 = 总题数）
+  return props.block.items.filter((_, i) => !answers.value[i]?.correct).length
 })
 
 const percent = computed(() => {
@@ -173,10 +236,12 @@ function fmtTime(sec) {
 // 开始考试
 function startExam() {
   phase.value = 'running'
+  deadline = Date.now() + (props.block.duration || 90) * 60 * 1000
   timeLeft.value = (props.block.duration || 90) * 60
   answers.value = {}
   timer = setInterval(() => {
-    timeLeft.value--
+    // 时间戳基准校准：后台/切标签回来后剩余时间自动修正，避免 setInterval 节流导致漂移
+    timeLeft.value = Math.max(0, Math.ceil((deadline - Date.now()) / 1000))
     if (timeLeft.value <= 0) {
       clearInterval(timer)
       timer = null
@@ -196,11 +261,43 @@ function selfAssess(i, correct) {
   answers.value[i] = { answered: true, selected: null, correct }
 }
 
+// 结果页：展示用户作答（选择题显示所选选项，自评题显示对错）
+function userAnswer(i) {
+  const a = answers.value[i]
+  if (!a) return ''
+  const item = props.block.items[i]
+  if (isChoice(item) && a.selected !== undefined && a.selected !== null) {
+    return `${'ABCDEFGH'[a.selected]}. ${item.options[a.selected] || ''}`
+  }
+  return a.correct ? '自评答对' : '自评答错'
+}
+
+// ===== 提前交卷 + 二次确认 =====
+// 未答题数（确认弹窗文案用）
+const unansweredCount = computed(() => props.block.items.length - answeredCount.value)
+// 提前交卷确认弹窗开关
+const confirmSubmit = ref(false)
+
+// 交卷点击入口：有未答题时先二次确认，全部作答则直接交卷
+function handleSubmitClick() {
+  if (hasUnanswered.value) {
+    confirmSubmit.value = true
+  } else {
+    submitExam()
+  }
+}
+// 确认提前交卷
+function doEarlySubmit() {
+  confirmSubmit.value = false
+  submitExam()
+}
+
 // 交卷
 async function submitExam() {
   // 防重复交卷：已提交或正在提交时直接返回，避免并发造成重复记分/错题入本
   if (submitting.value || phase.value !== 'running') return
   submitting.value = true
+  submitError.value = ''
   if (timer) { clearInterval(timer); timer = null }
 
   try {
@@ -221,23 +318,31 @@ async function submitExam() {
     )
     xpGained.value = result.xpGained || 0
 
-    // 错题入本（gameEngine 内部会按 题干+页面 去重，重复答错不重复收录）
+    // 错题入本（逐题容错：单题入库失败不阻断整卷交卷；gameEngine 内部会按 题干+页面 去重）
     for (const [i, item] of props.block.items.entries()) {
       if (answers.value[i]?.answered && !answers.value[i]?.correct) {
         const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
-        await game.recordError(
-          c.subject || 'math',
-          c.unitNum || '',
-          item.question,
-          item.answer,
-          selectedText,
-          `模拟卷解析：${item.answer}`,
-          { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
-        )
+        try {
+          await game.recordError(
+            c.subject || 'math',
+            c.unitNum || '',
+            item.question,
+            item.answer,
+            selectedText,
+            `模拟卷解析：${item.answer}`,
+            { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
+          )
+        } catch (e) {
+          console.error('[ExamBlock] 错题入本失败:', e)
+        }
       }
     }
 
     phase.value = 'result'
+  } catch (e) {
+    console.error('[ExamBlock] 交卷失败:', e)
+    // 交卷失败不丢作答：停留在进行页，提示用户可重试
+    submitError.value = '交卷失败，请重试'
   } finally {
     submitting.value = false
   }
@@ -249,22 +354,21 @@ function restartExam() {
   score.value = 0
   xpGained.value = 0
   answers.value = {}
+  submitError.value = ''
+  // 重置未答跳转状态
+  lastJumpIndex = -1
+  jumpTarget.value = -1
+  if (jumpTimer) { clearTimeout(jumpTimer); jumpTimer = null }
 }
 
 // ===== 作答离开保护（三层） =====
 // 作答中 = 进行中且已有作答
 const isRunning = computed(() => phase.value === 'running' && answeredCount.value > 0)
 
-// 1. 同步给父级 UnitView：页内翻页/跳页/切单元前弹确认
+// 1. 同步给父级 UnitView：页内翻页/跳页/切单元/跨路由离开统一由 UnitView 路由守卫弹确认
 watch(isRunning, (v) => { if (examState) examState.active = v })
 
-// 2. 路由级离开保护：离开学习页路由（返回首页/仪表盘等）前确认
-onBeforeRouteLeave(() => {
-  if (isRunning.value && !window.confirm('测验尚未交卷，离开将丢失作答记录。确定离开吗？')) return false
-  return true
-})
-
-// 3. 刷新/关闭页面前提醒
+// 2. 刷新/关闭页面前提醒
 function onBeforeUnload(e) {
   if (isRunning.value) {
     e.preventDefault()
@@ -275,6 +379,7 @@ onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
 
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer)
+  if (jumpTimer) clearTimeout(jumpTimer)
   if (examState) examState.active = false
   window.removeEventListener('beforeunload', onBeforeUnload)
 })
@@ -301,7 +406,7 @@ onBeforeUnmount(() => {
 /* 进行页 */
 .exam-toolbar {
   position: sticky; top: 0; z-index: 5;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: var(--spacer-10) var(--spacer-16);
   margin-bottom: var(--spacer-16); box-shadow: var(--shadow-sm);
@@ -310,11 +415,32 @@ onBeforeUnmount(() => {
 .timer-warn { color: var(--danger); animation: pulse 1s infinite; }
 @keyframes pulse { 50% { opacity: 0.5; } }
 .exam-progress { color: var(--text-muted); font-size: 0.85rem; }
+.exam-toolbar__actions { display: flex; align-items: center; gap: 8px; }
+.exam-jump-btn {
+  background: var(--primary-soft); color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+  padding: 6px 12px; font-size: 0.8rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+  white-space: nowrap;
+}
+.exam-jump-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .exam-submit-btn {
   background: var(--success); color: #fff; border-radius: var(--radius-full);
   padding: 6px 20px; font-weight: 600;
 }
 .exam-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* 交卷失败提示 */
+.exam-error {
+  background: rgba(224, 49, 49, 0.1);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--radius-md);
+  padding: var(--spacer-12);
+  margin-bottom: var(--spacer-12);
+  font-size: 0.88rem;
+}
 
 .exam-question {
   background: var(--surface); border: 1px solid var(--border);
@@ -322,6 +448,24 @@ onBeforeUnmount(() => {
   margin-bottom: var(--spacer-12);
 }
 .exam-answered { border-color: var(--primary); }
+/* 未答题：虚线描边 + 柔和高亮，长卷中一眼可辨 */
+.exam-question.exam-unanswered {
+  border-style: dashed;
+  border-color: var(--warning);
+  background: rgba(240, 140, 0, 0.03);
+}
+.exam-unanswered-tag {
+  font-size: 0.7rem; padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(240, 140, 0, 0.15); color: var(--warning);
+  font-weight: 600;
+}
+/* 跳转目标短暂闪烁 */
+.exam-jump-flash { animation: jumpFlash 1.4s ease; }
+@keyframes jumpFlash {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  30% { box-shadow: 0 0 0 3px var(--primary); }
+}
 .exam-q-head { display: flex; align-items: center; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
 .q-index {
   width: 22px; height: 22px; border-radius: 50%;
@@ -334,6 +478,8 @@ onBeforeUnmount(() => {
 .difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
 .difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
 .difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+/* 暗色模式下提高冲刺难度标签对比度 */
+:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
 .exam-score { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); }
 .exam-q-body { margin-bottom: var(--spacer-10); }
 
@@ -347,6 +493,8 @@ onBeforeUnmount(() => {
 }
 .option-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
 .option-selected { border-color: var(--primary); background: var(--primary-soft); }
+/* 触屏按压反馈 */
+.option-btn:active, .self-btn:active, .exam-submit-btn:active, .exam-restart-btn:active, .exam-start-btn:active { transform: scale(0.97); }
 .option-letter {
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--border);
@@ -405,4 +553,44 @@ onBeforeUnmount(() => {
 .review-q { flex: 1; }
 .review-answer { font-size: 0.9rem; background: var(--surface-muted); border-radius: var(--radius-md); padding: var(--spacer-10); }
 .review-label { font-weight: 600; color: var(--text-muted); }
+.review-user {
+  font-size: 0.9rem;
+  background: rgba(240, 140, 0, 0.08);
+  border: 1px dashed var(--warning);
+  border-radius: var(--radius-md);
+  padding: var(--spacer-10);
+  margin-top: 6px;
+}
+.review-no .review-user { border-color: var(--danger); background: rgba(224, 49, 49, 0.06); }
+
+/* 提前交卷确认弹窗 */
+.submit-confirm-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--spacer-24);
+}
+.submit-confirm {
+  width: min(360px, 100%);
+  padding: var(--spacer-24);
+}
+.submit-confirm__title { font-weight: 700; font-size: 1.05rem; margin-bottom: var(--spacer-12); }
+.submit-confirm__msg { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: var(--spacer-20); }
+.submit-confirm__actions { display: flex; gap: var(--spacer-12); }
+.submit-confirm__btn {
+  flex: 1; min-height: 44px;
+  border-radius: var(--radius-full);
+  font-weight: 600; font-size: 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.submit-confirm__cancel { background: var(--surface-muted); color: var(--text); border: 1px solid var(--border); }
+.submit-confirm__ok { background: var(--primary); color: #fff; }
+
+/* 移动端触控目标 ≥44px */
+@media (max-width: 600px) {
+  .exam-start-btn, .exam-submit-btn, .exam-jump-btn, .self-btn, .exam-restart-btn {
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+}
 </style>

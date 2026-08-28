@@ -8,11 +8,14 @@
 
 /* ---------- 亮色主题（默认） ---------- */
 :root {
+  color-scheme: light dark;
   --bg: #f6f7fb;
   --surface: #ffffff;
   --surface-muted: #eef0f6;
   --text: #1f2430;
+  --text-primary: #1f2430;
   --text-muted: #5b6472;
+  --text-secondary: #5b6472;
   --border: #e2e6ee;
   --primary: #2f6fed;
   --primary-soft: #e8f0ff;
@@ -20,13 +23,23 @@
   --success: #2f9e44;
   --warning: #f08c00;
   --danger: #e03131;
+  --radius-sm: 6px;
   --radius-md: 10px;
+  --radius: 12px;
   --radius-lg: 16px;
   --radius-full: 999px;
+  --spacer-4: 4px;
+  --spacer-6: 6px;
   --spacer-8: 8px;
+  --spacer-10: 10px;
   --spacer-12: 12px;
+  --spacer-14: 14px;
   --spacer-16: 16px;
+  --spacer-20: 20px;
   --spacer-24: 24px;
+  --spacer-32: 32px;
+  --spacer-40: 40px;
+  --spacer-48: 48px;
   --shadow-sm: 0 1px 3px rgba(31, 36, 48, 0.08);
   --shadow-md: 0 4px 16px rgba(31, 36, 48, 0.10);
   --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
@@ -34,11 +47,14 @@
 
 /* ---------- 暗色主题 ---------- */
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #16181f;
   --surface: #1f232c;
   --surface-muted: #2a2f3a;
   --text: #e6e9ef;
+  --text-primary: #e6e9ef;
   --text-muted: #aab2c0;
+  --text-secondary: #aab2c0;
   --border: #333a47;
   --primary: #6a9bff;
   --primary-soft: #24334d;
@@ -118,4 +134,26 @@ mark.katex-hl {
   padding: 0 2px;
   border-radius: 3px;
   font-weight: 600;
+}
+
+/* 移动端阅读排版：适当放大正文字号与行高，标题随窄屏收敛 */
+@media (max-width: 600px) {
+  body { font-size: 17px; line-height: 1.75; }
+  h1 { font-size: 1.4rem; }
+}
+
+/* 通用加载转圈（异步区块 / 图形画板 / 思维导图占位共用） */
+.block-spinner {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid var(--border); border-top-color: var(--primary);
+  border-radius: 50%; animation: blockSpin 0.8s linear infinite;
+  vertical-align: middle; flex: 0 0 auto;
+}
+@keyframes blockSpin { to { transform: rotate(360deg); } }
+
+/* 键盘焦点可见性（仅键盘导航时显示，触屏/鼠标点击不出现干扰圈） */
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible,
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

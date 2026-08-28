@@ -65,7 +65,12 @@ const routes = [
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 前进/后退：恢复原滚动位置；普通导航：回到顶部，避免新页短时停留在大片空白处
+    if (savedPosition) return savedPosition
+    return { top: 0, behavior: 'auto' }
+  }
 })
 
 /**

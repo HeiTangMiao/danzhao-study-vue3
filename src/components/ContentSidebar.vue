@@ -29,7 +29,7 @@
 <template>
   <aside class="content-sidebar" :class="{ collapsed, 'math': isMath }">
     <!-- 展开/收起开关（常驻右下/右上浮动） -->
-    <button class="sidebar-toggle" :class="{ active: !collapsed }" :title="collapsed ? '展开侧边栏' : '收起侧边栏'" @click="collapsed = !collapsed">
+    <button class="sidebar-toggle" :class="{ active: !collapsed }" :title="collapsed ? '展开侧边栏' : '收起侧边栏'" :aria-label="collapsed ? '展开侧边栏' : '收起侧边栏'" @click="collapsed = !collapsed">
       {{ collapsed ? '◀' : '▶' }}
     </button>
 
@@ -93,12 +93,12 @@
 
     <!-- 收起态：迷你图标徽标 -->
     <div v-else class="sidebar-mini">
-      <button class="mini-item" title="顶部" @click="emit('scroll-top')">⬆</button>
-      <button class="mini-item" :class="{ on: isDone }" title="完成" @click="emit('toggle-done')">{{ isDone ? '✅' : '○' }}</button>
-      <button class="mini-item" title="目录" @click="emit('toggle-toc')">☰</button>
-      <button class="mini-item" title="收藏" @click="emit('toggle-bookmark')">★</button>
-      <button class="mini-item" title="笔记" @click="emit('toggle-notes')">📝</button>
-      <button v-if="isMath" class="mini-item" title="GeoGebra 演练场" @click="emit('open-geogebra')">🧮</button>
+      <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')">⬆</button>
+      <button class="mini-item" :class="{ on: isDone }" title="完成" aria-label="标记完成" @click="emit('toggle-done')">{{ isDone ? '✅' : '○' }}</button>
+      <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')">☰</button>
+      <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')">★</button>
+      <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')">📝</button>
+      <button v-if="isMath" class="mini-item" title="GeoGebra 演练场" aria-label="GeoGebra 图形计算器" @click="emit('open-geogebra')">🧮</button>
     </div>
   </aside>
 
@@ -112,6 +112,10 @@
       class="sb-sheet"
       :class="{ open: sheetOpen, dragging: sheetDragging }"
       :style="sheetOpen && sheetDragY ? { transform: `translateY(${sheetDragY}px)` } : {}"
+      role="dialog"
+      aria-modal="true"
+      aria-label="答题卡与章节导航"
+      :aria-hidden="!sheetOpen"
     >
       <!-- 拖拽把手：下滑关闭抽屉 -->
       <div
@@ -124,7 +128,7 @@
       </div>
       <div class="sb-sheet__head">
         <span>📚 {{ unit?.title }}</span>
-        <button class="sb-sheet__close" title="关闭" @click="sheetOpen = false">✕</button>
+        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false">✕</button>
       </div>
       <div class="sb-sheet__body">
         <!-- 单元完成进度 -->
@@ -183,10 +187,10 @@
     </div>
 
     <!-- 更多操作面板：收藏 / 笔记 / 完成 / 计算器 / 顶部 -->
-    <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }">
+    <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }" role="dialog" aria-modal="true" aria-label="更多操作" :aria-hidden="!moreOpen">
       <div class="sb-sheet__head">
         <span>⋯ 更多操作</span>
-        <button class="sb-sheet__close" title="关闭" @click="moreOpen = false">✕</button>
+        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false">✕</button>
       </div>
       <div class="sb-more">
         <button class="sb-more__item" :class="{ on: isDone }" @click="emit('toggle-done'); moreOpen = false">
@@ -203,8 +207,8 @@
     <div class="sb-bar">
       <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet('nav')">☰<span>目录</span></button>
       <button class="sb-bar__btn" :disabled="!hasPrev" title="上一页" @click="emit('go-prev')">←<span>上页</span></button>
-      <button class="sb-bar__next" :title="hasNext ? '下一页' : '标记完成'" @click="onNextClick">
-        {{ hasNext ? '下一页 →' : (isDone ? '✅ 已完成' : '完成 ✓') }}
+      <button class="sb-bar__next" :title="nextBtnTitle" @click="onNextClick">
+        {{ nextBtnLabel }}
       </button>
       <button class="sb-bar__btn" :class="{ on: moreOpen }" title="更多操作" @click="openSheet('more')">⋯<span>更多</span></button>
     </div>
@@ -212,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   unit: { type: Object, default: null },
@@ -252,11 +256,20 @@ function closeSheets() {
   moreOpen.value = false
 }
 
+// Esc 关闭抽屉 / 更多面板
+function onKeyDown(e) {
+  if (e.key === 'Escape' && (sheetOpen.value || moreOpen.value)) closeSheets()
+}
+onMounted(() => window.addEventListener('keydown', onKeyDown))
+
 // 面板打开时锁定背景滚动（移动端手势隔离）
 watch([sheetOpen, moreOpen], ([s, m]) => {
   document.body.style.overflow = (s || m) ? 'hidden' : ''
 })
-onBeforeUnmount(() => { document.body.style.overflow = '' })
+onBeforeUnmount(() => {
+  document.body.style.overflow = ''
+  window.removeEventListener('keydown', onKeyDown)
+})
 
 // 抽屉把手下拉手势：跟手位移，松手超过阈值即关闭
 const sheetDragY = ref(0)
@@ -283,11 +296,25 @@ function onGrabTouchEnd() {
 const hasPrev = computed(() => props.fileIndex > 0)
 const hasNext = computed(() => !!props.unit && props.fileIndex < props.unit.files.length - 1)
 
-// 末页时主按钮转为「标记完成」
+// 末页时主按钮转为「标记完成」；末页且已完成则进入下一单元，无下一单元则返回顶部
 function onNextClick() {
   if (hasNext.value) emit('go-next')
   else if (!props.isDone) emit('toggle-done')
+  else if (nextUnit.value) emit('go-unit', nextUnit.value)
+  else emit('scroll-top')
 }
+
+// 底部主按钮文案/提示（随页次与完成状态切换，避免「死按钮」）
+const nextBtnLabel = computed(() => {
+  if (hasNext.value) return '下一页 →'
+  if (!props.isDone) return '完成 ✓'
+  return nextUnit.value ? '下一单元 →' : '返回顶部 ↑'
+})
+const nextBtnTitle = computed(() => {
+  if (hasNext.value) return '下一页'
+  if (!props.isDone) return '标记完成'
+  return nextUnit.value ? `下一单元：${nextUnit.value.title}` : '返回顶部'
+})
 
 // ===== 单元完成度（答题卡进度） =====
 const doneCount = computed(() => props.doneFiles.filter(Boolean).length)
@@ -612,6 +639,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
     box-shadow: 0 -2px 10px rgba(31, 36, 48, 0.06);
   }
+  /* 暗色模式下底部栏阴影随主题适配 */
+  :root[data-theme="dark"] .sb-bar { box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.45); }
   .sb-bar__btn {
     flex: 1; min-width: 0; min-height: 48px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -640,5 +669,11 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     transition: transform 0.15s;
   }
   .sb-bar__next:active { transform: scale(0.97); }
+}
+
+/* 横屏：底部栏与抽屉左右安全区适配（刘海屏） */
+@media (max-width: 1150px) and (orientation: landscape) {
+  .sb-bar { padding-left: calc(10px + var(--sal)); padding-right: calc(10px + var(--sar)); }
+  .sb-sheet { left: var(--sal); right: var(--sar); }
 }
 </style>

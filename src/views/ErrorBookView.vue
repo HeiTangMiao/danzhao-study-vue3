@@ -336,6 +336,11 @@ onMounted(async () => {
 .difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
 .difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
 .difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+/* 暗色模式下提高学科/难度标签对比度 */
+:root[data-theme="dark"] .tag-math { color: #8f9dff; }
+:root[data-theme="dark"] .tag-chinese { color: #ff8a8a; }
+:root[data-theme="dark"] .tag-computer { color: #6fc7f5; }
+:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
 .source-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface-muted); color: var(--text-muted); }
 .error-date { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); }
 
@@ -368,5 +373,10 @@ onMounted(async () => {
 
 @media (max-width: 600px) {
   .stats-card { grid-template-columns: repeat(2, 1fr); }
+  /* 触控目标 ≥44px */
+  .filter-btn, .clear-btn, .act-btn {
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
 }
 </style>

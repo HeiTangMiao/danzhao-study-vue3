@@ -9,23 +9,31 @@
 <template>
   <section class="block mindmap">
     <h3 class="block-title">🧠 {{ block.title || '知识结构导图' }}</h3>
-    <div v-if="enabled" class="mm-legend">
+    <div v-if="state === 'ready'" class="mm-legend">
       <span class="lg"><i class="dot c-key"></i>结论/性质</span>
       <span class="lg"><i class="dot c-method"></i>方法/技巧</span>
       <span class="lg"><i class="dot c-judge"></i>判定/识别</span>
       <span class="lg"><i class="dot c-err"></i>易错/注意</span>
       <span class="lg"><i class="dot c-conc"></i>概念/其他</span>
     </div>
-    <div v-if="enabled" class="mm-toolbar">
+    <div v-if="state === 'ready'" class="mm-toolbar">
       <button class="mm-btn" type="button" title="放大" @click="zoomIn">＋</button>
       <button class="mm-btn" type="button" title="缩小" @click="zoomOut">－</button>
       <button class="mm-btn" type="button" title="适应窗口" @click="fitToView">⤢</button>
       <button class="mm-btn" type="button" title="复位" @click="resetView">⟳</button>
-      <span class="mm-hint">滚轮缩放 · 拖拽移动 · 点击节点跳转正文</span>
+      <span class="mm-hint">按钮缩放 · 拖拽移动 · 点击节点跳转正文</span>
     </div>
     <div ref="viewport" class="mindmap-viewport" @wheel.prevent="onWheel">
       <div ref="canvas" class="mindmap-canvas" :style="canvasStyle">
         <div ref="container" class="mindmap-content"></div>
+      </div>
+      <!-- 加载中 / 失败占位（覆盖在视口上，不卸载画布容器，便于重试复用） -->
+      <div v-if="state === 'loading'" class="mm-status">
+        <span class="block-spinner"></span> 正在加载思维导图…
+      </div>
+      <div v-else-if="state === 'error'" class="mm-status">
+        <p class="mm-error-msg">⚠️ 思维导图加载失败</p>
+        <button class="mm-retry" type="button" @click="renderMindmap">🔄 重试</button>
       </div>
     </div>
   </section>
@@ -45,9 +53,11 @@ const viewport = ref(null)
 const canvas = ref(null)
 const container = ref(null)
 
+// 加载状态：loading 加载中 / ready 就绪 / error 失败
+const state = ref('loading')
+
 // 缩放平移状态
 const transform = reactive({ scale: 1, x: 0, y: 0 })
-const enabled = ref(false)
 const MIN = 0.5, MAX = 4, STEP = 0.15
 
 const canvasStyle = computed(() => ({
@@ -164,19 +174,43 @@ function navigateToBlock(label) {
   // 未命中正文：无操作（保持导图可见）
 }
 
-onMounted(async () => {
-  if (!container.value || !props.block.mermaid) return
-  await loadMermaid()
-  await renderMermaidTo(container.value, props.block.mermaid, { decorate: true })
-  bindNodeClick()
-  enabled.value = true
-  // 渲染完成后自动适应窗口（固定边界）
-  requestAnimationFrame(() => fitToView())
-  // 绑定视口拖拽
-  viewport.value.addEventListener('pointerdown', onPointerDown)
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
-})
+// 渲染思维导图（可重试）：库加载/渲染失败时展示错误态
+let dragBound = false
+async function renderMindmap() {
+  if (!container.value || !props.block.mermaid) {
+    state.value = 'error'
+    return
+  }
+  state.value = 'loading'
+  try {
+    const m = await loadMermaid()
+    if (!m) { state.value = 'error'; return }
+
+    await renderMermaidTo(container.value, props.block.mermaid, { decorate: true })
+    // 库加载成功但容器仍无图（渲染静默失败）视为失败
+    if (!container.value.querySelector('svg') && !container.value.querySelector('pre')) {
+      state.value = 'error'
+      return
+    }
+
+    bindNodeClick()
+    state.value = 'ready'
+    // 渲染完成后自动适应窗口（固定边界）
+    requestAnimationFrame(() => fitToView())
+    // 绑定视口拖拽（只绑定一次）
+    if (!dragBound) {
+      dragBound = true
+      viewport.value.addEventListener('pointerdown', onPointerDown)
+      window.addEventListener('pointermove', onPointerMove)
+      window.addEventListener('pointerup', onPointerUp)
+    }
+  } catch (e) {
+    console.error('[MindMapBlock] 渲染失败:', e)
+    state.value = 'error'
+  }
+}
+
+onMounted(renderMindmap)
 
 onBeforeUnmount(() => {
   viewport.value?.removeEventListener('pointerdown', onPointerDown)
@@ -218,4 +252,19 @@ onBeforeUnmount(() => {
 .mindmap-content svg { max-width: none; height: auto; display: block; }
 .mindmap-content svg .node { transition: filter .15s; }
 .mindmap-content svg .node:hover { filter: brightness(1.04); }
+
+/* 加载中 / 失败占位 */
+.mm-status {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; background: var(--surface, #fff); color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+.mm-error-msg { color: var(--danger, #e03131); }
+.mm-retry {
+  min-height: 44px; padding: 0 20px;
+  background: var(--primary); color: #fff;
+  border-radius: 999px; font-size: 0.88rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 </style>

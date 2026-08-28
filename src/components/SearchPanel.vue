@@ -5,7 +5,7 @@
    - 组件 fetch 该索引后本地过滤，点击结果跳转对应内容页
 -->
 <template>
-  <div class="search" :class="{ open: open }">
+  <div ref="searchEl" :class="{ open: open }" class="search">
     <div class="search-bar">
       <span class="search-icon">🔍</span>
       <input
@@ -16,11 +16,17 @@
         @focus="open = true"
         @input="debounced"
       />
-      <button v-if="q" class="search-clear" title="清空" @click="q = ''">✕</button>
+      <button v-if="q" class="search-clear" title="清空" aria-label="清空" @click="clearSearch">✕</button>
+    </div>
+
+    <!-- 索引加载失败 -->
+    <div v-if="open && focused && indexState === 'error'" class="search-empty">
+      <span>搜索索引加载失败，请重试</span>
+      <button class="search-retry" @click="loadIndex">🔄 重试</button>
     </div>
 
     <!-- 结果列表 -->
-    <div v-if="open && focused && results.length" class="search-results">
+    <div v-else-if="open && focused && indexState === 'ready' && results.length" class="search-results">
       <button
         v-for="(r, i) in results"
         :key="i"
@@ -38,14 +44,14 @@
     </div>
 
     <!-- 空状态 -->
-    <div v-else-if="open && focused && q" class="search-empty">没有匹配的内容，换个关键词试试</div>
+    <div v-else-if="open && focused && indexState === 'ready' && q" class="search-empty">没有匹配的内容，换个关键词试试</div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { matchSearch } from '@/utils/search'
+import { matchSearch, prepareSearchIndex } from '@/utils/search'
 
 const router = useRouter()
 
@@ -57,7 +63,13 @@ defineProps({
 const q = ref('')
 const open = ref(false)
 const focused = ref(false)
+// 防抖后的查询词（停顿 200ms 才更新，避免每次按键全量过滤）
+const debouncedQ = ref('')
 const index = ref([])
+// 索引加载状态：loading 加载中 / ready 就绪 / error 失败
+const indexState = ref('loading')
+// 搜索组件根元素（点击外部时关闭浮层）
+const searchEl = ref(null)
 let timer = null
 
 const SUBJECT_ICON = { math: '📐', chinese: '✍️', computer: '💻' }
@@ -65,22 +77,74 @@ const SUBJECT_NAME = { math: '数学', chinese: '语文', computer: '计算机' 
 function subjectIcon(s) { return SUBJECT_ICON[s] || '📖' }
 
 // 加载构建期生成的搜索索引（base './' 相对路径）
-onMounted(async () => {
+// 会话级缓存：同会话重复进入不重复 fetch（索引构建期生成，不会热更新）
+let indexCache = null
+async function loadIndex() {
+  indexState.value = 'loading'
+  if (indexCache) {
+    index.value = indexCache
+    indexState.value = 'ready'
+    return
+  }
   try {
     const res = await fetch('./search-index.json')
-    if (res.ok) index.value = await res.json()
-  } catch (e) { console.warn('[Search] 索引加载失败:', e) }
-})
+    if (res.ok) {
+      // 加载后一次性预计算小写检索串，避免每次按键重复拼接
+      indexCache = prepareSearchIndex(await res.json())
+      index.value = indexCache
+      indexState.value = 'ready'
+    } else {
+      indexState.value = 'error'
+    }
+  } catch (e) {
+    console.warn('[Search] 索引加载失败:', e)
+    indexState.value = 'error'
+  }
+}
 
 function debounced() {
   clearTimeout(timer)
-  timer = setTimeout(() => { focused.value = !!q.value.trim() }, 180)
+  timer = setTimeout(() => {
+    debouncedQ.value = q.value.trim()
+    focused.value = !!q.value.trim()
+  }, 200)
 }
-onBeforeUnmount(() => clearTimeout(timer))
 
-// 过滤匹配：标题 / 单元标题 / 副标题 / 正文关键词（纯函数，见 src/utils/search.js）
+// 点击组件外部关闭浮层
+function onDocClick(e) {
+  if (searchEl.value && !searchEl.value.contains(e.target)) {
+    open.value = false
+    focused.value = false
+  }
+}
+// Esc 关闭浮层
+function onEsc(e) {
+  if (e.key === 'Escape') {
+    open.value = false
+    focused.value = false
+  }
+}
+
+onMounted(() => {
+  loadIndex()
+  document.addEventListener('mousedown', onDocClick)
+  document.addEventListener('keydown', onEsc)
+})
+onBeforeUnmount(() => {
+  clearTimeout(timer)
+  document.removeEventListener('mousedown', onDocClick)
+  document.removeEventListener('keydown', onEsc)
+})
+
+// 清空搜索词（保留输入框焦点便于重新输入）
+function clearSearch() {
+  q.value = ''
+  debouncedQ.value = ''
+}
+
+// 过滤匹配：标题 / 单元标题 / 副标题 / 正文关键词（基于防抖后的查询词，纯函数见 src/utils/search.js）
 const results = computed(() => {
-  const hits = matchSearch(index.value, q.value)
+  const hits = matchSearch(index.value, debouncedQ.value)
   return hits.map((r) => ({ ...r, name: SUBJECT_NAME[r.subject] || r.subject }))
 })
 
@@ -89,6 +153,7 @@ const hasMore = computed(() => results.value.length >= 30)
 function go(r) {
   router.push({ name: 'unit', params: { subject: r.subject, unitNum: r.unitNum, fileIndex: r.fileIndex } })
   q.value = ''
+  debouncedQ.value = ''
   open.value = false
   focused.value = false
 }
@@ -113,9 +178,10 @@ function go(r) {
   font-size: 0.95rem;
 }
 .search-clear {
-  flex: 0 0 auto; width: 26px; height: 26px; border-radius: var(--radius-full);
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: var(--radius-full);
   background: var(--surface); border: 1px solid var(--border);
-  color: var(--text-muted); font-size: 0.8rem;
+  color: var(--text-muted); font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
 }
 
 /* 结果浮层 */
@@ -151,5 +217,13 @@ function go(r) {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
   z-index: 200;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.search-retry {
+  min-height: 44px; padding: 0 var(--spacer-20);
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
 }
 </style>

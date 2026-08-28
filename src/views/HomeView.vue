@@ -95,7 +95,7 @@
           <span class="tool-desc">回顾与复习错题</span>
         </div>
       </router-link>
-      <router-link :to="mockRoute" class="tool-card" style="border-top-color: #a855f7">
+      <router-link v-if="sprintUnit" :to="mockRoute" class="tool-card" style="border-top-color: #a855f7">
         <span class="tool-icon">🚀</span>
         <div class="tool-text">
           <span class="tool-name">模拟冲刺</span>
@@ -174,7 +174,7 @@
       <nav class="footer-nav" aria-label="页脚导航">
         <router-link to="/dashboard">学习仪表盘</router-link>
         <router-link to="/error-book">错题本</router-link>
-        <router-link :to="mockRoute">模拟冲刺</router-link>
+        <router-link v-if="sprintUnit" :to="mockRoute">模拟冲刺</router-link>
         <router-link to="/editor">内容编辑器</router-link>
         <router-link to="/">返回首页</router-link>
       </nav>
@@ -293,13 +293,15 @@ function goUnit(unit) {
 }
 
 // 模拟冲刺入口：跳转到当前学科冲刺单元的第一个页面
-const mockRoute = computed(() => {
+// 冲刺单元（当前学科存在冲刺单元才展示「模拟冲刺」入口，避免无效跳转回首页）
+const sprintUnit = computed(() => {
   const config = currentConfig.value
-  if (!config || !config.units) return { name: 'home' }
-  const sprint = config.units.find((u) => u.sprint)
-  if (sprint) return { name: 'unit', params: { subject: currentSubject.value, unitNum: sprint.num, fileIndex: 0 } }
-  return { name: 'home' }
+  if (!config || !config.units) return null
+  return config.units.find((u) => u.sprint) || null
 })
+const mockRoute = computed(() => sprintUnit.value
+  ? { name: 'unit', params: { subject: currentSubject.value, unitNum: sprintUnit.value.num, fileIndex: 0 } }
+  : null)
 </script>
 
 <style scoped>
