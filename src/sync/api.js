@@ -29,5 +29,12 @@ async function request(path, { method = 'GET', body, auth = true, retry = true }
 }
 
 export const api = {
-  sync: (payload) => request('/sync', { method: 'POST', body: payload })
+  sync: (payload) => request('/sync', { method: 'POST', body: payload }),
+  me: () => request('/auth/me'),
+  // ===== 管理员接口 =====
+  adminUsers: () => request('/admin/users'),
+  setUserRole: (id, role) => request(`/admin/users/${id}/role`, { method: 'PATCH', body: { role } }),
+  deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+  adminOverview: () => request('/admin/stats/overview'),
+  adminPagesStats: () => request('/admin/stats/pages')
 }

@@ -8,6 +8,7 @@ import jwt from '@fastify/jwt'
 import { initDB, closeDB } from './db.js'
 import { authRoutes } from './auth.js'
 import { syncRoutes } from './sync.js'
+import { adminRoutes } from './admin.js'
 
 const PORT = Number(process.env.PORT || 3000)
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
@@ -33,6 +34,7 @@ app.get('/api/health', async () => ({ ok: true, time: new Date().toISOString() }
 
 await app.register(authRoutes)
 await app.register(syncRoutes)
+await app.register(adminRoutes)
 
 await initDB()
 

@@ -8,11 +8,13 @@
     <header class="app-header">
       <div class="app-header__brand">📚 单招学习打卡</div>
       <div class="app-header__right">
-        <!-- 已登录：同步状态 + 退出 -->
+        <!-- 已登录：同步 + 个人主页 + 管理入口 + 退出 -->
         <template v-if="auth.isLoggedIn">
           <button class="app-header__sync" :disabled="syncing" @click="doSync">
-            {{ syncMsg || `👤 ${auth.user?.username || '已登录'}` }}
+            {{ syncMsg || '⤓ 同步' }}
           </button>
+          <router-link to="/profile" class="app-header__link">👤 {{ auth.user?.username }}</router-link>
+          <router-link v-if="auth.isAdmin" to="/admin" class="app-header__link">🛠 管理</router-link>
           <button class="app-header__logout" @click="logout">退出</button>
         </template>
         <!-- 未登录：登录入口 -->
@@ -102,6 +104,7 @@ function logout() {
 }
 .app-header__login,
 .app-header__sync,
+.app-header__link,
 .app-header__logout {
   min-height: 36px;
   padding: 0 var(--spacer-10);
@@ -140,6 +143,7 @@ function logout() {
   .app-main { padding: var(--spacer-16) var(--spacer-16) calc(var(--spacer-16) + var(--sab)); }
   .app-header__login,
   .app-header__sync,
+  .app-header__link,
   .app-header__logout {
     min-height: 40px;
     font-size: 0.8rem;

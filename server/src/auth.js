@@ -34,7 +34,7 @@ export async function authRoutes(app) {
 
     const passwordHash = await hash(password)
     const rows = await query(
-      'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email',
+      'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email, role',
       [name, email || null, passwordHash]
     )
     const user = rows[0]
@@ -56,7 +56,7 @@ export async function authRoutes(app) {
     if (!ok) return reply.code(401).send({ error: '用户名或密码错误' })
 
     return {
-      user: { id: user.id, username: user.username, email: user.email },
+      user: { id: user.id, username: user.username, email: user.email, role: user.role },
       ...issueTokens(app, user.id)
     }
   })
@@ -79,7 +79,9 @@ export async function authRoutes(app) {
 
   // 当前用户信息（联调用）
   app.get('/api/auth/me', { preHandler: app.authenticate }, async (req) => {
-    const rows = await query('SELECT id, username, email FROM users WHERE id = $1', [req.user.sub])
-    return { user: rows[0] }
+    const rows = await query('SELECT id, username, email, role, created_at FROM users WHERE id = $1', [req.user.sub])
+    const u = rows[0]
+    if (!u) return { user: null }
+    return { user: { id: u.id, username: u.username, email: u.email, role: u.role, createdAt: new Date(u.created_at).toISOString() } }
   })
 }

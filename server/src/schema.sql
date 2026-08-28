@@ -8,8 +8,12 @@ CREATE TABLE IF NOT EXISTS users (
   username      TEXT NOT NULL UNIQUE,
   email         TEXT UNIQUE,
   password_hash TEXT NOT NULL,
+  role          TEXT NOT NULL DEFAULT 'user',  -- 'user' | 'admin'
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- 兼容已存在的库：幂等补列（无则新增，有则跳过）
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user';
 
 -- 设备表（记录每台设备的同步游标）
 CREATE TABLE IF NOT EXISTS devices (

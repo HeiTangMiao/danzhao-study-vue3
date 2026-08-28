@@ -1,6 +1,6 @@
 <!--
   LoginView —— 账号登录 / 注册
-  说明：不登录也能正常学习（离线优先），登录用于跨设备同步学习数据。
+  说明：需登录后使用；学习进度、错题、笔记等数据自动跨设备同步。
 -->
 <template>
   <div class="login">
@@ -52,7 +52,7 @@
         </button>
       </form>
 
-      <p class="login__hint">💡 不登录也能学习，登录仅用于开启数据同步</p>
+      <p class="login__hint">🔒 登录后即可开始学习，进度、错题、笔记自动跨设备同步</p>
     </div>
   </div>
 </template>

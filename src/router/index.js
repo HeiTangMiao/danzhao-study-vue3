@@ -47,12 +47,51 @@ const routes = [
     path: '/error-book',
     name: 'error-book',
     component: () => import('@/views/ErrorBookView.vue')
+  },
+  {
+    // 个人主页
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/ProfileView.vue')
+  },
+  {
+    // 管理员界面（仅 role=admin）
+    path: '/admin',
+    name: 'admin',
+    meta: { admin: true },
+    component: () => import('@/views/AdminView.vue')
   }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+/**
+ * 全站强制登录守卫
+ *  - /login 未登录放行，已登录跳回首页
+ *  - 其余路由未登录一律跳 /login 并带 redirect 回跳
+ *  - meta.admin 路由要求 role=admin，否则回首页
+ */
+import { useAuthStore } from '@/stores/auth'
+
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+
+  if (to.path === '/login') {
+    return auth.isLoggedIn ? { path: '/' } : true
+  }
+
+  if (!auth.isLoggedIn) {
+    return { path: '/login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.admin && !auth.isAdmin) {
+    return { path: '/' }
+  }
+
+  return true
 })
 
 export default router

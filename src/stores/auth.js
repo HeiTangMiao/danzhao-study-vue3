@@ -25,8 +25,13 @@ export const useAuthStore = defineStore('auth', {
     refreshToken: '',
     user: null
   }),
+  // 持久化登录态：刷新/重启后保持登录（否则强制登录会反复踢回登录页）
+  persist: {
+    pick: ['accessToken', 'refreshToken', 'user']
+  },
   getters: {
-    isLoggedIn: (s) => !!s.accessToken
+    isLoggedIn: (s) => !!s.accessToken,
+    isAdmin: (s) => s.user?.role === 'admin'
   },
   actions: {
     /** 保存会话（注册/登录/刷新共用） */
