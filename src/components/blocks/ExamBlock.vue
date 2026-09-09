@@ -131,6 +131,7 @@
 import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { useStudyDbStore } from '@/stores/studyDb'
+import { useProgressStore } from '@/stores/progress'
 
 const props = defineProps({
   // 区块数据：{ type:'exam', title, duration, totalScore, passingScore, items:[...] }
@@ -140,6 +141,7 @@ const props = defineProps({
 })
 
 const db = useStudyDbStore()
+const progressStore = useProgressStore()
 
 // 考试作答中状态：注入父级 UnitView（页内翻页/跳页前统一确认，防误触丢失作答）
 const examState = inject('examState', null)
@@ -305,14 +307,21 @@ async function submitExam() {
     })
     score.value = total
 
-    // 记录测验成绩
+    // 记录测验成绩（写入真实页面 fileKey 行；测验页「完成」以交卷为标志）
     const c = props.context || {}
-    await db.recordTest(
-      c.subject || 'math',
-      c.unitNum || '',
-      total,
-      props.block.totalScore || 100
-    )
+    await db.recordTest({
+      subject: c.subject || 'math',
+      unitNum: c.unitNum || '',
+      unitTitle: c.unitTitle || '',
+      fileKey: c.fileKey || '',
+      fileTitle: c.fileTitle || '',
+      earnedPoints: total,
+      totalPoints: props.block.totalScore || 100
+    })
+    // 答题计数：本卷作答数计入当日统计与本页累计（仪表盘「答题总数 / 今日答题数」据此恢复非 0）
+    if (answeredCount.value > 0) {
+      await db.recordAnswered(answeredCount.value, { fileKey: c.fileKey || '' })
+    }
 
     // 错题入本（逐题容错：单题入库失败不阻断整卷交卷；recordError 内部会按 题干+页面 去重）
     for (const [i, item] of props.block.items.entries()) {
@@ -335,6 +344,8 @@ async function submitExam() {
     }
 
     phase.value = 'result'
+    // 测验页已交卷 → 刷新完成快照，答题卡/首页进度即时更新
+    progressStore.refresh().catch((e) => console.error('[ExamBlock] 刷新进度失败:', e))
   } catch (e) {
     console.error('[ExamBlock] 交卷失败:', e)
     // 交卷失败不丢作答：停留在进行页，提示用户可重试

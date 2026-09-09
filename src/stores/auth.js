@@ -55,25 +55,46 @@ export const useAuthStore = defineStore('auth', {
       return d.user
     },
 
-    /** 用 refresh 令牌换新 access 令牌（401 时自动调用） */
+    /** 用 refresh 令牌换新 access 令牌（401 时自动调用）。断网不登出，仅服务端明确拒绝才登出。 */
     async tryRefresh() {
       if (!this.refreshToken) return false
+      let res
       try {
-        const d = await post('/auth/refresh', { refreshToken: this.refreshToken })
-        this.accessToken = d.accessToken
-        this.refreshToken = d.refreshToken
-        return true
+        res = await fetch(`${BASE}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken: this.refreshToken })
+        })
       } catch {
+        // 网络不可达 / DNS 失败：保留登录态，等待下次同步重试
+        return false
+      }
+      // 服务端明确拒绝会话（过期 / 已轮换 / 已撤销）→ 会话确实失效才登出
+      if (res.status === 401) {
         this.logout()
         return false
       }
+      if (!res.ok) return false // 5xx 等瞬时错误：保留会话，不误登出
+      const d = await res.json().catch(() => ({}))
+      if (!d.accessToken) return false
+      this.accessToken = d.accessToken
+      this.refreshToken = d.refreshToken
+      return true
     },
 
-    /** 退出登录 */
+    /** 退出登录：先尽力撤销服务端 refresh 会话，再清本地登录态（断网也能本地登出） */
     logout() {
+      const token = this.refreshToken
       this.accessToken = ''
       this.refreshToken = ''
       this.user = null
+      if (token) {
+        fetch(`${BASE}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken: token })
+        }).catch(() => { /* 断网/失败：本地登出已完成，服务端会话随 token 过期自然失效 */ })
+      }
     }
   }
 })

@@ -160,7 +160,7 @@
     <footer class="home-footer">
       <div class="footer-info">
         <div class="footer-name">📚 单招学习之路</div>
-        <div class="footer-desc">多学科备考平台 · 知识体系 + 游戏化学习 + 低代码内容管理</div>
+        <div class="footer-desc">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</div>
         <div class="footer-copy">© 2026 Crafted with ❤️ by <span class="footer-author">黑糖＆菜菜</span></div>
       </div>
       <nav class="footer-nav" aria-label="页脚导航">
@@ -201,6 +201,8 @@ try {
 const dueCount = ref(null)
 onMounted(async () => {
   try {
+    // 刷新完成快照（访问/交卷后回首页能立即看到最新进度）
+    await progress.refresh()
     const db = (await import('@/stores/studyDb')).useStudyDbStore()
     await db.init()
     const errors = await db.getAllErrors()

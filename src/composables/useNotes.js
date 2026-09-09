@@ -72,9 +72,9 @@ export function useNotes(pageKey, subject = 'math', pageInfo = {}) {
     if (manual) setStatus('保存中…', 'saving')
 
     try {
-      // 内容为空则删除笔记
+      // 内容为空则软删笔记（写墓碑，跨设备删除同步）
       if (!trimmed) {
-        await db.deleteNote(key.value)
+        await db.deleteNoteSoft(key.value)
         setStatus(manual ? '已清空' : '已自动保存（空）', 'saved')
         return
       }

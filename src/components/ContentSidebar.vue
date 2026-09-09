@@ -16,7 +16,7 @@
   移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
   emits:
    - scroll-to   跳转到区块 ({index})
-   - toggle-done 标记完成
+   - 完成状态由访问/交卷自动驱动（组件仅展示 isDone / doneFiles，无手动标记）
    - toggle-bookmark 书签
    - toggle-notes 笔记
    - toggle-toc  目录面板
@@ -39,8 +39,8 @@
         <div class="sb-title">⚡ 快捷操作</div>
         <div class="sb-actions">
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')">⬆ <span>顶部</span></button>
-          <button class="sb-act" :class="{ on: isDone }" title="标记完成" @click="emit('toggle-done')">
-            {{ isDone ? '✅' : '○' }} <span>完成</span>
+          <button class="sb-act" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成">
+            {{ isDone ? '✅' : '○' }} <span>{{ isDone ? '已完成' : '学习中' }}</span>
           </button>
           <button class="sb-act" title="本页目录" @click="emit('toggle-toc')">☰ <span>目录</span></button>
           <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')">★ <span>收藏</span></button>
@@ -94,7 +94,7 @@
     <!-- 收起态：迷你图标徽标 -->
     <div v-else class="sidebar-mini">
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')">⬆</button>
-      <button class="mini-item" :class="{ on: isDone }" title="完成" aria-label="标记完成" @click="emit('toggle-done')">{{ isDone ? '✅' : '○' }}</button>
+      <button class="mini-item" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成" aria-label="完成状态">{{ isDone ? '✅' : '○' }}</button>
       <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')">☰</button>
       <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')">★</button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')">📝</button>
@@ -193,8 +193,8 @@
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false">✕</button>
       </div>
       <div class="sb-more">
-        <button class="sb-more__item" :class="{ on: isDone }" @click="emit('toggle-done'); moreOpen = false">
-          {{ isDone ? '✅' : '○' }}<span>{{ isDone ? '已完成' : '标记完成' }}</span>
+        <button class="sb-more__item" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成">
+          {{ isDone ? '✅' : '○' }}<span>{{ isDone ? '已完成' : '学习中' }}</span>
         </button>
         <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false">★<span>收藏本页</span></button>
         <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false">📝<span>学习笔记</span></button>
@@ -231,7 +231,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'scroll-to', 'scroll-top', 'toggle-done',
+  'scroll-to', 'scroll-top',
   'toggle-bookmark', 'toggle-notes', 'toggle-toc',
   'open-geogebra', 'go-file', 'go-unit',
   'go-prev', 'go-next'
@@ -296,23 +296,20 @@ function onGrabTouchEnd() {
 const hasPrev = computed(() => props.fileIndex > 0)
 const hasNext = computed(() => !!props.unit && props.fileIndex < props.unit.files.length - 1)
 
-// 末页时主按钮转为「标记完成」；末页且已完成则进入下一单元，无下一单元则返回顶部
+// 完成状态自动记录（访问即完成 / 测验交卷），底部主按钮只负责翻页与单元跳转
 function onNextClick() {
   if (hasNext.value) emit('go-next')
-  else if (!props.isDone) emit('toggle-done')
   else if (nextUnit.value) emit('go-unit', nextUnit.value)
   else emit('scroll-top')
 }
 
-// 底部主按钮文案/提示（随页次与完成状态切换，避免「死按钮」）
+// 底部主按钮文案/提示
 const nextBtnLabel = computed(() => {
   if (hasNext.value) return '下一页 →'
-  if (!props.isDone) return '完成 ✓'
   return nextUnit.value ? '下一单元 →' : '返回顶部 ↑'
 })
 const nextBtnTitle = computed(() => {
   if (hasNext.value) return '下一页'
-  if (!props.isDone) return '标记完成'
   return nextUnit.value ? `下一单元：${nextUnit.value.title}` : '返回顶部'
 })
 

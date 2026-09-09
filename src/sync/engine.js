@@ -14,14 +14,14 @@ import { api } from './api'
 const META_KEY = 'sync_meta_v1'
 
 // 业务实体 → IndexedDB 仓库与主键字段
+// 注：user_progress 已退役（完成状态由 page_progress 推导），不再参与同步
 const ENTITIES = [
   { entity: 'study_log', store: 'study_log', keyPath: 'id' },
   { entity: 'daily_stats', store: 'daily_stats', keyPath: 'date' },
   { entity: 'page_progress', store: 'page_progress', keyPath: 'key' },
   { entity: 'error_book', store: 'error_book', keyPath: 'id' },
   { entity: 'notes', store: 'notes', keyPath: 'pageKey' },
-  { entity: 'bookmarks', store: 'bookmarks', keyPath: 'pageKey' },
-  { entity: 'user_progress', store: 'user_progress', keyPath: 'id' }
+  { entity: 'bookmarks', store: 'bookmarks', keyPath: 'pageKey' }
 ]
 
 /** 读取 / 初始化同步元信息 */
@@ -50,7 +50,7 @@ export function useSyncEngine() {
   const auth = useAuthStore()
   const db = useStudyDbStore()
 
-  /** 采集本地全部仓库记录 → 变更列表 */
+  /** 采集本地全部仓库记录 → 变更列表（软删墓碑以 deleted:true 推送，供服务端传播删除） */
   async function collectChanges() {
     const changes = []
     for (const { entity, store, keyPath } of ENTITIES) {
@@ -59,10 +59,10 @@ export function useSyncEngine() {
         case 'study_log': rows = await db.getAllStudyLogs(); break
         case 'daily_stats': rows = await db.getAllDailyStats(); break
         case 'page_progress': rows = await db.getAllPageProgress(); break
-        case 'error_book': rows = await db.getAllErrors(); break
-        case 'notes': rows = await db.getAllNotes(); break
-        case 'bookmarks': rows = await db.getAllBookmarks(); break
-        case 'user_progress': rows = [(await db.getProgress())]; break
+        // 错题/笔记/书签：含软删墓碑的原始读取，UI 过滤版会漏推墓碑
+        case 'error_book': rows = await db.getAllErrorsRaw(); break
+        case 'notes': rows = await db.getAllNotesRaw(); break
+        case 'bookmarks': rows = await db.getAllBookmarksRaw(); break
         default: break
       }
       for (const row of rows) {
@@ -73,7 +73,7 @@ export function useSyncEngine() {
           key,
           payload: row,
           updatedAt: row.updatedAt || row.createdAt || row.date || new Date().toISOString(),
-          deleted: false
+          deleted: row.deleted === true
         })
       }
     }

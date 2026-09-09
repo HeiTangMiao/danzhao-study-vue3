@@ -42,7 +42,7 @@ const GeometryBlock = defineAsyncComponent({
 const props = defineProps({
   // 单个区块数据（content-schema 的 block）
   block: { type: Object, required: true },
-  // 页面上下文（学科/单元/页面标识），供交互区块记录 XP 与错题
+  // 页面上下文（学科/单元/页面标识），供测验/练习等交互区块记录成绩与错题
   context: { type: Object, default: () => ({}) }
 })
 

@@ -22,10 +22,9 @@ export interface ProgressStore {
   completedCount: (subject: Subject, unitNum: string) => number
   isCompleted: (subject: Subject, unitNum: string, fileIndex: number) => boolean
   subjectTotalCompleted: (subject: Subject) => number
-  toggleComplete: (subject: Subject, unitNum: string, fileIndex: number) => void
-  setBatchComplete: (subject: Subject, unitNum: string, indices: number[], done: boolean) => void
-  resetSubject: (subject: Subject) => void
-  resetAll: () => void
+  init: () => Promise<void>
+  /** 由 page_progress 重建完成快照（访问/交卷后调用） */
+  refresh: () => Promise<void>
 }
 
 // ===== 学习记录类型 =====
@@ -55,6 +54,8 @@ export interface PageProgress {
 
 /** 学习日志 */
 export interface StudyLog {
+  /** v6 起为业务生成 UUID（历史行保留旧数字 id） */
+  id?: string | number
   date: string
   timestamp: number
   subject: Subject
@@ -66,7 +67,10 @@ export interface StudyLog {
 
 /** 错题记录 */
 export interface ErrorRecord {
-  id?: number
+  /** v6 起为业务生成 UUID（历史行保留旧数字 id） */
+  id?: string | number
+  /** 软删墓碑：true 表示已删除待同步清理 */
+  deleted?: boolean
   subject: Subject
   unitNum: string
   question: string
@@ -97,6 +101,8 @@ export interface NoteRecord {
   unitTitle?: string
   content: string
   updatedAt: number
+  /** 软删墓碑 */
+  deleted?: boolean
 }
 
 /** 书签记录 */
@@ -107,6 +113,8 @@ export interface BookmarkRecord {
   unitTitle?: string
   unitNum?: string
   createdAt: number
+  /** 软删墓碑 */
+  deleted?: boolean
 }
 
 /** 数据导出结构 */

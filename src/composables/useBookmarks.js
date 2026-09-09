@@ -38,8 +38,8 @@ export function useBookmarks(pageKey, subject = 'math', pageInfo = {}) {
     if (!key.value) return
     try {
       if (isBookmarked.value) {
-        // 取消收藏
-        await db.deleteBookmark(key.value)
+        // 取消收藏（软删：写墓碑，跨设备删除同步）
+        await db.deleteBookmarkSoft(key.value)
         isBookmarked.value = false
       } else {
         // 添加收藏

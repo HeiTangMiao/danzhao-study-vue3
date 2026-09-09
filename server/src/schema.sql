@@ -42,3 +42,17 @@ CREATE TABLE IF NOT EXISTS sync_items (
 -- 增量拉取走该索引
 CREATE INDEX IF NOT EXISTS idx_sync_items_since
   ON sync_items (user_id, updated_at);
+
+-- keyset 分页索引：避免同毫秒时间戳跨 LIMIT 边界漏行
+-- 排序键 (user_id, updated_at, item_key)，游标 = 末行 (updated_at, item_key)
+CREATE INDEX IF NOT EXISTS idx_sync_items_keyset
+  ON sync_items (user_id, updated_at, item_key);
+
+-- refresh 会话表：refresh token 带 jti 在此登记，用于轮换与登出/删号撤销
+CREATE TABLE IF NOT EXISTS refresh_sessions (
+  jti        TEXT PRIMARY KEY,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_refresh_sessions_user ON refresh_sessions (user_id);

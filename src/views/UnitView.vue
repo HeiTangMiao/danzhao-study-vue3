@@ -49,9 +49,7 @@
           <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes">📝</button>
         </div>
       </div>
-      <button class="done-btn" :class="{ done: isDone }" @click="toggleDone">
-        {{ isDone ? '✅ 已完成' : '○ 标记完成' }}
-      </button>
+      <span v-if="isDone" class="done-chip">✅ 已完成</span>
     </header>
 
     <!-- 目录导航（折叠式） -->
@@ -132,7 +130,6 @@
       :done-files="doneFiles"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
-      @toggle-done="toggleDone"
       @toggle-bookmark="bookmark.toggleBookmark()"
       @toggle-notes="showNotes = !showNotes"
       @toggle-toc="showToc = !showToc"
@@ -361,6 +358,8 @@ async function loadPage() {
       fileTitle: fileMeta.value.title,
       isTest: fileMeta.value.isTest || false
     })
+    // 刷新完成快照（内容页打开即完成，测验页等交卷后再由 ExamBlock 刷新）
+    progress.refresh().catch((e) => console.error('[UnitView] 刷新进度失败:', e))
     // 记录最近学习位置（首页「继续学习」直达）
     saveLastStudy()
   } catch (e) {
@@ -391,16 +390,11 @@ loadPage()
 // 完成状态（按学科隔离）
 const isDone = computed(() => progress.isCompleted(subject.value, unit.value?.num, fileIndex.value))
 
-// 单元内各页面完成状态（供移动端答题卡网格）
+// 单元内各页面完成状态（供移动端答题卡网格；完成语义见 stores/progress.js）
 const doneFiles = computed(() => {
   if (!unit.value) return []
   return unit.value.files.map((_, i) => progress.isCompleted(subject.value, unit.value.num, i))
 })
-
-// 标记完成
-function toggleDone() {
-  progress.toggleComplete(subject.value, unit.value?.num, fileIndex.value)
-}
 
 // ===== 考试作答保护 =====
 // ExamBlock 注入此状态；作答中导航离开前统一确认，防误触丢失作答
@@ -499,6 +493,12 @@ watch(
 .page-header h1 { font-size: 1.6rem; }
 .page-subtitle { color: var(--text-muted); margin-top: var(--spacer-8); }
 .page-tools { display: flex; gap: var(--spacer-8); }
+.done-chip {
+  display: inline-flex; align-items: center;
+  margin-top: var(--spacer-12);
+  color: var(--success, #2e7d32);
+  font-size: 0.85rem; font-weight: 600;
+}
 .tool-btn {
   width: 36px; height: 36px;
   background: var(--surface); border: 1px solid var(--border);

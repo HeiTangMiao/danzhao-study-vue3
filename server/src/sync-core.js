@@ -9,6 +9,30 @@ export function toDate(v) {
 }
 
 /**
+ * 解析客户端 since 游标（keyset）。
+ *  - 对象 { ts, key }（新版 keyset 游标）
+ *  - 字符串（旧版纯时间游标）→ { legacy: true, ts }，含下界兼容、由调用方保证幂等
+ *  - 空/null → null（首次全量拉取）
+ * @param {*} v
+ * @returns {{ legacy: boolean, ts: Date, key?: string } | null}
+ */
+export function parseSince(v) {
+  if (v == null) return null
+  if (typeof v === 'string') {
+    if (!v) return null
+    return { legacy: true, ts: toDate(v) }
+  }
+  if (typeof v === 'object' && !Array.isArray(v)) {
+    return {
+      legacy: false,
+      ts: toDate(v.ts),
+      key: typeof v.key === 'string' ? v.key : ''
+    }
+  }
+  return null
+}
+
+/**
  * LWW（最后写入胜出）裁决：判断客户端推送是否应覆盖服务器现有记录
  * @param {string|null|undefined} existingUpdatedAt - 服务端已有记录的 updated_at（无则视为新增）
  * @param {*} incomingUpdatedAt - 客户端本次推送的 updatedAt

@@ -249,17 +249,17 @@ async function markRelearn(err) {
   if (idx >= 0) errors.value[idx] = updated
 }
 
-// 删除单条
+// 删除单条（软删：写墓碑，跨设备删除同步）
 async function removeError(err) {
   if (!window.confirm('确定删除这道错题吗？')) return
-  await db.deleteError(err.id)
+  await db.deleteErrorSoft(err.id)
   errors.value = errors.value.filter((e) => e.id !== err.id)
 }
 
-// 清空全部
+// 清空全部（软删：逐条写墓碑，保证删除能同步到其他设备）
 async function clearAll() {
   if (!window.confirm(`确定清空全部 ${errors.value.length} 条错题吗？此操作不可恢复。`)) return
-  await db.clearAllErrors()
+  await db.clearAllErrorsSoft()
   errors.value = []
 }
 

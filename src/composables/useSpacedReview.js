@@ -8,6 +8,10 @@
  *
  * 替代旧版 assets/js/spaced-review.js 的 SpacedReview 模块
  * 依赖：studyDb store
+ *
+ * 注意：本 composable 目前未接入任何视图（独立“错题复习”页尚未实现）。
+ * 其中 calculateSM2 / GRADES 被 ErrorBookView 复用（统一 SM-2 口径），请勿在未通知的情况下删除。
+ * 加载/统计/删除等其余能力保留，供未来错题复习页接回；删除已统一为软删墓碑（跨设备传播）。
  */
 import { ref } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
@@ -171,7 +175,7 @@ export function useSpacedReview() {
       await db.init()
       const errors = await db.getAllErrors()
       const toDelete = errors.filter((e) => e.repetitions >= 3 && e.interval >= 7)
-      await Promise.all(toDelete.map((e) => db.deleteError(e.id)))
+      await Promise.all(toDelete.map((e) => db.deleteErrorSoft(e.id)))
       return toDelete.length
     } catch (e) {
       console.warn('[SpacedReview] 删除已掌握失败:', e)

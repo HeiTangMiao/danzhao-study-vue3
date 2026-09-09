@@ -1,34 +1,57 @@
 /**
- * progressStore —— 学习进度 Store（Pinia，多学科隔离）
+ * progressStore —— 学习进度 Store（多学科隔离，由 page_progress 推导）
  * 职责：
- *  - 按学科记录每个单元/页面的学习完成状态
- *  - 持久化到 IndexedDB（数据层统一，替代原 localStorage 双轨）
- *  - 首次运行时自动迁移旧版 localStorage 进度数据（键 vue3_progress_v2）
- *
- * 对外 API（getters / actions）与旧版完全一致，调用方无需改动。
- *
- * 数据结构：
- *  completed: {
- *    [subject]: {           // 学科 key: 'math' | 'chinese' | 'computer'
- *      [unitNum]: {         // 单元编号: '01', '02', ...
- *        [fileIndex]: true  // 文件索引: 0, 1, 2, ...
- *      }
- *    }
- *  }
+ *  - 提供「按学科 → 单元 → 页面是否已完成」的内存快照（completed）
+ *  - 唯一数据源 = studyDb 的 page_progress（每页事实记录）
+ *  - 完成语义（访问即完成）：内容页打开（visited）即完成；测验 / 模拟卷页需交卷（testScore 非空）
+ *  - 本 Store 只读缓存：写入侧是 markPageVisited / recordTest，进度变化后调用 refresh() 重建快照
+ *    （旧版手动勾选完成 / user_progress.completed 已完成迁移，不再使用）
  */
 import { defineStore } from 'pinia'
 import { useStudyDbStore } from './studyDb'
+import { SUBJECTS } from '@/content/index'
 
-// 旧版 localStorage 持久化键（作为一次性迁移源）
-const LS_LEGACY_KEY = 'vue3_progress_v2'
+/**
+ * 从 page_progress 记录推导完成快照
+ * @param {Array<object>} rows - 全部 page_progress 记录
+ * @returns {{ completed: object, lastStudiedAt: number|null }}
+ */
+function buildSnapshot(rows) {
+  const byKey = new Map()
+  for (const r of rows) {
+    if (r && r.key) byKey.set(r.key, r)
+  }
+  const completed = {}
+  let lastStudiedAt = 0
+  for (const subject of Object.keys(SUBJECTS)) {
+    const config = SUBJECTS[subject]
+    for (const unit of config.units || []) {
+      const files = unit.files || []
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const key = `${subject}_${unit.num}_${file.name}`
+        const row = byKey.get(key)
+        // 完成判定：访问过，且（非测验页 或 测验页已交卷得分）
+        const done = !!(row && row.visited && (!file.isTest || row.testScore != null))
+        if (done) {
+          if (!completed[subject]) completed[subject] = {}
+          if (!completed[subject][unit.num]) completed[subject][unit.num] = {}
+          completed[subject][unit.num][i] = true
+        }
+        if (row && row.visitTime && row.visitTime > lastStudiedAt) lastStudiedAt = row.visitTime
+      }
+    }
+  }
+  return { completed, lastStudiedAt: lastStudiedAt || null }
+}
 
 export const useProgressStore = defineStore('progress', {
   state: () => ({
-    // 进度记录：按学科 → 单元号 → 文件索引
+    // 完成快照：按学科 → 单元号 → 文件索引
     completed: {},
-    // 最近学习时间戳
+    // 最近学习时间戳（取 page_progress 最新 visitTime）
     lastStudiedAt: null,
-    // 是否已完成 IndexedDB 加载（幂等保护，避免重复 init）
+    // 是否已完成一次快照（幂等保护）
     _loaded: false
   }),
   getters: {
@@ -76,98 +99,30 @@ export const useProgressStore = defineStore('progress', {
   },
   actions: {
     /**
-     * 初始化 / 加载进度（应用启动时调用一次）。
-     * 优先从 IndexedDB 读取；若不存在则迁移旧 localStorage 数据。
+     * 重建完成快照（数据源：page_progress）。
+     * 访问新页 / 交卷后调用，令首页进度与答题卡完成态即时更新。
+     */
+    async refresh() {
+      const db = useStudyDbStore()
+      await db.init()
+      const rows = await db.getAllPageProgress()
+      const s = buildSnapshot(rows)
+      this.completed = s.completed
+      this.lastStudiedAt = s.lastStudiedAt
+      this._loaded = true
+    },
+
+    /**
+     * 应用启动时的幂等初始化（等价 refresh，防重复扫描）
+     * 容错：IndexedDB 读取失败不阻断启动，仅记录警告，待下次访问/交卷时重试刷新。
      */
     async init() {
       if (this._loaded) return
-      this._loaded = true
       try {
-        const db = useStudyDbStore()
-        await db.init()
-        const stored = await db.getProgress()
-        if (stored && stored.completed && Object.keys(stored.completed).length > 0) {
-          this.completed = stored.completed
-          this.lastStudiedAt = stored.lastStudiedAt || null
-          return
-        }
-        // IndexedDB 无数据 → 尝试迁移旧 localStorage 进度
-        await this._migrateFromLocalStorage()
+        await this.refresh()
       } catch (e) {
-        console.warn('[Progress] init 失败:', e)
+        console.warn('[Progress] 加载进度失败，启动期间忽略:', e)
       }
-    },
-
-    /** 一次性迁移：读取旧 localStorage 进度并写入 IndexedDB */
-    async _migrateFromLocalStorage() {
-      let legacy = null
-      try {
-        const raw = localStorage.getItem(LS_LEGACY_KEY)
-        if (raw) legacy = JSON.parse(raw)
-      } catch (e) { /* 解析失败则忽略，视为无迁移源 */ }
-      if (!legacy || !legacy.completed) return
-      this.completed = legacy.completed || {}
-      this.lastStudiedAt = legacy.lastStudiedAt || null
-      await this._persist()
-      try { localStorage.removeItem(LS_LEGACY_KEY) } catch (e) { /* 忽略 */ }
-    },
-
-    /** 将当前进度写入 IndexedDB */
-    async _persist() {
-      try {
-        const db = useStudyDbStore()
-        await db.saveProgress({ id: 'main', completed: this.completed, lastStudiedAt: this.lastStudiedAt })
-      } catch (e) {
-        console.warn('[Progress] 保存失败:', e)
-      }
-    },
-
-    /**
-     * 标记某学科某页面完成/未完成
-     * @param {string} subject - 学科 key
-     * @param {string} unitNum - 单元编号
-     * @param {number} fileIndex - 文件索引
-     */
-    toggleComplete(subject, unitNum, fileIndex) {
-      if (!this.completed[subject]) this.completed[subject] = {}
-      if (!this.completed[subject][unitNum]) this.completed[subject][unitNum] = {}
-      this.completed[subject][unitNum][fileIndex] = !this.completed[subject][unitNum][fileIndex]
-      this.lastStudiedAt = Date.now()
-      this._persist()
-    },
-    /**
-     * 批量设置某学科某单元的完成状态
-     * @param {string} subject - 学科 key
-     * @param {string} unitNum - 单元编号
-     * @param {number[]} indices - 文件索引数组
-     * @param {boolean} done - 完成或取消
-     */
-    setBatchComplete(subject, unitNum, indices, done) {
-      if (!this.completed[subject]) this.completed[subject] = {}
-      if (!this.completed[subject][unitNum]) this.completed[subject][unitNum] = {}
-      for (const i of indices) {
-        this.completed[subject][unitNum][i] = done
-      }
-      this.lastStudiedAt = Date.now()
-      this._persist()
-    },
-    /**
-     * 重置某学科全部进度
-     * @param {string} subject - 学科 key
-     */
-    resetSubject(subject) {
-      if (this.completed[subject]) {
-        delete this.completed[subject]
-      }
-      this._persist()
-    },
-    /**
-     * 重置全部进度
-     */
-    resetAll() {
-      this.completed = {}
-      this.lastStudiedAt = null
-      this._persist()
     }
   }
 })

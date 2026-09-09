@@ -94,7 +94,7 @@ export function usePomodoro(): UsePomodoroReturn
 // ===== useSpacedReview =====
 
 export interface ReviewItem {
-  id: number
+  id: string | number
   question: string
   correctAnswer: string
   userAnswer: string

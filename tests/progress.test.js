@@ -1,33 +1,23 @@
 /**
- * progress store —— 学习进度数据层测试
- * 通过 mock studyDb（IndexedDB 封装）验证：
- *  - init 幂等与 IndexedDB 数据加载
- *  - 旧 localStorage 数据迁移（含完成后清理旧键）
- *  - 增删改操作会触发 IndexedDB 持久化
+ * progress store —— 完成快照（由 page_progress 推导）测试
+ * 通过 mock studyDb 验证：
+ *  - refresh / init 依据 page_progress 构建完成快照
+ *  - 完成语义：内容页打开（visited）即完成；测验页需已交卷（testScore 非空）
+ *  - init 幂等：仅首次读取
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useProgressStore } from '@/stores/progress'
 
-// 内存版 studyDb mock：模拟 getProgress / saveProgress / init
+// 内存版 studyDb mock：进度快照只读 getAllPageProgress / init
 const mockDB = {
   init: vi.fn(async () => {}),
-  getProgress: vi.fn(async () => null),
-  saveProgress: vi.fn(async () => {})
+  getAllPageProgress: vi.fn(async () => [])
 }
 
 vi.mock('@/stores/studyDb', () => ({
   useStudyDbStore: () => mockDB
 }))
-
-// localStorage mock
-const lsMap = new Map()
-const localStorageMock = {
-  getItem: vi.fn((k) => (lsMap.has(k) ? lsMap.get(k) : null)),
-  setItem: vi.fn((k, v) => { lsMap.set(k, String(v)) }),
-  removeItem: vi.fn((k) => { lsMap.delete(k) })
-}
-vi.stubGlobal('localStorage', localStorageMock)
 
 function makePinia() {
   const pinia = createPinia()
@@ -37,63 +27,56 @@ function makePinia() {
 
 beforeEach(() => {
   makePinia()
-  lsMap.clear()
-  // 恢复各 mock 默认行为（clearAllMocks 会清掉实现，这里手动复位）
   mockDB.init.mockImplementation(async () => {})
-  mockDB.getProgress.mockImplementation(async () => null)
-  mockDB.saveProgress.mockImplementation(async () => {})
+  mockDB.getAllPageProgress.mockImplementation(async () => [])
   vi.clearAllMocks()
 })
 
-describe('progress store - 数据层', () => {
-  it('init 从 IndexedDB 加载已完成进度', async () => {
-    mockDB.getProgress.mockResolvedValue({
-      id: 'main',
-      completed: { math: { '01': { 0: true, 1: true } } },
-      lastStudiedAt: 123
-    })
+// 数学冲刺单元（unit '12'）的页面 key：0=考试技巧（内容页）、1/2=真题模拟卷（测验页）
+const K = {
+  content: 'math_12_01-考试技巧',
+  testNoScore: 'math_12_02-真题模拟卷一',
+  testDone: 'math_12_03-真题模拟卷二'
+}
+
+describe('progress store - 完成快照推导', () => {
+  it('内容页打开即完成；测验页需交卷才完成', async () => {
+    mockDB.getAllPageProgress.mockResolvedValue([
+      { key: K.content, visited: true, visitTime: 10, testScore: null },
+      { key: K.testNoScore, visited: true, visitTime: 20, testScore: null },
+      { key: K.testDone, visited: true, visitTime: 30, testScore: 66 }
+    ])
     const store = useProgressStore()
-    await store.init()
-    expect(store.completedCount('math', '01')).toBe(2)
-    expect(store.lastStudiedAt).toBe(123)
+    await store.refresh()
+
+    expect(store.isCompleted('math', '12', 0)).toBe(true)   // 内容页
+    expect(store.isCompleted('math', '12', 1)).toBe(false)  // 测验未交卷
+    expect(store.isCompleted('math', '12', 2)).toBe(true)   // 测验已交卷
+    expect(store.completedCount('math', '12')).toBe(2)
+    expect(store.lastStudiedAt).toBe(30)
   })
 
-  it('init 幂等：重复调用不重复读库', async () => {
+  it('未访问的页面不计完成', async () => {
+    mockDB.getAllPageProgress.mockResolvedValue([])
     const store = useProgressStore()
-    await store.init()
-    await store.init()
-    expect(mockDB.getProgress).toHaveBeenCalledTimes(1)
+    await store.refresh()
+    expect(store.completedCount('math', '12')).toBe(0)
+    expect(store.isCompleted('math', '12', 0)).toBe(false)
   })
 
-  it('IndexedDB 无数据时从旧 localStorage 迁移并清理旧键', async () => {
-    lsMap.set('vue3_progress_v2', JSON.stringify({
-      completed: { chinese: { '02': { 3: true } } },
-      lastStudiedAt: 456
-    }))
+  it('init 幂等：重复调用不重复读取 page_progress', async () => {
     const store = useProgressStore()
     await store.init()
-    expect(store.isCompleted('chinese', '02', 3)).toBe(true)
-    // 迁移后写入 IndexedDB 且删除旧键
-    expect(mockDB.saveProgress).toHaveBeenCalled()
-    expect(localStorageMock.removeItem).toHaveBeenCalledWith('vue3_progress_v2')
+    await store.init()
+    expect(mockDB.getAllPageProgress).toHaveBeenCalledTimes(1)
   })
 
-  it('toggleComplete 切换状态并持久化', async () => {
+  it('subjectTotalCompleted 跨单元汇总', async () => {
+    mockDB.getAllPageProgress.mockResolvedValue([
+      { key: K.content, visited: true, visitTime: 1, testScore: null }
+    ])
     const store = useProgressStore()
-    await store.init()
-    store.toggleComplete('math', '01', 2)
-    expect(store.isCompleted('math', '01', 2)).toBe(true)
-    store.toggleComplete('math', '01', 2)
-    expect(store.isCompleted('math', '01', 2)).toBe(false)
-    expect(mockDB.saveProgress).toHaveBeenCalled()
-  })
-
-  it('resetAll 清空进度并持久化', async () => {
-    const store = useProgressStore()
-    await store.init()
-    store.toggleComplete('math', '01', 0)
-    store.resetAll()
-    expect(store.subjectTotalCompleted('math')).toBe(0)
-    expect(mockDB.saveProgress).toHaveBeenCalled()
+    await store.refresh()
+    expect(store.subjectTotalCompleted('math')).toBe(1)
   })
 })
