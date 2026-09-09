@@ -4,7 +4,6 @@
    - 考试模式：倒计时、逐题作答、交卷评分
    - 选择题点击作答；判断/填空/解答题自评作答
    - 交卷后展示成绩、正确率、逐题回顾与错题入本
-   - 高分（≥90%）触发成就与 XP 奖励
 -->
 <template>
   <section class="block exam">
@@ -85,7 +84,6 @@
         <div class="result-score">{{ score }}<span class="result-total"> / {{ block.totalScore || 100 }}</span></div>
         <div class="result-percent">{{ percent }}%</div>
         <div class="result-verdict">{{ passed ? '恭喜通过！' : '未达及格线，继续加油' }}</div>
-        <div v-if="xpGained > 0" class="result-xp">+{{ xpGained }} XP</div>
       </div>
 
       <div class="result-stats">
@@ -132,7 +130,7 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
-import { useGameEngineStore } from '@/stores/gameEngine'
+import { useStudyDbStore } from '@/stores/studyDb'
 
 const props = defineProps({
   // 区块数据：{ type:'exam', title, duration, totalScore, passingScore, items:[...] }
@@ -141,7 +139,7 @@ const props = defineProps({
   context: { type: Object, default: () => ({}) }
 })
 
-const game = useGameEngineStore()
+const db = useStudyDbStore()
 
 // 考试作答中状态：注入父级 UnitView（页内翻页/跳页前统一确认，防误触丢失作答）
 const examState = inject('examState', null)
@@ -152,10 +150,9 @@ const phase = ref('intro')
 const timeLeft = ref(0)
 // 每题作答状态
 const answers = ref({})
-// 得分 / XP
+// 得分
 const score = ref(0)
-const xpGained = ref(0)
-// 交卷中标记：防止连点/并发触发重复记分与错题（刷 XP / 双倍加分）
+// 交卷中标记：防止连点/并发触发重复记分与错题入库
 const submitting = ref(false)
 // 交卷失败提示
 const submitError = ref('')
@@ -308,22 +305,21 @@ async function submitExam() {
     })
     score.value = total
 
-    // 记录测验成绩（XP + 成就）
+    // 记录测验成绩
     const c = props.context || {}
-    const result = await game.recordTest(
+    await db.recordTest(
       c.subject || 'math',
       c.unitNum || '',
       total,
       props.block.totalScore || 100
     )
-    xpGained.value = result.xpGained || 0
 
-    // 错题入本（逐题容错：单题入库失败不阻断整卷交卷；gameEngine 内部会按 题干+页面 去重）
+    // 错题入本（逐题容错：单题入库失败不阻断整卷交卷；recordError 内部会按 题干+页面 去重）
     for (const [i, item] of props.block.items.entries()) {
       if (answers.value[i]?.answered && !answers.value[i]?.correct) {
         const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
         try {
-          await game.recordError(
+          await db.recordError(
             c.subject || 'math',
             c.unitNum || '',
             item.question,
@@ -352,7 +348,6 @@ async function submitExam() {
 function restartExam() {
   phase.value = 'intro'
   score.value = 0
-  xpGained.value = 0
   answers.value = {}
   submitError.value = ''
   // 重置未答跳转状态
@@ -522,11 +517,6 @@ onBeforeUnmount(() => {
 .result-verdict { font-size: 1.1rem; font-weight: 600; }
 .result-pass .result-verdict { color: var(--success); }
 .result-fail .result-verdict { color: var(--danger); }
-.result-xp {
-  display: inline-block; margin-top: var(--spacer-8);
-  background: var(--warning); color: #fff; border-radius: var(--radius-full);
-  padding: 3px 14px; font-weight: 700;
-}
 .result-stats { display: flex; justify-content: center; gap: var(--spacer-24); margin-bottom: var(--spacer-16); }
 .result-stat { text-align: center; }
 .rs-num { display: block; font-size: 1.6rem; font-weight: 700; }

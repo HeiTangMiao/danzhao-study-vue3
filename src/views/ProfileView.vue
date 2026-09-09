@@ -1,6 +1,6 @@
 <!--
   ProfileView —— 个人主页
-  职责：展示账号信息 + 学习数据总览（等级/连击/进度/成就/错题/笔记）
+  职责：展示账号信息 + 学习数据总览（学科进度/错题/笔记）
 -->
 <template>
   <div class="profile">
@@ -31,37 +31,23 @@
         </div>
       </section>
 
-      <!-- 等级与 XP -->
-      <section v-if="data" class="card level-card">
-        <div class="level-badge">
-          <span class="lv-num">{{ data.levelInfo.level.lv }}</span>
-          <span class="lv-title">{{ data.levelInfo.level.title }}</span>
-        </div>
-        <div class="level-info">
-          <div class="xp-total">总经验 {{ data.totalXP }} XP</div>
-          <div class="xp-bar"><div class="xp-fill" :style="{ width: (data.levelInfo.progress * 100) + '%' }"></div></div>
-          <div v-if="data.levelInfo.next" class="xp-hint">距 {{ data.levelInfo.next.title }} 还需 {{ data.levelInfo.needXP }} XP</div>
-          <div v-else class="xp-hint">已达满级 🎓</div>
-        </div>
-      </section>
-
       <!-- 数据总览 -->
-      <section v-if="data" class="stat-grid">
-        <div class="card stat-card"><div class="stat-icon">🔥</div><div class="stat-val">{{ data.streak }}</div><div class="stat-label">连续学习(天)</div></div>
-        <div class="card stat-card"><div class="stat-icon">📖</div><div class="stat-val">{{ data.totalVisited }}</div><div class="stat-label">已学页面</div></div>
-        <div class="card stat-card"><div class="stat-icon">✏️</div><div class="stat-val">{{ data.totalQuestions }}</div><div class="stat-label">答题总数</div></div>
-        <div class="card stat-card"><div class="stat-icon">🏆</div><div class="stat-val">{{ data.achievements.length }}</div><div class="stat-label">成就</div></div>
-        <div class="card stat-card"><div class="stat-icon">⭐</div><div class="stat-val">{{ data.allErrors.length }}</div><div class="stat-label">错题</div></div>
+      <section v-if="overview" class="stat-grid">
+        <div class="card stat-card"><div class="stat-icon">📖</div><div class="stat-val">{{ overview.totalVisited }}</div><div class="stat-label">已学页面</div></div>
+        <div class="card stat-card"><div class="stat-icon">✏️</div><div class="stat-val">{{ overview.totalQuestions }}</div><div class="stat-label">答题总数</div></div>
+        <div class="card stat-card"><div class="stat-icon">⭐</div><div class="stat-val">{{ overview.errorsCount }}</div><div class="stat-label">错题</div></div>
         <div class="card stat-card"><div class="stat-icon">📝</div><div class="stat-val">{{ noteCount }}</div><div class="stat-label">笔记</div></div>
       </section>
 
       <!-- 学科进度 -->
-      <section v-if="data" class="card subjects-card">
+      <section v-if="overview" class="card subjects-card">
         <h2>📊 学科进度</h2>
-        <div v-for="(s, key) in data.subjects" :key="key" class="subject-row">
+        <div v-for="(_, key) in SUBJECT_NAMES" :key="key" class="subject-row">
           <span class="subject-name">{{ subjectName(key) }}</span>
-          <span class="subject-bar"><span class="subject-fill" :style="{ width: (s.total ? (s.visited / s.total * 100) : 0) + '%' }"></span></span>
-          <span class="subject-count">{{ s.visited }}/{{ s.total }}</span>
+          <span class="subject-bar">
+            <span class="subject-fill" :style="{ width: (subjectTotals[key] ? (overview.subjects[key].visited / subjectTotals[key]) * 100 : 0) + '%' }"></span>
+          </span>
+          <span class="subject-count">{{ overview.subjects[key].visited }}/{{ subjectTotals[key] }}</span>
         </div>
       </section>
 
@@ -79,21 +65,21 @@
 <script setup>
 /**
  * 个人主页逻辑
- * 数据来源：auth store（账号）+ gameEngine.getDashboardData()（学习统计）
+ * 数据来源：auth store（账号）+ studyDb.getLearningOverview()（学习统计）
  */
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useGameEngineStore } from '@/stores/gameEngine'
 import { useStudyDbStore } from '@/stores/studyDb'
+import { getSubjectConfig } from '@/content/index'
 import { api } from '@/sync/api'
 
 const router = useRouter()
 const auth = useAuthStore()
-const game = useGameEngineStore()
+const db = useStudyDbStore()
 
 const loading = ref(true)
-const data = ref(null)
+const overview = ref(null)
 const noteCount = ref(0)
 const registerDate = ref('')
 // 加载失败提示
@@ -107,6 +93,16 @@ const avatarEmoji = computed(() => {
 const SUBJECT_NAMES = { math: '数学', chinese: '语文', computer: '计算机' }
 const subjectName = (k) => SUBJECT_NAMES[k] || k
 
+// 各学科页面总数（由内容配置计算）
+const subjectTotals = computed(() => {
+  const totals = {}
+  for (const k of Object.keys(SUBJECT_NAMES)) {
+    const cfg = getSubjectConfig(k)
+    totals[k] = cfg && cfg.units ? cfg.units.reduce((s, u) => s + u.files.length, 0) : 0
+  }
+  return totals
+})
+
 async function load() {
   loading.value = true
   error.value = ''
@@ -118,8 +114,7 @@ async function load() {
       if (me.user.createdAt) registerDate.value = me.user.createdAt.slice(0, 10)
     }
 
-    const [dashboard, db] = await Promise.all([game.getDashboardData(), useStudyDbStore()])
-    data.value = dashboard
+    overview.value = await db.getLearningOverview()
     noteCount.value = (await db.getAllNotes()).length
   } catch (e) {
     console.warn('[Profile] 加载失败:', e)
@@ -166,17 +161,7 @@ function logout() {
 .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: #f0c040; color: #5a4300; font-weight: 600; }
 .email, .meta { margin: 4px 0 0; color: var(--text-secondary, #888); font-size: 0.85rem; }
 
-.level-card { display: flex; gap: var(--spacer-14); align-items: center; }
-.level-badge { flex-shrink: 0; text-align: center; }
-.lv-num { font-size: 2rem; font-weight: 700; display: block; }
-.lv-title { font-size: 0.8rem; color: var(--text-secondary, #666); }
-.level-info { flex: 1; }
-.xp-total { font-size: 0.9rem; margin-bottom: 6px; }
-.xp-bar { height: 10px; background: var(--surface-muted); border-radius: 999px; overflow: hidden; }
-.xp-fill { height: 100%; background: var(--accent, #4a6cf7); border-radius: 999px; }
-.xp-hint { font-size: 0.75rem; color: var(--text-secondary, #888); margin-top: 4px; }
-
-.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacer-10); }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacer-10); }
 .stat-card { text-align: center; padding: var(--spacer-14) var(--spacer-8); }
 .stat-icon { font-size: 1.3rem; }
 .stat-val { font-size: 1.3rem; font-weight: 700; }

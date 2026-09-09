@@ -17,7 +17,6 @@ const META_KEY = 'sync_meta_v1'
 const ENTITIES = [
   { entity: 'study_log', store: 'study_log', keyPath: 'id' },
   { entity: 'daily_stats', store: 'daily_stats', keyPath: 'date' },
-  { entity: 'achievements', store: 'achievements', keyPath: 'id' },
   { entity: 'page_progress', store: 'page_progress', keyPath: 'key' },
   { entity: 'error_book', store: 'error_book', keyPath: 'id' },
   { entity: 'notes', store: 'notes', keyPath: 'pageKey' },
@@ -59,7 +58,6 @@ export function useSyncEngine() {
       switch (store) {
         case 'study_log': rows = await db.getAllStudyLogs(); break
         case 'daily_stats': rows = await db.getAllDailyStats(); break
-        case 'achievements': rows = await db.getAllAchievements(); break
         case 'page_progress': rows = await db.getAllPageProgress(); break
         case 'error_book': rows = await db.getAllErrors(); break
         case 'notes': rows = await db.getAllNotes(); break

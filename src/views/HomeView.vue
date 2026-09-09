@@ -11,20 +11,12 @@
   <div class="home">
     <header class="home-hero">
       <h1>📚 单招学习之路</h1>
-      <p class="home-subtitle">多学科备考平台 | 知识体系 + 游戏化学习 + 低代码内容管理</p>
+      <p class="home-subtitle">多学科备考平台 | 知识体系 + 高效练习 + 低代码内容管理</p>
     </header>
 
-    <!-- 继续学习卡片：上次学习位置一键直达 + 连续打卡（移动学习 App 标配） -->
-    <section v-if="lastStudy || quickStats" class="continue-card card">
-      <div class="continue-card__stats">
-        <span class="continue-streak" :class="{ hot: quickStats && quickStats.streak > 0 }">
-          🔥 连续学习 <strong>{{ quickStats ? quickStats.streak : 0 }}</strong> 天
-        </span>
-        <span v-if="quickStats" class="continue-level">
-          Lv.{{ quickStats.levelInfo.level.lv }} · {{ quickStats.levelInfo.level.title }}
-        </span>
-      </div>
-      <button v-if="lastStudy" class="continue-card__main" @click="continueStudy">
+    <!-- 继续学习卡片：上次学习位置一键直达 -->
+    <section v-if="lastStudy" class="continue-card card">
+      <button class="continue-card__main" @click="continueStudy">
         <span class="continue-icon">{{ subjectIcon(lastStudy.subject) }}</span>
         <span class="continue-text">
           <span class="continue-label">继续学习</span>
@@ -186,14 +178,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProgressStore } from '@/stores/progress'
-import { useGameEngineStore } from '@/stores/gameEngine'
 import { SUBJECT_LIST, getSubjectConfig } from '@/content/index'
 import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
 import SearchPanel from '@/components/SearchPanel.vue'
 
 const router = useRouter()
 const progress = useProgressStore()
-const game = useGameEngineStore()
 
 // 学科列表
 const subjectList = SUBJECT_LIST
@@ -206,12 +196,6 @@ const lastStudy = ref(null)
 try {
   lastStudy.value = JSON.parse(localStorage.getItem('last_study') || 'null')
 } catch { lastStudy.value = null }
-
-// 快速统计：等级 + 连续打卡天数（带 30 秒缓存）
-const quickStats = ref(null)
-onMounted(async () => {
-  try { quickStats.value = await game.getQuickStats() } catch { /* 数据库不可用时静默 */ }
-})
 
 // 今日待复习错题数（SM-2 到期）：首页复习提醒
 const dueCount = ref(null)
@@ -316,17 +300,6 @@ const mockRoute = computed(() => sprintUnit.value
   display: flex;
   flex-direction: column;
   gap: var(--spacer-12);
-}
-.continue-card__stats {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 0.85rem; color: var(--text-muted);
-}
-.continue-streak strong { color: var(--text); font-size: 1.05rem; }
-.continue-streak.hot strong { color: var(--warning); }
-.continue-level {
-  background: var(--primary-soft); color: var(--primary);
-  padding: 2px 10px; border-radius: var(--radius-full);
-  font-size: 0.78rem; font-weight: 600;
 }
 .continue-card__main {
   display: flex; align-items: center; gap: var(--spacer-12);

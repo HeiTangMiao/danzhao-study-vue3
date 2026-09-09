@@ -33,7 +33,7 @@ vue3-refactor/
 │   ├── types/                  # TypeScript 类型声明（.d.ts）
 │   │   ├── content.d.ts        # 内容 Schema 类型
 │   │   ├── site.d.ts           # 站点配置类型（含 Subject 联合类型）
-│   │   ├── store.d.ts          # Store 类型（Progress / GameEngine / StudyDB）
+│   │   ├── store.d.ts          # Store 类型（Progress / StudyDB）
 │   │   └── composable.d.ts     # Composable 类型（7 个组合式函数）
 │   ├── content/                # 内容数据（Schema 实例，多学科）
 │   │   ├── index.js            # 多学科内容索引（SUBJECTS / getSubjectConfig）
@@ -91,30 +91,30 @@ vue3-refactor/
 |------|----------|
 | `src/types/content.d.ts` | 内容 Schema 类型（区块、页面结构） |
 | `src/types/site.d.ts` | 站点配置类型（含 `Subject = 'math' \| 'chinese' \| 'computer'` 联合类型） |
-| `src/types/store.d.ts` | Store 类型：`ProgressStore`（含多学科 API）、`GameEngine`（含 `DashboardData`、`Achievement` 等）、`StudyDB`（含 `NoteRecord`、`ErrorRecord` 等） |
+| `src/types/store.d.ts` | Store 类型：`ProgressStore`（含多学科 API）、`StudyDB`（含 `NoteRecord`、`ErrorRecord`、`DailyStat` 等学习记录类型） |
 | `src/types/composable.d.ts` | Composable 类型：`useNotes`、`useBookmarks`、`useTheme`、`usePomodoro`、`useSpacedReview`（另含 `useKatex` / `useMermaid` 模块级函数） |
 
 ### 状态管理
 
 | Store | 职责 | 持久化 |
 |-------|------|--------|
-| progress | 学习进度（按学科隔离的页面完成标记） | localStorage |
-| studyDb | IndexedDB 数据层（7 仓库 CRUD） | IndexedDB |
-| gameEngine | XP / 等级 / 连击 / 成就 / 学科进度 | IndexedDB（经 studyDb） |
+| auth | 账号与登录态（access / refresh token） | localStorage |
+| progress | 学习进度（按学科隔离的页面完成标记） | IndexedDB（经 studyDb） |
+| studyDb | IndexedDB 数据层（7 仓库 CRUD + 学习工具接口，游戏化已移除） | IndexedDB |
 
 ### IndexedDB 数据仓库
 
 | 仓库名 | keyPath | 说明 |
 |--------|---------|------|
 | study_log | id (auto) | 学习日志 |
-| daily_stats | date | 每日统计 |
-| achievements | id | 成就解锁 |
-| page_progress | key | 页面进度 |
-| error_book | id (auto) | 错题本（含 SM-2 字段） |
+| daily_stats | date | 每日统计（文件数/题目数/学习时长） |
+| page_progress | key | 页面进度（访问状态、答题数、测验分数） |
+| error_book | id (auto) | 错题本（含 SM-2 间隔复习字段） |
 | notes | pageKey | 笔记 |
 | bookmarks | pageKey | 书签 |
+| user_progress | id | 统一学习进度（completed 映射 + 最近学习时间戳） |
 
-数据库结构与旧版完全一致，旧 PWA 数据可直接读取。
+数据库版本 v5：已删除游戏化 `achievements` 仓库，并清理 `daily_stats` 中的 `xp`/`checkin` 等字段。除学习记录（访问/答题/测验/学习时长/错题/笔记/书签）外不再存储任何游戏化数据。
 
 ## 多学科架构
 
@@ -156,10 +156,10 @@ getSubjectConfig('chinese') // 按学科 key 获取配置（未知学科回退�
 |------|----------|
 | HomeView | 学科选择卡片（数学/语文），按阶段分组展示单元，localStorage 记忆选中学科 |
 | UnitView | 通过 `route.params.subject` 动态加载 `@/content/${subject}/${folder}/${name}.js`，进度按学科隔离 |
-| DashboardView | 新增学科进度区块，展示各学科完成百分比、已访问页面数和 XP |
+| DashboardView | 展示各学科进度、今日学习统计与错题学情分析（纯学习进度页，无游戏化） |
 | EditorView | 新增学科选择器和单元选择器，动态导入按 `editorSubject` 变量切换，导出时 page ID 包含正确学科 |
 | progress store | 进度结构从 `completed[unitNum][fileIndex]` 改为 `completed[subject][unitNum][fileIndex]`，新增 `subjectTotalCompleted()` / `setBatchComplete()` / `resetSubject()` / `resetAll()` |
-| gameEngine store | `_getUnitFileCount()` / `_getSubjectTotalFiles()` 通过 `getSubjectConfig()` 动态获取文件数；`getDashboardData()` 按学科汇总进度；新增 `all_math` / `all_chinese` / `dual_study` 成就 |
+| studyDb store | 提供学习工具接口：`markPageVisited` / `recordTest` / `recordError` / `updateDailyStat` / `getLearningOverview`，按学科汇总学习进度与统计（无游戏化） |
 
 ## 新增内容流程
 
@@ -211,8 +211,9 @@ npm run tauri:android:build  # 构建 APK
 | 语文内容迁移 | ✅ 完成 | 6 单元全部迁移 + 校验通过 |
 | 计算机内容迁移 | ✅ 完成 | 5 单元全部迁移 + 校验通过 |
 | 可视化组件 | ✅ 完成 | JSXGraph / Mermaid / KaTeX |
-| 逻辑层迁移 | ✅ 完成 | studyDb + gameEngine + 7 composables |
-| 仪表盘 | ✅ 完成 | 等级 / 热力图 / 成就墙 / 学科进度 |
+| 逻辑层迁移 | ✅ 完成 | studyDb + 学习工具 composables（错题/间隔复习/番茄钟/笔记/书签/主题） |
+| 仪表盘 | ✅ 完成 | 学科进度 / 今日统计 / 错题学情分析（无游戏化） |
+| 游戏化移除 | ✅ 完成 | 等级/XP/成就/打卡/连击/热力图全部移除，gameEngine store 删除，数据库升级至 v5 |
 | 低代码编辑器 | ✅ 完成 | 三栏布局 + 公式可视化编辑 + 模板面板 |
 | 公式编辑器增强 | ✅ 完成 | 16 个常用公式模板快捷插入 |
 | 类型定义 | ✅ 完成 | content.d.ts + site.d.ts + store.d.ts + composable.d.ts |

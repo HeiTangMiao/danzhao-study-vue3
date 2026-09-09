@@ -20,7 +20,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['src/composables/useSpacedReview.js', 'src/stores/gameEngine.js']
+      include: ['src/composables/useSpacedReview.js', 'src/stores/studyDb.js']
     }
   }
 })

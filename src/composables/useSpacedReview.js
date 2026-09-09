@@ -7,11 +7,10 @@
  *  - 删除已掌握的错题
  *
  * 替代旧版 assets/js/spaced-review.js 的 SpacedReview 模块
- * 依赖：studyDb store、gameEngine store（复习正确时奖励 XP）
+ * 依赖：studyDb store
  */
 import { ref } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
-import { useGameEngineStore } from '@/stores/gameEngine'
 
 // SM-2 评分等级
 export const GRADES = {
@@ -70,7 +69,6 @@ export function calculateSM2(error, grade) {
 
 export function useSpacedReview() {
   const db = useStudyDbStore()
-  const game = useGameEngineStore()
 
   // 响应式状态
   const dueReviews = ref([])       // 待复习错题队列
@@ -160,12 +158,6 @@ export function useSpacedReview() {
     sessionStats.value.reviewed++
     if (grade >= 3) {
       sessionStats.value.correct++
-      // 正确复习奖励 XP
-      try {
-        await game.trackAnswer(error.subject, error.unitNum, 'review_' + error.id)
-      } catch (e) {
-        console.warn('[SpacedReview] 记录复习 XP 失败:', e)
-      }
     } else {
       sessionStats.value.wrong++
     }

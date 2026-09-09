@@ -3,25 +3,27 @@
  * 职责：
  *  - 封装 IndexedDB 的初始化与 7 个对象仓库的 CRUD 操作
  *  - 替代旧版 assets/js/db.js 的 StudyDB 模块
- *  - 为 gameEngine store 及各 composable 提供统一数据访问层
+ *  - 为各 composable 与 store 提供统一数据访问层（游戏化已移除）
  *
  * 对象仓库说明：
  *  - study_log：学习日志（每次访问/答题/测验的记录）
- *  - daily_stats：每日统计（XP、文件数、题目数、打卡、学习时长）
- *  - achievements：成就解锁记录
- *  - page_progress：页面进度（访问状态、答题数、测验分数、XP）
+ *  - daily_stats：每日统计（文件数、题目数、学习时长）
+ *  - page_progress：页面进度（访问状态、答题数、测验分数）
  *  - error_book：错题本（含 SM-2 间隔复习字段）
  *  - notes：每页笔记
  *  - bookmarks：书签收藏
+ *  - user_progress：统一学习进度（completed 映射 + 最近学习时间戳）
  *
- * 兼容性：数据库结构（库名/版本/仓库/索引）与旧版完全一致，
- *         确保旧版 PWA 已有数据可被新逻辑直接读取。
+ * 版本历史：
+ *  - v1~v3：曾在 daily_stats/study_log 等仓库记录 xp/checkin/成就等游戏字段
+ *  - v4：学习进度统一入库（user_progress）
+ *  - v5：移除游戏化 —— 删除 achievements 仓库，清理 daily_stats 中的游戏字段
  */
 import { defineStore } from 'pinia'
 
-// IndexedDB 配置（与旧版 db.js 保持一致，确保数据兼容）
+// IndexedDB 配置（库名保持兼容；版本号 v5 移除游戏字段）
 const DB_NAME = 'study_game_db'
-const DB_VERSION = 4
+const DB_VERSION = 5
 
 // 单例数据库连接
 let dbInstance = null
@@ -90,6 +92,32 @@ function openDB() {
       // 仓库结构：{ id: 'main', completed: {...}, lastStudiedAt: number|null }
       if (oldVersion < 4 && !d.objectStoreNames.contains('user_progress')) {
         d.createObjectStore('user_progress', { keyPath: 'id' })
+      }
+
+      // v5：移除游戏化 —— 删除成就仓库，清理每日统计中的游戏字段
+      if (oldVersion < 5) {
+        if (d.objectStoreNames.contains('achievements')) {
+          d.deleteObjectStore('achievements')
+        }
+        // 清理由旧版本遗留的 xp/checkin/subjects 字段，仅保留学习统计
+        const store = d.transaction('daily_stats', 'readwrite').objectStore('daily_stats')
+        if (store) {
+          store.openCursor().onsuccess = (ev) => {
+            const cursor = ev.target.result
+            if (cursor) {
+              const rec = cursor.value
+              if (rec && (rec.xp !== undefined || rec.checkin !== undefined || rec.subjects !== undefined)) {
+                cursor.update({
+                  date: rec.date,
+                  filesVisited: rec.filesVisited || 0,
+                  questionsAnswered: rec.questionsAnswered || 0,
+                  studyMinutes: rec.studyMinutes || 0
+                })
+              }
+              cursor.continue()
+            }
+          }
+        }
       }
     }
   })
@@ -172,6 +200,14 @@ function dbClear(storeName) {
   })
 }
 
+/** 获取日期字符串 YYYY-MM-DD（本地时区，用于每日统计/学习日志） */
+function getDateStr(d = new Date()) {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export const useStudyDbStore = defineStore('studyDb', {
   actions: {
     // ===== 初始化 =====
@@ -220,7 +256,7 @@ export const useStudyDbStore = defineStore('studyDb', {
     async getDailyStat(date) {
       await this.init()
       const r = await dbGet('daily_stats', date)
-      return r || { date, xp: 0, filesVisited: 0, questionsAnswered: 0, checkin: false, subjects: {} }
+      return r || { date, filesVisited: 0, questionsAnswered: 0, studyMinutes: 0 }
     },
 
     /** 保存 / 更新每日统计 */
@@ -253,26 +289,6 @@ export const useStudyDbStore = defineStore('studyDb', {
     async getAllPageProgress() {
       await this.init()
       return dbGetAll('page_progress')
-    },
-
-    // ===== 成就 =====
-
-    /** 获取某成就 */
-    async getAchievement(id) {
-      await this.init()
-      return dbGet('achievements', id)
-    },
-
-    /** 保存 / 更新成就 */
-    async saveAchievement(ach) {
-      await this.init()
-      return dbPut('achievements', ach)
-    },
-
-    /** 获取全部已解锁成就 */
-    async getAllAchievements() {
-      await this.init()
-      return dbGetAll('achievements')
     },
 
     // ===== 错题本 =====
@@ -374,6 +390,120 @@ export const useStudyDbStore = defineStore('studyDb', {
       return dbPut('user_progress', progress)
     },
 
+    // ===== 学习工具记录（原 gameEngine，已去除游戏化） =====
+
+    /**
+     * 更新今日学习统计（不含游戏化字段）
+     * @param {{ filesVisited?: number, questionsAnswered?: number, studyMinutes?: number }} delta
+     */
+    async updateDailyStat(delta = {}) {
+      await this.init()
+      const date = getDateStr()
+      const stat = await this.getDailyStat(date)
+      stat.filesVisited = (stat.filesVisited || 0) + (delta.filesVisited || 0)
+      stat.questionsAnswered = (stat.questionsAnswered || 0) + (delta.questionsAnswered || 0)
+      stat.studyMinutes = (stat.studyMinutes || 0) + (delta.studyMinutes || 0)
+      await this.saveDailyStat(stat)
+    },
+
+    /**
+     * 记录页面访问（首次访问）：落 page_progress + 今日统计 + 学习日志
+     * @returns {Promise<{ alreadyVisited: boolean }>}
+     */
+    async markPageVisited({ subject, unitNum, unitTitle, fileKey, fileTitle, isTest = false }) {
+      await this.init()
+      const existing = await this.getPageProgress(fileKey)
+      if (existing && existing.visited) return { alreadyVisited: true }
+      await this.savePageProgress({
+        key: fileKey, subject, unitNum, unitTitle, fileTitle,
+        visited: true, visitTime: Date.now(),
+        questionsAnswered: 0, questionsTotal: 0, testScore: null
+      })
+      await this.addStudyLog({
+        date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+        action: isTest ? 'test_complete' : 'page_visit'
+      })
+      await this.updateDailyStat({ filesVisited: isTest ? 0 : 1 })
+      return { alreadyVisited: false }
+    },
+
+    /**
+     * 记录测验成绩（写入 page_progress：${subject}_unit_${unitNum}_test）
+     * @returns {Promise<{ percent: number, testPoints: string }>}
+     */
+    async recordTest(subject, unitNum, earnedPoints, totalPoints) {
+      await this.init()
+      const percent = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0
+      const fileKey = `${subject}_unit_${unitNum}_test`
+      const existing = await this.getPageProgress(fileKey)
+      const testPoints = `${earnedPoints}/${totalPoints}`
+      await this.savePageProgress({
+        ...(existing || {}),
+        key: fileKey, subject, unitNum, visited: true,
+        testScore: percent, testPoints
+      })
+      await this.addStudyLog({
+        date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+        action: 'complete_test', testScore: percent
+      })
+      return { percent, testPoints }
+    },
+
+    /**
+     * 记录错题到错题本（SM-2 初始字段），同页面同题干去重
+     * @returns {Promise<{ id, success, duplicated? }>}
+     */
+    async recordError(subject, unitNum, question, correctAnswer, userAnswer, explanation, extra) {
+      await this.init()
+      const fileKey = (extra && extra.fileKey) || ''
+      const allErrors = await this.getAllErrors()
+      const dup = allErrors.find(
+        (e) => e.subject === subject && e.question === question &&
+          (fileKey ? e.fileKey === fileKey : e.unitNum === unitNum)
+      )
+      if (dup) return { id: dup.id, success: true, duplicated: true }
+      const error = {
+        subject, unitNum, question, correctAnswer, userAnswer,
+        explanation: explanation || '',
+        createdAt: Date.now(), createdAtDate: getDateStr(),
+        reviewed: false, reviewCount: 0,
+        easeFactor: 2.5, interval: 0, repetitions: 0,
+        nextReviewDate: getDateStr(), lastReviewedAt: null
+      }
+      if (extra && typeof extra === 'object') Object.assign(error, extra)
+      const id = await this.addError(error)
+      return { id, success: true }
+    },
+
+    /**
+     * 学习概况（无游戏化）：各学科已学/答题 + 今日统计 + 错题数
+     * 各学科 total（页面总数）由视图用 getSubjectConfig 结合计算
+     */
+    async getLearningOverview() {
+      await this.init()
+      const [allProgress, allStats, allErrors] = await Promise.all([
+        this.getAllPageProgress(), this.getAllDailyStats(), this.getAllErrors()
+      ])
+      const subjects = {
+        math: { visited: 0, questions: 0 },
+        chinese: { visited: 0, questions: 0 },
+        computer: { visited: 0, questions: 0 }
+      }
+      let totalVisited = 0
+      let totalQuestions = 0
+      for (const p of allProgress) {
+        if (!subjects[p.subject]) continue
+        if (p.visited) { subjects[p.subject].visited++; totalVisited++ }
+        const q = p.questionsAnswered || 0
+        subjects[p.subject].questions += q
+        totalQuestions += q
+      }
+      const todayStr = getDateStr()
+      const statMap = new Map(allStats.map((s) => [s.date, s]))
+      const todayStat = statMap.get(todayStr) || { filesVisited: 0, questionsAnswered: 0, studyMinutes: 0 }
+      return { subjects, totalVisited, totalQuestions, todayStat, errorsCount: allErrors.length, allErrors }
+    },
+
     // ===== 数据导出 / 导入 =====
 
     /**
@@ -382,10 +512,9 @@ export const useStudyDbStore = defineStore('studyDb', {
      */
     async exportAllData() {
       await this.init()
-      const [studyLogs, dailyStats, achievements, pageProgress, errors, notes, bookmarks, progress] = await Promise.all([
+      const [studyLogs, dailyStats, pageProgress, errors, notes, bookmarks, progress] = await Promise.all([
         this.getAllStudyLogs(),
         this.getAllDailyStats(),
-        this.getAllAchievements(),
         this.getAllPageProgress(),
         this.getAllErrors(),
         this.getAllNotes(),
@@ -408,7 +537,6 @@ export const useStudyDbStore = defineStore('studyDb', {
         exportedAt: new Date().toISOString(),
         study_log: studyLogs,
         daily_stats: dailyStats,
-        achievements,
         page_progress: pageProgress,
         error_book: errors,
         notes,
@@ -426,7 +554,7 @@ export const useStudyDbStore = defineStore('studyDb', {
       if (!data || typeof data !== 'object') throw new Error('无效的数据格式')
 
       // 注意：user_progress 为单条记录对象而非数组，单独处理
-      const stores = ['study_log', 'daily_stats', 'achievements', 'page_progress', 'error_book', 'notes', 'bookmarks', 'user_progress']
+      const stores = ['study_log', 'daily_stats', 'page_progress', 'error_book', 'notes', 'bookmarks', 'user_progress']
 
       // 数据格式校验（数组类仓库要求为数组）
       for (const key of stores) {

@@ -3,15 +3,14 @@
  * 职责：
  *  - 25 分钟专注 + 5 分钟休息，每 4 个番茄后长休息 15 分钟
  *  - 状态持久化到 localStorage（防止刷新丢失）
- *  - 完成专注后记录学习时长到 daily_stats 并奖励 XP
+ *  - 完成专注后记录学习时长到 daily_stats
  *  - 提供音效与通知能力
  *
  * 替代旧版 assets/js/pomodoro.js
- * 依赖：studyDb store、gameEngine store
+ * 依赖：studyDb store
  */
 import { ref, computed, onUnmounted } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
-import { useGameEngineStore } from '@/stores/gameEngine'
 
 // 计时配置（秒）
 const FOCUS_DURATION = 25 * 60      // 专注 25 分钟
@@ -36,7 +35,6 @@ function getDateStr(d = new Date()) {
 
 export function usePomodoro() {
   const db = useStudyDbStore()
-  const game = useGameEngineStore()
 
   // 响应式状态
   const running = ref(false)
@@ -186,7 +184,7 @@ export function usePomodoro() {
   }
 
   /** 完成当前阶段（专注→休息 或 休息→专注）
-   *  @param {boolean} rewarded - 是否按真实完成计（跳过时不发放 XP / 不计学习时长）
+   *  @param {boolean} rewarded - 是否按真实完成计（跳过时不记录学习时长）
    */
   async function completePhase(rewarded = true) {
     stopInterval()
@@ -199,9 +197,6 @@ export function usePomodoro() {
       cycleCount.value++
       if (rewarded) {
         await recordStudyMinutes(FOCUS_DURATION / 60)
-        // 奖励 XP
-        await game.updateDailyStat(10, 'general', 0, 0)
-        game._invalidateQuickStatsCache()
         // 以 daily_stats 为单一数据源刷新今日番茄数
         await loadTodaySessions()
         notify('番茄钟完成！', '专注了25分钟，休息一下吧 🎉')
@@ -257,7 +252,7 @@ export function usePomodoro() {
     clearState()
   }
 
-  /** 跳过当前阶段（不发放 XP、不记录学习时长，直接进入下一阶段） */
+  /** 跳过当前阶段（不记录学习时长，直接进入下一阶段） */
   function skip() {
     if (running.value || timeLeft.value < totalDuration.value) {
       timeLeft.value = 0

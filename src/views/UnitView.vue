@@ -4,7 +4,7 @@
    - 根据路由参数 subject + unitNum + fileIndex 加载对应内容数据
    - 将内容区块数组交给 BlockRenderer 逐块渲染
    - 提供上一页/下一页导航与完成标记
-   - 游戏化追踪：页面访问奖励 XP、答题奖励 XP
+   - 学习追踪：记录页面访问、答题与测验成绩（无游戏化奖励）
    - 笔记功能：每页可记录学习笔记
    - 书签功能：收藏当前页面
 -->
@@ -52,10 +52,6 @@
       <button class="done-btn" :class="{ done: isDone }" @click="toggleDone">
         {{ isDone ? '✅ 已完成' : '○ 标记完成' }}
       </button>
-      <!-- XP 获得提示 -->
-      <transition name="fade">
-        <span v-if="xpPopup" class="xp-popup">+{{ xpPopup }} XP</span>
-      </transition>
     </header>
 
     <!-- 目录导航（折叠式） -->
@@ -212,7 +208,7 @@ import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } f
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 import { useProgressStore } from '@/stores/progress'
-import { useGameEngineStore } from '@/stores/gameEngine'
+import { useStudyDbStore } from '@/stores/studyDb'
 import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
 import { usePomodoro } from '@/composables/usePomodoro'
@@ -223,7 +219,7 @@ import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
 const route = useRoute()
 const router = useRouter()
 const progress = useProgressStore()
-const game = useGameEngineStore()
+const db = useStudyDbStore()
 
 // 番茄钟（学习页悬浮计时器）
 const pomodoro = usePomodoro()
@@ -256,25 +252,13 @@ const showDesmos = ref(false)
 // 加载状态
 const loading = ref(false)
 
-// XP 获得浮动提示
-const xpPopup = ref(null)
-let xpPopupTimer = null
-
-/** 显示 XP 获得提示（2 秒后消失） */
-function showXPPopup(xp) {
-  if (!xp) return
-  xpPopup.value = xp
-  if (xpPopupTimer) clearTimeout(xpPopupTimer)
-  xpPopupTimer = setTimeout(() => { xpPopup.value = null }, 2000)
-}
-
 // 生成页面唯一标识（学科_单元号_文件名）
 const pageKey = computed(() => {
   if (!unit.value || !fileMeta.value) return ''
   return `${subject.value}_${unit.value.num}_${fileMeta.value.name}`
 })
 
-// 页面上下文（供交互区块记录 XP 与错题）
+// 页面上下文（供交互区块记录错题等）
 const pageContext = computed(() => ({
   subject: subject.value,
   unitNum: unit.value?.num || '',
@@ -359,7 +343,7 @@ const bookmark = useBookmarks(pageKey, subject, computed(() => ({
 // 动态加载内容数据（Vite 支持动态 import）
 const page = ref(null)
 
-/** 加载页面内容并追踪访问（奖励 XP） */
+/** 加载页面内容并记录访问 */
 async function loadPage() {
   if (!unit.value || !fileMeta.value) return
   loading.value = true
@@ -368,16 +352,15 @@ async function loadPage() {
     // 根据学科动态导入对应内容文件
     const m = await import(`@/content/${subject.value}/${unit.value.folder}/${fileMeta.value.name}.js`)
     page.value = m.default
-    // 游戏化追踪：记录页面访问
-    const result = await game.trackVisit(
-      subject.value,
-      unit.value.num,
-      unit.value.title,
-      pageKey.value,
-      fileMeta.value.title,
-      fileMeta.value.isTest || false
-    )
-    if (result.xpGained > 0) showXPPopup(result.xpGained)
+    // 记录页面访问（学习日志 / 每日统计）
+    await db.markPageVisited({
+      subject: subject.value,
+      unitNum: unit.value.num,
+      unitTitle: unit.value.title,
+      fileKey: pageKey.value,
+      fileTitle: fileMeta.value.title,
+      isTest: fileMeta.value.isTest || false
+    })
     // 记录最近学习位置（首页「继续学习」直达）
     saveLastStudy()
   } catch (e) {
@@ -479,8 +462,6 @@ function goUnit(u) {
 watch(
   () => [route.params.subject, route.params.unitNum, route.params.fileIndex],
   () => {
-    // 切换页面时重置会话连击
-    game.resetSessionStreak()
     loadPage()
   }
 )
@@ -534,20 +515,6 @@ watch(
 }
 .done-btn.done { background: rgba(47, 158, 68, 0.12); border-color: var(--success); color: var(--success); }
 
-/* XP 浮动提示 */
-.xp-popup {
-  position: absolute; top: 0; right: 0;
-  background: var(--primary); color: #fff;
-  padding: 4px 14px; border-radius: var(--radius-full);
-  font-weight: 600; font-size: 0.9rem;
-  animation: xpFloat 2s ease;
-}
-@keyframes xpFloat {
-  0% { opacity: 0; transform: translateY(10px); }
-  20% { opacity: 1; transform: translateY(0); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-10px); }
-}
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 
 /* 加载提示 */

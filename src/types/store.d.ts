@@ -28,41 +28,14 @@ export interface ProgressStore {
   resetAll: () => void
 }
 
-// ===== GameEngine Store =====
+// ===== 学习记录类型 =====
 
-/** 等级信息 */
-export interface LevelInfo {
-  level: Level
-  next: Level | null
-  progress: number
-  needXP: number
-  totalXP: number
-}
-
-/** 等级定义 */
-export interface Level {
-  lv: number
-  title: string
-  xp: number
-}
-
-/** 成就定义 */
-export interface Achievement {
-  id: string
-  name: string
-  desc: string
-  icon: string
-  unlockedDate?: string
-}
-
-/** 每日统计 */
+/** 每日统计（学习记录，无游戏化字段） */
 export interface DailyStat {
   date: string
-  xp: number
   filesVisited: number
   questionsAnswered: number
-  checkin: boolean
-  subjects?: Record<string, { xp: number; files: number; questions: number }>
+  studyMinutes: number
 }
 
 /** 页面进度 */
@@ -78,7 +51,6 @@ export interface PageProgress {
   questionsTotal: number
   testScore: number | null
   testPoints?: string
-  xpEarned: number
 }
 
 /** 学习日志 */
@@ -89,7 +61,6 @@ export interface StudyLog {
   unitNum: string
   fileKey: string
   action: 'page_visit' | 'answer_question' | 'complete_test' | 'test_complete'
-  xp: number
   testScore?: number
 }
 
@@ -114,43 +85,6 @@ export interface ErrorRecord {
   fileKey?: string
   fileTitle?: string
   unitTitle?: string
-}
-
-/** 仪表盘数据 */
-export interface DashboardData {
-  totalXP: number
-  levelInfo: LevelInfo
-  streak: number
-  todayStat: DailyStat
-  heatmap: Array<{ date: string; xp: number; checkin: boolean }>
-  subjects: Record<Subject, {
-    total: number
-    visited: number
-    xp: number
-    units: Record<string, { visited: number; xp: number }>
-  }>
-  achievements: Achievement[]
-  allProgress: PageProgress[]
-  allErrors: ErrorRecord[]
-  totalVisited: number
-  totalQuestions: number
-}
-
-/** XP 奖励规则 */
-export interface XPRules {
-  READ_PAGE: number
-  ANSWER_QUESTION: number
-  COMPLETE_TEST: number
-  HIGH_SCORE_BONUS: number
-  PERFECT_SCORE_BONUS: number
-  DAILY_STREAK_BASE: number
-}
-
-/** 追踪访问结果 */
-export interface TrackVisitResult {
-  xpGained: number
-  alreadyVisited?: boolean
-  error?: unknown
 }
 
 // ===== StudyDB Store =====
@@ -181,7 +115,6 @@ export interface ExportData {
   exportedAt: string
   study_log: StudyLog[]
   daily_stats: DailyStat[]
-  achievements: Achievement[]
   page_progress: PageProgress[]
   error_book: ErrorRecord[]
   notes: NoteRecord[]

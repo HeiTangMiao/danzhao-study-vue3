@@ -40,12 +40,12 @@ src/
 │   └── site.js                  # 各学科站点配置
 ├── stores/
 │   ├── progress.js              # 学习进度（多学科隔离）
-│   ├── studyDb.js               # IndexedDB 数据层
-│   └── gameEngine.js            # 游戏引擎（多学科进度）
+│   ├── studyDb.js               # IndexedDB 数据层 + 学习工具接口（无游戏化）
+│   └── auth.js                  # 账号与会话管理
 └── types/
     ├── content.d.ts             # 内容 Schema 类型
     ├── site.d.ts                # 站点配置类型（含 Subject 联合类型）
-    ├── store.d.ts               # Store 类型（Progress / GameEngine / StudyDB）
+    ├── store.d.ts               # Store 类型（Progress / StudyDB）
     └── composable.d.ts          # Composable 类型（7 个组合式函数）
 ```
 
@@ -249,68 +249,25 @@ progress.resetAll()                              // 重置全部进度
 
 ### useStudyDbStore
 
-IndexedDB 数据层，7 个对象仓库的 CRUD + 导入导出。所有记录均含 `subject` 字段用于区分学科。
+IndexedDB 数据层，7 个对象仓库的 CRUD + 学习工具接口 + 导入导出。所有学习记录均含 `subject` 字段用于区分学科。
 
 ```js
 const db = useStudyDbStore()
 await db.init()
 await db.getNote('math_01_01-集合的概念与表示')
 await db.saveNote({ pageKey: 'math_01_01-集合的概念与表示', subject: 'math', content: '...' })
+await db.markPageVisited({ subject, unitNum, unitTitle, fileKey, fileTitle, isTest })  // 页面访问
+await db.recordTest(subject, unitNum, earnedPoints, totalPoints)                        // 测验成绩
+await db.recordError(subject, unitNum, question, correctAnswer, userAnswer, explanation) // 错题入库
+await db.updateDailyStat({ filesVisited, questionsAnswered, studyMinutes })            // 今日统计
+const overview = await db.getLearningOverview()                                        // 学习概况
 const backup = await db.exportAllData()
 await db.importAllData(backup)
 ```
 
-对象仓库：study_log / daily_stats / achievements / page_progress / error_book / notes / bookmarks
+对象仓库：study_log / daily_stats / page_progress / error_book / notes / bookmarks / user_progress
 
-`daily_stats` 仓库的记录额外含 `subjects` 字段，按学科分别统计每日 XP、文件访问数和答题数。
-
-### useGameEngineStore
-
-游戏化引擎：XP / 等级 / 连击 / 成就 / 学科进度 / 仪表盘数据。支持多学科（数学/语文）。
-
-```js
-const game = useGameEngineStore()
-
-// 追踪学习行为（subject 参数区分学科）
-await game.trackVisit('math', '01', '集合与逻辑', 'math_01_01', '集合的概念', false)
-await game.trackVisit('chinese', '01', '语言文字运用', 'chinese_01_01', '字音字形', false)
-await game.trackAnswer('math', '01', 'math_01_01')
-await game.recordTest('chinese', '01', 90, 100)
-
-// 仪表盘数据（含按学科汇总的进度）
-const dashboard = await game.getDashboardData()
-// dashboard.subjects = { math: { total, visited, xp, units }, chinese: { ... } }
-
-const quick = await game.getQuickStats()  // 带 30s 缓存
-```
-
-**多学科辅助方法**：
-
-| 方法 | 说明 |
-|------|------|
-| `_getUnitFileCount(subject, unitNum)` | 从 `getSubjectConfig()` 动态获取某学科某单元的文件总数 |
-| `_getSubjectTotalFiles(subject)` | 从配置计算某学科全部文件总数 |
-| `getDashboardData()` | 聚合数据，`subjects` 字段按学科汇总完成数和 XP |
-| `checkAchievements(subject)` | 成就检测，包含学科通关和双修判定 |
-
-**成就体系**（14 个）：
-
-| 成就 ID | 名称 | 条件 |
-|---------|------|------|
-| `first_step` | 初入书海 | 完成第一次学习 |
-| `streak_7` / `streak_30` / `streak_100` | 一周不辍 / 月度坚持 / 百日筑基 | 连续学习 7/30/100 天 |
-| `math_unit_1` | 集合达人 | 完成数学第1单元 |
-| `chinese_unit_1` | 文字达人 | 完成语文第1单元 |
-| `all_math` | 数学通关 | 完成数学全部 11 单元 |
-| `all_chinese` | 语文通关 | 完成语文全部 5 单元 |
-| `dual_study` | 双修先锋 | 同日学习数学和语文 |
-| `perfect_test` | 满分测验 | 复习测验正确率 100% |
-| `fast_learner` | 速度之星 | 10 分钟内完成一个知识点 |
-| `level_10` / `level_20` / `level_30` | 小有所成 / 学有所成 / 学海状元 | 达到 10/20/30 级 |
-
-XP 规则：阅读页面 +10 / 答题 +5 / 测验 +50 / 高分 +30 / 满分 +20
-
-等级体系（30 级）：学徒 → 书童 → 秀才 → 举人 → 贡士 → 进士 → 探花 → 榜眼 → 状元
+`daily_stats` 仓库记录仅含学习指标（`filesVisited` / `questionsAnswered` / `studyMinutes`），不含 XP、打卡等游戏字段（数据库 v5 已清理）。
 
 ---
 
@@ -339,11 +296,15 @@ XP 规则：阅读页面 +10 / 答题 +5 / 测验 +50 / 高分 +30 / 满分 +20
 
 ### DashboardView
 
-学习仪表盘，展示游戏化数据与学科进度。
+学习仪表盘（纯学习进度页），展示学习数据。
 
-- 数据来源：`game.getDashboardData()`
-- 学科进度区块：遍历 `data.subjects`，展示各学科完成百分比、已访问页面数（`visited/total`）和 XP
-- 热力图（最近 90 天）、成就墙、今日统计、等级与 XP 概览
+- 数据来源：`db.getLearningOverview()`
+- 核心数据卡片：已学页面 / 答题总数 / 错题收录 / 今日待复习
+- 今日学习：访问页面、答题数、学习时长
+- 学科进度区块：遍历 `overview.subjects`，展示各学科完成百分比（`visited/total`）与答题数
+- 学情分析与复习建议：基于错题本聚合薄弱知识点（跨语/数/计学科）
+
+游戏化元素（等级、XP、连击、热力图、成就墙）已彻底移除。
 
 ### EditorView
 
