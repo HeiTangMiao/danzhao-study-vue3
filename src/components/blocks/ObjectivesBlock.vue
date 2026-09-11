@@ -5,7 +5,7 @@
 <template>
   <section class="block objectives">
     <h3 class="block-title">🎯 {{ block.title || '学习目标' }}</h3>
-    <div class="objectives-box">
+    <div class="block-card objectives-box">
       <p v-for="(item, i) in block.items" :key="i" class="objective-item">
         <span class="objective-dot">•</span>
         <MathJaxRender :text="item" />
@@ -24,12 +24,9 @@ defineProps({
 </script>
 
 <style scoped>
-.objectives-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacer-16);
-}
+/* .objectives-box 自身已无规则：外框由 .block-card 完整提供，
+ * 本块是少数「与基础框架零差异」的实例。类名保留，作为可定位的钩子。
+ * 注意它刻意不带 --shadow —— 不要顺手补齐。 */
 .objective-item {
   display: flex;
   gap: var(--spacer-8);

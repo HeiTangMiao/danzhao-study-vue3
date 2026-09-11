@@ -8,7 +8,7 @@
 <template>
   <section class="block example">
     <h2 class="block-title">📝 {{ block.title || '典型例题' }}</h2>
-    <div v-for="(item, i) in block.items" :key="i" class="example-card">
+    <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--shadow example-card">
       <div class="ex-head">
         <span class="ex-title">{{ item.title || `例题 ${i + 1}` }}</span>
         <span v-if="item.difficulty" class="difficulty-tag" :class="diffClass(item.difficulty)">
@@ -48,6 +48,7 @@
 <script setup>
 import { reactive } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import { diffLabel, diffClass } from '@/utils/blockMeta'
 
 defineProps({
   // 区块数据：{ type:'example', title, items:[{title,difficulty,question,solution,answer}] }
@@ -62,39 +63,21 @@ function toggle(kind, index) {
   opened[kind][index] = !opened[kind][index]
 }
 
-// 难度文案映射
-const DIFF_LABEL = { basic: '基础', medium: '中等', advanced: '提高', sprint: '冲刺' }
-const DIFF_CLASS = { basic: 'difficulty-basic', medium: 'difficulty-medium', advanced: 'difficulty-advanced', sprint: 'difficulty-sprint' }
-
-function diffLabel(d) { return DIFF_LABEL[d] || '基础' }
-function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
 </script>
 
 <style scoped>
+/* 外框来自 .block-card，此处只留差异：每张例题卡之间的间距 */
 .example-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacer-16);
   margin-bottom: var(--spacer-16);
-  box-shadow: var(--shadow-sm);
 }
 .ex-head { display: flex; align-items: center; justify-content: space-between; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
 .ex-title { font-weight: 700; }
-.difficulty-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); }
-.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
-.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-/* 暗色模式下提高冲刺难度标签对比度 */
-:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
-
 .ex-question { margin-bottom: var(--spacer-10); }
 .ex-solution-wrap, .ex-answer-wrap { margin-top: var(--spacer-8); }
 .ex-toggle {
   background: var(--primary-soft); color: var(--primary);
   border: 1px solid var(--primary); border-radius: var(--radius-full);
-  padding: 4px 14px; font-size: 0.85rem;
+  padding: 4px 14px; font-size: var(--fs-md);
 }
 .ex-toggle:hover { background: var(--primary); color: #fff; }
 /* 触屏按压反馈 */

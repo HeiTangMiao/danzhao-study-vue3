@@ -258,7 +258,7 @@ onBeforeUnmount(() => {
   position: absolute; inset: 0; z-index: 2;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 12px; background: var(--surface, #fff); color: var(--text-muted, #94a3b8);
-  font-size: 0.85rem;
+  font-size: var(--fs-md);
 }
 .mm-error-msg { color: var(--danger, #e03131); }
 .mm-retry {

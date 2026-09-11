@@ -6,7 +6,7 @@
 <template>
   <section class="block knowledge">
     <h3 v-if="block.title" class="block-title">{{ block.title }}</h3>
-    <div class="knowledge-box">
+    <div class="block-card block-card--md block-card--rail-primary knowledge-box">
       <p v-for="(para, i) in paragraphs" :key="i" class="knowledge-para">
         <MathJaxRender :text="para" />
       </p>
@@ -31,12 +31,9 @@ const paragraphs = computed(() => {
 </script>
 
 <style scoped>
+/* 外框（底色 / 描边 / 圆角 / 内边距 / 左粗边）来自 .block-card，
+ * 此处只留差异：与下一块之间的间距 */
 .knowledge-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--primary);
-  border-radius: var(--radius-md);
-  padding: var(--spacer-16);
   margin-bottom: var(--spacer-12);
 }
 .knowledge-para { margin-bottom: var(--spacer-8); }

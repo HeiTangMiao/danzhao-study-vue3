@@ -5,7 +5,7 @@
 <template>
   <section class="block errorfocus">
     <h2 class="block-title">🚨 {{ block.title || '易错专项' }}</h2>
-    <div v-for="(item, i) in block.items" :key="i" class="ef-card">
+    <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--shadow ef-card">
       <div class="ef-scenario">
         <span class="ef-badge">场景 {{ i + 1 }}</span>
         <MathJaxRender :text="item.scenario" class="ef-scenario-text" />
@@ -39,17 +39,13 @@ defineProps({
 </script>
 
 <style scoped>
+/* 外框来自 .block-card，此处只留差异：每个易错场景卡之间的间距 */
 .ef-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacer-16);
   margin-bottom: var(--spacer-16);
-  box-shadow: var(--shadow-sm);
 }
 .ef-scenario { display: flex; align-items: flex-start; gap: var(--spacer-8); margin-bottom: var(--spacer-12); }
 .ef-badge {
-  flex-shrink: 0; font-size: 0.75rem; font-weight: 700;
+  flex-shrink: 0; font-size: var(--fs-xs); font-weight: 700;
   background: rgba(240, 140, 0, 0.15); color: var(--warning);
   padding: 2px 10px; border-radius: var(--radius-full);
 }
@@ -58,7 +54,7 @@ defineProps({
 .ef-compare { display: flex; align-items: stretch; gap: var(--spacer-8); margin-bottom: var(--spacer-10); }
 .ef-side {
   flex: 1; border-radius: var(--radius-md); padding: var(--spacer-12);
-  font-size: 0.9rem;
+  font-size: var(--fs-base);
 }
 .ef-wrong { background: rgba(224, 49, 49, 0.06); border: 1px solid rgba(224, 49, 49, 0.25); }
 .ef-right { background: rgba(47, 158, 68, 0.06); border: 1px solid rgba(47, 158, 68, 0.25); }
@@ -73,7 +69,7 @@ defineProps({
   display: flex; gap: var(--spacer-8);
   background: rgba(47, 111, 237, 0.08); border: 1px solid var(--primary);
   border-radius: var(--radius-md); padding: var(--spacer-10) var(--spacer-12);
-  font-size: 0.9rem;
+  font-size: var(--fs-base);
 }
 .ef-tip-icon { color: var(--primary); }
 

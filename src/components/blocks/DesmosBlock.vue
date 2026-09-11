@@ -23,7 +23,7 @@ defineProps({
 
 <style scoped>
 .block-title {
-  font-size: 1.15rem;
+  font-size: var(--fs-xl);
   font-weight: 600;
   margin: var(--spacer-16) 0 var(--spacer-8);
 }

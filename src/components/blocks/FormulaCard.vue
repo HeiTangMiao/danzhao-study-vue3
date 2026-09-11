@@ -4,7 +4,7 @@
 -->
 <template>
   <section class="block formula">
-    <div class="formula-card">
+    <div class="block-card block-card--shadow formula-card">
       <div v-if="block.title" class="formula-label">{{ block.title }}</div>
       <div v-for="(line, i) in lines" :key="i" class="formula-line">
         <MathJaxRender :text="line" block />
@@ -30,16 +30,12 @@ const lines = computed(() => {
 </script>
 
 <style scoped>
+/* 外框（底色 / 描边 / 圆角 / 内边距 / 阴影）来自 .block-card，此处只留差异 */
 .formula-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacer-16);
-  box-shadow: var(--shadow-sm);
   margin-bottom: var(--spacer-12);
 }
 .formula-label {
-  font-size: 0.85rem;
+  font-size: var(--fs-md);
   color: var(--text-muted);
   margin-bottom: var(--spacer-8);
 }

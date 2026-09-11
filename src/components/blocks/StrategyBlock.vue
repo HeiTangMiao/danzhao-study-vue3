@@ -5,7 +5,7 @@
 <template>
   <section class="block strategy">
     <h2 class="block-title">🎯 {{ block.title || '考试技巧' }}</h2>
-    <div v-for="(item, i) in block.items" :key="i" class="strategy-card">
+    <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--md block-card--rail-accent strategy-card">
       <div class="strategy-head">
         <span class="strategy-num">{{ i + 1 }}</span>
         <span class="strategy-title">{{ item.title }}</span>
@@ -27,11 +27,8 @@ defineProps({
 </script>
 
 <style scoped>
+/* 外框来自 .block-card，此处只留差异：内边距略窄（14/16）与卡间距 */
 .strategy-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius-md);
   padding: var(--spacer-14) var(--spacer-16);
   margin-bottom: var(--spacer-12);
 }
@@ -40,8 +37,8 @@ defineProps({
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
   background: var(--accent); color: #fff;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; font-weight: 700;
+  font-size: var(--fs-sm); font-weight: 700;
 }
-.strategy-title { font-weight: 700; font-size: 1rem; }
+.strategy-title { font-weight: 700; font-size: var(--fs-lg); }
 .strategy-content { color: var(--text); font-size: 0.92rem; padding-left: 36px; }
 </style>

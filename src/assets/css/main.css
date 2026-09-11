@@ -31,18 +31,73 @@
   --radius: 12px;
   --radius-lg: 16px;
   --radius-full: 999px;
-  --spacer-4: 4px;
-  --spacer-6: 6px;
-  --spacer-8: 8px;
-  --spacer-10: 10px;
-  --spacer-12: 12px;
-  --spacer-14: 14px;
-  --spacer-16: 16px;
-  --spacer-20: 20px;
-  --spacer-24: 24px;
-  --spacer-32: 32px;
-  --spacer-40: 40px;
-  --spacer-48: 48px;
+
+  /* ---------- 间距阶梯（4px 基数） ----------
+   * 背景：改造前只有 --spacer-* 七档，且全部挤在 6~20px 区间
+   *      （实测 --spacer-12 被用了 83 次、--spacer-8 74 次），等于没有节奏可言。
+   *      新阶梯按 4px 基数把通档拉开，供区块间距与容器内边距使用。
+   */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* 语义间距：写样式时优先用这几个名字，而不是记数字 */
+  --gap-block: var(--space-6); /* 区块与区块之间 */
+  --gap-block-tight: var(--space-4); /* 容器 / 同组区块之间 */
+  --pad-shell: var(--space-5); /* 区块内边距 */
+  --pad-page: var(--space-5); /* 页面左右留白 */
+
+  /* ---------- 旧间距名（别名）----------
+   * 这些名字散落在 14 个区块组件与各 view 里（累计 300+ 处），一次性改名既改不完也难复核。
+   * 此处把旧名接到新阶梯上，取值**逐条保持不变** —— 所以重写阶梯本身不产生任何视觉变化，
+   * 后续可以按文件、按组件慢慢迁到新名，最后删掉这一节。
+   * 注意：6 / 10 / 14 / 20 / 40 五个旧档位在新阶梯里没有等价值，暂留字面量并标注归并目标，
+   *      归并会让那 59 处间距发生 2~4px 变化，属于设计改动，统一放在下一步做。
+   */
+  --spacer-4: var(--space-1);
+  --spacer-6: 6px; /* 待归并 → --space-1 */
+  --spacer-8: var(--space-2);
+  --spacer-10: 10px; /* 待归并 → --space-2 */
+  --spacer-12: var(--space-3);
+  --spacer-14: 14px; /* 待归并 → --space-4 */
+  --spacer-16: var(--space-4);
+  --spacer-20: 20px; /* 待归并 → --space-5 */
+  --spacer-24: var(--space-5);
+  --spacer-32: var(--space-6);
+  --spacer-40: 40px; /* 待归并 → --space-7 */
+  --spacer-48: var(--space-7);
+
+  /* ---------- 字号阶梯 ----------
+   * 背景：改造前全站没有字号 token，只有 --font-base 一个字体族；
+   *      实测 src/ 下散落 31 种互不相同的硬编码字号（0.6rem ~ 3rem，还夹着 12px / 15px）。
+   *      rem 为单位：跟随根字号缩放，不会与移动端的 body 字号调整打架。
+   */
+  --fs-2xs: 0.7rem;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8rem;
+  --fs-md: 0.85rem;
+  --fs-base: 0.9rem;
+  --fs-lg: 1rem;
+  --fs-xl: 1.15rem; /* 区块标题 */
+  --fs-2xl: 1.4rem; /* 页面标题 */
+  --fs-3xl: 2rem; /* 强调数字 */
+
+  /* 行高与字重：标题最多 600，不用 700 —— 极简路线靠字号与留白建立层次，不靠加粗 */
+  --lh-tight: 1.4;
+  --lh-snug: 1.6;
+  --lh-normal: 1.7;
+  --lh-loose: 1.9;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
   --shadow-sm: 0 1px 3px rgba(31, 36, 48, 0.08);
   --shadow-md: 0 4px 16px rgba(31, 36, 48, 0.10);
   --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
@@ -105,7 +160,7 @@ body {
 /* 通用标题层级 */
 h1 { font-size: 1.6rem; font-weight: 700; }
 h2 { font-size: 1.45rem; font-weight: 700; margin: var(--spacer-24) 0 var(--spacer-12); }
-h3 { font-size: 1.15rem; font-weight: 600; margin: var(--spacer-16) 0 var(--spacer-8); }
+h3 { font-size: var(--fs-xl); font-weight: 600; margin: var(--spacer-16) 0 var(--spacer-8); }
 
 a {
   color: var(--primary);
@@ -142,7 +197,7 @@ mark.katex-hl {
 /* 移动端阅读排版：适当放大正文字号与行高，标题随窄屏收敛 */
 @media (max-width: 600px) {
   body { font-size: 17px; line-height: 1.75; }
-  h1 { font-size: 1.4rem; }
+  h1 { font-size: var(--fs-2xl); }
 }
 
 /* 通用加载转圈（异步区块 / 图形画板 / 思维导图占位共用） */

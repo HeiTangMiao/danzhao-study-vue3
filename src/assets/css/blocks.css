@@ -34,3 +34,60 @@
 .difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 /* 暗色模式下提高冲刺难度标签对比度 */
 :root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
+
+/* ============================================================
+ * 框架族 .block-card
+ * ------------------------------------------------------------
+ * 背景：改造前 9 个区块组件各自手写卡片外框，共 14 处。
+ *      实测聚成 8 个家族，其中 3 处（formula-card / example-card / ef-card）
+ *      与全局 .card 的五条声明逐字相同，另一半是各自漂移的变体。
+ *
+ * 为什么是「一个类」而不是「一个组件」：
+ *  1) 大量外框挂在 v-for 的每一项上（例题 / 易错项 / 题目 / 技巧项 / 逐题），
+ *     单根组件包不出 per-item 卡；强行套用会把 N 张卡并成 1 张大卡。
+ *  2) 类名不改变 DOM 层数。区块外框若提到根节点上，会同时改变层数与间距来源 ——
+ *     而根元素 .block 全仓库没有任何 CSS 规则，没有任何兜底能缓冲这种位移。
+ *  3) 差异声明留在组件的 scoped 样式里即可，无需靠 props 表达。
+ *
+ * 特异度约定（改这个文件前务必先读）：
+ *  组件 scoped 样式编译后形如 .ef-card[data-v-xxx]，特异度 (0,2,0)；
+ *  本文件的 .block-card 是 (0,1,0)。所以**组件里的差异声明永远胜出**，
+ *  本文件只负责「大家一样的那部分」。同一元素上同时挂
+ *  .block-card 与 .block-card--md 时，靠本文件内的书写顺序决定（修饰符在后）。
+ * ============================================================ */
+
+/* 基础框架：surface 底 + 1px 描边 + 大圆角 + 16px 内边距 */
+.block-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacer-16);
+}
+
+/* 圆角降一档（表格类、题目类等偏「密集」的卡用 md） */
+.block-card--md { border-radius: var(--radius-md); }
+
+/* 内边距放宽到 24px（整页级的展示卡用，如考试介绍页与结果页） */
+.block-card--loose { padding: var(--spacer-24); }
+
+/* 阴影：默认不带。全站只有 4 处卡带 --shadow-sm，显式加上即可，
+ * 不设默认值是为了避免「给 7 个本来没阴影的卡凭空加一层投影」。 */
+.block-card--shadow { box-shadow: var(--shadow-sm); }
+
+/* 左粗边强调（rail）：色值由使用者指定 —— 实测 knowledge 用 primary、
+ * strategy 用 accent、exam 的 review-item 由状态类给 success/danger，
+ * 与底色语义无关，所以不派生自 tone。 */
+.block-card--rail-primary { border-left: 4px solid var(--primary); }
+.block-card--rail-accent { border-left: 4px solid var(--accent); }
+
+/* 语义底色（tone）：底色 + 同色描边成对出现。
+ * 底色沿用改造前的硬编码 rgba 字面量 —— 它们在暗色主题下不随语义色变化，
+ * 是既有的不一致行为，本次迁移保持原样，不在抽取阶段「顺手修好」。 */
+.block-card--tone-accent {
+  background: rgba(47, 111, 237, 0.08);
+  border-color: var(--primary);
+}
+.block-card--tone-warn {
+  background: rgba(240, 140, 0, 0.10);
+  border-color: var(--warning);
+}

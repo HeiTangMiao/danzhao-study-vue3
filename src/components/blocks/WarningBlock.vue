@@ -4,7 +4,7 @@
 -->
 <template>
   <section class="block warning">
-    <div class="warning-box">
+    <div class="block-card block-card--md block-card--tone-warn warning-box">
       <span class="warning-icon">⚠️</span>
       <MathJaxRender :text="block.text" />
     </div>
@@ -21,12 +21,11 @@ defineProps({
 </script>
 
 <style scoped>
+/* 底色与描边来自 .block-card--tone-warn，圆角来自 --md，
+ * 此处只留差异：横向排布、图标与文字的间距、较窄的内边距、块间距 */
 .warning-box {
   display: flex;
   gap: var(--spacer-8);
-  background: rgba(240, 140, 0, 0.10);
-  border: 1px solid var(--warning);
-  border-radius: var(--radius-md);
   padding: var(--spacer-12) var(--spacer-16);
   margin-bottom: var(--spacer-12);
 }

@@ -20,7 +20,7 @@
       <li
         v-for="(item, i) in block.items"
         :key="i"
-        class="exercise-item"
+        class="block-card block-card--md exercise-item"
         :class="{ 'is-answered': states[i]?.selected !== undefined }"
       >
         <!-- 题目标题行：难度 + 题号 -->
@@ -75,6 +75,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import { diffLabel, diffClass } from '@/utils/blockMeta'
 
 const props = defineProps({
   // 区块数据：{ type:'quiz', title, items:[{type,difficulty,question,options,correctIndex,answer}] }
@@ -101,13 +102,6 @@ function isChoice(item) {
   return Array.isArray(item.options) && item.options.length > 0 && item.correctIndex !== undefined
 }
 
-// 难度文案映射
-const DIFF_LABEL = { basic: '基础', medium: '中等', advanced: '提高', sprint: '冲刺' }
-const DIFF_CLASS = { basic: 'difficulty-basic', medium: 'difficulty-medium', advanced: 'difficulty-advanced', sprint: 'difficulty-sprint' }
-
-function diffLabel(d) { return DIFF_LABEL[d] || '基础' }
-function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
-
 // 标记选择题所选选项，并展开答案/解析（不做对错判定）
 function pickChoice(i, oi) {
   states[i] = { selected: oi }
@@ -122,15 +116,14 @@ function toggle(i) { opened[i] = !opened[i] }
 .quiz-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacer-8); margin-bottom: var(--spacer-12); }
 .quiz-stats { display: flex; gap: 6px; flex-wrap: wrap; }
 .stat-chip {
-  font-size: 0.75rem; padding: 2px 10px; border-radius: var(--radius-full);
+  font-size: var(--fs-xs); padding: 2px 10px; border-radius: var(--radius-full);
   background: var(--surface-muted); color: var(--text-muted);
 }
 
 .exercise-list { list-style: none; }
+/* 外框来自 .block-card，此处只留差异：较窄的内边距、题间距，
+ * 以及「已作答」态依赖的 border-color 过渡 */
 .exercise-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   padding: var(--spacer-12) var(--spacer-16);
   margin-bottom: var(--spacer-12);
   transition: border-color 0.2s ease;
@@ -142,18 +135,8 @@ function toggle(i) { opened[i] = !opened[i] }
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--primary-soft); color: var(--primary);
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 0.75rem; font-weight: 700;
+  font-size: var(--fs-xs); font-weight: 700;
 }
-.difficulty-tag {
-  display: inline-block; font-size: 0.72rem; padding: 1px 10px;
-  border-radius: var(--radius-full);
-}
-.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
-.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-/* 暗色模式下提高冲刺难度标签对比度 */
-:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
 .q-type-tag {
   font-size: 0.72rem; padding: 1px 8px; border-radius: var(--radius-full);
   background: var(--surface-muted); color: var(--text-muted);
@@ -179,7 +162,7 @@ function toggle(i) { opened[i] = !opened[i] }
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--border);
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; font-weight: 700; color: var(--text-muted);
+  font-size: var(--fs-sm); font-weight: 700; color: var(--text-muted);
 }
 .option-selected .option-letter { background: var(--primary); color: #fff; border-color: var(--primary); }
 .option-text { flex: 1; }

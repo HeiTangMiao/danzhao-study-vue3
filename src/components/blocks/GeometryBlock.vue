@@ -9,7 +9,7 @@
 <template>
   <section class="block diagram">
     <h3 v-if="block.title" class="block-title">{{ block.title }}</h3>
-    <div class="diagram-box">
+    <div class="block-card block-card--md diagram-box">
       <JsxGraphBoard :setup="setupFn" :boundingbox="boundingbox" :height="height" :fixed="block.fixed" />
       <p v-if="block.caption" class="diagram-caption">{{ block.caption }}</p>
       <p v-if="!setupFn" class="diagram-error">⚠️ 图形初始化代码无效，无法渲染。</p>
@@ -47,10 +47,8 @@ const height = computed(() => props.block.height || 320)
 </script>
 
 <style scoped>
+/* 外框来自 .block-card，此处只留差异：较窄的内边距（画板本身就占地方）与卡间距 */
 .diagram-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   padding: var(--spacer-12);
   margin-bottom: var(--spacer-12);
 }
@@ -58,12 +56,12 @@ const height = computed(() => props.block.height || 320)
   margin-top: var(--spacer-8);
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--fs-md);
 }
 .diagram-error {
   margin-top: var(--spacer-8);
   text-align: center;
   color: var(--danger);
-  font-size: 0.85rem;
+  font-size: var(--fs-md);
 }
 </style>
