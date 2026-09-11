@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-08-04",
-  "unitNum": "08",
-  "subject": "math",
-  "title": "二项式定理",
-  "subtitle": "通项公式与赋值法求系数和",
   "blocks": [
     {
       "type": "mindmap",

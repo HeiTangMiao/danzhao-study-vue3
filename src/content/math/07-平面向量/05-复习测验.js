@@ -6,11 +6,6 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-07-05",
-  unitNum: "07",
-  subject: "math",
-  title: "平面向量 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

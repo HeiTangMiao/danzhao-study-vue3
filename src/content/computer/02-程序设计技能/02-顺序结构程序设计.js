@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》程序设计技能模块编制
  */
 export default {
-  id: "computer-02-02",
-  unitNum: "02",
-  subject: "computer",
-  title: "顺序结构程序设计",
-  subtitle: "表达式、运算符与顺序执行程序",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-06",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "直线与圆锥曲线",
-  "subtitle": "位置关系判定与弦长公式",
   "blocks": [
     {
       "type": "objectives",

@@ -1,0 +1,36 @@
+/* ============================================================
+ * 区块共用样式
+ * 说明：
+ *  - 收纳「跨区块复用」的展示规则，由 main.css 顶部 @import 引入
+ *  - 区块专属样式仍留在各自组件的 <style scoped> 中，不要往这里堆
+ * ============================================================ */
+
+/* ---------- 难度标签 ----------
+ * 原先在 ExampleBlock / QuizBlock / ExamBlock / ErrorBookView 各写一遍，此处统一。
+ * 取值与 src/utils/blockMeta.js 的 DIFFICULTY 常量一一对应。
+ *
+ * 抽取时的取值依据（四条声明逐字取自改造前的副本，不要凭「看起来该有」加东西）：
+ *   font-size / padding / border-radius —— 四份副本逐字相同，即下面这三条；
+ *   display: inline-block —— 只有 QuizBlock 原版有，另三份没有。
+ *     之所以仍放进共用规则：这四处宿主（.ex-head / .exam-q-head / .exercise-head /
+ *     .error-head）全是 flex 容器，flex 子项会被 blockify，inline 与 inline-block
+ *     渲染结果相同，所以合并是无害的。若将来有宿主不是 flex，这里要拆成差异声明。
+ *
+ * 曾经多写过一条 white-space: nowrap —— 四份原版都没有。它会把标签的 min-content
+ * 从「一个汉字」抬到「整段文案」，窄屏 + 长标题时标签由折两行变成不折行，并把差额
+ * 转嫁给同行的标题（实测 375px 视口下命中，如 06-幂函数.js 的「例题3：幂函数的
+ * 定义域与奇偶性（综合应用型）」）。已删除；窄屏不折行是合理的诉求，但那是视觉改动，
+ * 应当作为独立一次改动提出，而不是混在「零视觉变化」的重构里。
+ */
+.difficulty-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 1px 10px;
+  border-radius: var(--radius-full);
+}
+.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
+.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
+.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
+.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+/* 暗色模式下提高冲刺难度标签对比度 */
+:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }

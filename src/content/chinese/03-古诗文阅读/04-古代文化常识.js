@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-03-04",
-  "unitNum": "03",
-  "subject": "chinese",
-  "title": "古代文化常识",
-  "subtitle": "称谓、官职、历法、科举制度",
   "blocks": [
     {
       "type": "mindmap",

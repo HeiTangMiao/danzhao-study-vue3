@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》职业素养模块编制
  */
 export default {
-  id: "computer-01-02",
-  unitNum: "01",
-  subject: "computer",
-  title: "文件命名与安全管理",
-  subtitle: "命名规则、文件安全与数据备份",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

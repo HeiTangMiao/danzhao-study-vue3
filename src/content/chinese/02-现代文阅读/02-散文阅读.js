@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-02",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "散文阅读",
-  "subtitle": "形散神不散、线索、意象赏析",
   "blocks": [
     {
       "type": "mindmap",

@@ -3,11 +3,6 @@
  * 页面：统计图表与数据分布
  */
 export default {
-  id: "math-09-07",
-  unitNum: "09",
-  subject: "math",
-  title: "统计图表与数据分布",
-  subtitle: "频率分布表、直方图、折线图与茎叶图",
   blocks: [
     {
       type: "mindmap",

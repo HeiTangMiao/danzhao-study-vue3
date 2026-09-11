@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-10-01",
-  "unitNum": "10",
-  "subject": "math",
-  "title": "空间几何体",
-  "subtitle": "多面体与旋转体结构特征、三视图",
   "blocks": [
     {
       "type": "objectives",

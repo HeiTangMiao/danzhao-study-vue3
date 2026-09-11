@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-01",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "直线方程",
-  "subtitle": "倾斜角斜率、五种方程与距离公式",
   "blocks": [
     {
       "type": "objectives",

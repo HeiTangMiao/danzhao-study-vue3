@@ -204,12 +204,15 @@
 import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
+// 别名导入：本组件已有名为 loadPage 的本地函数（负责访问记录/进度刷新等副作用）
+import { loadPage as loadContentPage } from '@/content/loadPage'
 import { useProgressStore } from '@/stores/progress'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
 import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
+import { iconOf } from '@/components/blocks/registry'
 import ContentSidebar from '@/components/ContentSidebar.vue'
 import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
 
@@ -266,19 +269,13 @@ const pageContext = computed(() => ({
 
 // ===== 目录导航（TOC）与阅读进度 =====
 
-// 目录图标映射（按区块类型）
-const TOC_ICON = {
-  mindmap: '🧠', objectives: '🎯', knowledge: '📖', formula: '🧮',
-  table: '📊', warning: '⚠️', tip: '💡', example: '📝',
-  quiz: '✏️', diagram: '📐', errorfocus: '🚨', strategy: '🎯', exam: '📝'
-}
-
-// 生成目录：仅收录有标题的区块
+// 生成目录：仅收录「有标题 且 该类型配置了图标」的区块
+// 图标来自 blocks/registry.js，未知类型图标为空字符串，自然被过滤掉
 const toc = computed(() => {
   if (!page.value || !Array.isArray(page.value.blocks)) return []
   return page.value.blocks
-    .map((b, i) => ({ index: i, type: b.type, title: b.title }))
-    .filter((b) => b.title && TOC_ICON[b.type])
+    .map((b, i) => ({ index: i, type: b.type, title: b.title, icon: iconOf(b.type) }))
+    .filter((b) => b.title && b.icon)
 })
 
 // 目录面板显隐
@@ -346,9 +343,9 @@ async function loadPage() {
   loading.value = true
   // 注意：不在此清空 page —— 翻页时保留旧内容直到新内容就绪，避免整块闪空
   try {
-    // 根据学科动态导入对应内容文件
-    const m = await import(`@/content/${subject.value}/${unit.value.folder}/${fileMeta.value.name}.js`)
-    page.value = m.default
+    // 加载内容页：元信息由 site.js 推导并注入（见 src/content/loadPage.js）
+    // 注意：此处不做空值合并 —— 越界时 loadContentPage 返回 null，交由下方 catch/模板降级
+    page.value = await loadContentPage(subject.value, unit.value.num, fileIndex.value)
     // 记录页面访问（学习日志 / 每日统计）
     await db.markPageVisited({
       subject: subject.value,

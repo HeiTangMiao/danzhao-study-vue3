@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-05-02",
-  "unitNum": "05",
-  "subject": "chinese",
-  "title": "外国文学与名著导读",
-  "subtitle": "欧美经典作家作品与名著考点",
   "blocks": [
     {
       "type": "mindmap",

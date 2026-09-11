@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-04-02",
-  "unitNum": "04",
-  "subject": "math",
-  "title": "三角函数定义与同角关系",
-  "subtitle": "任意角三角函数定义、同角关系式",
   "blocks": [
     {
       "type": "mindmap",

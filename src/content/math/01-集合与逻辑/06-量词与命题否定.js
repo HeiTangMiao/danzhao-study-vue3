@@ -4,11 +4,6 @@
  * 说明：全称量词、存在量词与命题的否定
  */
 export default {
-  id: "math-01-06",
-  unitNum: "01",
-  subject: "math",
-  title: "量词与命题否定",
-  subtitle: "全称命题、特称命题及其否定",
   blocks: [
     {
       type: "mindmap",

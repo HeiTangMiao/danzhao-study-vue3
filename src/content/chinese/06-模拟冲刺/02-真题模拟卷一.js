@@ -7,11 +7,6 @@
  *  - 作文题使用 solve 题型自评作答
  */
 export default {
-  id: "chinese-06-02",
-  unitNum: "06",
-  subject: "chinese",
-  title: "真题模拟卷（一）",
-  subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分",
   blocks: [
     {
       type: "exam",

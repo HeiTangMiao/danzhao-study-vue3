@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-05",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "议论文阅读",
-  "subtitle": "论点论据、论证方法、论证结构",
   "blocks": [
     {
       "type": "mindmap",

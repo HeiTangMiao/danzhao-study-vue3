@@ -3,11 +3,6 @@
  * 页面：抽样方法
  */
 export default {
-  id: "math-09-06",
-  unitNum: "09",
-  subject: "math",
-  title: "抽样方法",
-  subtitle: "简单随机抽样、系统抽样与分层抽样",
   blocks: [
     {
       type: "mindmap",

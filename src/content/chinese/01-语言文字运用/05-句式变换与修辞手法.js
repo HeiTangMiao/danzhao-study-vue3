@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-05",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "句式变换与修辞手法",
-  "subtitle": "主动被动转换、12种修辞全覆盖",
   "blocks": [
     {
       "type": "mindmap",

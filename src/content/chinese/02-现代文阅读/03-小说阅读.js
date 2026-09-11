@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-03",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "小说阅读",
-  "subtitle": "三要素、情节结构、人物分析",
   "blocks": [
     {
       "type": "mindmap",

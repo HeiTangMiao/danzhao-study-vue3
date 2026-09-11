@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-08-02",
-  "unitNum": "08",
-  "subject": "math",
-  "title": "排列",
-  "subtitle": "排列数公式、捆绑法与插空法",
   "blocks": [
     {
       "type": "mindmap",

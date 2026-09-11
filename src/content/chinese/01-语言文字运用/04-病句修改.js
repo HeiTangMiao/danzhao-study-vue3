@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-04",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "病句修改",
-  "subtitle": "六大病句类型辨析与修改方法",
   "blocks": [
     {
       "type": "mindmap",

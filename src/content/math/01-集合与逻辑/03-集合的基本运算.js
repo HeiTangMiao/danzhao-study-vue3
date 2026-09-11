@@ -4,11 +4,6 @@
  * 说明：由原始 HTML 抽取为结构化区块，按 type 分发渲染
  */
 export default {
-  id: "math-01-03",
-  unitNum: "01",
-  subject: "math",
-  title: "集合的基本运算",
-  subtitle: "掌握交集、并集、补集的运算及德摩根定律",
   blocks: [
     {
       type: "mindmap",

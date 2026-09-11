@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-06",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "实用类文本阅读",
-  "subtitle": "新闻、传记、科普、职场文书",
   "blocks": [
     {
       "type": "mindmap",

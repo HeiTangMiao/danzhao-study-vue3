@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-03",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "椭圆",
-  "subtitle": "定义、标准方程与几何性质",
   "blocks": [
     {
       "type": "objectives",

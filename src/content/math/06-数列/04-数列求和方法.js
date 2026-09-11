@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-06-04",
-  "unitNum": "06",
-  "subject": "math",
-  "title": "数列求和方法",
-  "subtitle": "裂项相消、错位相减、分组求和",
   "blocks": [
     {
       "type": "mindmap",

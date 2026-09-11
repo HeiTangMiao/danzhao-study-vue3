@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》职业素养模块编制
  */
 export default {
-  id: "computer-01-01",
-  unitNum: "01",
-  subject: "computer",
-  title: "计算机操作规范",
-  subtitle: "职业道德、机房规范、开关机与设备操作",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

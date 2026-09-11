@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》职业素养模块编制
  */
 export default {
-  id: "computer-01-03",
-  unitNum: "01",
-  subject: "computer",
-  title: "职业素养 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

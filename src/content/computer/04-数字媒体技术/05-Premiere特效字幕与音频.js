@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》数字媒体技术应用技能模块编制
  */
 export default {
-  id: "computer-04-05",
-  unitNum: "04",
-  subject: "computer",
-  title: "Premiere 特效字幕与音频",
-  subtitle: "视频特效、字幕制作、转场与音频",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

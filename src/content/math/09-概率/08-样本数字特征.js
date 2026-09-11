@@ -3,11 +3,6 @@
  * 页面：样本数字特征
  */
 export default {
-  id: "math-09-08",
-  unitNum: "09",
-  subject: "math",
-  title: "样本数字特征",
-  subtitle: "平均数、中位数、众数与方差标准差",
   blocks: [
     {
       type: "mindmap",

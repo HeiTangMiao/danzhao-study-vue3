@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》编制
  */
 export default {
-  id: "computer-05-01",
-  unitNum: "05",
-  subject: "computer",
-  title: "考试技巧与得分策略",
-  subtitle: "考场流程、时间分配与抢分技巧",
   blocks: [
     // ---------- 考试信息 ----------
     {

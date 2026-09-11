@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-07",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "语言文字运用 · 复习测验",
-  "subtitle": "本单元知识综合检测",
   "blocks": [
     {
       "type": "warning",

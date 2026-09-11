@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-10-02",
-  "unitNum": "10",
-  "subject": "math",
-  "title": "表面积与体积",
-  "subtitle": "各几何体表面积与体积公式",
   "blocks": [
     {
       "type": "objectives",

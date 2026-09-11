@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-01",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "记叙文阅读",
-  "subtitle": "六要素、叙事顺序、描写方法",
   "blocks": [
     {
       "type": "mindmap",

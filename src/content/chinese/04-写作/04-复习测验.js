@@ -3,11 +3,6 @@
  * 本单元综合复习测验：基础文体写作、应用文写作、通用写作技巧
  */
 export default {
-  id: "chinese-04-04",
-  unitNum: "04",
-  subject: "chinese",
-  title: "写作 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

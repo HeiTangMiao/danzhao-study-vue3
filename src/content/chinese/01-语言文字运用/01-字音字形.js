@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-01",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "字音字形",
-  "subtitle": "多音字、形近字、易错字音形辨析",
   "blocks": [
     {
       "type": "mindmap",

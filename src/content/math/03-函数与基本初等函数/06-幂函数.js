@@ -4,11 +4,6 @@
  * 说明：幂函数定义、图像与性质
  */
 export default {
-  id: "math-03-06",
-  unitNum: "03",
-  subject: "math",
-  title: "幂函数",
-  subtitle: "幂函数定义、图像与性质",
   blocks: [
     {
       type: "mindmap",

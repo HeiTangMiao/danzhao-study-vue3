@@ -6,11 +6,6 @@
  *  - quiz 区块：冲刺拔高题（可点击作答 + 即时反馈 + 错题入本）
  */
 export default {
-  id: "chinese-01-08",
-  unitNum: "01",
-  subject: "chinese",
-  title: "语言文字运用 · 易错专项与冲刺",
-  subtitle: "高频易错点 + 冲刺拔高题",
   blocks: [
     {
       type: "errorfocus",

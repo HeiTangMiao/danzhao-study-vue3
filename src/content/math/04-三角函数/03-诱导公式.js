@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-04-03",
-  "unitNum": "04",
-  "subject": "math",
-  "title": "诱导公式",
-  "subtitle": "奇变偶不变，符号看象限",
   "blocks": [
     {
       "type": "mindmap",

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-04-04",
-  "unitNum": "04",
-  "subject": "math",
-  "title": "三角恒等变换",
-  "subtitle": "和差公式、倍角公式、辅助角公式",
   "blocks": [
     {
       "type": "mindmap",

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-10-03",
-  "unitNum": "10",
-  "subject": "math",
-  "title": "空间点线面位置关系",
-  "subtitle": "平面公理与异面直线所成角",
   "blocks": [
     {
       "type": "objectives",

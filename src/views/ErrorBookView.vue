@@ -144,6 +144,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
 import { calculateSM2 } from '@/composables/useSpacedReview'
@@ -167,12 +168,6 @@ const statusFilters = [
   { key: 'unreviewed', label: '待复习' },
   { key: 'reviewed', label: '已掌握' }
 ]
-
-// 难度映射
-const DIFF_LABEL = { basic: '基础', medium: '中等', advanced: '提高', sprint: '冲刺' }
-const DIFF_CLASS = { basic: 'difficulty-basic', medium: 'difficulty-medium', advanced: 'difficulty-advanced', sprint: 'difficulty-sprint' }
-function diffLabel(d) { return DIFF_LABEL[d] || '基础' }
-function diffClass(d) { return DIFF_CLASS[d] || 'difficulty-basic' }
 
 // 统计
 const unreviewedCount = computed(() => errors.value.filter((e) => !e.reviewed).length)
@@ -331,16 +326,10 @@ onMounted(async () => {
 .tag-chinese { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
 .tag-computer { background: rgba(14, 165, 233, 0.12); color: #0ea5e9; }
 .tag-undefined { background: var(--surface-muted); color: var(--text-muted); }
-.difficulty-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); }
-.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
-.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-/* 暗色模式下提高学科/难度标签对比度 */
+/* 暗色模式下提高学科标签对比度（难度标签样式见 src/assets/css/blocks.css） */
 :root[data-theme="dark"] .tag-math { color: #8f9dff; }
 :root[data-theme="dark"] .tag-chinese { color: #ff8a8a; }
 :root[data-theme="dark"] .tag-computer { color: #6fc7f5; }
-:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
 .source-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface-muted); color: var(--text-muted); }
 .error-date { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); }
 

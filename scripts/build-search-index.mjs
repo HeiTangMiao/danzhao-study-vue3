@@ -4,37 +4,15 @@
  *  - 遍历 src/content 全部内容页，抽取站点配置元信息 + 页面内文本，生成 public/search-index.json
  *  - 供前端 SearchPanel 离线全文检索（跨数学/语文/计算机三学科）
  * 用法：node scripts/build-search-index.mjs（作为 build 的预构建步骤执行）
+ *
+ * 说明：文件遍历与「路径 → 元信息」索引均来自 scripts/lib/load-content.mjs，
+ *      与 scripts/validate-content.mjs 共用同一份实现，避免两处各写一遍后慢慢漂移。
  */
-import { readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs'
-import { join, dirname, relative } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { writeFileSync, mkdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { ROOT, CONTENT_DIR, collectFiles, buildMetaIndex, importFresh, relPathOf } from './lib/load-content.mjs'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const ROOT = join(__dirname, '..')
-const CONTENT = join(ROOT, 'src', 'content')
 const OUT = join(ROOT, 'public', 'search-index.json')
-
-// 各学科的站点配置路径（数学配置位于根 site.js）
-const SITE_FILES = {
-  math: join(ROOT, 'src', 'content', 'site.js'),
-  chinese: join(ROOT, 'src', 'content', 'chinese', 'site.js'),
-  computer: join(ROOT, 'src', 'content', 'computer', 'site.js')
-}
-
-const sep = '/'
-// 兼容路径分隔符（Windows）
-const norm = (p) => p.split(/[\\/]+/).filter(Boolean).join(sep)
-
-/** 递归收集内容 .js 文件（跳过 site.js / index.js） */
-function collect(dir, acc = []) {
-  for (const name of readdirSync(dir)) {
-    if (name === 'site.js' || name === 'index.js') continue
-    const p = join(dir, name)
-    if (statSync(p).isDirectory()) collect(p, acc)
-    else if (name.endsWith('.js')) acc.push(p)
-  }
-  return acc
-}
 
 /**
  * 从任意区块/对象中递归抽取所有字符串，拼成可检索文本
@@ -72,46 +50,29 @@ function clean(t) {
 }
 
 async function build() {
-  // 1) 依站点配置建立 文件路径 → 元信息索引（保证有序且覆盖全部注册页面）
-  const metaByRel = new Map()
-  for (const [subject, sitePath] of Object.entries(SITE_FILES)) {
-    const m = await import(pathToFileURL(sitePath).href + '?t=' + Date.now())
-    const site = m.SITE_CONFIG || m.CHINESE_CONFIG || m.default
-    if (!site || !site.units) continue
-    for (const u of site.units) {
-      ;(u.files || []).forEach((f, fileIndex) => {
-        const rel = norm(`${subject}/${u.folder}/${f.name}.js`)
-        metaByRel.set(rel, {
-          subject, unitNum: u.num, fileIndex,
-          unitTitle: u.title, title: f.title, subtitle: f.subtitle || '',
-          isTest: !!f.isTest
-        })
-      })
-    }
-  }
+  // 1) 依站点配置建立「文件相对路径 → 元信息」索引（保证有序且覆盖全部注册页面）
+  const metaByRel = await buildMetaIndex()
 
   // 2) 遍历磁盘采样页面文件，import 正文并回填文本
   const index = []
-  for (const file of collect(CONTENT)) {
-    const rel = norm(relative(CONTENT, file))
+  for (const file of collectFiles(CONTENT_DIR)) {
+    const rel = relPathOf(file)
     const meta = metaByRel.get(rel)
     let page = null
     try {
-      const mod = await import(pathToFileURL(file).href + '?t=' + Date.now())
+      const mod = await importFresh(file)
       page = mod.default
     } catch (e) { /* 单页加载失败不影响其余 */ }
 
     const entry = meta || {
-      subject: rel.split(sep)[0],
+      subject: rel.split('/')[0],
       unitNum: '', fileIndex: 0,
       unitTitle: '', title: '', subtitle: '',
       isTest: false
     }
-    if (page && Array.isArray(page.blocks)) {
-      entry.keywords = clean(extractText(page.blocks)).slice(0, 800)
-    } else {
-      entry.keywords = ''
-    }
+    entry.keywords = page && Array.isArray(page.blocks)
+      ? clean(extractText(page.blocks)).slice(0, 800)
+      : ''
     index.push(entry)
   }
 

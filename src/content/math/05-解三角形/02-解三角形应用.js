@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-05-02",
-  "unitNum": "05",
-  "subject": "math",
-  "title": "解三角形应用",
-  "subtitle": "面积公式与实际测量问题",
   "blocks": [
     {
       "type": "mindmap",

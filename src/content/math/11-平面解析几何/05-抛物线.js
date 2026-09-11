@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-05",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "抛物线",
-  "subtitle": "定义、四种标准方程与焦点准线",
   "blocks": [
     {
       "type": "objectives",

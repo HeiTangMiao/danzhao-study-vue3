@@ -3,11 +3,6 @@
  * 本单元综合复习测验：中国文学史、外国文学与名著导读
  */
 export default {
-  id: "chinese-05-03",
-  unitNum: "05",
-  subject: "chinese",
-  title: "文学常识 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

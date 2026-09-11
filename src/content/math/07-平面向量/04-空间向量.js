@@ -4,11 +4,6 @@
  * 说明：空间向量运算、坐标表示及其在立体几何中的应用
  */
 export default {
-  id: "math-07-04",
-  unitNum: "07",
-  subject: "math",
-  title: "空间向量",
-  subtitle: "空间向量运算与立体几何中的向量方法",
   blocks: [
     {
       type: "mindmap",

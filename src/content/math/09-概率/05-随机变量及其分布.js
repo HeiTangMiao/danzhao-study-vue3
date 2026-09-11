@@ -3,11 +3,6 @@
  * 页面：随机变量及其分布
  */
 export default {
-  id: "math-09-05",
-  unitNum: "09",
-  subject: "math",
-  title: "随机变量及其分布",
-  subtitle: "分布列、二项分布、超几何分布与数字特征",
   blocks: [
     {
       type: "mindmap",

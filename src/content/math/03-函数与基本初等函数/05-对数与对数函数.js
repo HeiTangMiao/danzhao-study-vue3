@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-03-05",
-  "unitNum": "03",
-  "subject": "math",
-  "title": "对数与对数函数",
-  "subtitle": "对数运算、换底公式与对数函数",
   "blocks": [
     {
       "type": "objectives",

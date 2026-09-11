@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-06-03",
-  "unitNum": "06",
-  "subject": "math",
-  "title": "等比数列",
-  "subtitle": "定义、通项公式、求和公式与性质",
   "blocks": [
     {
       "type": "mindmap",

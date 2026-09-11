@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-03-02",
-  "unitNum": "03",
-  "subject": "chinese",
-  "title": "文言文实词与虚词",
-  "subtitle": "120个实词、12个虚词、一词多义",
   "blocks": [
     {
       "type": "mindmap",

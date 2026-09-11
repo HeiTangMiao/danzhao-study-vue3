@@ -3,11 +3,6 @@
  * 本单元综合复习测验：古诗词鉴赏、文言实词虚词、特殊句式翻译、古代文化常识
  */
 export default {
-  id: "chinese-03-05",
-  unitNum: "03",
-  subject: "chinese",
-  title: "古诗文阅读 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

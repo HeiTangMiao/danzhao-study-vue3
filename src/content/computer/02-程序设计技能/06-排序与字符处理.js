@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》程序设计技能模块编制
  */
 export default {
-  id: "computer-02-06",
-  unitNum: "02",
-  subject: "computer",
-  title: "排序与字符处理",
-  subtitle: "冒泡排序、选择排序与字符串操作",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

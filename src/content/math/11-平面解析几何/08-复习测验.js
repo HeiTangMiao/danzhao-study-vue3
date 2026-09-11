@@ -7,11 +7,6 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-11-08",
-  unitNum: "11",
-  subject: "math",
-  title: "平面解析几何 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

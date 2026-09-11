@@ -113,13 +113,13 @@ export const SITE_CONFIG = {
         { name: "01-随机事件与概率", title: "随机事件与概率", subtitle: "事件关系、概率加法公式与对立事件" },
         { name: "02-古典概型", title: "古典概型", subtitle: "古典概型两个特征与概率计算" },
         { name: "03-几何概型", title: "几何概型", subtitle: "长度型、面积型、体积型概率计算" },
-        { name: "04-条件概率与独立性", title: "条件概率与独立性", subtitle: "条件概率公式与相互独立事件" },
+        { name: "04-条件概率与独立性", title: "条件概率与相互独立事件", subtitle: "条件概率公式与相互独立事件" },
         { name: "05-随机变量及其分布", title: "随机变量及其分布", subtitle: "分布列、二项分布、期望与方差" },
         { name: "06-抽样方法", title: "抽样方法", subtitle: "简单随机抽样、系统抽样、分层抽样" },
         { name: "07-统计图表与数据分布", title: "统计图表与数据分布", subtitle: "频率分布表、直方图、茎叶图" },
         { name: "08-样本数字特征", title: "样本数字特征", subtitle: "平均数、中位数、方差与标准差" },
         { name: "09-统计案例", title: "统计案例", subtitle: "线性回归与独立性检验" },
-        { name: "10-复习测验", title: "概率与统计 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        { name: "10-复习测验", title: "概率统计 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
         { name: "11-易错专项与冲刺", title: "概率与统计 · 易错专项与冲刺", subtitle: "高频易错点 + 冲刺拔高题" }
       ]
     },
@@ -151,7 +151,7 @@ export const SITE_CONFIG = {
     {
       num: "12", title: "模拟冲刺", folder: "12-模拟冲刺", phase: 5, color: "#a855f7", icon: "🚀", sprint: true,
       files: [
-        { name: "01-考试技巧", title: "考试技巧与得分策略", subtitle: "考场时间分配、抢分技巧与常见失分点" },
+        { name: "01-考试技巧", title: "考试技巧与得分策略（数学）", subtitle: "考场时间分配、抢分技巧与常见失分点" },
         { name: "02-真题模拟卷一", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true },
         { name: "03-真题模拟卷二", title: "真题模拟卷（二）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true }
       ]

@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》计算机网络技术技能模块编制
  */
 export default {
-  id: "computer-03-07",
-  unitNum: "03",
-  subject: "computer",
-  title: "计算机网络技术 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-03-04",
-  "unitNum": "03",
-  "subject": "math",
-  "title": "指数与指数函数",
-  "subtitle": "指数幂运算与指数函数图像性质",
   "blocks": [
     {
       "type": "objectives",

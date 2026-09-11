@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-02-04",
-  "unitNum": "02",
-  "subject": "math",
-  "title": "基本不等式与最值",
-  "subtitle": "均值不等式及最值应用",
   "blocks": [
     {
       "type": "mindmap",

@@ -5,11 +5,6 @@
  * 结构：必考模块（程序设计技能 75 分）+ 选考模块（网络技术 / 数字媒体 75 分）
  */
 export default {
-  id: "computer-05-02",
-  unitNum: "05",
-  subject: "computer",
-  title: "真题模拟卷（一）",
-  subtitle: "全真模拟 · 限时 90 分钟 · 满分 150 分",
   blocks: [
     // ---------- 考试说明 ----------
     {

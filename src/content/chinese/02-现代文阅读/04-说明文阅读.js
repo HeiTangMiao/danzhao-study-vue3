@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-02-04",
-  "unitNum": "02",
-  "subject": "chinese",
-  "title": "说明文阅读",
-  "subtitle": "说明顺序、说明方法、语言特点",
   "blocks": [
     {
       "type": "mindmap",

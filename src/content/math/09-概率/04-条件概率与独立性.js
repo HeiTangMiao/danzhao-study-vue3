@@ -3,11 +3,6 @@
  * 页面：条件概率与相互独立事件
  */
 export default {
-  id: "math-09-04",
-  unitNum: "09",
-  subject: "math",
-  title: "条件概率与相互独立事件",
-  subtitle: "条件概率公式与独立事件同时发生的概率",
   blocks: [
     {
       type: "mindmap",

@@ -7,11 +7,6 @@
  *  - 文本中的 LaTeX 公式（\(...\) / $$...$$）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-01-01",
-  unitNum: "01",
-  subject: "math",
-  title: "集合的概念与表示",
-  subtitle: "理解集合三要素，掌握集合的表示方法",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

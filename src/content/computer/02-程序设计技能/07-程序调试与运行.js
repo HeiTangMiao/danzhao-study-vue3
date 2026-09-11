@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》程序设计技能模块编制
  */
 export default {
-  id: "computer-02-07",
-  unitNum: "02",
-  subject: "computer",
-  title: "程序调试与运行",
-  subtitle: "语法错误、逻辑错误与调试方法",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

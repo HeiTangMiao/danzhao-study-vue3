@@ -6,11 +6,6 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-09-10",
-  unitNum: "09",
-  subject: "math",
-  title: "概率统计 · 复习测验",
-  subtitle: "本单元知识综合检测",
   blocks: [
     // ---------- 测验信息说明 ----------
     {

@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》数字媒体技术应用技能模块编制
  */
 export default {
-  id: "computer-04-02",
-  unitNum: "04",
-  subject: "computer",
-  title: "Photoshop 图层与图像操作",
-  subtitle: "图层操作、文字、滤镜与调整图层",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》数字媒体技术应用技能模块编制
  */
 export default {
-  id: "computer-04-01",
-  unitNum: "04",
-  subject: "computer",
-  title: "Photoshop 基础与常用工具",
-  subtitle: "工作界面、选区工具、画笔与修图工具",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-09-01",
-  "unitNum": "09",
-  "subject": "math",
-  "title": "随机事件与概率",
-  "subtitle": "事件关系、概率加法公式与对立事件",
   "blocks": [
     {
       "type": "mindmap",

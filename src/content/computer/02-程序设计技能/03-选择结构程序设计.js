@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》程序设计技能模块编制
  */
 export default {
-  id: "computer-02-03",
-  unitNum: "02",
-  subject: "computer",
-  title: "选择结构程序设计",
-  subtitle: "if 语句、多分支与嵌套判断",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

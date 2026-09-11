@@ -6,11 +6,6 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-12-01",
-  unitNum: "12",
-  subject: "math",
-  title: "考试技巧与得分策略（数学）",
-  subtitle: "考场时间分配、抢分技巧与常见失分点",
   blocks: [
     {
       type: "warning",

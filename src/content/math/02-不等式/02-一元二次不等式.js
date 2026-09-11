@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-02-02",
-  "unitNum": "02",
-  "subject": "math",
-  "title": "一元二次不等式",
-  "subtitle": "三个二次关系与含参数讨论",
   "blocks": [
     {
       "type": "mindmap",

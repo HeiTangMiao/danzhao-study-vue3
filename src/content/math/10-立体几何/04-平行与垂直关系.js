@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-10-04",
-  "unitNum": "10",
-  "subject": "math",
-  "title": "平行与垂直关系",
-  "subtitle": "线面平行垂直判定与性质定理",
   "blocks": [
     {
       "type": "objectives",

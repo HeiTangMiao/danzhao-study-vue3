@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》数字媒体技术应用技能模块编制
  */
 export default {
-  id: "computer-04-04",
-  unitNum: "04",
-  subject: "computer",
-  title: "Premiere 基础与视频编辑",
-  subtitle: "项目创建、素材导入、剪辑与关键帧",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

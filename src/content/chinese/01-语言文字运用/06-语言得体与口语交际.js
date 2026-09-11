@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-06",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "语言得体与口语交际",
-  "subtitle": "谦辞敬辞、场合得体、职场用语",
   "blocks": [
     {
       "type": "mindmap",

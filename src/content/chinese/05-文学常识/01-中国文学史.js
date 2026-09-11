@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-05-01",
-  "unitNum": "05",
-  "subject": "chinese",
-  "title": "中国文学史",
-  "subtitle": "先秦至清代文学脉络与代表作家",
   "blocks": [
     {
       "type": "mindmap",

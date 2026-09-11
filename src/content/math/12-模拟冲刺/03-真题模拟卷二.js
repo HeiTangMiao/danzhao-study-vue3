@@ -7,11 +7,6 @@
  *  - 文本中的 LaTeX 公式（\(...\)）由 MathJaxRender 组件渲染
  */
 export default {
-  id: "math-12-03",
-  unitNum: "12",
-  subject: "math",
-  title: "真题模拟卷（二）",
-  subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分",
   blocks: [
     {
       type: "exam",

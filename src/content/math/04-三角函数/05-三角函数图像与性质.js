@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-04-05",
-  "unitNum": "04",
-  "subject": "math",
-  "title": "三角函数图像与性质",
-  "subtitle": "正弦余弦正切性质与y=Asin(ωx+φ)",
   "blocks": [
     {
       "type": "mindmap",

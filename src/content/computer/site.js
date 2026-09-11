@@ -60,7 +60,7 @@ export const COMPUTER_CONFIG = {
     {
       num: "05", title: "模拟冲刺", folder: "05-模拟冲刺", phase: 3, color: "#a855f7", icon: "🚀", sprint: true,
       files: [
-        { name: "01-考试技巧", title: "考试技巧与得分策略", subtitle: "考场流程、时间分配与抢分技巧" },
+        { name: "01-考试技巧", title: "考试技巧与得分策略（计算机）", subtitle: "考场流程、时间分配与抢分技巧" },
         { name: "02-真题模拟卷", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 90 分钟 · 满分 150 分", isTest: true }
       ]
     }

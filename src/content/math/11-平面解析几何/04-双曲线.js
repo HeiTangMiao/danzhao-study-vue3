@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-04",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "双曲线",
-  "subtitle": "定义、标准方程与渐近线",
   "blocks": [
     {
       "type": "objectives",

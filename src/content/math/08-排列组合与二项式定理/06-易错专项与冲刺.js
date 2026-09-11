@@ -6,11 +6,6 @@
  *  - quiz 区块：冲刺拔高题（可点击作答 + 即时反馈 + 错题入本）
  */
 export default {
-  id: "math-08-06",
-  unitNum: "08",
-  subject: "math",
-  title: "排列组合与二项式定理 · 易错专项与冲刺",
-  subtitle: "高频易错点 + 冲刺拔高题",
   blocks: [
     {
       type: "errorfocus",

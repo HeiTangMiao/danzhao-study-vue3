@@ -4,11 +4,6 @@
  * 说明：曲线与方程的对应关系与求轨迹方程的常用方法
  */
 export default {
-  id: "math-11-07",
-  unitNum: "11",
-  subject: "math",
-  title: "曲线与方程",
-  subtitle: "曲线与方程的关系与求轨迹方程的方法",
   blocks: [
     {
       type: "mindmap",

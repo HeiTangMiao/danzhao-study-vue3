@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-04-01",
-  "unitNum": "04",
-  "subject": "math",
-  "title": "任意角与弧度制",
-  "subtitle": "角度弧度换算、弧长与扇形面积",
   "blocks": [
     {
       "type": "mindmap",

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-07-03",
-  "unitNum": "07",
-  "subject": "math",
-  "title": "向量的数量积",
-  "subtitle": "数量积定义、坐标运算与夹角公式",
   "blocks": [
     {
       "type": "objectives",

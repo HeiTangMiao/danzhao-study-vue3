@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-02-01",
-  "unitNum": "02",
-  "subject": "math",
-  "title": "不等式的基本性质",
-  "subtitle": "实数大小比较与不等式基本性质",
   "blocks": [
     {
       "type": "mindmap",

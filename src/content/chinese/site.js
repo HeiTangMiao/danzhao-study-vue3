@@ -72,7 +72,7 @@ export const CHINESE_CONFIG = {
     {
       num: "06", title: "模拟冲刺", folder: "06-模拟冲刺", phase: 4, color: "#a855f7", icon: "🚀", sprint: true,
       files: [
-        { name: "01-考试技巧", title: "考试技巧与得分策略", subtitle: "考场时间分配、抢分技巧与常见失分点" },
+        { name: "01-考试技巧", title: "考试技巧与得分策略（语文）", subtitle: "考场时间分配、抢分技巧与常见失分点" },
         { name: "02-真题模拟卷一", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true }
       ]
     }

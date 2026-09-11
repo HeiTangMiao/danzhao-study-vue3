@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-07-02",
-  "unitNum": "07",
-  "subject": "math",
-  "title": "向量的坐标表示",
-  "subtitle": "坐标运算、模公式与共线条件",
   "blocks": [
     {
       "type": "objectives",

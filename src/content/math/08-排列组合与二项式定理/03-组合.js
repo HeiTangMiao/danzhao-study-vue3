@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-08-03",
-  "unitNum": "08",
-  "subject": "math",
-  "title": "组合",
-  "subtitle": "组合数公式、性质与分组分配",
   "blocks": [
     {
       "type": "mindmap",

@@ -3,11 +3,6 @@
  * 页面：几何概型
  */
 export default {
-  id: "math-09-03",
-  unitNum: "09",
-  subject: "math",
-  title: "几何概型",
-  subtitle: "无限性与等可能性，长度/面积/体积型概率",
   blocks: [
     {
       type: "mindmap",

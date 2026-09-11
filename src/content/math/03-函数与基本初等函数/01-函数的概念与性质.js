@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-03-01",
-  "unitNum": "03",
-  "subject": "math",
-  "title": "函数的概念与性质",
-  "subtitle": "函数三要素、单调性、奇偶性",
   "blocks": [
     {
       "type": "objectives",

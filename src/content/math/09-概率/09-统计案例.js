@@ -3,11 +3,6 @@
  * 页面：统计案例
  */
 export default {
-  id: "math-09-09",
-  unitNum: "09",
-  subject: "math",
-  title: "统计案例",
-  subtitle: "变量相关性、线性回归与独立性检验",
   blocks: [
     {
       type: "mindmap",

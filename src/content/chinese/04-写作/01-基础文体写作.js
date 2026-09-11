@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-04-01",
-  "unitNum": "04",
-  "subject": "chinese",
-  "title": "基础文体写作",
-  "subtitle": "记叙文、议论文、抒情散文写作",
   "blocks": [
     {
       "type": "mindmap",

@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-02-03",
-  "unitNum": "02",
-  "subject": "math",
-  "title": "绝对值不等式与分式不等式",
-  "subtitle": "绝对值不等式解法与分式不等式转化",
   "blocks": [
     {
       "type": "mindmap",

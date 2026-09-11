@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-02",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "词语与成语运用",
-  "subtitle": "实词虚词辨析、成语七大误用类型",
   "blocks": [
     {
       "type": "mindmap",

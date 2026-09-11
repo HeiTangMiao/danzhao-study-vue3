@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-11-02",
-  "unitNum": "11",
-  "subject": "math",
-  "title": "圆的方程",
-  "subtitle": "标准方程一般方程与位置关系",
   "blocks": [
     {
       "type": "objectives",

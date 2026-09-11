@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》计算机网络技术技能模块编制
  */
 export default {
-  id: "computer-03-02",
-  unitNum: "03",
-  subject: "computer",
-  title: "网络拓扑搭建",
-  subtitle: "拓扑结构、设备选型与连线配置",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

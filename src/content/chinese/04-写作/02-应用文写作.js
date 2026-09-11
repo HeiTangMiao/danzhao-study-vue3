@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-04-02",
-  "unitNum": "04",
-  "subject": "chinese",
-  "title": "应用文写作",
-  "subtitle": "条据、通知、书信、职场文书",
   "blocks": [
     {
       "type": "mindmap",

@@ -16,10 +16,10 @@ export type BlockType =
   | 'example'    // 例题
   | 'quiz'       // 练习题
   | 'diagram'    // 可视化图
-  | 'divider'    // 分割线
   | 'errorfocus' // 易错专项
   | 'strategy'   // 考试技巧
   | 'exam'       // 模拟卷
+  | 'desmos'     // 演练场（GeoGebra 图形计算器）
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -110,9 +110,10 @@ export interface DiagramBlock extends BaseBlock {
   caption?: string      // 图注
 }
 
-/** 分割线区块 */
-export interface DividerBlock extends BaseBlock {
-  type: 'divider'
+/** 演练场区块（GeoGebra 图形计算器） */
+export interface DesmosBlock extends BaseBlock {
+  type: 'desmos'
+  initialExpressions?: string[] // 初始表达式列表（LaTeX）
 }
 
 /** 易错专项条目 */
@@ -172,16 +173,16 @@ export type Block =
   | ExampleBlock
   | QuizBlock
   | DiagramBlock
-  | DividerBlock
   | ErrorFocusBlock
   | StrategyBlock
   | ExamBlock
+  | DesmosBlock
 
 /** 内容页面 */
 export interface ContentPage {
   id: string            // 页面唯一标识，如 'math-01-01'
   unitNum: string       // 所属单元编号
-  subject: 'math' | 'chinese'
+  subject: 'math' | 'chinese' | 'computer'
   title: string         // 页面标题
   subtitle: string      // 页面副标题
   icon?: string         // 页面图标（emoji）

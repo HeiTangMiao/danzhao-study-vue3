@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-01-03",
-  "unitNum": "01",
-  "subject": "chinese",
-  "title": "标点符号",
-  "subtitle": "顿号、冒号、问号、引号等规范用法",
   "blocks": [
     {
       "type": "mindmap",

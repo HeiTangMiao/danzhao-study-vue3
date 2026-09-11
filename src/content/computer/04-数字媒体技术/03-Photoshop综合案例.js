@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》数字媒体技术应用技能模块编制
  */
 export default {
-  id: "computer-04-03",
-  unitNum: "04",
-  subject: "computer",
-  title: "Photoshop 综合案例",
-  subtitle: "海报设计、图案填充与印章效果",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

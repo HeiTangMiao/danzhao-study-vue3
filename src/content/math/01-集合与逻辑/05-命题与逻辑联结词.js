@@ -4,11 +4,6 @@
  * 说明：命题概念、四种命题与复合命题真值判断
  */
 export default {
-  id: "math-01-05",
-  unitNum: "01",
-  subject: "math",
-  title: "命题与逻辑联结词",
-  subtitle: "命题概念、四种命题与复合命题真值判断",
   blocks: [
     {
       type: "mindmap",

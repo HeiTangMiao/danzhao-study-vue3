@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》计算机网络技术技能模块编制
  */
 export default {
-  id: "computer-03-01",
-  unitNum: "03",
-  subject: "computer",
-  title: "网络基础与 PacketTracer 入门",
-  subtitle: "网络概念、IP 地址与模拟器使用",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

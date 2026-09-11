@@ -4,11 +4,6 @@
  * 说明：由原始 HTML 抽取为结构化区块，按 type 分发渲染
  */
 export default {
-  id: "math-01-04",
-  unitNum: "01",
-  subject: "math",
-  title: "充分条件与必要条件",
-  subtitle: "理解充分条件、必要条件、充要条件及判定方法",
   blocks: [
     {
       type: "mindmap",

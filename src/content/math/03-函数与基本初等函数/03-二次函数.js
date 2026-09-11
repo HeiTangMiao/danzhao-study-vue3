@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-03-03",
-  "unitNum": "03",
-  "subject": "math",
-  "title": "二次函数",
-  "subtitle": "三种解析式、图像性质、闭区间最值",
   "blocks": [
     {
       "type": "objectives",

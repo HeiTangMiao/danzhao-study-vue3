@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-06-01",
-  "unitNum": "06",
-  "subject": "math",
-  "title": "数列基础",
-  "subtitle": "数列定义、通项公式与Sn的关系",
   "blocks": [
     {
       "type": "mindmap",

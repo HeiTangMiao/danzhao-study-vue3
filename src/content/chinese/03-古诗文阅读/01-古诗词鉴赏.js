@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-03-01",
-  "unitNum": "03",
-  "subject": "chinese",
-  "title": "古诗词鉴赏",
-  "subtitle": "八大题材、意象、表现手法",
   "blocks": [
     {
       "type": "mindmap",

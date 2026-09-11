@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-03-03",
-  "unitNum": "03",
-  "subject": "chinese",
-  "title": "文言文特殊句式与翻译",
-  "subtitle": "判断句、被动句、倒装句、翻译标准",
   "blocks": [
     {
       "type": "mindmap",

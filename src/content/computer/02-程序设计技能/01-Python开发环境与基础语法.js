@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》程序设计技能模块编制
  */
 export default {
-  id: "computer-02-01",
-  unitNum: "02",
-  subject: "computer",
-  title: "Python 开发环境与基础语法",
-  subtitle: "环境搭建、变量、数据类型与输入输出",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

@@ -3,11 +3,6 @@
  * 由原始 HTML 自动转换
  */
 export default {
-  "id": "chinese-04-03",
-  "unitNum": "04",
-  "subject": "chinese",
-  "title": "通用写作技巧",
-  "subtitle": "审题立意、结构模板、素材积累",
   "blocks": [
     {
       "type": "mindmap",

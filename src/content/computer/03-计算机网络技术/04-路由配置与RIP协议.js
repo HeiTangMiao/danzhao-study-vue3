@@ -4,11 +4,6 @@
  * 依据《杭州市高校招生职业技能操作考试 计算机类考试说明》计算机网络技术技能模块编制
  */
 export default {
-  id: "computer-03-04",
-  unitNum: "03",
-  subject: "computer",
-  title: "路由配置与 RIP 协议",
-  subtitle: "路由器配置、静态路由与 RIP 动态路由",
   blocks: [
     // ---------- 知识结构导图 ----------
     {

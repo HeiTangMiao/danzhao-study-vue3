@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-03-02",
-  "unitNum": "03",
-  "subject": "math",
-  "title": "一次函数与反比例函数",
-  "subtitle": "图像与性质、实际建模",
   "blocks": [
     {
       "type": "objectives",

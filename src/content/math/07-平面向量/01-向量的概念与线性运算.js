@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-07-01",
-  "unitNum": "07",
-  "subject": "math",
-  "title": "向量的概念与线性运算",
-  "subtitle": "向量定义、加减法与数乘运算",
   "blocks": [
     {
       "type": "objectives",

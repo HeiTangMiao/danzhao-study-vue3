@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-05-01",
-  "unitNum": "05",
-  "subject": "math",
-  "title": "正弦定理与余弦定理",
-  "subtitle": "正弦定理、余弦定理及适用场景",
   "blocks": [
     {
       "type": "mindmap",

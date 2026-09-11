@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-09-02",
-  "unitNum": "09",
-  "subject": "math",
-  "title": "古典概型",
-  "subtitle": "古典概型两个特征与概率计算",
   "blocks": [
     {
       "type": "mindmap",

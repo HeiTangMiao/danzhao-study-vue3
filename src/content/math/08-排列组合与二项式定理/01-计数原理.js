@@ -4,11 +4,6 @@
  * 由原始 HTML 自动转换生成
  */
 export default {
-  "id": "math-08-01",
-  "unitNum": "08",
-  "subject": "math",
-  "title": "计数原理",
-  "subtitle": "分类加法与分步乘法计数原理",
   "blocks": [
     {
       "type": "mindmap",

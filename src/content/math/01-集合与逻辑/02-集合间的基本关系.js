@@ -4,11 +4,6 @@
  * 说明：由原始 HTML 抽取为结构化区块，按 type 分发渲染
  */
 export default {
-  id: "math-01-02",
-  unitNum: "01",
-  subject: "math",
-  title: "集合间的基本关系",
-  subtitle: "掌握子集、真子集、集合相等及空集的概念",
   blocks: [
     {
       type: "mindmap",

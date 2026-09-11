@@ -5,11 +5,6 @@
  *  - 使用 strategy 区块展示考场时间分配、抢分技巧与常见失分点
  */
 export default {
-  id: "chinese-06-01",
-  unitNum: "06",
-  subject: "chinese",
-  title: "考试技巧与得分策略（语文）",
-  subtitle: "考场时间分配、抢分技巧与常见失分点",
   blocks: [
     {
       type: "warning",
