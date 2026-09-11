@@ -1,11 +1,14 @@
 <!--
-  EditorView —— 低代码内容编辑器 MVP
+  EditorView —— 低代码内容编辑器
   职责：
    - 左侧：单元/页面树，选择要编辑的页面
-   - 中部：区块编辑器（按 type 编辑各区块字段）
-   - 右侧：实时预览（Schema 驱动渲染）
-   - 导出：将编辑后的内容导出为 JS/JSON 数据文件
-  说明：这是 P2 阶段的最小可用版本，展示"内容与渲染解耦"的核心流程。
+   - 中部：区块编辑器（字段形状由 content-schema 推导，见 schemaForm.js）
+   - 右侧：实时预览（与学习页共用 BlockRenderer）
+   - 导出：把编辑结果导出为内容文件
+
+  说明：编辑器原先手写字段表，只覆盖 9/14 种类型，errorfocus / strategy / exam 完全不可编辑、
+        题目选项也编不了。现在表单由 schema 推导：schema 加字段，表单自动出现。
+        校验用的是与 CI 完全相同的实现（src/utils/validateBlock.js），编辑时即可看到错误。
 -->
 <template>
   <div class="editor">
@@ -13,15 +16,18 @@
     <header class="editor-toolbar">
       <router-link to="/" class="toolbar-back">← 返回</router-link>
       <h2>✏️ 低代码内容编辑器</h2>
-      <!-- 学科选择 -->
+      <!-- 学科选择（由 SUBJECT_META 驱动，新增学科无需改这里） -->
       <select v-model="editorSubject" class="subject-select" @change="onSubjectChange">
-        <option value="math">📐 数学</option>
-        <option value="chinese">✍️ 语文</option>
+        <option v-for="(meta, key) in SUBJECT_META" :key="key" :value="key">
+          {{ meta.icon }} {{ meta.name }}
+        </option>
       </select>
       <!-- 单元选择 -->
       <select v-model="editorUnitNum" class="unit-select" @change="onUnitChange">
         <option v-for="u in site.units" :key="u.num" :value="u.num">{{ u.num }} · {{ u.title }}</option>
       </select>
+      <span v-if="errorTotal" class="toolbar-errors">{{ errorTotal }} 处待修</span>
+      <span v-else class="toolbar-ok">校验通过</span>
       <button class="toolbar-export" @click="exportContent">导出</button>
     </header>
 
@@ -40,41 +46,36 @@
             {{ f.title }}
           </li>
         </ul>
-        <button class="add-block-btn" @click="addBlock">+ 添加区块</button>
       </aside>
 
       <!-- 中栏：区块编辑 -->
       <main class="editor-main">
         <div v-for="(block, bi) in editingBlocks" :key="bi" class="block-editor">
           <div class="block-editor__head">
-            <select v-model="block.type" class="type-select">
-              <option v-for="t in blockTypes" :key="t" :value="t">{{ blockTypeLabel(t) }}</option>
+            <select
+              :value="block.type"
+              class="type-select"
+              @change="onTypeChange(bi, $event.target.value)"
+            >
+              <option v-for="t in BLOCK_TYPES" :key="t" :value="t">{{ labelOf(t) }}</option>
             </select>
             <button class="del-btn" aria-label="删除区块" @click="removeBlock(bi)">✕</button>
           </div>
-          <!-- 文本字段编辑（按类型动态渲染） -->
-          <div v-for="field in textFields(block.type)" :key="field" class="field">
-            <label>{{ fieldLabel(field) }}</label>
-            <textarea v-model="block[field]" rows="3" placeholder="在此输入内容..."></textarea>
-          </div>
-          <!-- 公式区块的多行公式编辑 -->
-          <div v-if="block.type === 'formula' && block.formulas" class="field">
-            <label>公式列表</label>
-            <div v-for="(f, fi) in block.formulas" :key="fi" class="formula-item">
-              <FormulaEditor :modelValue="f" @update:modelValue="v => block.formulas[fi] = v" />
-              <button class="del-btn" @click="block.formulas.splice(fi, 1)">✕</button>
-            </div>
-            <button class="add-item-btn" @click="block.formulas.push('')">+ 添加公式</button>
-          </div>
-          <!-- 列表字段编辑：items / paragraphs / lines -->
-          <div v-if="block.items" class="field">
-            <label>条目列表</label>
-            <div v-for="(item, ii) in block.items" :key="ii" class="list-item">
-              <input :value="item.question || item.title" placeholder="内容" @input="e => setItem(block, ii, e.target.value)" />
-              <button class="del-btn" aria-label="删除条目" @click="removeItem(block, ii)">✕</button>
-            </div>
-            <button class="add-item-btn" @click="addItem(block)">+ 添加条目</button>
-          </div>
+
+          <BlockForm :fields="fieldsOfBlock(block)" :obj="block" />
+
+          <!-- 与 CI 同一份校验规则的实时反馈 -->
+          <ul v-if="blockErrors[bi] && blockErrors[bi].length" class="block-errors">
+            <li v-for="(e, ei) in blockErrors[bi]" :key="ei">{{ e }}</li>
+          </ul>
+        </div>
+
+        <!-- 新增区块：先选类型，再由 schema 生成最小合法骨架 -->
+        <div class="add-block">
+          <select v-model="newBlockType" class="type-select">
+            <option v-for="t in BLOCK_TYPES" :key="t" :value="t">{{ labelOf(t) }}</option>
+          </select>
+          <button class="add-block-btn" @click="addBlock">+ 添加区块</button>
         </div>
       </main>
 
@@ -92,9 +93,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { getSubjectConfig } from '@/content/index'
+import { getSubjectConfig, SUBJECT_META } from '@/content/index'
+import { loadPage as loadContentPage } from '@/content/loadPage'
 import BlockRenderer from '@/components/BlockRenderer.vue'
-import FormulaEditor from '@/components/FormulaEditor.vue'
+import { BLOCK_TYPES, labelOf } from '@/components/blocks/registry'
+import { createBlockValidator } from '@/utils/validateBlock'
+import contentSchema from '@/utils/contentSchema'
+import { blockFields, skeletonOf } from './schemaForm'
+import BlockForm from './BlockForm.vue'
 
 // 当前编辑学科（默认数学）
 const editorSubject = ref('math')
@@ -110,38 +116,20 @@ const currentUnit = computed(() => {
 })
 // 当前页索引
 const curIndex = ref(0)
-// 当前页信息
+// 当前页信息（标题等元信息来自 site.js，内容文件里不再有）
 const curFile = computed(() => currentUnit.value.files[curIndex.value])
 // 当前页的区块（编辑副本）
 const editingBlocks = ref([])
 
-// 支持的区块类型
-const blockTypes = ['knowledge', 'formula', 'table', 'example', 'quiz', 'tip', 'warning', 'mindmap', 'objectives']
+// 新增区块时默认选中的类型
+const newBlockType = ref('knowledge')
+// 区块类型中文名统一取自渲染注册表，避免编辑器与渲染层各写一份
+const fieldsOfBlock = (block) => blockFields(contentSchema, block.type)
 
-// 区块类型中文名
-const TYPE_LABEL = {
-  knowledge: '知识点', formula: '公式', table: '表格', example: '例题',
-  quiz: '题目', tip: '提示', warning: '警告', mindmap: '思维导图', objectives: '学习目标'
-}
-function blockTypeLabel(t) { return TYPE_LABEL[t] || t }
-
-// 各类型可编辑的文本字段
-const TEXT_FIELDS = {
-  knowledge: ['title', 'paragraphs'],
-  formula: ['title'],
-  table: ['title', 'headers', 'rows'],
-  example: ['title'],
-  quiz: ['title'],
-  tip: ['title', 'text'],
-  warning: ['text'],
-  mindmap: ['title', 'mermaid'],
-  objectives: ['title']
-}
-function textFields(type) { return TEXT_FIELDS[type] || ['title'] }
-
-// 字段中文名
-const FIELD_LABEL = { title: '标题', text: '内容', paragraphs: '段落', lines: '公式行', headers: '表头', rows: '表格行' }
-function fieldLabel(f) { return FIELD_LABEL[f] || f }
+// 校验器与 CI（scripts/validate-content.mjs）用的是同一份实现，只是注入了同一份 schema
+const validateBlock = createBlockValidator(contentSchema)
+const blockErrors = computed(() => editingBlocks.value.map((b) => validateBlock(b)))
+const errorTotal = computed(() => blockErrors.value.reduce((n, list) => n + list.length, 0))
 
 // 学科切换处理
 function onSubjectChange() {
@@ -161,46 +149,40 @@ function onUnitChange() {
 // 选择页面
 async function selectPage(i) {
   curIndex.value = i
-  // 加载该页内容作为编辑基础（按学科动态导入）
+  // 加载该页内容作为编辑基础（与 UnitView 共用同一条加载链路）
   try {
-    const m = await import(`@/content/${editorSubject.value}/${currentUnit.value.folder}/${curFile.value.name}.js`)
-    editingBlocks.value = JSON.parse(JSON.stringify(m.default.blocks || []))
+    const loaded = await loadContentPage(editorSubject.value, currentUnit.value.num, i)
+    // 深拷贝：编辑过程不得污染模块级缓存的内容对象
+    editingBlocks.value = JSON.parse(JSON.stringify(loaded?.blocks || []))
   } catch {
     editingBlocks.value = []
   }
 }
 
-// 添加区块
+// 添加区块：按所选类型从 schema 生成最小合法骨架，避免新增即非法
 function addBlock() {
-  editingBlocks.value.push({ type: 'knowledge', title: '新知识点', paragraphs: '' })
+  editingBlocks.value.push(skeletonOf(contentSchema, newBlockType.value))
 }
 
 // 删除区块
 function removeBlock(i) { editingBlocks.value.splice(i, 1) }
 
-// 添加列表条目
-function addItem(block) {
-  if (!block.items) block.items = []
-  block.items.push({ difficulty: 'basic', question: '', answer: '' })
-}
-function removeItem(block, ii) { block.items.splice(ii, 1) }
-
-// 编辑列表条目内容（同时写入 question 或题目标题字段）
-function setItem(block, ii, value) {
-  const item = block.items[ii]
-  if (Object.prototype.hasOwnProperty.call(item, 'question')) item.question = value
-  else if (Object.prototype.hasOwnProperty.call(item, 'title')) item.title = value
+// 切换区块类型：字段完全不同，按新类型重新生成骨架（保留原有的标题）
+function onTypeChange(i, type) {
+  const old = editingBlocks.value[i]
+  const next = skeletonOf(contentSchema, type)
+  if (old && old.title) next.title = old.title
+  editingBlocks.value.splice(i, 1, next)
 }
 
-// 导出内容（生成 JS 文件代码）
+// 导出内容
 function exportContent() {
-  const page = {
-    id: `${editorSubject.value}-${currentUnit.value.num}-${String(curIndex.value + 1).padStart(2, '0')}`,
-    unitNum: currentUnit.value.num,
-    subject: editorSubject.value,
-    title: curFile.value.title,
-    subtitle: curFile.value.subtitle,
-    blocks: editingBlocks.value
+  // 只导出 blocks —— 元信息唯一真相源是 site.js，内容文件里出现
+  // id / unitNum / subject / title / subtitle 会被 validate:content 判为硬错误。
+  const page = { blocks: editingBlocks.value }
+  if (errorTotal.value > 0) {
+    const ok = window.confirm(`当前有 ${errorTotal.value} 处校验问题，导出的内容可能无法通过 CI。仍要导出吗？`)
+    if (!ok) return
   }
   // 生成 JS 模块代码
   const code = `export default ${JSON.stringify(page, null, 2)}`
@@ -232,6 +214,8 @@ selectPage(0)
   border-radius: var(--radius-md); padding: 4px 8px;
   color: var(--text); font-size: 0.85rem;
 }
+.toolbar-errors { color: var(--danger); font-size: 0.85rem; }
+.toolbar-ok { color: var(--success, var(--primary)); font-size: 0.85rem; }
 .toolbar-export {
   margin-left: auto;
   background: var(--primary); color: #fff;
@@ -252,12 +236,6 @@ selectPage(0)
 }
 .tree-item:hover { background: var(--surface-muted); }
 .tree-item.active { background: var(--primary-soft); color: var(--primary); }
-.add-block-btn {
-  margin-top: var(--spacer-12); width: 100%;
-  background: var(--primary-soft); color: var(--primary);
-  border: 1px dashed var(--primary); border-radius: var(--radius-md);
-  padding: 8px;
-}
 .editor-main {
   flex: 1; padding: var(--spacer-16); overflow-y: auto;
   display: flex; flex-direction: column; gap: var(--spacer-16);
@@ -266,24 +244,26 @@ selectPage(0)
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: var(--spacer-12);
 }
-.block-editor__head { display: flex; align-items: center; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
+.block-editor__head { display: flex; align-items: center; gap: var(--spacer-8); margin-bottom: var(--spacer-12); }
 .type-select {
   background: var(--surface-muted); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: 4px 8px;
   color: var(--text);
 }
 .del-btn { margin-left: auto; color: var(--danger); }
-.field { margin-bottom: var(--spacer-8); }
-.field label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
-.field textarea, .list-item input {
-  width: 100%; background: var(--surface-muted);
-  border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 8px; color: var(--text); font-family: inherit;
+.block-errors {
+  margin-top: var(--spacer-8); padding-left: 18px;
+  color: var(--danger); font-size: 0.8rem; list-style: disc;
 }
-.list-item { display: flex; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
-.add-item-btn { color: var(--primary); font-size: 0.85rem; }
-.formula-item { display: flex; gap: var(--spacer-8); margin-bottom: var(--spacer-8); align-items: flex-start; }
-.formula-item .del-btn { margin-top: 4px; flex-shrink: 0; }
+.add-block {
+  display: flex; gap: var(--spacer-8); align-items: center;
+  padding: var(--spacer-12); border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+.add-block-btn {
+  background: var(--primary-soft); color: var(--primary);
+  border-radius: var(--radius-md); padding: 6px 14px;
+}
 .editor-preview {
   width: 320px; border-left: 1px solid var(--border);
   padding: var(--spacer-12); overflow-y: auto;
