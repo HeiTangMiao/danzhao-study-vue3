@@ -192,7 +192,7 @@ function go(r) {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
   padding: 6px;
 }
 .search-result {
@@ -215,7 +215,7 @@ function go(r) {
   position: absolute; left: 0; right: 0; top: calc(100% + 6px);
   padding: 14px; text-align: center; font-size: 0.85rem; color: var(--text-muted);
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-pop);
   z-index: 200;
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }

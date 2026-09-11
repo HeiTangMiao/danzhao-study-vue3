@@ -2,9 +2,11 @@
  * .block-card 框架族契约测试
  *
  * 背景：改造前 9 个区块组件各自手写卡片外框共 14 处，实测聚成 8 个家族。
- *      本次把它们收敛到 blocks.css 的 .block-card 一族，组件只留差异。
- *      这类「把声明从组件搬到全局类」的重构，失败方式极其隐蔽 ——
- *      CSS 错了不会报错，只会让某个区块悄悄少一圈描边或少一层阴影。
+ *      阶段 3 第一步把它们收敛到 blocks.css 的 .block-card 一族，组件只留差异。
+ *      阶段 3 第二步视觉改版（极简留白）后，大部分区块已改为纯留白 / 发丝线，
+ *      仍需要卡片容器（surface 底 + 描边）的只剩少量 per-item 卡：
+ *      strategy（技巧项）、errorfocus（易错项）、exam-toolbar（sticky 工具栏）
+ *      以及 objectives / diagram。
  *
  * 职责（两条，缺一不可）：
  *  1. 保真：每个框架位置**合并后的声明**，必须与本文件记录的原值逐条相等。
@@ -55,12 +57,8 @@ function mergeFor(classes, order) {
 const ORDER = [
   'block-card',
   'block-card--md',
-  'block-card--loose',
-  'block-card--shadow',
-  'block-card--rail-primary',
-  'block-card--rail-accent',
-  'block-card--tone-accent',
-  'block-card--tone-warn'
+  'block-card--shadow-xs',
+  'block-card--rail-accent'
 ]
 
 /**
@@ -80,54 +78,12 @@ const FRAME_PROPS = [
 ]
 
 /**
- * 14 处框架的「改造前原值」快照
- *
- * 来源：改造前逐文件读取的 <style scoped>，逐字抄录。这张表就是本次重构的验收标准。
- * 比对的是**级联后的最终值**（组件 scoped 覆盖共用类），不是类本身 —— 因为有些框架
- * 的 padding 是留在组件里的差异值，共用类提供的是被覆盖掉的那个值。
+ * 阶段 3 第二步改版后的框架位置快照。
+ * 大部分区块已不用卡片；这份表是「仍用 .block-card 的少数位置」的新基准。
  */
 const FRAMES = [
   {
-    file: 'FormulaCard.vue',
-    selector: '.formula-card',
-    classes: ['block-card', 'block-card--shadow'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-lg)',
-      padding: 'var(--spacer-16)',
-      'box-shadow': 'var(--shadow-sm)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
-    file: 'ExampleBlock.vue',
-    selector: '.example-card',
-    classes: ['block-card', 'block-card--shadow'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-lg)',
-      padding: 'var(--spacer-16)',
-      'box-shadow': 'var(--shadow-sm)',
-      'margin-bottom': 'var(--spacer-16)'
-    }
-  },
-  {
-    file: 'ErrorFocusBlock.vue',
-    selector: '.ef-card',
-    classes: ['block-card', 'block-card--shadow'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-lg)',
-      padding: 'var(--spacer-16)',
-      'box-shadow': 'var(--shadow-sm)',
-      'margin-bottom': 'var(--spacer-16)'
-    }
-  },
-  {
-    // 少数与基础框架零差异的实例；刻意不带 --shadow
+    // 少数与基础框架零差异的实例；刻意不带阴影
     file: 'ObjectivesBlock.vue',
     selector: '.objectives-box',
     classes: ['block-card'],
@@ -139,19 +95,6 @@ const FRAMES = [
     }
   },
   {
-    file: 'KnowledgeBlock.vue',
-    selector: '.knowledge-box',
-    classes: ['block-card', 'block-card--md', 'block-card--rail-primary'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-left': '4px solid var(--primary)',
-      'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
     file: 'StrategyBlock.vue',
     selector: '.strategy-card',
     classes: ['block-card', 'block-card--md', 'block-card--rail-accent'],
@@ -160,8 +103,19 @@ const FRAMES = [
       border: '1px solid var(--border)',
       'border-left': '4px solid var(--accent)',
       'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-14) var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
+      padding: 'var(--spacer-14) var(--spacer-16)'
+    }
+  },
+  {
+    // 易错项卡：改版后不再带阴影（区块不再有阴影），只剩基础框架
+    file: 'ErrorFocusBlock.vue',
+    selector: '.ef-card',
+    classes: ['block-card'],
+    expected: {
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
+      'border-radius': 'var(--radius-lg)',
+      padding: 'var(--spacer-16)'
     }
   },
   {
@@ -172,95 +126,20 @@ const FRAMES = [
       background: 'var(--surface)',
       border: '1px solid var(--border)',
       'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-12)',
-      'margin-bottom': 'var(--spacer-12)'
+      padding: 'var(--spacer-12)'
     }
   },
   {
-    file: 'QuizBlock.vue',
-    selector: '.exercise-item',
-    classes: ['block-card', 'block-card--md'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-12) var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
-    // 改造前是 border: 1px solid var(--primary)，现在拆成基础边框 + border-color 覆写，
-    // 计算值相同；这里按「简写 + 覆写」记录，与合并结果的形式一致
-    file: 'TipBlock.vue',
-    selector: '.tip-box',
-    classes: ['block-card', 'block-card--md', 'block-card--tone-accent'],
-    expected: {
-      background: 'rgba(47, 111, 237, 0.08)',
-      border: '1px solid var(--border)',
-      'border-color': 'var(--primary)',
-      'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-12) var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
-    file: 'WarningBlock.vue',
-    selector: '.warning-box',
-    classes: ['block-card', 'block-card--md', 'block-card--tone-warn'],
-    expected: {
-      background: 'rgba(240, 140, 0, 0.10)',
-      border: '1px solid var(--border)',
-      'border-color': 'var(--warning)',
-      'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-12) var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
-    file: 'ExamBlock.vue',
-    selector: '.exam-intro',
-    classes: ['block-card', 'block-card--loose'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-lg)',
-      padding: 'var(--spacer-24)'
-    }
-  },
-  {
-    file: 'ExamBlock.vue',
-    selector: '.exam-result',
-    classes: ['block-card', 'block-card--loose'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-lg)',
-      padding: 'var(--spacer-24)'
-    }
-  },
-  {
-    file: 'ExamBlock.vue',
-    selector: '.exam-question',
-    classes: ['block-card', 'block-card--md'],
-    expected: {
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      'border-radius': 'var(--radius-md)',
-      padding: 'var(--spacer-14) var(--spacer-16)',
-      'margin-bottom': 'var(--spacer-12)'
-    }
-  },
-  {
-    // sticky 工具栏：唯一带阴影的实例
+    // sticky 工具栏：唯一保留阴影的位置，用极浅的 --shadow-xs
     file: 'ExamBlock.vue',
     selector: '.exam-toolbar',
-    classes: ['block-card', 'block-card--md', 'block-card--shadow'],
+    classes: ['block-card', 'block-card--md', 'block-card--shadow-xs'],
     expected: {
       background: 'var(--surface)',
       border: '1px solid var(--border)',
       'border-radius': 'var(--radius-md)',
       padding: 'var(--spacer-10) var(--spacer-16)',
-      'box-shadow': 'var(--shadow-sm)',
+      'box-shadow': 'var(--shadow-xs)',
       'margin-bottom': 'var(--spacer-16)'
     }
   }
@@ -369,14 +248,9 @@ describe('.block-card 框架族：差异留在组件里', () => {
   // 抽取的边界：类提供「大家一样的部分」，组件保留「只有自己不一样的部分」。
   // 下面这些差异如果被误搬进 blocks.css，就会污染其他区块，必须留在原地。
   const DELTAS = [
-    { file: 'StrategyBlock.vue', selector: '.strategy-card', props: ['padding', 'margin-bottom'] },
-    { file: 'GeometryBlock.vue', selector: '.diagram-box', props: ['padding', 'margin-bottom'] },
-    { file: 'QuizBlock.vue', selector: '.exercise-item', props: ['padding', 'margin-bottom', 'transition'] },
-    { file: 'KnowledgeBlock.vue', selector: '.knowledge-box', props: ['margin-bottom'] },
-    { file: 'FormulaCard.vue', selector: '.formula-card', props: ['margin-bottom'] },
-    { file: 'ExampleBlock.vue', selector: '.example-card', props: ['margin-bottom'] },
-    { file: 'ErrorFocusBlock.vue', selector: '.ef-card', props: ['margin-bottom'] },
-    { file: 'ExamBlock.vue', selector: '.exam-question', props: ['padding', 'margin-bottom'] }
+    { file: 'StrategyBlock.vue', selector: '.strategy-card', props: ['padding'] },
+    { file: 'GeometryBlock.vue', selector: '.diagram-box', props: ['padding'] },
+    { file: 'ExamBlock.vue', selector: '.exam-toolbar', props: ['padding', 'margin-bottom'] }
   ]
 
   it.each(DELTAS)('$file $selector 保留了 $props', (delta) => {
@@ -387,7 +261,7 @@ describe('.block-card 框架族：差异留在组件里', () => {
     }
   })
 
-  it('blocks.css 里不含任何 margin-bottom —— 块间距是每个区块自己的事，不进共用族', () => {
+  it('blocks.css 里不含任何 margin-bottom —— 块间距由 UnitView 的 .block-anchor 统一负责', () => {
     expect(BLOCKS_CSS).not.toMatch(/margin-bottom/)
   })
 })
@@ -467,3 +341,5 @@ describe('间距与字号阶梯', () => {
     }
   })
 })
+
+

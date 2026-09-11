@@ -12,20 +12,26 @@
 /* ---------- 亮色主题（默认） ---------- */
 :root {
   color-scheme: light dark;
-  --bg: #f6f7fb;
+  /* 色彩降噪：背景由偏蓝的 #f6f7fb 改为近白暖灰 #fbfbfa；
+   * 语义色统一降饱和（warning/accent/success/danger 都往沉稳方向调了一档），
+   * 层次改由发丝线（--line）与字号对比建立，而不是靠大面积彩色。 */
+  --bg: #fbfbfa;
   --surface: #ffffff;
-  --surface-muted: #eef0f6;
+  --surface-muted: #f2f2ef;
   --text: #1f2430;
   --text-primary: #1f2430;
   --text-muted: #5b6472;
   --text-secondary: #5b6472;
-  --border: #e2e6ee;
+  --border: #e4e6e0;
+  --line: #e9eae4; /* 发丝线：分隔区块/题目 */
+  --line-strong: #d6d8d0; /* 更强发丝线：需要更强分隔的边框 */
   --primary: #2f6fed;
-  --primary-soft: #e8f0ff;
-  --accent: #e8590c;
-  --success: #2f9e44;
-  --warning: #f08c00;
-  --danger: #e03131;
+  --primary-soft: #eef2fc;
+  --accent: #c2500c;
+  --success: #2f8f44;
+  --warning: #b26a00;
+  --tone-warn: #b26a00; /* 语义警告色的新名；--warning 保留兼容旧引用 */
+  --danger: #c92a2a;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius: 12px;
@@ -98,9 +104,20 @@
   --fw-semibold: 600;
   --fw-bold: 700;
 
-  --shadow-sm: 0 1px 3px rgba(31, 36, 48, 0.08);
-  --shadow-md: 0 4px 16px rgba(31, 36, 48, 0.10);
+  --shadow-xs: 0 1px 3px rgba(31, 36, 48, 0.10); /* 只给 sticky 顶栏 */
+  --shadow-pop: 0 8px 30px rgba(31, 36, 48, 0.16); /* 只给浮层（搜索下拉 / TOC / 遮罩面板） */
   --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+
+  /* ---------- 动效 token ----------
+   * 极简路线：动效克制。全站交互动效只留 5 处（折叠展开 / 悬停 / 浮层进出 /
+   * 阅读进度条 / 迷你顶栏），统一走这三个时长与两个缓动；配合
+   * prefers-reduced-motion 兜底（见文末）。不做路由切换过渡、不做列表 stagger、
+   * 不做滚动视差、不做 hover 位移放大。 */
+  --dur-1: 100ms;
+  --dur-2: 160ms;
+  --dur-3: 240ms;
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* ---------- 暗色主题 ---------- */
@@ -108,20 +125,23 @@
   color-scheme: dark;
   --bg: #16181f;
   --surface: #1f232c;
-  --surface-muted: #2a2f3a;
+  --surface-muted: #282d38;
   --text: #e6e9ef;
   --text-primary: #e6e9ef;
   --text-muted: #aab2c0;
   --text-secondary: #aab2c0;
   --border: #333a47;
+  --line: #2b313c; /* 发丝线（暗色：比背景略亮即可） */
+  --line-strong: #3a4250;
   --primary: #6a9bff;
   --primary-soft: #24334d;
   --accent: #ff8a4c;
   --success: #69db7c;
-  --warning: #ffc078;
+  --warning: #d9a64b; /* 降饱和警告色（暗色下提亮保证对比度） */
+  --tone-warn: #d9a64b;
   --danger: #ff6b6b;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
 
 /* ---------- 基础样式复位 ---------- */
@@ -142,7 +162,6 @@ body {
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.3s ease, color 0.3s ease;
   /* 移动端：去掉点击高亮闪烁、禁止字号自动缩放 */
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
@@ -176,13 +195,12 @@ button {
   color: inherit;
 }
 
-/* 通用卡片容器 */
+/* 通用卡片容器（极简：不再自带阴影，只留描边；浮层阴影由各浮层显式加 --shadow-pop） */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacer-16);
-  box-shadow: var(--shadow-sm);
 }
 
 /* 重点高亮标记（==高亮== 语法渲染结果） */
@@ -214,4 +232,14 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible,
 input:focus-visible, textarea:focus-visible, select:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* 动效兜底：系统偏好减弱动效时，全局关掉过渡与动画 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

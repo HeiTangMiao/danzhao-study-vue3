@@ -1,17 +1,20 @@
 <!--
   WarningBlock —— 警告提示区块
   职责：突出强调易错点、常考考点等警示性内容
+  视觉（阶段 3 第二步）：与 tip 共用 .shell--note（左 2px 语义色细线），
+  彻底删掉 rgba 填充、1px 描边、圆角。
 -->
 <template>
-  <section class="block warning">
-    <div class="block-card block-card--md block-card--tone-warn warning-box">
+  <BlockShell variant="note" tone="tone-warn">
+    <div class="warning-box">
       <span class="warning-icon">⚠️</span>
       <MathJaxRender :text="block.text" />
     </div>
-  </section>
+  </BlockShell>
 </template>
 
 <script setup>
+import BlockShell from './BlockShell.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 
 defineProps({
@@ -21,13 +24,10 @@ defineProps({
 </script>
 
 <style scoped>
-/* 底色与描边来自 .block-card--tone-warn，圆角来自 --md，
- * 此处只留差异：横向排布、图标与文字的间距、较窄的内边距、块间距 */
+/* 左细线来自 .shell--note；此处只留差异：图标与文字的横向排布与间距 */
 .warning-box {
   display: flex;
   gap: var(--spacer-8);
-  padding: var(--spacer-12) var(--spacer-16);
-  margin-bottom: var(--spacer-12);
 }
-.warning-icon { color: var(--warning); }
+.warning-icon { color: var(--tone-warn); }
 </style>

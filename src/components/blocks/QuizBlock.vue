@@ -20,7 +20,7 @@
       <li
         v-for="(item, i) in block.items"
         :key="i"
-        class="block-card block-card--md exercise-item"
+        class="exercise-item"
         :class="{ 'is-answered': states[i]?.selected !== undefined }"
       >
         <!-- 题目标题行：难度 + 题号 -->
@@ -121,14 +121,11 @@ function toggle(i) { opened[i] = !opened[i] }
 }
 
 .exercise-list { list-style: none; }
-/* 外框来自 .block-card，此处只留差异：较窄的内边距、题间距，
- * 以及「已作答」态依赖的 border-color 过渡 */
+/* 题目去卡片（阶段 3 第二步）：改用发丝线分隔，选项选中态才用底色 */
 .exercise-item {
-  padding: var(--spacer-12) var(--spacer-16);
-  margin-bottom: var(--spacer-12);
-  transition: border-color 0.2s ease;
+  padding: var(--spacer-12) 0;
 }
-.exercise-item.is-answered { border-color: var(--primary); }
+.exercise-item + .exercise-item { border-top: 1px solid var(--line); }
 
 .exercise-head { display: flex; align-items: center; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
 .q-index {

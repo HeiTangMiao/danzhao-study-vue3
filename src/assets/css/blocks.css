@@ -5,49 +5,51 @@
  *  - 区块专属样式仍留在各自组件的 <style scoped> 中，不要往这里堆
  * ============================================================ */
 
-/* ---------- 难度标签 ----------
- * 原先在 ExampleBlock / QuizBlock / ExamBlock / ErrorBookView 各写一遍，此处统一。
- * 取值与 src/utils/blockMeta.js 的 DIFFICULTY 常量一一对应。
- *
- * 抽取时的取值依据（四条声明逐字取自改造前的副本，不要凭「看起来该有」加东西）：
- *   font-size / padding / border-radius —— 四份副本逐字相同，即下面这三条；
- *   display: inline-block —— 只有 QuizBlock 原版有，另三份没有。
- *     之所以仍放进共用规则：这四处宿主（.ex-head / .exam-q-head / .exercise-head /
- *     .error-head）全是 flex 容器，flex 子项会被 blockify，inline 与 inline-block
- *     渲染结果相同，所以合并是无害的。若将来有宿主不是 flex，这里要拆成差异声明。
- *
- * 曾经多写过一条 white-space: nowrap —— 四份原版都没有。它会把标签的 min-content
- * 从「一个汉字」抬到「整段文案」，窄屏 + 长标题时标签由折两行变成不折行，并把差额
- * 转嫁给同行的标题（实测 375px 视口下命中，如 06-幂函数.js 的「例题3：幂函数的
- * 定义域与奇偶性（综合应用型）」）。已删除；窄屏不折行是合理的诉求，但那是视觉改动，
- * 应当作为独立一次改动提出，而不是混在「零视觉变化」的重构里。
+/* ---------- 统一区块标题 ----------
+ * 阶段 3 第二步：改造前 .block-title 有 3 处互不相同的定义（MindMap 是
+ * 1.05rem/0 0 12px、Desmos 逐字复制全局 h3、Objectives 只覆盖下边距），
+ * 其余 7 个区块靠全局 h3 兜底 —— 等于没有统一标题。
+ * 这里成为 .block-title 的唯一真相源，各组件不再各自定义。
  */
-.difficulty-tag {
-  display: inline-block;
-  font-size: 0.72rem;
-  padding: 1px 10px;
-  border-radius: var(--radius-full);
+.block-title {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--space-3);
 }
-.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
-.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-/* 暗色模式下提高冲刺难度标签对比度 */
-:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
+
+/* ---------- 外壳族 .block-shell ----------
+ * 阶段 3 第二步引入：区块外壳（标题 + 变体）统一由 BlockShell.vue 提供。
+ * 变体决定外观，极简路线靠留白与发丝线建立层次，不用大面积底色：
+ *  - shell--plain    ：默认，纯留白（knowledge / objectives 等）
+ *  - shell--note     ：左 2px 语义色细线（tip / warning 共用，色值由调用方设 --tone）
+ *  - shell--formula  ：全站唯一保留浅底色的类型（formula）
+ *  - shell--viewport ：保留边框的视口（diagram / desmos 等）
+ * 约束：外壳不带下边距 —— 块间距由 UnitView 的 .block-anchor 间距统一负责。
+ */
+.block-shell { /* 本身无规则，外观全部由变体决定 */ }
+.shell--note {
+  border-left: 2px solid var(--tone, var(--primary));
+  padding: var(--space-1) 0 var(--space-1) var(--space-4);
+}
+.shell--formula {
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+.shell--viewport {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+}
 
 /* ============================================================
  * 框架族 .block-card
  * ------------------------------------------------------------
- * 背景：改造前 9 个区块组件各自手写卡片外框，共 14 处。
- *      实测聚成 8 个家族，其中 3 处（formula-card / example-card / ef-card）
- *      与全局 .card 的五条声明逐字相同，另一半是各自漂移的变体。
- *
- * 为什么是「一个类」而不是「一个组件」：
- *  1) 大量外框挂在 v-for 的每一项上（例题 / 易错项 / 题目 / 技巧项 / 逐题），
- *     单根组件包不出 per-item 卡；强行套用会把 N 张卡并成 1 张大卡。
- *  2) 类名不改变 DOM 层数。区块外框若提到根节点上，会同时改变层数与间距来源 ——
- *     而根元素 .block 全仓库没有任何 CSS 规则，没有任何兜底能缓冲这种位移。
- *  3) 差异声明留在组件的 scoped 样式里即可，无需靠 props 表达。
+ * 背景：阶段 3 第一步把 14 处手写卡片外框收敛为这一个类族；
+ *      第二步视觉改版后，大部分区块已改为纯留白/发丝线，
+ *      仍需要卡片容器（surface 底 + 描边）的只剩少量 per-item 卡：
+ *      strategy（技巧项）、errorfocus（易错项）、exam-toolbar（sticky 工具栏）。
+ *      因此类族收缩为「基础框架 + 少量仍被使用的修饰符」。
  *
  * 特异度约定（改这个文件前务必先读）：
  *  组件 scoped 样式编译后形如 .ef-card[data-v-xxx]，特异度 (0,2,0)；
@@ -64,30 +66,28 @@
   padding: var(--spacer-16);
 }
 
-/* 圆角降一档（表格类、题目类等偏「密集」的卡用 md） */
+/* 圆角降一档（密集类卡用 md） */
 .block-card--md { border-radius: var(--radius-md); }
 
-/* 内边距放宽到 24px（整页级的展示卡用，如考试介绍页与结果页） */
-.block-card--loose { padding: var(--spacer-24); }
+/* 阴影：只给 sticky 工具栏（exam-toolbar），用极浅的 --shadow-xs */
+.block-card--shadow-xs { box-shadow: var(--shadow-xs); }
 
-/* 阴影：默认不带。全站只有 4 处卡带 --shadow-sm，显式加上即可，
- * 不设默认值是为了避免「给 7 个本来没阴影的卡凭空加一层投影」。 */
-.block-card--shadow { box-shadow: var(--shadow-sm); }
-
-/* 左粗边强调（rail）：色值由使用者指定 —— 实测 knowledge 用 primary、
- * strategy 用 accent、exam 的 review-item 由状态类给 success/danger，
- * 与底色语义无关，所以不派生自 tone。 */
-.block-card--rail-primary { border-left: 4px solid var(--primary); }
+/* 左粗边强调（rail）：色值由使用者指定 —— strategy 用 accent */
 .block-card--rail-accent { border-left: 4px solid var(--accent); }
 
-/* 语义底色（tone）：底色 + 同色描边成对出现。
- * 底色沿用改造前的硬编码 rgba 字面量 —— 它们在暗色主题下不随语义色变化，
- * 是既有的不一致行为，本次迁移保持原样，不在抽取阶段「顺手修好」。 */
-.block-card--tone-accent {
-  background: rgba(47, 111, 237, 0.08);
-  border-color: var(--primary);
+/* ---------- 难度标签 ----------
+ * 原先在 ExampleBlock / QuizBlock / ExamBlock / ErrorBookView 各写一遍，此处统一。
+ * 取值与 src/utils/blockMeta.js 的 DIFFICULTY 常量一一对应。
+ */
+.difficulty-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 1px 10px;
+  border-radius: var(--radius-full);
 }
-.block-card--tone-warn {
-  background: rgba(240, 140, 0, 0.10);
-  border-color: var(--warning);
-}
+.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
+.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
+.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
+.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+/* 暗色模式下提高冲刺难度标签对比度 */
+:root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }

@@ -22,9 +22,5 @@ defineProps({
 </script>
 
 <style scoped>
-.block-title {
-  font-size: var(--fs-xl);
-  font-weight: 600;
-  margin: var(--spacer-16) 0 var(--spacer-8);
-}
+/* 标题统一走 blocks.css 的全局 .block-title */
 </style>

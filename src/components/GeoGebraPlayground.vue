@@ -281,9 +281,7 @@ onBeforeUnmount(() => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  margin-bottom: var(--spacer-16);
 }
 .ggb-head {
   display: flex;

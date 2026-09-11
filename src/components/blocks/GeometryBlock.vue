@@ -47,10 +47,10 @@ const height = computed(() => props.block.height || 320)
 </script>
 
 <style scoped>
-/* 外框来自 .block-card，此处只留差异：较窄的内边距（画板本身就占地方）与卡间距 */
+/* 视口保留边框（阶段 3 第二步：diagram 视口仍需边框，去掉块间距，
+ * 由 .block-anchor 统一负责） */
 .diagram-box {
   padding: var(--spacer-12);
-  margin-bottom: var(--spacer-12);
 }
 .diagram-caption {
   margin-top: var(--spacer-8);

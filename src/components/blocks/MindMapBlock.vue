@@ -221,7 +221,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.block-title { font-size: 1.05rem; font-weight: 600; margin: 0 0 12px; color: var(--text-primary, #2d3748); }
 .mm-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 10px; }
 .lg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary, #4a5568); }
 .lg .dot { width: 11px; height: 11px; border-radius: 3px; border: 1px solid rgba(0,0,0,.08); }

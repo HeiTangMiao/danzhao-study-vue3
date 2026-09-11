@@ -8,7 +8,7 @@
 <template>
   <section class="block example">
     <h2 class="block-title">📝 {{ block.title || '典型例题' }}</h2>
-    <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--shadow example-card">
+    <div v-for="(item, i) in block.items" :key="i" class="example-card">
       <div class="ex-head">
         <span class="ex-title">{{ item.title || `例题 ${i + 1}` }}</span>
         <span v-if="item.difficulty" class="difficulty-tag" :class="diffClass(item.difficulty)">
@@ -66,10 +66,11 @@ function toggle(kind, index) {
 </script>
 
 <style scoped>
-/* 外框来自 .block-card，此处只留差异：每张例题卡之间的间距 */
+/* 例题去卡片（阶段 3 第二步）：改用发丝线分隔，不用卡片 */
 .example-card {
-  margin-bottom: var(--spacer-16);
+  padding: var(--spacer-12) 0;
 }
+.example-card + .example-card { border-top: 1px solid var(--line); }
 .ex-head { display: flex; align-items: center; justify-content: space-between; gap: var(--spacer-8); margin-bottom: var(--spacer-8); }
 .ex-title { font-weight: 700; }
 .ex-question { margin-bottom: var(--spacer-10); }

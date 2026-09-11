@@ -27,11 +27,12 @@ defineProps({
 </script>
 
 <style scoped>
-/* 外框来自 .block-card，此处只留差异：内边距略窄（14/16）与卡间距 */
+/* 外框来自 .block-card（--md + --rail-accent），此处只留差异：
+ * 内边距略窄（14/16），块间距交给 .block-anchor */
 .strategy-card {
   padding: var(--spacer-14) var(--spacer-16);
-  margin-bottom: var(--spacer-12);
 }
+.strategy-card + .strategy-card { margin-top: var(--spacer-12); }
 .strategy-head { display: flex; align-items: center; gap: var(--spacer-10); margin-bottom: var(--spacer-8); }
 .strategy-num {
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;

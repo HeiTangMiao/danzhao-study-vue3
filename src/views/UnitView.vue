@@ -512,7 +512,7 @@ watch(
 }
 .done-btn.done { background: rgba(47, 158, 68, 0.12); border-color: var(--success); color: var(--success); }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-active, .fade-leave-active { transition: opacity var(--dur-3) var(--ease-standard); }
 
 /* 加载提示 */
 .loading-hint { text-align: center; padding: var(--spacer-40); color: var(--text-muted); }
@@ -547,7 +547,10 @@ watch(
 .notes-foot { display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacer-8); font-size: 0.8rem; color: var(--text-muted); }
 .notes-save { background: var(--primary-soft); color: var(--primary); border: none; border-radius: var(--radius-full); padding: 4px 12px; cursor: pointer; }
 
-.page-content { display: flex; flex-direction: column; gap: var(--spacer-8); }
+/* 阶段 3 第二步：区块间距统一为 32px —— gap 归零，靠 .block-anchor 相邻选择器给间距。
+ * 各区块自身的 margin-bottom 已一并移除（间距双来源问题，见交接文档第六节第 4 条） */
+.page-content { display: flex; flex-direction: column; gap: 0; }
+.block-anchor + .block-anchor { margin-top: var(--gap-block, 32px); }
 .block-anchor { scroll-margin-top: 16px; }
 
 /* 侧边栏可见时，为内容区右侧预留空间，避免被固定侧边栏遮挡 */
@@ -575,7 +578,7 @@ watch(
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
   }
   .topbar-back {
     flex: 0 0 auto;
@@ -628,7 +631,7 @@ watch(
   display: flex; flex-direction: column;
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
   overflow: hidden;
   overflow-y: auto; /* 内容超高（短屏/横屏）时可滚动，避免画布被裁切 */
 }
@@ -692,6 +695,7 @@ watch(
 .leave-confirm {
   width: min(360px, 100%);
   padding: var(--spacer-24);
+  box-shadow: var(--shadow-pop);
 }
 .leave-confirm__title { font-weight: 700; font-size: 1.05rem; margin-bottom: var(--spacer-12); }
 .leave-confirm__msg { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: var(--spacer-20); }
@@ -714,14 +718,14 @@ watch(
   width: 56px; height: 56px; border-radius: 50%;
   background: var(--primary); color: #fff; border: none;
   font-size: 1.5rem; cursor: pointer;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
   display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s ease;
+  transition: transform var(--dur-1) var(--ease-standard);
 }
 .pomodoro-fab__btn:active { transform: scale(0.92); }
 .pomodoro-card {
   width: 250px; padding: 14px 16px;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
 }
 .pomodoro-card__head { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
 .pomodoro-mode { font-weight: 700; }

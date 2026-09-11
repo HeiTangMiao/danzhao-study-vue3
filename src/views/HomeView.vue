@@ -309,8 +309,7 @@ const mockRoute = computed(() => sprintUnit.value
   background: var(--primary); color: #fff;
   border: none; border-radius: var(--radius-md);
   padding: var(--spacer-12) var(--spacer-16);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s ease;
+  transition: transform var(--dur-1) var(--ease-standard);
 }
 .continue-card__main:active { transform: scale(0.98); }
 .continue-icon { font-size: 1.5rem; }
@@ -385,11 +384,10 @@ const mockRoute = computed(() => sprintUnit.value
   border: 1px solid var(--border);
   border-top-width: 3px;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
   color: var(--text);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--dur-2) var(--ease-standard);
 }
-.tool-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); color: var(--text); }
+.tool-card:hover { border-color: var(--primary); color: var(--text); }
 .tool-icon { font-size: 1.4rem; }
 .tool-text { display: flex; flex-direction: column; line-height: 1.4; }
 .tool-name { font-weight: 700; font-size: 0.95rem; }
@@ -424,8 +422,7 @@ const mockRoute = computed(() => sprintUnit.value
 .phase-icon { font-size: 1.2rem; }
 
 .unit-list { display: flex; flex-direction: column; gap: var(--spacer-12); }
-.unit-card { cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.unit-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.unit-card { cursor: pointer; }
 .unit-card__head { display: flex; align-items: center; gap: var(--spacer-16); }
 .unit-icon {
   width: 48px; height: 48px;

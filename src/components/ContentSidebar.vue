@@ -354,7 +354,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   border: 1px solid var(--border);
   border-right: none;
   border-radius: 10px 0 0 10px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   color: var(--text-muted);
   font-size: 0.8rem;
   display: flex; align-items: center; justify-content: center;
@@ -367,7 +367,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
   padding: 12px;
   scrollbar-width: thin;
 }
@@ -458,7 +458,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pop);
   padding: 8px 4px;
   width: 44px;
 }
@@ -497,7 +497,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     display: flex; flex-direction: column;
     background: var(--surface);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-pop);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     transform: translateY(105%);
     transition: transform 0.28s ease;
@@ -662,7 +662,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     border-radius: var(--radius-md);
     font-size: 0.95rem;
     font-weight: 700;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
     transition: transform 0.15s;
   }
   .sb-bar__next:active { transform: scale(0.97); }

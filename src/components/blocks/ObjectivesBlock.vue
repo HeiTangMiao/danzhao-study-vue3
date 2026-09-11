@@ -32,6 +32,6 @@ defineProps({
   gap: var(--spacer-8);
   margin-bottom: var(--spacer-8);
 }
+.objective-item:last-child { margin-bottom: 0; }
 .objective-dot { color: var(--primary); font-weight: 700; }
-.block-title { margin-bottom: var(--spacer-12); }
 </style>

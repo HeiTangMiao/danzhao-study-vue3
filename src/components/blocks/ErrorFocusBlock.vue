@@ -5,7 +5,7 @@
 <template>
   <section class="block errorfocus">
     <h2 class="block-title">🚨 {{ block.title || '易错专项' }}</h2>
-    <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--shadow ef-card">
+    <div v-for="(item, i) in block.items" :key="i" class="block-card ef-card">
       <div class="ef-scenario">
         <span class="ef-badge">场景 {{ i + 1 }}</span>
         <MathJaxRender :text="item.scenario" class="ef-scenario-text" />
@@ -39,10 +39,9 @@ defineProps({
 </script>
 
 <style scoped>
-/* 外框来自 .block-card，此处只留差异：每个易错场景卡之间的间距 */
-.ef-card {
-  margin-bottom: var(--spacer-16);
-}
+/* 外框来自 .block-card；无阴影（区块不再有阴影）。
+ * 块间距交给 .block-anchor，卡与卡之间用相邻选择器 */
+.ef-card + .ef-card { margin-top: var(--spacer-16); }
 .ef-scenario { display: flex; align-items: flex-start; gap: var(--spacer-8); margin-bottom: var(--spacer-12); }
 .ef-badge {
   flex-shrink: 0; font-size: var(--fs-xs); font-weight: 700;

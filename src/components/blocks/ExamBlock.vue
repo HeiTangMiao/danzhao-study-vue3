@@ -7,8 +7,8 @@
 -->
 <template>
   <section class="block exam">
-    <!-- 考试介绍页 -->
-    <div v-if="phase === 'intro'" class="block-card block-card--loose exam-intro">
+    <!-- 考试介绍页（极简：无卡片，居中排版） -->
+    <div v-if="phase === 'intro'" class="exam-intro">
       <div class="exam-intro-icon">📝</div>
       <h2 class="exam-title">{{ block.title || '模拟卷' }}</h2>
       <div class="exam-meta">
@@ -23,7 +23,7 @@
 
     <!-- 考试进行页 -->
     <div v-else-if="phase === 'running'" class="exam-running">
-      <div class="block-card block-card--md block-card--shadow exam-toolbar">
+      <div class="block-card block-card--md block-card--shadow-xs exam-toolbar">
         <span class="exam-timer" :class="{ 'timer-warn': timeLeft <= 300 }">⏱ {{ fmtTime(timeLeft) }}</span>
         <span class="exam-progress">已答 {{ answeredCount }}/{{ block.items.length }}</span>
         <span class="exam-toolbar__actions">
@@ -42,7 +42,7 @@
         :key="i"
         :ref="(el) => (questionEls[i] = el)"
         :class="{ 'exam-answered': answers[i]?.answered, 'exam-unanswered': !answers[i]?.answered, 'exam-jump-flash': jumpTarget === i }"
-        class="block-card block-card--md exam-question"
+        class="exam-question"
       >
         <div class="exam-q-head">
           <span class="q-index">{{ i + 1 }}</span>
@@ -77,8 +77,8 @@
       </div>
     </div>
 
-    <!-- 结果页 -->
-    <div v-else class="block-card block-card--loose exam-result">
+    <!-- 结果页（极简：无卡片） -->
+    <div v-else class="exam-result">
       <div class="result-hero" :class="passed ? 'result-pass' : 'result-fail'">
         <div class="result-icon">{{ passed ? '🎉' : '📚' }}</div>
         <div class="result-score">{{ score }}<span class="result-total"> / {{ block.totalScore || 100 }}</span></div>
@@ -387,9 +387,12 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 介绍页 */
-/* 外框来自 .block-card（含 --loose 的 24px 内边距），此处只留居中 */
-.exam-intro { text-align: center; }
+/* 介绍页（极简：无卡片，居中排版，靠上边距与页面留白分段） */
+.exam-intro {
+  text-align: center;
+  padding: var(--spacer-24) var(--spacer-16);
+  border-top: 1px solid var(--line);
+}
 .exam-intro-icon { font-size: 3rem; margin-bottom: var(--spacer-12); }
 .exam-title { margin-bottom: var(--spacer-16); }
 .exam-meta { display: flex; justify-content: center; gap: var(--spacer-12); flex-wrap: wrap; margin-bottom: var(--spacer-16); }
@@ -406,8 +409,8 @@ onBeforeUnmount(() => {
 .exam-start-btn:hover { transform: translateY(-2px); }
 
 /* 进行页 */
-/* 外框来自 .block-card（--md + --shadow），此处只留差异：
- * 吸顶定位、横向排布、较窄的内边距。
+/* 工具栏：唯一保留卡片底 + 极浅阴影（sticky 顶栏专用 --shadow-xs），
+ * 其余部分不再用卡片。
  * 注意 position: sticky 依赖滚动祖先没有被 transform/filter/overflow 截断 ——
  * 这个祖先链上不要加动画 transform。 */
 .exam-toolbar {
@@ -447,17 +450,11 @@ onBeforeUnmount(() => {
   font-size: 0.88rem;
 }
 
-/* 外框来自 .block-card，此处只留差异：内边距与题间距 */
+/* 题目去卡片（阶段 3 第二步）：发丝线分隔，不用卡片；
+ * 未答态不再用虚线框 + 底色，由「未答」标签提示 */
 .exam-question {
-  padding: var(--spacer-14) var(--spacer-16);
-  margin-bottom: var(--spacer-12);
-}
-.exam-answered { border-color: var(--primary); }
-/* 未答题：虚线描边 + 柔和高亮，长卷中一眼可辨 */
-.exam-question.exam-unanswered {
-  border-style: dashed;
-  border-color: var(--warning);
-  background: rgba(240, 140, 0, 0.03);
+  padding: var(--spacer-14) 0;
+  border-top: 1px solid var(--line);
 }
 .exam-unanswered-tag {
   font-size: var(--fs-2xs); padding: 1px 8px;
@@ -508,10 +505,14 @@ onBeforeUnmount(() => {
 .self-ok.active { border-color: var(--success); color: var(--success); background: rgba(47, 158, 68, 0.1); }
 .self-no.active { border-color: var(--danger); color: var(--danger); background: rgba(224, 49, 49, 0.1); }
 
-/* 结果页 */
-/* 外框来自 .block-card --loose，本类已无规则；类名保留作为定位钩子 */
-
-.result-hero { text-align: center; padding: var(--spacer-24); border-radius: var(--radius-lg); margin-bottom: var(--spacer-16); }
+/* 结果页（极简：无卡片，靠发丝线与留白分段） */
+.result-hero {
+  text-align: center;
+  padding: var(--spacer-24);
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  margin-bottom: var(--spacer-16);
+}
 .result-pass { background: rgba(47, 158, 68, 0.08); border: 2px solid var(--success); }
 .result-fail { background: rgba(224, 49, 49, 0.06); border: 2px solid var(--danger); }
 .result-icon { font-size: 2.5rem; margin-bottom: var(--spacer-8); }
