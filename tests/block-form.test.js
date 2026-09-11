@@ -42,10 +42,10 @@ describe('BlockForm 控件渲染', () => {
 
   it('枚举字段渲染为下拉，选项与 schema 一致', () => {
     const { wrapper } = mountBlock('knowledge')
-    const options = fieldOf(wrapper, 'kind').findAll('option').map((o) => o.element.value)
+    const options = fieldOf(wrapper, 'variant').findAll('option').map((o) => o.element.value)
     expect(options).toEqual(contentSchema.definitions.block.allOf
       .find((b) => b.if.properties.type.const === 'knowledge')
-      .then.properties.kind.enum)
+      .then.properties.variant.enum)
   })
 
   it('数字字段渲染为 number 输入框', () => {

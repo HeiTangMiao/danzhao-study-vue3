@@ -22,6 +22,8 @@ import ErrorFocusBlock from './ErrorFocusBlock.vue'
 import StrategyBlock from './StrategyBlock.vue'
 import ExamBlock from './ExamBlock.vue'
 import DesmosBlock from './DesmosBlock.vue'
+import ColumnsBlock from './ColumnsBlock.vue'
+import GroupBlock from './GroupBlock.vue'
 
 /**
  * 类型 → 渲染组件
@@ -42,7 +44,11 @@ const BLOCK_COMPONENTS = {
   errorfocus: ErrorFocusBlock,
   strategy: StrategyBlock,
   exam: ExamBlock,
-  desmos: DesmosBlock
+  desmos: DesmosBlock,
+  // 容器型区块：由 BlockRenderer 内部自引用递归（registry 绑定仅为完整性，
+  // BlockRenderer 在模板里用 v-if 分支处理，不会走到这里的 component）
+  columns: ColumnsBlock,
+  group: GroupBlock
 }
 
 /** 类型 → { component, label, icon }：渲染层视角的完整注册表 */

@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -34,18 +34,20 @@
       "allOf": [
         { "if": { "properties": { "type": { "const": "mindmap" } } }, "then": { "required": ["mermaid"], "properties": { "mermaid": { "type": "string", "description": "Mermaid 语法代码" } } } },
         { "if": { "properties": { "type": { "const": "objectives" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "type": "string" } } } } },
-        { "if": { "properties": { "type": { "const": "knowledge" } } }, "then": { "required": ["paragraphs"], "properties": { "paragraphs": { "type": "array", "items": { "type": "string" } }, "kind": { "type": "string", "enum": ["concept", "points", "error"], "description": "知识点子类型：概念/要点/易错" } } } },
+        { "if": { "properties": { "type": { "const": "knowledge" } } }, "then": { "required": ["paragraphs"], "properties": { "paragraphs": { "type": "array", "items": { "type": "string" } }, "variant": { "type": "string", "enum": ["plain", "definition", "aside"], "description": "知识点变体：plain 默认 / definition 定义（左细线）/ aside 补充说明（降字号降色）" } } } },
         { "if": { "properties": { "type": { "const": "formula" } } }, "then": { "required": ["formulas"], "properties": { "formulas": { "type": "array", "items": { "type": "string" } } } } },
         { "if": { "properties": { "type": { "const": "table" } } }, "then": { "required": ["headers", "rows"], "properties": { "headers": { "type": "array", "items": { "type": "string" } }, "rows": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } } } } },
         { "if": { "properties": { "type": { "const": "warning" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
         { "if": { "properties": { "type": { "const": "tip" } } }, "then": { "required": ["text"], "properties": { "text": { "type": "string" } } } },
-        { "if": { "properties": { "type": { "const": "example" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/exampleItem" } } } } },
+        { "if": { "properties": { "type": { "const": "example" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/exampleItem" } }, "variant": { "type": "string", "enum": ["full", "compact"], "description": "例题变体：full 默认完整 / compact 紧凑" } } } },
         { "if": { "properties": { "type": { "const": "quiz" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/quizItem" } } } } },
         { "if": { "properties": { "type": { "const": "diagram" } } }, "then": { "required": ["boardId", "initCode"], "properties": { "boardId": { "type": "string" }, "caption": { "type": "string" }, "initCode": { "type": "string", "description": "JSXGraph 初始化代码（字符串形式）" } } } },
         { "if": { "properties": { "type": { "const": "errorfocus" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/errorFocusItem" } } } } },
         { "if": { "properties": { "type": { "const": "strategy" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/strategyItem" } } } } },
         { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } },
-        { "if": { "properties": { "type": { "const": "desmos" } } }, "then": { "properties": { "initialExpressions": { "type": "array", "items": { "type": "string" }, "description": "初始表达式列表（LaTeX）" } } } }
+        { "if": { "properties": { "type": { "const": "desmos" } } }, "then": { "properties": { "initialExpressions": { "type": "array", "items": { "type": "string" }, "description": "初始表达式列表（LaTeX）" } } } },
+        { "if": { "properties": { "type": { "const": "columns" } } }, "then": { "required": ["items"], "properties": { "cols": { "type": "number", "enum": [2, 3], "description": "桌面端列数；窄屏自动降单列" }, "gap": { "type": "string", "enum": ["normal", "tight"], "description": "列间距：normal 正常 / tight 紧凑" }, "items": { "type": "array", "items": { "type": "array", "items": { "$ref": "#/definitions/block" } }, "description": "每列是一个区块数组，长度必须与 cols 一致" } } } },
+        { "if": { "properties": { "type": { "const": "group" } } }, "then": { "properties": { "variant": { "type": "string", "enum": ["band", "collapse"], "description": "band=分组带（发丝线分隔）；collapse=可折叠分组" }, "collapsed": { "type": "boolean", "description": "collapse 变体初始是否折叠" }, "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } } } }
       ]
     },
     "exampleItem": {

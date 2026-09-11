@@ -22,16 +22,26 @@ describe('内容文件渲染侧冒烟测试', () => {
     expect(pages.length).toBeGreaterThan(100)
   })
 
-  it('每个区块的 type 都能被渲染层识别', async () => {
+  it('每个区块的 type 都能被渲染层识别（含容器内子区块）', async () => {
     const unknown = []
+    // 容器型区块：子区块在 items 里（columns 是「数组的数组」、group 是区块数组）
+    const childBlocksOf = (b) => {
+      if (b.type === 'group') return b.items || []
+      if (b.type === 'columns') return (b.items || []).flat()
+      return []
+    }
+    const walk = (blocks, file, path) => {
+      blocks.forEach((b, i) => {
+        const loc = `${path}[${i}]`
+        if (!BLOCK_TYPES.includes(b.type)) {
+          unknown.push(`${file} 区块${loc} type=${b.type}`)
+        }
+        walk(childBlocksOf(b), file, loc)
+      })
+    }
     for (const file of pages) {
       const mod = await import(pathToFileURL(file).href)
-      const blocks = mod.default?.blocks || []
-      blocks.forEach((b, i) => {
-        if (!BLOCK_TYPES.includes(b.type)) {
-          unknown.push(`${relative(CONTENT_DIR, file)} 区块[${i}] type=${b.type}`)
-        }
-      })
+      walk(mod.default?.blocks || [], relative(CONTENT_DIR, file), '区块')
     }
     expect(unknown).toEqual([])
   })

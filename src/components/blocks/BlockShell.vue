@@ -22,7 +22,7 @@ import { computed } from 'vue'
 const props = defineProps({
   // 区块标题（可选：tip / warning 无标题时留空）
   title: { type: String, default: '' },
-  // 外壳变体：plain 纯留白 / note 左细线 / formula 浅底色
+  // 外壳变体：plain 纯留白 / note 左细线 / formula 浅底色 / viewport 保边框 / definition 左细线+微底色
   variant: { type: String, default: 'plain' },
   // 语义色 token 名（如 'primary' | 'tone-warn'），映射为 --tone 供 .shell--note 使用
   tone: { type: String, default: '' }

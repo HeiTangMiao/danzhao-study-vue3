@@ -156,18 +156,29 @@ function bindNodeClick() {
 
 function navigateToBlock(label) {
   // 联动条件：当前页有匹配区块标题的知识点
-  // 工具函数：从标题关键词定位正文中的 knowledge 区块标题（如 "一、xxx" 等）
+  // 阶段 4：容器型区块（columns / group）内的子区块不再有 .block-anchor 外层，
+  // 所以这里不再遍历 .block-anchor，改为遍历全部「标题元素」，
+  // 命中后就近找最近的 .block-anchor 作为滚动目标（有 scroll-margin-top 兜底）。
   const main = document.querySelector('.page-content')
   if (!main) return
-  const anchors = main.querySelectorAll('.block-anchor')
-  for (const a of anchors) {
-    const h = a.querySelector('h3.block-title, .knowledge-title, .block h3')
+  // 标题候选：区块标题（h2/h3 .block-title）、知识点标题、公式卡 label、
+  // 以及历史遗留的 .block h3 兜底。容器内子区块也会被 querySelectorAll 命中。
+  const titles = main.querySelectorAll('.block-title, .knowledge-title, .formula-label, .block h3')
+  for (const h of titles) {
     const t = h?.textContent?.trim() || ''
-    // 匹配：导图节点标签包含正文标题主干，或标题包含节点标签主干
-    const norm = (s) => s.replace(/^[一二三四五六七八九十]+[、.．]\s*/, '').replace(/\s*/g, '')
+    // 匹配：导图节点标签包含正文标题主干，或标题包含节点标签主干。
+    // 归一化去掉序号前缀与「的/个/与/和」等结构虚词：
+    // 「集合三特性」↔「集合的三个特性」这类表达差异即可互相命中。
+    const norm = (s) => s
+      .replace(/^[一二三四五六七八九十]+[、.．]\s*/, '')
+      .replace(/[的个与和及或]/g, '')
+      .replace(/\s*/g, '')
     const L = norm(label), T = norm(t)
     if (L && T && (L.includes(T) || T.includes(L)) && T.length >= 2) {
-      a.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // 滚动到标题元素本身；若在锚点容器内（含容器型区块的顶层 .block-anchor），
+      // 优先滚到锚点容器以复用 scroll-margin-top
+      const target = h.closest('.block-anchor') || h
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
   }

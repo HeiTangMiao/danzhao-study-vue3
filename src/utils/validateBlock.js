@@ -141,6 +141,31 @@ export function createBlockValidator(schema) {
           }
         }
         break
+      // 容器型区块（阶段 4）：递归校验子区块 —— 子区块的错误带上路径前缀
+      case 'columns': {
+        const cols = Array.isArray(block.items) ? block.items : []
+        cols.forEach((col, ci) => {
+          if (!Array.isArray(col)) {
+            errors.push(`第${ci + 1}列不是数组`)
+            return
+          }
+          col.forEach((child, bi) => {
+            for (const e of validateBlock(child)) {
+              errors.push(`第${ci + 1}列 区块[${bi}] ${e}`)
+            }
+          })
+        })
+        break
+      }
+      case 'group': {
+        const items = Array.isArray(block.items) ? block.items : []
+        items.forEach((child, i) => {
+          for (const e of validateBlock(child)) {
+            errors.push(`区块[${i}] ${e}`)
+          }
+        })
+        break
+      }
       default:
         break
     }

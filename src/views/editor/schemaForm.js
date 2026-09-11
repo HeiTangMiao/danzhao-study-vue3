@@ -55,7 +55,11 @@ const FIELD_LABEL = {
   totalScore: '满分',
   passingScore: '及格分',
   initialExpressions: '初始表达式',
+  variant: '变体',
   kind: '知识点子类型',
+  cols: '列数',
+  gap: '列间距',
+  collapsed: '默认折叠',
   type: '题型',
   options: '选项',
   correctIndex: '正确选项',
@@ -86,6 +90,10 @@ function kindOf(name, prop) {
   if (prop.type === 'array') {
     const items = prop.items || {}
     if (items.$ref) return 'objectList'
+    // 容器型区块（columns / group）：数组的数组，内层是区块引用
+    // （如 columns.items: [[block, ...], ...]）。编辑器只读展示子区块清单，
+    // 深度编辑留待阶段 6（编辑器写回与序列化统一）。
+    if (items.type === 'array' && items.items?.$ref) return 'nestedObjectList'
     if (items.type === 'array') return 'stringMatrix'
     return 'stringList'
   }

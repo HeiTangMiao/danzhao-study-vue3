@@ -62,7 +62,9 @@ describe('blockFields 覆盖度', () => {
     expect(kind('objectives', 'items')).toBe('stringList') // 一维字符串
     expect(kind('quiz', 'items')).toBe('objectList') // 子对象数组
     expect(kind('exam', 'duration')).toBe('number')
-    expect(kind('knowledge', 'kind')).toBe('enum')
+    expect(kind('knowledge', 'variant')).toBe('enum') // 知识点变体（阶段 4 取代死字段 kind）
+    // 容器型区块（阶段 4）：columns 的 items 是「数组的数组」（每列一个区块数组）
+    expect(kind('columns', 'items')).toBe('nestedObjectList')
   })
 })
 
@@ -141,5 +143,48 @@ describe('校验器与 CI 共用同一份规则', () => {
   it('错误描述是相对区块的，不带文件前缀（由调用方补）', () => {
     // Node 侧拼成 `xxx.js 区块[2] 缺少 type`，编辑器侧直接列在区块下方
     expect(validateBlock({})).toEqual(['缺少 type'])
+  })
+})
+
+describe('容器型区块（阶段 4）', () => {
+  it('columns 的 items 推导为 nestedObjectList（数组的数组，内层是区块）', () => {
+    const f = blockFields(contentSchema, 'columns').find((x) => x.name === 'items')
+    expect(f.kind).toBe('nestedObjectList')
+  })
+
+  it('columns 的 cols 枚举是 2/3，gap 枚举是 normal/tight', () => {
+    const fields = blockFields(contentSchema, 'columns')
+    const cols = fields.find((x) => x.name === 'cols')
+    expect(cols.kind).toBe('enum')
+    expect(cols.options).toEqual([2, 3])
+    const gap = fields.find((x) => x.name === 'gap')
+    expect(gap.options).toEqual(['normal', 'tight'])
+  })
+
+  it('group 的 items 推导为 objectList（区块数组）', () => {
+    const f = blockFields(contentSchema, 'group').find((x) => x.name === 'items')
+    expect(f.kind).toBe('objectList')
+    expect(f.itemRef).toBe('block')
+  })
+
+  it('校验器递归进入 columns 子区块，错误带列路径前缀', () => {
+    const errors = validateBlock({
+      type: 'columns',
+      items: [
+        [{ type: 'knowledge', paragraphs: ['合法'] }, { type: '__不存在__' }],
+        [{ type: 'warning', text: '' }]
+      ]
+    })
+    const joined = errors.join('\n')
+    expect(joined).toContain('第1列 区块[1] 未知类型')
+    expect(joined).toContain('第2列 区块[0] warning 区块 text 为空')
+  })
+
+  it('校验器递归进入 group 子区块，错误带区块路径前缀', () => {
+    const errors = validateBlock({
+      type: 'group',
+      items: [{ type: 'formula' }]
+    })
+    expect(errors.join('\n')).toContain('区块[0] 公式区块缺少 formulas')
   })
 })

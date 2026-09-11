@@ -96,6 +96,19 @@
           + 添加{{ f.label }}
         </button>
       </div>
+
+      <!-- 容器型区块的子区块清单（columns.items / group 结构）—— 只读展示，
+           深度编辑留待阶段 6（编辑器写回与序列化统一） -->
+      <div v-else-if="f.kind === 'nestedObjectList'" class="nested-readonly">
+        <p v-if="!(obj[f.name] || []).length" class="nested-readonly__empty">（暂无子区块）</p>
+        <ul v-else class="nested-readonly__list">
+          <li v-for="(col, ci) in obj[f.name] || []" :key="ci" class="nested-readonly__col">
+            <span class="nested-readonly__col-name">列 {{ ci + 1 }}</span>
+            <span class="nested-readonly__col-count">{{ (col || []).length }} 个区块</span>
+          </li>
+        </ul>
+        <p class="nested-readonly__hint">容器子区块请在内容文件中编辑，或在预览区确认效果。</p>
+      </div>
     </div>
   </div>
 </template>
@@ -182,4 +195,17 @@ const hasOptions = computed(() => Array.isArray(obj.value.options) && obj.value.
   display: flex; align-items: center; justify-content: space-between;
   font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;
 }
+/* 容器区块子清单（只读） */
+.nested-readonly {
+  border: 1px dashed var(--border); border-radius: var(--radius-md);
+  padding: var(--spacer-8) var(--spacer-12);
+  background: var(--surface-muted);
+  font-size: 0.8rem; color: var(--text-muted);
+}
+.nested-readonly__list { list-style: none; }
+.nested-readonly__col {
+  display: flex; justify-content: space-between; gap: var(--spacer-8);
+  padding: 2px 0;
+}
+.nested-readonly__hint { margin-top: 6px; font-size: 0.75rem; }
 </style>

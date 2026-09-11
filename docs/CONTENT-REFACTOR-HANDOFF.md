@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-11，对应 `main` 分支 `bb576a2`。
+> 最后更新：2026-09-11，对应 `main` 分支 `5c7c16b`（阶段 3 第二步已合入）。
 
 ---
 
@@ -34,6 +34,7 @@
 ### 已完成并合入 `main`
 
 ```
+5c7c16b  refactor(blocks): 视觉降噪改版（极简留白）                          ← 阶段3 第二步
 bb576a2  deepseek修改                                    ← 用户自己提交的 GeoGebra 自托管文件（与本重构无关）
 1720949  refactor(blocks): 卡片外框收敛为 .block-card 类族 + 设计 token 阶梯      ← 阶段3 第一步
 259c4a4  feat(editor): 编辑器改为 schema 驱动，覆盖全部 14 种区块类型            ← 阶段2
@@ -41,8 +42,9 @@ bb576a2  deepseek修改                                    ← 用户自己提�
 66a8683  feat: 认证强化 + keyset 同步升级 + 完成态由 page_progress 推导
 ```
 
-**三个提交已逐个验证**：每个提交单独 checkout 后 lint / test / validate / build 四项全过，
-且各自保留 139 个内容 chunk。测试数 70 → 102 → 148 逐级递增。
+**四个提交已逐个验证**：每个提交单独 checkout 后 lint / test / validate / build 四项全过，
+且各自保留 139 个内容 chunk。测试数 70 → 102 → 148 → 125（阶段 3 第二步把
+`block-card.test.js` 的框架快照从 14 个收缩到 5 个，测试总数随之下降）逐级演进。
 
 ### 阶段 0+1：元信息与类型清单收敛（`8760dc7`）
 
@@ -89,6 +91,28 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 - `src/assets/css/main.css` —— `--space-1..9` / `--fs-2xs..3xl` / 行高字重阶梯
 - `tests/block-card.test.js` —— 46 条契约断言
 
+### 阶段 3 第二步：视觉降噪改版（`5c7c16b`）
+
+**解决的问题**：「一摞白卡片」+ 间距拥挤 + 全站无统一标题。
+
+**做的内容**：
+- 新增 `src/components/blocks/BlockShell.vue`（统一标题 + 外壳族）；
+  `.block-title` 收敛到 blocks.css 全局一份
+- 区块去卡片：`knowledge`/`objectives` 纯留白（正文 68ch），`tip`/`warning`
+  共用 `.shell--note`（左 2px 细线），`quiz`/`example`/`exam` 改发丝线分隔，
+  `formula` 唯一保留浅底色（`.shell--formula`），`mindmap`/`diagram`/`desmos`
+  视口保留边框（`.shell--viewport`）；`strategy`/`errorfocus` 保卡片去阴影
+- 间距双来源收敛：`.page-content` gap 归零，`.block-anchor + .block-anchor`
+  `margin-top: var(--gap-block)`（32px），各区块自身 margin-bottom 已移除
+- 色彩降噪：`--bg → #fbfbfa`，新增 `--line`/`--line-strong`，`--tone-warn: #b26a00`
+- 阴影三档：`--shadow-xs`（sticky 顶栏）/ `--shadow-pop`（浮层），区块无阴影
+- 动效 token：`--dur-1/2/3` + `--ease-standard/out` + `prefers-reduced-motion`
+- `block-card.test.js` 快照收缩到 5 个框架并做了变异测试
+
+**验收**：门禁全过 + 139 chunk；浏览器实测明暗双主题 × 移动端 375px 通过。
+⚠️ 文档里此前写的验收 URL `/#/unit/...` 实际路由是 `/#/study/...`
+（`/unit/` 仅作旧路由重定向），验证时按实际路由访问。
+
 ---
 
 ## 三、硬性约束（违反会破坏既有资产）
@@ -120,52 +144,11 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 
 ## 四、剩余任务
 
-### 阶段 3 第二步：视觉降噪改版（**下一步就该做这个**）
-
-**这是有意为之的视觉 Breaking change**，也是「极简留白」真正落地的地方。
-
-**做什么**（来自计划 3.2–3.5）：
-
-1. **引入 `BlockShell.vue`** —— 到这一步它才有发挥空间（见第六节第 1 条的约束与边界）。
-2. **消除重复卡片样式**：`.block-card` 族已就位，第二步要**去掉大部分卡片**：
-   - `knowledge`：删掉整个卡片外框，纯靠标题与留白分段，正文 `max-width: 68ch`；
-     `definition` 变体用 2px 左侧细线；`aside` 变体降字号降色
-   - `formula`：**唯一保留浅底色**的类型；删边框、删阴影、圆角降一档；label 改小字号 + 加字距
-   - `tip` / `warning`：共用一个 `.shell--note` 规则（`border-left: 2px solid var(--tone)`），
-     彻底删掉 `rgba()` 填充、1px 描边、圆角 —— 目前这两个文件的规则逐字重复
-   - `quiz`：题目去掉卡片外框，改 `border-top: 1px solid var(--line)` 发丝线分隔；
-     **只有选项选中态用底色**
-   - `example` / `exam`：靠发丝线分隔，不用卡片
-   - `mindmap` / `diagram` / `desmos`：视口需**保留边框**
-3. **block 间距 8px → 32px**（`UnitView.vue:550` 的 `.page-content`）：
-   ```css
-   .page-content { display: flex; flex-direction: column; gap: 0; }
-   .block-anchor + .block-anchor { margin-top: var(--gap-block, 32px); }
-   ```
-   ⚠️ 注意现在**间距有两个来源**：`.page-content` 的 `gap: 8px` **加上**各区块自己的
-   `margin-bottom`（8/10/12/16px 不一）。改版时要把两者一起处理，否则会得到意外结果。
-4. **色彩降噪**：`--bg` 由 `#f6f7fb`（偏蓝）改近白暖灰 `#fbfbfa`；新增 `--line`（发丝线）/
-   `--line-strong`；语义色统一降饱和（`--warning: #f08c00` → `--tone-warn: #b26a00`）；
-   `--primary` 保持品牌蓝但**只用于文字/图标/1px 线**。
-5. **阴影只留 3 档**：`none` / `--shadow-xs`（只给 sticky 顶栏）/ `--shadow-pop`（只给浮层：
-   desmos 遮罩、搜索下拉、TOC 面板）。**区块本身不再有阴影。**
-6. **动效 token**：`--dur-1/2/3`(100/160/240ms) + `--ease-standard` / `--ease-out`，
-   加 `prefers-reduced-motion` 兜底。只有 5 处交互有动效：折叠展开、悬停、浮层进出、
-   阅读进度条、迷你顶栏。**明确不做**：路由切换过渡（建议删掉 `UnitView.vue:515` 的
-   `.fade-enter-active`）、列表 stagger、滚动视差、hover 位移放大、
-   `main.css` 的全局 `transition: background .3s`（主题切换会闪）。
-
-**验收**：
-- 全站门禁四条命令全过 + 139 个内容 chunk 不变
-- **必须人工在浏览器里看**，覆盖每种区块类型 × 明暗双主题 × 移动端 375px：
-  - `/#/unit/math/01/0`（knowledge / tip / warning / formula / table / quiz / example / mindmap 全出现）
-  - `/#/unit/math/03/2`（含 diagram + desmos）
-  - `/#/unit/math/01/6`（18 页同构复习页之一）、`/#/unit/math/01/7`（16 页同构冲刺页之一）
-- 明暗主题下检查对比度：正文 ≥ 4.5:1、次要文字 ≥ 3:1
+### ~~阶段 3 第二步：视觉降噪改版~~（已完成，见第二节 `5c7c16b`）
 
 ---
 
-### 阶段 4：版式层（依赖阶段 3）
+### 阶段 4：版式层（**下一步就该做这个**）
 
 **目标**：新增 `columns` / `group` 两个容器型区块，让页面能编排而不只是纵向堆叠。
 
@@ -218,7 +201,7 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 3. 数学任一单元的 `08-易错专项与冲刺.js`（16 页共享模板）
 
 **验收**：`npm run validate:content`；`npm test`（补递归用例）；三档宽度（1440/1024/375）
-下降列行为；**重点验证 `/#/unit/math/01/0` 点思维导图节点仍能滚到对应块**。
+下降列行为；**重点验证 `/#/study/math/01/0` 点思维导图节点仍能滚到对应块**。
 
 ---
 
@@ -423,10 +406,9 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 
 ### 6. 硬编码 `rgba()` 在暗色主题下不随语义色变化
 
-`TipBlock` 的 `rgba(47,111,237,.08)`、`WarningBlock` 的 `rgba(240,140,0,.10)`、
-`ErrorFocusBlock` 的 `ef-wrong`/`ef-right`、`ExamBlock` 的 11 处 rgba，都是写死的字面量。
-**这是既有的不一致行为，迁移时应保持原样**，不要在抽取阶段「顺手修好」——
-那会让暗色观感改变，属于另一个议题。
+`TipBlock` / `WarningBlock` 的 `rgba()` 填充已在阶段 3 第二步随 `.shell--note` 改版
+一起删除。仍存留的是 `ErrorFocusBlock` 的 `ef-wrong`/`ef-right`、`ExamBlock` 的 11 处 rgba。
+**这些是既有的不一致行为，如无必要不要「顺手修好」** —— 那会让暗色观感改变，属于另一个议题。
 
 ### 7. `ExamBlock` 的定位上下文很脆弱
 
@@ -434,10 +416,11 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 `position: fixed` + `z-index: 300`（**没有用 Teleport**）。两者都怕祖先有
 `transform` / `filter` / `contain`。**不要在它们的祖先链上加动画 transform**。
 
-### 8. `.exam-result` / `.objectives-box` 现在没有 CSS 规则了
+### 8. `.exam-result` / `.objectives-box` 现在的定位
 
-它们的外框完全由 `.block-card` 提供，类名保留作为定位钩子。
-**不要以为类被删了**，也不要顺手给它们补规则。
+阶段 3 第二步后：`.objectives-box` 外框仍完全由 `.block-card` 提供；`.exam-result`
+已改为无卡片（`result-hero` 用 `border-top` 发丝线）。两者类名都保留作为定位钩子，
+**不要以为类被删了，也不要顺手给它们补规则**。
 
 ---
 

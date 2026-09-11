@@ -20,6 +20,8 @@ export type BlockType =
   | 'strategy'   // 考试技巧
   | 'exam'       // 模拟卷
   | 'desmos'     // 演练场（GeoGebra 图形计算器）
+  | 'columns'    // 多栏容器
+  | 'group'      // 分组容器
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -49,7 +51,7 @@ export interface ObjectivesBlock extends BaseBlock {
 export interface KnowledgeBlock extends BaseBlock {
   type: 'knowledge'
   paragraphs: string[] // 段落列表
-  kind?: 'concept' | 'points' | 'error' // 子类型：概念/要点/易错
+  variant?: 'plain' | 'definition' | 'aside' // 变体：默认/定义（左细线）/补充说明（降字号降色）
 }
 
 /** 公式区块 */
@@ -83,6 +85,7 @@ export interface ExampleItem {
 /** 例题区块 */
 export interface ExampleBlock extends BaseBlock {
   type: 'example'
+  variant?: 'full' | 'compact' // 变体：完整 / 紧凑
   items: ExampleItem[]
 }
 
@@ -162,6 +165,22 @@ export interface ExamBlock extends BaseBlock {
   items: ExamItem[]
 }
 
+/** 多栏容器区块：items 为「每列一个区块数组」 */
+export interface ColumnsBlock extends BaseBlock {
+  type: 'columns'
+  cols?: 2 | 3           // 桌面端列数；窄屏自动降单列
+  gap?: 'normal' | 'tight' // 列间距
+  items: Block[][]       // 每列是一个区块数组，长度必须与 cols 一致
+}
+
+/** 分组容器区块 */
+export interface GroupBlock extends BaseBlock {
+  type: 'group'
+  variant?: 'band' | 'collapse' // band=分组带；collapse=可折叠分组
+  collapsed?: boolean    // collapse 变体初始是否折叠
+  items: Block[]         // 组内区块
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -177,6 +196,8 @@ export type Block =
   | StrategyBlock
   | ExamBlock
   | DesmosBlock
+  | ColumnsBlock
+  | GroupBlock
 
 /** 内容页面 */
 export interface ContentPage {

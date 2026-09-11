@@ -41,6 +41,13 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
 }
+/* definition 变体：左 2px 主色细线 + 微底色，用于「定义型」知识点 */
+.shell--definition {
+  border-left: 2px solid var(--primary);
+  background: var(--surface-muted);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-3) var(--space-4);
+}
 
 /* ============================================================
  * 框架族 .block-card
