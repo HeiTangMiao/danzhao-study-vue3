@@ -201,14 +201,16 @@ async function loadCalculator() {
         state.value = 'ready'
       }
     }
-    // 加载超时兜底：官方脚本/CAS 引擎加载失败时不再无限转圈
+    // 加载超时兜底：官方脚本/CAS 引擎加载失败时不再无限转圈。
+    // 注意：自托管引擎体积较大（web 模块约 47MB），首次冷加载可能明显超过默认 15s，
+    //       故放宽到 45s，避免引擎仍在正常加载时被误报为「加载失败」。
     clearTimeout(loadTimer)
     loadTimer = setTimeout(() => {
       if (state.value === 'loading') {
         console.warn('[GeoGebraPlayground] 加载超时')
         state.value = 'error'
       }
-    }, 15000)
+    }, 45000)
 
     applet = new GGBApplet(params, true)
     // 自托管模式：将 web 模块（nocache + 主编译程序）指向本地，实现完全离线
