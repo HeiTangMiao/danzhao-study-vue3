@@ -33,9 +33,11 @@ export const BLOCK_TYPES_META = {
   // 容器型区块：不进入本页目录（目录只收有具体内容的区块）
   columns: { label: '多栏', icon: '' },
   group: { label: '分组', icon: '' },
-  // 结构型区块（阶段 5）：步骤条与速记卡都是正文型内容，进本页目录
+  // 结构型区块（阶段 5）：步骤条 / 速记卡 / 对比 / 术语卡都是正文型内容，进本页目录
   steps: { label: '步骤条', icon: '🔢' },
-  summary: { label: '一页速记', icon: '📌' }
+  summary: { label: '一页速记', icon: '📌' },
+  compare: { label: '对比', icon: '⚖' },
+  vocab: { label: '术语卡', icon: '📕' }
 }
 
 /** 全部区块类型（顺序与 BLOCK_TYPES_META 一致） */

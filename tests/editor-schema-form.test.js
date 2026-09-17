@@ -147,6 +147,30 @@ describe('结构型区块（阶段 5）', () => {
     // 三段均可选：没有必填标记（「至少一段非空」是语义规则，由校验器兜）
     expect(fields.filter((f) => f.required)).toEqual([])
   })
+
+  it('compare 的 left / right 必填，aspects 推导为 objectList（子对象来自 compareAspect）', () => {
+    const fields = blockFields(contentSchema, 'compare')
+    expect(fields.map((f) => [f.name, f.required])).toEqual([
+      ['title', false],
+      ['left', true],
+      ['right', true],
+      ['aspects', true]
+    ])
+    const aspects = fields.find((f) => f.name === 'aspects')
+    expect(aspects.kind).toBe('objectList')
+    expect(aspects.itemRef).toBe('compareAspect')
+    expect(aspects.itemFields.map((x) => x.name)).toEqual(['label', 'left', 'right'])
+  })
+
+  it('vocab 的 items 推导为 objectList，释义与例句走多行文本域', () => {
+    const f = blockFields(contentSchema, 'vocab').find((x) => x.name === 'items')
+    expect(f.kind).toBe('objectList')
+    expect(f.itemRef).toBe('vocabItem')
+    expect(f.itemFields.filter((x) => x.required).map((x) => x.name)).toEqual(['term', 'meaning'])
+    expect(f.itemFields.find((x) => x.name === 'meaning').kind).toBe('textarea')
+    expect(f.itemFields.find((x) => x.name === 'example').kind).toBe('textarea')
+    expect(f.itemFields.find((x) => x.name === 'pinyin').kind).toBe('string')
+  })
 })
 
 describe('校验器与 CI 共用同一份规则', () => {

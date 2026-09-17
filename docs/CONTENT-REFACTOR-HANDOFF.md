@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-17，对应本地 `main` 分支 `081a9c7` + 阶段 5 P1 工作区改动（尚未提交、尚未推送）。
+> 最后更新：2026-09-17，对应本地 `main` 分支 `fa7c237`（阶段 5 P1）+ 阶段 5 P2 工作区改动（尚未提交、尚未推送）。
 
 ---
 
@@ -34,7 +34,8 @@
 ### 已完成并合入 `main`
 
 ```
-081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块            ← 阶段4（本地，未推送）
+fa7c237  feat(blocks): 阶段5 P1 结构扩充——新增 steps/summary 区块              ← 阶段5 P1（本地，未推送）
+081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块              ← 阶段4（本地，未推送）
 5c7c16b  refactor(blocks): 视觉降噪改版（极简留白）                          ← 阶段3 第二步
 bb576a2  deepseek修改                                    ← 用户自己提交的 GeoGebra 自托管文件（与本重构无关）
 1720949  refactor(blocks): 卡片外框收敛为 .block-card 类族 + 设计 token 阶梯      ← 阶段3 第一步
@@ -155,7 +156,7 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 `tests/content-smoke.test.js` 改为递归 walk 容器子区块；
 浏览器实测 columns 桌面双栏与 800px 单列、group band、导图点击 4 个节点跳转。
 
-### 阶段 5 P1：编号步骤条 + 一页速记（工作区改动，尚未提交）
+### 阶段 5 P1：编号步骤条 + 一页速记（已提交 `fa7c237`）
 
 **新增两个结构型区块**（`schema/content-schema.json`）：
 - `steps`：`items` 是 `stepItem` 数组（`title` 必填 / `content` 可选），
@@ -183,6 +184,36 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 - `math/01-集合与逻辑/01-集合的概念与表示.js` —— 页尾加 `summary`（三特性 / 数集链公式 / 互异性易错）
 
 **验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 135 → **148**。
+
+### 阶段 5 P2：双栏中性对照 + 术语卡（工作区改动，尚未提交）
+
+**新增两个结构型区块**（`schema/content-schema.json`）：
+- `compare`：**中性对照**，`left` / `right` 两侧名称 + `aspects`（`label` / `left` / `right`）
+  维度列表，三者皆必填 —— 与 `errorfocus`（错↔对）语义不同，**不可互相顶替**
+- `vocab`：术语卡，`items` 是 `vocabItem` 数组（`term` / `meaning` 必填，
+  `pinyin` / `example` / `note` 可选）
+
+**关键实现**：
+- `src/components/blocks/CompareBlock.vue` —— ≥768px 三栏（维度 | 左 | 右），中缝用发丝线
+  分隔（`.compare-cell--right` 的 `border-left`），行间也是发丝线；窄屏表头隐藏、
+  每个格子用 `.compare-who` 自带名称 —— **两侧地位对等，不要用红/绿暗示对错**
+- `src/components/blocks/VocabBlock.vue` —— per-item 卡沿用 `.block-card--md`（不自造外框），
+  术语大字 + 读音小字 + 「例 / 注」小标签
+- `src/utils/validateBlock.js` —— compare 校验两侧名称、`aspects` 非空、维度三字段非空；
+  vocab 校验 `items` 非空、`term` / `meaning` 非空、可选字段给空串要删
+- `src/views/editor/schemaForm.js` —— `meaning` / `example` 加入 `LONG_FIELDS`（多行文本域）
+- 测试：`tests/compare-vocab.test.js`（10 例，jsdom）、`tests/block-card.test.js` 增 1 处框架快照
+  （`.vocab-card` 用 `--md` 圆角）、`tests/editor-schema-form.test.js` 增 2 例
+- **变异测试**：故意去掉 compare 的 `left` 空校验 / 给 `.vocab-card` 加 padding /
+  把右侧格子的窄屏名称写成左侧名，三处守卫均如实失败，随后已还原
+
+**内容回填（人工草稿，1 处 compare + 1 处 vocab，均为无损改写）**：
+- `math/01-集合与逻辑/06-量词与命题否定.js` —— 「全称命题与特称命题的对比」由 `table`
+  改为 `compare`（4 个维度：量词 / 形式 / 为真的条件 / 为假的条件）
+- `chinese/03-古诗文阅读/02-文言文实词与虚词.js` —— 「虚词『何』的用法」由 `knowledge`
+  改为 `vocab`（原文全句作 `meaning`，「固定结构」作 `note`）
+
+**验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 148 → **162**。
 
 ---
 
@@ -223,7 +254,7 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 
 ---
 
-### 阶段 5：结构扩充（P1 已完成，下一步 P2）
+### 阶段 5：结构扩充（P1 / P2 已完成，下一步 P3）
 
 按优先级：
 
@@ -231,8 +262,8 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 |---|---|---|---|---|
 | ~~**P1**~~ ✅ | `steps` | 编号步骤条（序号圆点 + 发丝竖线串联） | **60+ 页** | 数学「解题通法」、计算机「操作步骤」、语文「文言翻译四步法」现在被塞进 `knowledge.paragraphs` 手写「1. 2. 3.」，无法折叠、无法进 TOC、搜索片段命不中（**已完成，见第二节阶段 5 P1**） |
 | ~~**P1**~~ ✅ | `summary` | 「一页速记」卡（`points` / `formulas` / `mustKnow`） | **139 页** | 单招备考的核心场景是考前回看；现在复习要滚完 9 个块（**已完成，见第二节阶段 5 P1**） |
-| **P2** | `compare` | 双栏中性对照（`left`/`right`/`aspects`） | **40+ 页** | 「列举法 vs 描述法」「借代 vs 借喻」「栈 vs 队列」。**与 `errorfocus` 语义不同**（后者是错↔对），不能复用 |
-| **P2** | `vocab` | 术语卡（`term`/`pinyin`/`meaning`/`example`/`note`） | **25+ 页** | 语文 33 页现在硬塞进 `table`，撑不住四字段 |
+| ~~**P2**~~ ✅ | `compare` | 双栏中性对照（`left`/`right`/`aspects`） | **40+ 页** | 「列举法 vs 描述法」「借代 vs 借喻」「栈 vs 队列」。**与 `errorfocus` 语义不同**（后者是错↔对），不能复用（**已完成，见第二节阶段 5 P2**） |
+| ~~**P2**~~ ✅ | `vocab` | 术语卡（`term`/`pinyin`/`meaning`/`example`/`note`） | **25+ 页** | 语文 33 页现在硬塞进 `table`，撑不住四字段（**已完成，见第二节阶段 5 P2**） |
 | **P3** | `code` | `<pre>` 等宽 + 复制按钮（**不引 Prism/Shiki**） | **15+ 页** | 计算机 26 页；零依赖版即可交付 80% 价值 |
 | **P3** | `cloze` | 挖空 + 点击展开 | **10+ 页** | 可先用 `quiz.fill` 顶 |
 
@@ -462,6 +493,8 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `src/components/blocks/GroupBlock.vue` | 分组带 / 可折叠容器 | `variant` 是 computed，不是函数；见阶段 4 小节 |
 | `src/components/blocks/StepsBlock.vue` | 编号步骤条（序号圆点 + 发丝竖线） | 序号由渲染层生成，内容里**不要**手写「1. 2. 3.」；竖线是 `:not(:last-child)::before`，改间距时同步改 `bottom` |
 | `src/components/blocks/SummaryBlock.vue` | 一页速记卡（三段可选） | 外框复用 `.block-card`，别自造；三段同时为空由 `validateBlock` 拦下；标题缺省时组件显示「一页速记」，但**本页目录只看内容里的 title** —— 想让速记进 TOC 就得显式写 title |
+| `src/components/blocks/CompareBlock.vue` | 双栏中性对照（维度 × 左 / 右） | 与 `errorfocus` 语义不同：**两侧地位对等**，不要引入对错色；≥768px 才分栏，窄屏靠 `.compare-who` 自带名称 |
+| `src/components/blocks/VocabBlock.vue` | 术语卡（term / pinyin / meaning / example / note） | 外框复用 `.block-card--md`；可选字段为空串时校验器报错（要求删字段而不是留空行） |
 | `src/views/UnitView.vue` | 内容页；TOC、锚点、`.page-content` 间距 | 290 行附近的加载点、286 行的锚点跳转、550 行的间距 |
 | `src/components/blocks/MindMapBlock.vue` | 导图；`navigateToBlock()` 文字匹配跳转 | 阶段 4 已改为「全部标题元素 + `closest('.block-anchor')`」，改动前先读第二节阶段 4 小节 |
 

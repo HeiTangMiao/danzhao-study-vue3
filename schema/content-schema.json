@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group", "steps", "summary"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group", "steps", "summary", "compare", "vocab"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -49,7 +49,9 @@
         { "if": { "properties": { "type": { "const": "columns" } } }, "then": { "required": ["items"], "properties": { "cols": { "type": "number", "enum": [2, 3], "description": "桌面端列数；窄屏自动降单列" }, "gap": { "type": "string", "enum": ["normal", "tight"], "description": "列间距：normal 正常 / tight 紧凑" }, "items": { "type": "array", "items": { "type": "array", "items": { "$ref": "#/definitions/block" } }, "description": "每列是一个区块数组，长度必须与 cols 一致" } } } },
         { "if": { "properties": { "type": { "const": "group" } } }, "then": { "properties": { "variant": { "type": "string", "enum": ["band", "collapse"], "description": "band=分组带（发丝线分隔）；collapse=可折叠分组" }, "collapsed": { "type": "boolean", "description": "collapse 变体初始是否折叠" }, "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } } } },
         { "if": { "properties": { "type": { "const": "steps" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/stepItem" }, "description": "编号步骤：渲染时按顺序自动编号，序号由渲染层生成不要写进标题" } } } },
-        { "if": { "properties": { "type": { "const": "summary" } } }, "then": { "properties": { "points": { "type": "array", "items": { "type": "string" }, "description": "速记要点：核心结论清单" }, "formulas": { "type": "array", "items": { "type": "string" }, "description": "必背公式：LaTeX 行，块级居中展示" }, "mustKnow": { "type": "array", "items": { "type": "string" }, "description": "必记结论：最容易忘、必须记死的点" } } } }
+        { "if": { "properties": { "type": { "const": "summary" } } }, "then": { "properties": { "points": { "type": "array", "items": { "type": "string" }, "description": "速记要点：核心结论清单" }, "formulas": { "type": "array", "items": { "type": "string" }, "description": "必背公式：LaTeX 行，块级居中展示" }, "mustKnow": { "type": "array", "items": { "type": "string" }, "description": "必记结论：最容易忘、必须记死的点" } } } },
+        { "if": { "properties": { "type": { "const": "compare" } } }, "then": { "required": ["left", "right", "aspects"], "properties": { "left": { "type": "string", "description": "左侧名称：如「列举法」" }, "right": { "type": "string", "description": "右侧名称：如「描述法」" }, "aspects": { "type": "array", "items": { "$ref": "#/definitions/compareAspect" }, "description": "对照维度：每项一行，左右两侧各一句（中性对照，不分对错）" } } } },
+        { "if": { "properties": { "type": { "const": "vocab" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/vocabItem" } } } } }
       ]
     },
     "exampleItem": {
@@ -81,6 +83,26 @@
       "properties": {
         "title": { "type": "string", "description": "步骤标题：一句话说明这一步做什么" },
         "content": { "type": "string", "description": "步骤说明：可选，支持 **加粗** 与 LaTeX" }
+      }
+    },
+    "compareAspect": {
+      "type": "object",
+      "required": ["label", "left", "right"],
+      "properties": {
+        "label": { "type": "string", "description": "对照维度：如「适用场景」" },
+        "left": { "type": "string", "description": "左侧说法：支持 **加粗** 与 LaTeX" },
+        "right": { "type": "string", "description": "右侧说法：支持 **加粗** 与 LaTeX" }
+      }
+    },
+    "vocabItem": {
+      "type": "object",
+      "required": ["term", "meaning"],
+      "properties": {
+        "term": { "type": "string", "description": "术语：词条本身" },
+        "pinyin": { "type": "string", "description": "读音：拼音或英文读法，可选" },
+        "meaning": { "type": "string", "description": "释义：词条的准确解释" },
+        "example": { "type": "string", "description": "例句：可选，给出典型用例" },
+        "note": { "type": "string", "description": "备注：可选，易混点或记忆提示" }
       }
     },
     "errorFocusItem": {

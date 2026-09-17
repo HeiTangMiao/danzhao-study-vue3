@@ -26,6 +26,8 @@ import ColumnsBlock from './ColumnsBlock.vue'
 import GroupBlock from './GroupBlock.vue'
 import StepsBlock from './StepsBlock.vue'
 import SummaryBlock from './SummaryBlock.vue'
+import CompareBlock from './CompareBlock.vue'
+import VocabBlock from './VocabBlock.vue'
 
 /**
  * 类型 → 渲染组件
@@ -53,7 +55,9 @@ const BLOCK_COMPONENTS = {
   group: GroupBlock,
   // 结构型区块（阶段 5）
   steps: StepsBlock,
-  summary: SummaryBlock
+  summary: SummaryBlock,
+  compare: CompareBlock,
+  vocab: VocabBlock
 }
 
 /** 类型 → { component, label, icon }：渲染层视角的完整注册表 */

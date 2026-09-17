@@ -196,6 +196,44 @@ export function createBlockValidator(schema) {
         }
         break
       }
+      case 'compare': {
+        // 两侧地位对等，两边都必须给名称；维度至少一条，否则整块只剩下两个名字
+        if (isEmpty(block.left)) errors.push('对比区块 left 为空')
+        if (isEmpty(block.right)) errors.push('对比区块 right 为空')
+        if (!Array.isArray(block.aspects) || block.aspects.length === 0) {
+          errors.push('对比区块缺少 aspects（对照维度）')
+        } else {
+          block.aspects.forEach((a, ai) => {
+            if (!a || typeof a !== 'object') {
+              errors.push(`对比维度[${ai}] 不是对象`)
+              return
+            }
+            for (const f of ['label', 'left', 'right']) {
+              if (isEmpty(a[f])) errors.push(`对比维度[${ai}] ${f} 为空`)
+            }
+          })
+        }
+        break
+      }
+      case 'vocab':
+        if (!Array.isArray(block.items) || block.items.length === 0) errors.push('术语卡区块缺少 items')
+        else {
+          block.items.forEach((it, ii) => {
+            if (!it || typeof it !== 'object') {
+              errors.push(`术语[${ii}] 不是对象`)
+              return
+            }
+            if (isEmpty(it.term)) errors.push(`术语[${ii}] term 为空`)
+            if (isEmpty(it.meaning)) errors.push(`术语[${ii}] meaning 为空`)
+            // 可选字段给了空串说明本想删掉 —— 直接删字段，别留空行
+            for (const f of ['pinyin', 'example', 'note']) {
+              if (it[f] !== undefined && isEmpty(it[f])) {
+                errors.push(`术语[${ii}] ${f} 为空（如需省略请删掉该字段）`)
+              }
+            }
+          })
+        }
+        break
       default:
         break
     }

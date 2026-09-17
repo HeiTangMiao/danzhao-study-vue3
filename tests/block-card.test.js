@@ -154,6 +154,18 @@ const FRAMES = [
       'border-radius': 'var(--radius-lg)',
       padding: 'var(--spacer-16)'
     }
+  },
+  {
+    // 阶段 5 术语卡：per-item 卡，圆角降一档（md），其余与基础框架一致
+    file: 'VocabBlock.vue',
+    selector: '.vocab-card',
+    classes: ['block-card', 'block-card--md'],
+    expected: {
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
+      'border-radius': 'var(--radius-md)',
+      padding: 'var(--spacer-16)'
+    }
   }
 ]
 

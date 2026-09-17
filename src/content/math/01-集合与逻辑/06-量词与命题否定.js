@@ -68,12 +68,15 @@ export default {
       ]
     },
     {
-      type: "table",
+      type: "compare",
       title: "全称命题与特称命题的对比",
-      headers: ["类别", "量词", "形式", "为真的条件", "为假的条件"],
-      rows: [
-        ["全称命题", "\\(\\forall\\)（任意）", "\\(\\forall x \\in M, p(x)\\)", "\\(M\\) 中所有元素都满足 \\(p(x)\\)", "存在一个元素不满足 \\(p(x)\\)"],
-        ["特称命题", "\\(\\exists\\)（存在）", "\\(\\exists x \\in M, p(x)\\)", "\\(M\\) 中至少一个元素满足 \\(p(x)\\)", "\\(M\\) 中所有元素都不满足 \\(p(x)\\)"]
+      left: "全称命题",
+      right: "特称命题",
+      aspects: [
+        { label: "量词", left: "\\(\\forall\\)（任意）", right: "\\(\\exists\\)（存在）" },
+        { label: "形式", left: "\\(\\forall x \\in M, p(x)\\)", right: "\\(\\exists x \\in M, p(x)\\)" },
+        { label: "为真的条件", left: "\\(M\\) 中所有元素都满足 \\(p(x)\\)", right: "\\(M\\) 中至少一个元素满足 \\(p(x)\\)" },
+        { label: "为假的条件", left: "存在一个元素不满足 \\(p(x)\\)", right: "\\(M\\) 中所有元素都不满足 \\(p(x)\\)" }
       ]
     },
     {

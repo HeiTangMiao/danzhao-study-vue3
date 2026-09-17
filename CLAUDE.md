@@ -60,7 +60,7 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 原因见 `src/content/pageMeta.js`：这批字段曾在 139 个文件里各手写一份、又在 site.js 各写一份，实测漂移了 19 页（页头与侧边栏显示两个版本）。现在 site.js 是唯一真相源，元信息由 `resolvePageMeta(学科配置, 单元号, fileIndex)` 推导并在加载时注入；`title`/`subtitle` 一律取自 site.js，页面文件里的同名字段即使写了也被忽略。
 若你接手的是 1B 之前的旧文件（还带着五元组），运行 `node scripts/migrate-content-meta.mjs --write` 剥离（默认干跑，不加 `--write` 不落盘）。
 
-- Block 结构由 `schema/content-schema.json` 约束（18 种类型：mindmap / objectives / knowledge / formula / table / warning / tip / example / quiz / diagram / errorfocus / strategy / exam / desmos / columns / group / steps / summary）。该 schema 是**类型白名单的唯一真相源**，validator 的白名单从它派生，`tests/block-registry.test.js` 负责钉死它与渲染注册表 `registry.js`、`.d.ts` 三者一致。
+- Block 结构由 `schema/content-schema.json` 约束（20 种类型：mindmap / objectives / knowledge / formula / table / warning / tip / example / quiz / diagram / errorfocus / strategy / exam / desmos / columns / group / steps / summary / compare / vocab）。该 schema 是**类型白名单的唯一真相源**，validator 的白名单从它派生，`tests/block-registry.test.js` 负责钉死它与渲染注册表 `registry.js`、`.d.ts` 三者一致。
   新增类型 = schema 加 allOf 分支（+ 子对象 definition）+ 新建组件 + `registry.js` / `blockTypes.js` 各加一行 + 同步 `.d.ts`；编辑器表单与校验白名单会自动跟随，不要再手写字段表。
 - `UnitView.vue` 把路由参数解析为 学科/单元/fileIndex，再动态导入内容文件，因此**每个内容文件都是独立的懒加载 chunk**（139 个页面）。内容文件需自包含；每个页面文件都单独打包发布。
 - **`site.js` 的 `files[]` 数组顺序就是 `fileIndex`**，直接决定 URL 与历史进度语义——**绝不可重排**，只能追加。

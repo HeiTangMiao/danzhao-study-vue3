@@ -24,6 +24,8 @@ export type BlockType =
   | 'group'      // 分组容器
   | 'steps'      // 编号步骤条
   | 'summary'    // 一页速记
+  | 'compare'    // 双栏中性对照
+  | 'vocab'      // 术语卡
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -203,6 +205,36 @@ export interface SummaryBlock extends BaseBlock {
   mustKnow?: string[]   // 必记结论
 }
 
+/** 对照维度条目 */
+export interface CompareAspect {
+  label: string         // 对照维度：如「适用场景」
+  left: string          // 左侧说法
+  right: string         // 右侧说法
+}
+
+/** 双栏中性对照区块（左右地位对等，不分对错） */
+export interface CompareBlock extends BaseBlock {
+  type: 'compare'
+  left: string          // 左侧名称
+  right: string         // 右侧名称
+  aspects: CompareAspect[]
+}
+
+/** 术语条目 */
+export interface VocabItem {
+  term: string          // 术语
+  pinyin?: string       // 读音（拼音或英文读法）
+  meaning: string       // 释义
+  example?: string      // 例句
+  note?: string         // 备注（易混点 / 记忆提示）
+}
+
+/** 术语卡区块 */
+export interface VocabBlock extends BaseBlock {
+  type: 'vocab'
+  items: VocabItem[]
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -222,6 +254,8 @@ export type Block =
   | GroupBlock
   | StepsBlock
   | SummaryBlock
+  | CompareBlock
+  | VocabBlock
 
 /** 内容页面 */
 export interface ContentPage {
