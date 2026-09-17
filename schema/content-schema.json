@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group", "steps", "summary"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -47,7 +47,9 @@
         { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } },
         { "if": { "properties": { "type": { "const": "desmos" } } }, "then": { "properties": { "initialExpressions": { "type": "array", "items": { "type": "string" }, "description": "初始表达式列表（LaTeX）" } } } },
         { "if": { "properties": { "type": { "const": "columns" } } }, "then": { "required": ["items"], "properties": { "cols": { "type": "number", "enum": [2, 3], "description": "桌面端列数；窄屏自动降单列" }, "gap": { "type": "string", "enum": ["normal", "tight"], "description": "列间距：normal 正常 / tight 紧凑" }, "items": { "type": "array", "items": { "type": "array", "items": { "$ref": "#/definitions/block" } }, "description": "每列是一个区块数组，长度必须与 cols 一致" } } } },
-        { "if": { "properties": { "type": { "const": "group" } } }, "then": { "properties": { "variant": { "type": "string", "enum": ["band", "collapse"], "description": "band=分组带（发丝线分隔）；collapse=可折叠分组" }, "collapsed": { "type": "boolean", "description": "collapse 变体初始是否折叠" }, "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } } } }
+        { "if": { "properties": { "type": { "const": "group" } } }, "then": { "properties": { "variant": { "type": "string", "enum": ["band", "collapse"], "description": "band=分组带（发丝线分隔）；collapse=可折叠分组" }, "collapsed": { "type": "boolean", "description": "collapse 变体初始是否折叠" }, "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } } } },
+        { "if": { "properties": { "type": { "const": "steps" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/stepItem" }, "description": "编号步骤：渲染时按顺序自动编号，序号由渲染层生成不要写进标题" } } } },
+        { "if": { "properties": { "type": { "const": "summary" } } }, "then": { "properties": { "points": { "type": "array", "items": { "type": "string" }, "description": "速记要点：核心结论清单" }, "formulas": { "type": "array", "items": { "type": "string" }, "description": "必背公式：LaTeX 行，块级居中展示" }, "mustKnow": { "type": "array", "items": { "type": "string" }, "description": "必记结论：最容易忘、必须记死的点" } } } }
       ]
     },
     "exampleItem": {
@@ -71,6 +73,14 @@
         "correctIndex": { "type": "number", "description": "选择题正确选项索引（可选）" },
         "answer": { "type": "string", "description": "答案与解析" },
         "difficulty": { "type": "string", "enum": ["basic", "medium", "advanced", "sprint"], "description": "难度：基础/中等/提高/冲刺" }
+      }
+    },
+    "stepItem": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "description": "步骤标题：一句话说明这一步做什么" },
+        "content": { "type": "string", "description": "步骤说明：可选，支持 **加粗** 与 LaTeX" }
       }
     },
     "errorFocusItem": {

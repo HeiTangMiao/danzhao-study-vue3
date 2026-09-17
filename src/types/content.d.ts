@@ -22,6 +22,8 @@ export type BlockType =
   | 'desmos'     // 演练场（GeoGebra 图形计算器）
   | 'columns'    // 多栏容器
   | 'group'      // 分组容器
+  | 'steps'      // 编号步骤条
+  | 'summary'    // 一页速记
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -181,6 +183,26 @@ export interface GroupBlock extends BaseBlock {
   items: Block[]         // 组内区块
 }
 
+/** 编号步骤条目 */
+export interface StepItem {
+  title: string         // 步骤标题（一句话说明这一步做什么）
+  content?: string      // 步骤说明（可选，支持加粗与 LaTeX）
+}
+
+/** 编号步骤条区块（序号由渲染层生成） */
+export interface StepsBlock extends BaseBlock {
+  type: 'steps'
+  items: StepItem[]
+}
+
+/** 一页速记区块：三段均为可选，但至少一段非空 */
+export interface SummaryBlock extends BaseBlock {
+  type: 'summary'
+  points?: string[]     // 速记要点
+  formulas?: string[]   // 必背公式（LaTeX，块级居中）
+  mustKnow?: string[]   // 必记结论
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -198,6 +220,8 @@ export type Block =
   | DesmosBlock
   | ColumnsBlock
   | GroupBlock
+  | StepsBlock
+  | SummaryBlock
 
 /** 内容页面 */
 export interface ContentPage {

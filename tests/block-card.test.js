@@ -142,6 +142,18 @@ const FRAMES = [
       'box-shadow': 'var(--shadow-xs)',
       'margin-bottom': 'var(--spacer-16)'
     }
+  },
+  {
+    // 阶段 5「一页速记」卡：与基础框架零差异，组件 scoped 里只留排版声明
+    file: 'SummaryBlock.vue',
+    selector: '.summary-card',
+    classes: ['block-card'],
+    expected: {
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
+      'border-radius': 'var(--radius-lg)',
+      padding: 'var(--spacer-16)'
+    }
   }
 ]
 
@@ -331,7 +343,7 @@ describe('间距与字号阶梯', () => {
     expect([...sizes].sort((a, b) => a - b)).toEqual(sizes)
   })
 
-  it('没有任何旧间距名被删掉 —— 14 个组件与各 view 还在用', () => {
+  it('没有任何旧间距名被删掉 —— 各区块组件与 view 还在用', () => {
     for (const name of [
       '--spacer-4', '--spacer-6', '--spacer-8', '--spacer-10', '--spacer-12',
       '--spacer-14', '--spacer-16', '--spacer-20', '--spacer-24', '--spacer-32',

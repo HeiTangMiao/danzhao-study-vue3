@@ -122,6 +122,33 @@ describe('skeletonOf 最小合法骨架', () => {
   })
 })
 
+describe('结构型区块（阶段 5）', () => {
+  it('steps 的 items 推导为 objectList，子对象字段来自 stepItem', () => {
+    const f = blockFields(contentSchema, 'steps').find((x) => x.name === 'items')
+    expect(f.kind).toBe('objectList')
+    expect(f.itemRef).toBe('stepItem')
+    // 只有 title 必填；content 走多行文本域
+    expect(f.itemFields.map((x) => [x.name, x.required])).toEqual([['title', true], ['content', false]])
+    expect(f.itemFields.find((x) => x.name === 'content').kind).toBe('textarea')
+    // 标签沿用通用字段表（title → 标题），content 未登记则取 schema description 的前半段
+    expect(f.itemFields.map((x) => x.label)).toEqual(['标题', '步骤说明'])
+  })
+
+  it('summary 的三段推导为 stringList，字段名与中文标签可读', () => {
+    const fields = blockFields(contentSchema, 'summary')
+    expect(fields.map((f) => [f.name, f.kind])).toEqual([
+      ['title', 'string'],
+      ['points', 'stringList'],
+      ['formulas', 'stringList'],
+      ['mustKnow', 'stringList']
+    ])
+    // formulas 沿用公式区块的登记名「公式行」；points / mustKnow 取 schema description 前半段
+    expect(fields.map((f) => f.label)).toEqual(['标题', '速记要点', '公式行', '必记结论'])
+    // 三段均可选：没有必填标记（「至少一段非空」是语义规则，由校验器兜）
+    expect(fields.filter((f) => f.required)).toEqual([])
+  })
+})
+
 describe('校验器与 CI 共用同一份规则', () => {
   it('correctIndex 越界会被拦下', () => {
     const errors = validateBlock({

@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-11，对应 `main` 分支 `5c7c16b`（阶段 3 第二步已合入）。
+> 最后更新：2026-09-17，对应本地 `main` 分支 `081a9c7` + 阶段 5 P1 工作区改动（尚未提交、尚未推送）。
 
 ---
 
@@ -34,6 +34,7 @@
 ### 已完成并合入 `main`
 
 ```
+081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块            ← 阶段4（本地，未推送）
 5c7c16b  refactor(blocks): 视觉降噪改版（极简留白）                          ← 阶段3 第二步
 bb576a2  deepseek修改                                    ← 用户自己提交的 GeoGebra 自托管文件（与本重构无关）
 1720949  refactor(blocks): 卡片外框收敛为 .block-card 类族 + 设计 token 阶梯      ← 阶段3 第一步
@@ -42,9 +43,10 @@ bb576a2  deepseek修改                                    ← 用户自己提�
 66a8683  feat: 认证强化 + keyset 同步升级 + 完成态由 page_progress 推导
 ```
 
-**四个提交已逐个验证**：每个提交单独 checkout 后 lint / test / validate / build 四项全过，
+**阶段 0–3 的四个提交已逐个 checkout 验证**：lint / test / validate / build 四项全过，
 且各自保留 139 个内容 chunk。测试数 70 → 102 → 148 → 125（阶段 3 第二步把
-`block-card.test.js` 的框架快照从 14 个收缩到 5 个，测试总数随之下降）逐级演进。
+`block-card.test.js` 的框架快照从 14 个收缩到 5 个，测试总数随之下降）逐级演进；
+阶段 4 后为 **135**。
 
 ### 阶段 0+1：元信息与类型清单收敛（`8760dc7`）
 
@@ -113,6 +115,75 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 ⚠️ 文档里此前写的验收 URL `/#/unit/...` 实际路由是 `/#/study/...`
 （`/unit/` 仅作旧路由重定向），验证时按实际路由访问。
 
+### 阶段 4：版式层（`081a9c7`）
+
+**解决的问题**：全站唯一布局是纵向堆叠、schema 零布局字段；顺带修掉导图联动隐患。
+
+**新增两个容器型区块**（`schema/content-schema.json`）：
+- `columns`：`items` 是**数组的数组**（每列一个区块数组），`cols` 枚举 2/3，
+  `gap` normal/tight；`@media (min-width: 1024px)` 才分列，窄屏自动降单列
+  （子元素 `min-width: 0` 防撑破）
+- `group`：`variant` band（发丝线分组带）/ collapse（可折叠，`collapsed` 给初值），
+  `items` 是区块数组
+
+**同时**：`knowledge.kind`（0 使用且从未被读取的死字段）→ `variant: plain|definition|aside`；
+`example` 加 `variant: full|compact`。
+
+**关键实现**：
+- [BlockRenderer.vue](file:///c:/Users/33073/Desktop/danzhao-study-vue3/src/components/BlockRenderer.vue)
+  —— 容器分支在**模板内自引用递归**（`<BlockRenderer v-for="child in col" />`），
+  **不是**让容器组件 import BlockRenderer（会循环依赖 + resolver 拿到 undefined）
+- `src/components/blocks/ColumnsBlock.vue` / `GroupBlock.vue` —— 新建，slot 注入子区块
+- `src/utils/validateBlock.js` —— 递归校验子区块，错误带「第N列 区块[i]」路径前缀
+- `src/views/editor/schemaForm.js` —— 新增 `nestedObjectList` kind（数组的数组且内层 `$ref`）；
+  `BlockForm.vue` 的嵌套容器目前是**只读清单**（深度编辑留待阶段 6）
+
+**⚠️ 导图联动的两条链路差异（阶段 4 修掉的那条）**：容器内子区块**没有** `.block-anchor`
+外层，原 `navigateToBlock()` 按锚点遍历必然**静默失效**。现改为遍历全部标题元素
+（`.block-title, .knowledge-title, .formula-label, .block h3`），命中后
+`closest('.block-anchor') || h` 取滚动目标；并加了序号前缀与「的/个/与/和/及/或」虚词归一化
+（「集合三特性」↔「集合的三个特性」）。**未来任何「按锚点遍历」的新链路都要按这个模式写。**
+TOC 链路（按索引 `#block-{i}`）不受影响。
+
+**改造了 3 个代表性内容页**：
+1. `01-集合的概念与表示.js` —— 13 块 → group band「核心概念」+ columns 双栏 + band「表示方法」
+2. `07-复习测验.js`（18 页共享模板）—— 两个 quiz 包进 group band
+3. `08-易错专项与冲刺.js`（16 页共享模板）—— columns 双栏（易错对比 | 冲刺题）
+
+**验收**：门禁全过 + 139 chunk + 主包 47.3 KB + schema 未进主包；
+新增 `tests/container-render.test.js`（jsdom，5 例：双栏 / 缺列兜底 / band / collapse / 嵌套容器）；
+`tests/content-smoke.test.js` 改为递归 walk 容器子区块；
+浏览器实测 columns 桌面双栏与 800px 单列、group band、导图点击 4 个节点跳转。
+
+### 阶段 5 P1：编号步骤条 + 一页速记（工作区改动，尚未提交）
+
+**新增两个结构型区块**（`schema/content-schema.json`）：
+- `steps`：`items` 是 `stepItem` 数组（`title` 必填 / `content` 可选），
+  **序号由渲染层按顺序生成** —— 内容里不要再手写「1. 2. 3.」，改顺序不用改文案
+- `summary`：`points` / `formulas` / `mustKnow` 三段**皆可选**，但至少一段非空（JSON Schema
+  表达不了，由语义校验兜住）
+
+**关键实现**：
+- `src/components/blocks/StepsBlock.vue` —— 序号圆点 + 发丝竖线串联
+  （`.step:not(:last-child)::before`：线从本项圆点下沿连到下一项圆点上沿），
+  `ol/li` 语义；标题与说明走 MathJaxRender（支持加粗与 LaTeX）
+- `src/components/blocks/SummaryBlock.vue` —— 整块一张 `.block-card`（**不自造外框**），
+  默认标题「一页速记」；空字符串 / 脏值在渲染前过滤，缺哪段不渲染哪段
+- `src/utils/validateBlock.js` —— steps 校验 `items` 非空、`title` 非空、`content` 给空要删字段；
+  summary 校验「三段至少一项非空」、字段须为数组、无空元素
+- 测试：`tests/steps-summary.test.js`（9 例，jsdom）、`tests/block-card.test.js` 增 1 处框架快照
+  （`.summary-card` 与基础框架零差异）、`tests/editor-schema-form.test.js` 增 2 例
+  （编辑器字段推导与中文标签自动跟随，含 `stepItem` 走 objectList）
+- **变异测试**：故意去掉 title 空校验 / 把序号改成常量 / 给 `.summary-card` 加 padding，
+  三处守卫均如实失败，随后已还原
+
+**内容回填（人工草稿，1 处 steps + 2 处 summary）**：
+- `computer/03-计算机网络技术/02-网络拓扑搭建.js` —— 「考试拓扑搭建步骤」从
+  `knowledge.paragraphs` 手写 ①–⑤ 改为 `steps`（文字无损迁移），并在页尾加 `summary`
+- `math/01-集合与逻辑/01-集合的概念与表示.js` —— 页尾加 `summary`（三特性 / 数集链公式 / 互异性易错）
+
+**验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 135 → **148**。
+
 ---
 
 ## 三、硬性约束（违反会破坏既有资产）
@@ -148,71 +219,18 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 
 ---
 
-### 阶段 4：版式层（**下一步就该做这个**）
-
-**目标**：新增 `columns` / `group` 两个容器型区块，让页面能编排而不只是纵向堆叠。
-
-**为什么是容器而不是 `span`/grid**：`span` 需要父级是 grid，而 grid 的统一 gap 会夺走
-「留白节奏」的控制权。容器方案让作者管编排、容器管间距。
-
-**schema 新增两个分支**（`schema/content-schema.json`）：
-
-```jsonc
-{ "if": { "properties": { "type": { "const": "columns" } } },
-  "then": { "required": ["items"], "properties": {
-    "cols": { "type": "number", "enum": [2, 3], "description": "桌面端列数；窄屏自动降单列" },
-    "gap":  { "type": "string", "enum": ["normal","tight"] },
-    "items": { "type": "array", "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } }
-  } } },
-
-{ "if": { "properties": { "type": { "const": "group" } } },
-  "then": { "properties": {
-    "variant": { "type": "string", "enum": ["band","collapse"], "description": "band=分组带；collapse=可折叠分组" },
-    "collapsed": { "type": "boolean" },
-    "items": { "type": "array", "items": { "$ref": "#/definitions/block" } }
-  } } }
-```
-
-同时给 `knowledge` 加 `variant: plain|definition|aside`、`example` 加 `variant: full|compact`。
-（`knowledge.kind` 是 0 使用且从未被读取的死字段，用 `variant` 取代它。）
-
-**⚠️ 递归渲染必须在 `BlockRenderer.vue` 内部自引用**（SFC 支持按文件名自引用）——
-不要让 `ColumnsBlock.vue` 去 import `BlockRenderer`，那会形成循环依赖且模块求值顺序会让
-`resolver` 拿到 `undefined`。未知类型分支保持**显式提示**，不要退回静默空白。
-
-**⚠️ 必须一并处理的隐患（漏掉会让 96 个含导图的页面点击联动失效）**：
-本仓库有**两条互不相同**的「跳到某个区块」链路：
-
-1. **本页目录（TOC）** —— `UnitView.vue:286` 的 `document.getElementById('block-' + index)`，
-   靠 `v-for` 挂在每个区块外层 div 上的 `id="block-{i}"`，**按索引**定位。
-2. **思维导图点击节点跳正文** —— `MindMapBlock.vue:157` 的 `navigateToBlock()`，
-   **不认索引**：`querySelectorAll('.block-anchor')` 取出所有锚点，再逐个读锚点内
-   `h3.block-title, .knowledge-title, .block h3` 的**文字**，与导图节点标签做归一化后的
-   互相包含匹配。**只匹配 `h3.block-title`** —— 用 `<h2 class="block-title">` 的
-   `ExampleBlock` / `ErrorFocusBlock` / `StrategyBlock` / `QuizBlock` 本来就匹配不到。
-
-引入容器后，子区块不再有 `.block-anchor` 外层，链路 2 的 `querySelectorAll` 只会取到顶层
-容器，而容器上大概率没有 `h3.block-title`，匹配随即失效（**不报错，只是点了没反应**）。
-修复方向是「容器内也参与匹配」或「导图直接拿子区块标题表」，**不是改 id**。
-
-**建议先改造 3 个代表性内容页**（覆盖最集中的同构结构，收益/风险比最高）：
-1. `src/content/math/01-集合与逻辑/01-集合的概念与表示.js` —— 13 块 → 9 块 + 2 容器
-2. 数学任一单元的 `07-复习测验.js`（18 页共享模板）—— 一处改动覆盖 18 页
-3. 数学任一单元的 `08-易错专项与冲刺.js`（16 页共享模板）
-
-**验收**：`npm run validate:content`；`npm test`（补递归用例）；三档宽度（1440/1024/375）
-下降列行为；**重点验证 `/#/study/math/01/0` 点思维导图节点仍能滚到对应块**。
+### ~~阶段 4：版式层~~（已完成，见第二节 `081a9c7`）
 
 ---
 
-### 阶段 5：结构扩充（依赖阶段 4）
+### 阶段 5：结构扩充（P1 已完成，下一步 P2）
 
 按优先级：
 
 | 优先级 | 类型 | 形态 | 预期复用度 | 理由 |
 |---|---|---|---|---|
-| **P1** | `steps` | 编号步骤条（序号圆点 + 发丝竖线串联） | **60+ 页** | 数学「解题通法」、计算机「操作步骤」、语文「文言翻译四步法」现在被塞进 `knowledge.paragraphs` 手写「1. 2. 3.」，无法折叠、无法进 TOC、搜索片段命不中 |
-| **P1** | `summary` | 「一页速记」卡（`points` / `formulas` / `mustKnow`） | **139 页** | 单招备考的核心场景是考前回看；现在复习要滚完 9 个块 |
+| ~~**P1**~~ ✅ | `steps` | 编号步骤条（序号圆点 + 发丝竖线串联） | **60+ 页** | 数学「解题通法」、计算机「操作步骤」、语文「文言翻译四步法」现在被塞进 `knowledge.paragraphs` 手写「1. 2. 3.」，无法折叠、无法进 TOC、搜索片段命不中（**已完成，见第二节阶段 5 P1**） |
+| ~~**P1**~~ ✅ | `summary` | 「一页速记」卡（`points` / `formulas` / `mustKnow`） | **139 页** | 单招备考的核心场景是考前回看；现在复习要滚完 9 个块（**已完成，见第二节阶段 5 P1**） |
 | **P2** | `compare` | 双栏中性对照（`left`/`right`/`aspects`） | **40+ 页** | 「列举法 vs 描述法」「借代 vs 借喻」「栈 vs 队列」。**与 `errorfocus` 语义不同**（后者是错↔对），不能复用 |
 | **P2** | `vocab` | 术语卡（`term`/`pinyin`/`meaning`/`example`/`note`） | **25+ 页** | 语文 33 页现在硬塞进 `table`，撑不住四字段 |
 | **P3** | `code` | `<pre>` 等宽 + 复制按钮（**不引 Prism/Shiki**） | **15+ 页** | 计算机 26 页；零依赖版即可交付 80% 价值 |
@@ -221,11 +239,12 @@ schema（白名单，validator 从它派生）→ blockTypes.js（中文名/图�
 **不做**：`timeline`（仅语文文学史少数页面，收益不抵成本）；`mindmap` 不加变体（96 页已充分覆盖）。
 
 **新增一个类型的净成本已经很低**（阶段 0–2 把这件事铺平了）：
-`schema` 加一个分支 + 一个新 `.vue` + `registry.js` 加一行 + `blockTypes.js` 加一行。
+`schema` 加一个分支（+ 子对象 definition）+ 一个新 `.vue` + `registry.js` 加一行 +
+`blockTypes.js` 加一行 + 同步 `.d.ts`。
 编辑器表单与校验白名单会**自动跟随**。`.d.ts` 由 `tests/block-registry.test.js` 守护。
 
-**内容回填建议**：先只回填 `summary`。可从现有 `warning`/`tip` 抽取初稿，
-但**必须是人工确认的草稿，不要自动发布**。
+**内容回填**：P1 已按「人工确认的草稿」回填（1 处 steps + 2 处 summary，见第二节）；
+P2 / P3 建议照此办理 —— 先回填 1–2 个代表性页面验证链路，**不要自动批量发布**。
 
 ---
 
@@ -312,7 +331,7 @@ cytoscape 444 KB 等一堆图类型 chunk，**全员预热是灾难**。
   并在 `requestIdleCallback` 里预取 meta（**不是**正文）。查询词长度 ≥ 2 时按当前 subject
   取对应正文分片。`snippet` 改从正文取（现在从被截断的 keywords 取，命中后常常截不到上下文）。
 
-**验收**：`dist/search-meta.json` < 30 KB；DevTools「Slow 4G」下冷启动 `/#/unit/math/01/0`，
+**验收**：`dist/search-meta.json` < 30 KB；DevTools「Slow 4G」下冷启动 `/#/study/math/01/0`，
 确认非公式部分先出现、公式在引擎就绪后替换；**搜一个只出现在某页后半段的词**，
 改造前搜不到、改造后能搜到。
 
@@ -429,7 +448,7 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | 文件 | 作用 | 改它的注意点 |
 |---|---|---|
 | `schema/content-schema.json` | **唯一真相源**：类型白名单 + 字段定义 | 加类型只需加一个 `allOf` 分支；validator 白名单与编辑器表单会自动跟随 |
-| `src/components/BlockRenderer.vue` | 分发枢纽 | 阶段 4 的容器递归要在这里**自引用**，不要外部 import |
+| `src/components/BlockRenderer.vue` | 分发枢纽 | 容器递归已在此**模板内自引用**（v-if 分支），新增容器照此办理，不要外部 import |
 | `src/components/blocks/registry.js` | 类型 → 组件绑定 | 加类型加一行 |
 | `src/components/blocks/blockTypes.js` | 类型 → 中文名/图标 | 加类型加一行；`icon: ''` 表示不进本页目录 |
 | `src/components/blocks/asyncBlock.js` | 统一的异步组件工厂 | 共用占位/错误组件，保留 150ms delay |
@@ -439,8 +458,12 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `src/views/editor/schemaForm.js` | 由 schema 推导编辑器表单字段 | 纯函数，零 import |
 | `src/content/pageMeta.js` | 页面元信息推导（两端共用） | 改这里等于改所有页面的元信息语义 |
 | `src/content/loadPage.js` | 浏览器侧唯一加载入口 | 动态导入的**字面量前缀**不可改成变量 |
+| `src/components/blocks/ColumnsBlock.vue` | 双/三栏容器（slot 注入子区块） | 只在 `@media (min-width: 1024px)` 分列；子元素需 `min-width: 0` |
+| `src/components/blocks/GroupBlock.vue` | 分组带 / 可折叠容器 | `variant` 是 computed，不是函数；见阶段 4 小节 |
+| `src/components/blocks/StepsBlock.vue` | 编号步骤条（序号圆点 + 发丝竖线） | 序号由渲染层生成，内容里**不要**手写「1. 2. 3.」；竖线是 `:not(:last-child)::before`，改间距时同步改 `bottom` |
+| `src/components/blocks/SummaryBlock.vue` | 一页速记卡（三段可选） | 外框复用 `.block-card`，别自造；三段同时为空由 `validateBlock` 拦下；标题缺省时组件显示「一页速记」，但**本页目录只看内容里的 title** —— 想让速记进 TOC 就得显式写 title |
 | `src/views/UnitView.vue` | 内容页；TOC、锚点、`.page-content` 间距 | 290 行附近的加载点、286 行的锚点跳转、550 行的间距 |
-| `src/components/blocks/MindMapBlock.vue` | 导图；157 行的文字匹配跳转 | 见阶段 4 的隐患说明 |
+| `src/components/blocks/MindMapBlock.vue` | 导图；`navigateToBlock()` 文字匹配跳转 | 阶段 4 已改为「全部标题元素 + `closest('.block-anchor')`」，改动前先读第二节阶段 4 小节 |
 
 ---
 
@@ -483,7 +506,7 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 
 1. `npm run validate:content && npm run lint && npm test && npm run build` —— 确认起点是绿的。
 2. 读 `CLAUDE.md`（项目约定）与 `docs/COMPONENTS.md`（组件清单）。
-3. **人工在浏览器里看一遍现状**（`/#/unit/math/01/0` 与 `/#/unit/math/03/2`，明暗各一次），
+3. **人工在浏览器里看一遍现状**（`/#/study/math/01/0` 与 `/#/study/math/03/2`，明暗各一次），
    建立「改动前长什么样」的基准 —— 阶段 3 第二步是视觉改版，没有基准就无法判断改得好不好。
 4. 找用户确认视觉方向后再开工，**不要**自行决定配色与间距的具体数值。
 5. 动 CSS 时，**每一步都跑 `npx vitest run tests/block-card.test.js`**；

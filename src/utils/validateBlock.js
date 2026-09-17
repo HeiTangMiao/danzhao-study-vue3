@@ -166,6 +166,36 @@ export function createBlockValidator(schema) {
         })
         break
       }
+      // 结构型区块（阶段 5）
+      case 'steps':
+        if (!Array.isArray(block.items) || block.items.length === 0) errors.push('步骤区块缺少 items')
+        else {
+          block.items.forEach((it, ii) => {
+            if (!it || typeof it !== 'object') {
+              errors.push(`步骤[${ii}] 不是对象`)
+              return
+            }
+            // 序号由渲染层生成，标题必填且不能为空 —— 否则会渲染出没有内容的圆点
+            if (isEmpty(it.title)) errors.push(`步骤[${ii}] title 为空`)
+            if (it.content !== undefined && isEmpty(it.content)) {
+              errors.push(`步骤[${ii}] content 为空（如需省略请删掉该字段）`)
+            }
+          })
+        }
+        break
+      case 'summary': {
+        // 三段均可选，但不能同时为空 —— 否则渲染出一张只有标题的空卡
+        const fields = ['points', 'formulas', 'mustKnow']
+        const filled = fields.filter((f) => Array.isArray(block[f]) && block[f].length > 0)
+        if (filled.length === 0) errors.push('速记区块 points / formulas / mustKnow 至少一项非空')
+        for (const f of fields) {
+          const v = block[f]
+          if (v === undefined) continue
+          if (!Array.isArray(v)) errors.push(`速记区块 ${f} 应为数组`)
+          else if (v.some((x) => isEmpty(x))) errors.push(`速记区块 ${f} 存在空元素`)
+        }
+        break
+      }
       default:
         break
     }
