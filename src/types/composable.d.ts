@@ -55,6 +55,13 @@ export function useTheme(): UseThemeReturn
 // ===== useKatex（替代旧 MathJax 的公式渲染） =====
 
 export function renderMath(text: string, forceBlock?: boolean): string
+/** 引擎未就绪时的纯文本兜底（剥掉数学定界符） */
+export function renderPlainFallback(text: string): string
+/** 幂等预热 KaTeX（阶段 7.1：引擎已移出内容页关键路径） */
+export function warmKatex(): Promise<object | null>
+export function isKatexReady(): boolean
+/** 就绪版本号（响应式）：组件依赖它，在引擎到位后重渲染 */
+export const engineVersion: { value: number }
 export function typesetMath(root?: HTMLElement): Promise<void>
 export function loadMathJax(): Promise<void>
 

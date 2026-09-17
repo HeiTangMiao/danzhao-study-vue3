@@ -27,5 +27,19 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
 
+/**
+ * 空闲预热 KaTeX（523 KB / 155 KB gz）
+ * 说明：引擎已从内容页关键路径移出（见交接文档阶段 7.1）。这里在首屏空闲时提前下载，
+ *      让后续进入内容页时引擎已就绪、不闪纯文本；用动态 import 保证它不挤进入口 chunk。
+ */
+function warmKatexWhenIdle() {
+  import('./composables/useKatex').then((m) => m.warmKatex())
+}
+if (typeof window.requestIdleCallback === 'function') {
+  window.requestIdleCallback(warmKatexWhenIdle, { timeout: 3000 })
+} else {
+  setTimeout(warmKatexWhenIdle, 1200)
+}
+
 // 挂载到 #app 节点
 app.mount('#app')

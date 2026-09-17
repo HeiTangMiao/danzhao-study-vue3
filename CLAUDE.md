@@ -74,7 +74,7 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 
 `BlockRenderer.vue` 按 block 的 `type` 分发到 `src/components/blocks/*.vue`（映射表在 `src/components/blocks/registry.js`，不要另建一份）。重型库**故意**采用懒加载，必须保持这种方式（这里的打包体量纪律很重要——主 chunk 曾从约 1MB 精简到几十 KB，当前实测约 47KB）：
 
-- KaTeX——公式（`FormulaCard` 等），通过 `useKatex` 组合式函数。
+- KaTeX——公式（`FormulaCard` 等），通过 `useKatex` 组合式函数。**523 KB 引擎已移出内容页关键路径**：`warmKatex()` 幂等异步加载（路由守卫 / 空闲回调 / `MathJaxRender.onMounted` 三处预热），`renderMath` 保持同步、引擎未就绪时返回纯文本兜底，组件靠 `engineVersion` 在就绪后重渲染；渲染结果另有 512 KB FIFO memo（`clearMathCache()` 可清）。**不要**把 `import katex` 或 `katex.min.css` 改回静态 import。
 - Mermaid——思维导图/流程图，异步加载（`useMermaid`）。
 - JSXGraph——`GeometryBlock`/`JsxGraphBoard`，约 1MB，仅动态导入。
 - GeoGebra——自托管离线资源放在 `public/vendor` 下（不走外部 CDN），用于 `GeoGebraPlayground.vue`。

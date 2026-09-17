@@ -201,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 // 别名导入：本组件已有名为 loadPage 的本地函数（负责访问记录/进度刷新等副作用）
@@ -214,7 +214,9 @@ import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import ContentSidebar from '@/components/ContentSidebar.vue'
-import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
+
+// GeoGebra 演练场只在浮层打开时才挂载（见模板 v-if）：组件本体与自托管脚本都推迟到那时
+const GeoGebraPlayground = defineAsyncComponent(() => import('@/components/GeoGebraPlayground.vue'))
 
 const route = useRoute()
 const router = useRouter()

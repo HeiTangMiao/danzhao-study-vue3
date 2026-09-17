@@ -175,12 +175,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProgressStore } from '@/stores/progress'
 import { SUBJECT_LIST, getSubjectConfig } from '@/content/index'
-import GeoGebraPlayground from '@/components/GeoGebraPlayground.vue'
 import SearchPanel from '@/components/SearchPanel.vue'
+
+// GeoGebra 演练场只在卡片展开时才挂载（见模板 v-if="desmosOpen"）：组件本体推迟到那时
+const GeoGebraPlayground = defineAsyncComponent(() => import('@/components/GeoGebraPlayground.vue'))
 
 const router = useRouter()
 const progress = useProgressStore()

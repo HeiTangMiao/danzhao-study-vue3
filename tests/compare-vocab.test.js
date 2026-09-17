@@ -13,6 +13,10 @@ import { join } from 'node:path'
 import { mount } from '@vue/test-utils'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { createBlockValidator } from '@/utils/validateBlock'
+import { warmKatex } from '@/composables/useKatex'
+
+// KaTeX 是异步预热的（阶段 7.1）：等价于「路由守卫已提前加载完」的状态
+await warmKatex()
 
 const schema = JSON.parse(readFileSync(join(process.cwd(), 'schema', 'content-schema.json'), 'utf-8'))
 const validateBlock = createBlockValidator(schema)

@@ -99,6 +99,7 @@ import { ref, computed, onUnmounted } from 'vue'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
 import { loadPage as loadContentPage } from '@/content/loadPage'
 import { serializePage, buildHeader } from '@/content/serializePage'
+import { clearMathCache } from '@/composables/useKatex'
 import { copyText } from '@/utils/copyText'
 import { WRITE_ENDPOINT } from '@/utils/contentWrite'
 import BlockRenderer from '@/components/BlockRenderer.vue'
@@ -164,6 +165,8 @@ const flashWrite = makeFlash(writeState)
 onUnmounted(() => {
   flashCopy.dispose()
   flashWrite.dispose()
+  // 编辑器里公式是「逐字符」在变的，每个中间态都是一个新缓存键，退出时清一次（阶段 7.2）
+  clearMathCache()
 })
 
 // 学科切换处理

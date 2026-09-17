@@ -84,6 +84,11 @@ import { useAuthStore } from '@/stores/auth'
 router.beforeEach((to) => {
   const auth = useAuthStore()
 
+  // 内容页会渲染公式：在这里点火预热 KaTeX（幂等、不 await），
+  // 让 523 KB 引擎与路由 chunk / 内容 chunk **并行**下载（见交接文档阶段 7.1）。
+  // 用动态 import 而非静态 import —— 避免把 useKatex 拖进入口 chunk。
+  if (to.name === 'unit') import('@/composables/useKatex').then((m) => m.warmKatex())
+
   if (to.path === '/login') {
     return auth.isLoggedIn ? { path: '/' } : true
   }

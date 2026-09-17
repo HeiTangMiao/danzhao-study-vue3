@@ -9,14 +9,17 @@
 <template>
   <section class="block mindmap">
     <h3 class="block-title">🧠 {{ block.title || '知识结构导图' }}</h3>
-    <div v-if="state === 'ready'" class="mm-legend">
+    <!-- 图例与工具栏在渲染完成前也保留在 DOM 里（仅 visibility 隐藏）：
+         它们是**插在固定高度视口上方**的，若用 v-if 到 ready 才插入，
+         下方所有内容会被顶下去 —— 这就是 mermaid 唯一的 CLS 来源（阶段 7.3 实测结论）。 -->
+    <div class="mm-legend" :class="{ 'mm-pending': state !== 'ready' }">
       <span class="lg"><i class="dot c-key"></i>结论/性质</span>
       <span class="lg"><i class="dot c-method"></i>方法/技巧</span>
       <span class="lg"><i class="dot c-judge"></i>判定/识别</span>
       <span class="lg"><i class="dot c-err"></i>易错/注意</span>
       <span class="lg"><i class="dot c-conc"></i>概念/其他</span>
     </div>
-    <div v-if="state === 'ready'" class="mm-toolbar">
+    <div class="mm-toolbar" :class="{ 'mm-pending': state !== 'ready' }">
       <button class="mm-btn" type="button" title="放大" @click="zoomIn">＋</button>
       <button class="mm-btn" type="button" title="缩小" @click="zoomOut">－</button>
       <button class="mm-btn" type="button" title="适应窗口" @click="fitToView">⤢</button>
@@ -233,6 +236,8 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .mm-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 10px; }
+/* 未就绪时占位但不显示：保留高度，避免图例/工具栏插入时把下方内容顶下去（CLS） */
+.mm-pending { visibility: hidden; }
 .lg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary, #4a5568); }
 .lg .dot { width: 11px; height: 11px; border-radius: 3px; border: 1px solid rgba(0,0,0,.08); }
 .c-key  { background: #FBF3E4; }

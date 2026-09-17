@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-17，对应本地 `main` 分支 `164b055`（阶段 6 已完成，尚未推送）。
+> 最后更新：2026-09-17，对应本地 `main` 分支 `73b02e4`（阶段 6 已完成）+ 阶段 7.1 / 7.2 / 7.3 工作区改动（尚未提交、尚未推送）。
 
 ---
 
@@ -369,56 +369,113 @@ Tauri 侧写回应走 Rust fs，属独立议题。
 
 ### 阶段 7：运行时性能（可独立并行，与版式无关）
 
-#### 7.1 KaTeX 移出关键路径（收益最大：523 KB / 155 KB gz）
+#### 7.1 KaTeX 移出关键路径（**已完成**，工作区改动待提交）
 
-核心手法：从「模块图静态依赖」改为「路由守卫并行预取 + 就绪后重渲染」。
+核心手法：从「模块图静态依赖」改为「路由守卫并行预取 + 就绪后重渲染」。实际落地如下：
 
-- `useKatex.js` 顶层 `import katex` 改为**幂等的 `warmKatex()`** 动态加载
-  （模块级 `katex`/`loading`/`cssInjected` 三态，与 `useMermaid.js` 现有模式一致）。
-- `renderMath` **保持同步**（这是 KaTeX 相对 MathJax 的核心优势，不要丢），
-  未就绪时返回 `renderPlainFallback(text)` —— 剥掉 `\( \) $$ \[ \]` 定界符的纯文本，
-  避免闪出乱码。新增短路径：不含数学定界符且非 `forceBlock` 的文本直接返回，
-  跳过正则扫描。
-- `MathJaxRender.vue` 用**显式版本号** `engineVersion` 驱动就绪后的重渲染 ——
-  因为 `renderMath` 读的是非响应式模块变量，必须把这个隐式依赖暴露出来，
-  否则会出现「莫名其妙不更新」。
-- 预取三处：`main.js` 的 `requestIdleCallback`（回退 `setTimeout`）、
-  `router/index.js` 的 `beforeEach`（目标为内容页时，让 523 KB 与路由/内容 chunk **并行**下载）、
-  `MathJaxRender.onMounted` 兜底。
+- `src/composables/useKatex.js`：顶层 `import katex` + `import 'katex/dist/katex.min.css'`
+  改为 `warmKatex()` 里的**动态 import**（幂等：模块级 `katex` / `loadingPromise` 两态，
+  与 `useMermaid` 同一模式）。**样式与 JS 一起按需加载**，没有把 `katex.min.css` 挪进入口。
+- `renderMath` **仍是同步的**（KaTeX 相对 MathJax 的核心优势，没丢）：引擎未就绪 → 返回
+  `renderPlainFallback(text)`（剥掉 `\( \) $$ \[ \]` 的纯文本，**仍走** 转义/加粗/高亮/换行那一套）；
+  新增短路径：不含定界符且非 `forceBlock` 时直接 `processSegment`，跳过正则扫描。
+- `MathJaxRender.vue`：`engineVersion`（模块导出的 `ref`）是 computed 里的**显式依赖**
+  （`engineVersion.value === 0 ? renderPlainFallback(...) : renderMath(...)`）。
+  ⚠️ 这是本次最容易写错的地方：`renderMath` 读的是模块级变量，Vue 追踪不到，
+  少了这个分支，引擎就绪后公式**永远停在纯文本、且不报错**。
+- 预取三处：`main.js` 的 `requestIdleCallback`（回退 `setTimeout` 1200ms）、
+  `router/index.js` 的 `beforeEach`（`to.name === 'unit'` 时点火，与路由/内容 chunk 并行）、
+  `MathJaxRender.onMounted` 兜底。三处都用**动态 import**，避免把 `useKatex` 拖进入口 chunk。
+- `.mathjax-block` 加 `min-height: 1.6em`：引擎就绪前后块级公式容器不产生布局跳动
+  （计划里写着「块级公式容器有 min-height」，实测**原本没有**，这次补上）。
 
-**FOUT 的诚实结论**：523 KB 引擎不可能既零阻塞又零 FOUT，选择是「让哪些页面承担」。
-正常导航路径下引擎早已就绪、**无 FOUT**；冷启动深链会有约 100–300ms 的纯文本窗口，
-但闪的是普通文字而非乱码，且块级公式容器有 `min-height` 不产生布局跳动。
-**不建议**把 `katex.min.css` 挪进入口换零 FOUT。
+**FOUT 的诚实结论**（与计划一致）：523 KB 引擎不可能既零阻塞又零 FOUT。
+正常导航路径下引擎早已就绪、无 FOUT；冷启动深链有约 100–300ms 纯文本窗口，
+闪的是普通文字而非乱码。
 
-**度量口径**：`ANALYZE=1 npm run build` 后 `dist/assets/UnitView-*.js` 里搜 `vendor-katex`
-应为 **0 次**，且 `vendor-katex-*.js` 仍是独立 chunk。
+**度量口径实测**（`npm run build` 后）：
+- `dist/assets/UnitView-*.js` / `BlockRenderer-*.js` / 入口 `index-*.js` 里
+  `vendor-katex` 出现 **0 次**；`vendor-katex-*.js`（523.74 kB）仍是独立 chunk，
+  只被 `useKatex-*.js`（2.2 kB）与 mermaid 自己的动态 katex 引用指向
+- 入口 48.40 → **48.72 kB**（多了空闲预热那几行），139 chunk 不变
+- ⚠️ **别用 PowerShell 的 `Select-String` 查产物**：压缩后单行几万字符，它会静默漏匹配
+  （本次一度误判成「没有任何 chunk 引用 katex」）。用 `node -e` + `fs.readFileSync` 查。
 
-#### 7.2 `renderMath` memo
+**验收**：
+- 测试 200 → **208**（`tests/useKatex.test.js` 重写 + 新增 `tests/math-render.test.js`：
+  「冷启动 → 纯文本 → 预热完成自动换公式」的真实时序；另两个引用公式断言的测试文件
+  在顶部 `await warmKatex()` 对齐正常导航路径）
+- 变异测试三处均如实失败：去掉未就绪兜底 / 去掉 `engineVersion` 分支 / 去掉 `warmKatex` 幂等早退
+- **真实浏览器实测**（`vite preview` + 假 token 绕过登录守卫）：`#/study/math/01/0`
+  页面 `.katex` = 133、`.katex-error` = 0、正文无残留 `\(` 与 `\mathbb` 字面字符、
+  控制台无 katex 报错；计算机页正常
 
-按字符总量限界的 **FIFO Map**（不用 LRU：内容文本运行时不可变，是时间局部性，无访问偏斜）。
-上限 512 KB HTML 字符串。key 用 `(forceBlock?'B':'I') + '\0' + text`。
-导出 `clearMathCache()` 供测试与编辑器用。
+#### 7.2 `renderMath` memo（**已完成**，工作区改动待提交）
 
-#### 7.3 区块异步化的取舍（**只动 3 个，不要贪**）
+按字符总量限界的 **FIFO Map**（上限 512 KB HTML 字符串），key = `B|I + '\0' + text`，
+导出 `clearMathCache()`。实际落地与计划一致，三点必须记住：
 
-| 组 | 类型 | 依据 |
+- **兜底结果绝不入缓存** —— 否则引擎就绪后会一直命中「纯文本」（这条是最容易埋的坑，
+  已单独立测试 + 变异测试）
+- 命中后**不调整顺序**：内容文本运行时不可变，命中分布是时间局部性、没有访问偏斜，
+  LRU 的「移到队尾」纯属额外开销
+- 淘汰按**累计 HTML 字符数**而非条数：单条从一行公式（几百字节）到整段解析（几 KB）
+  差两个数量级，按条数限界会让小条目把大条目挤出去
+- 编辑器 `EditorView.onUnmounted` 调 `clearMathCache()`：公式在编辑器里是逐字符变化的，
+  每个中间态都是一个新键，退出时清一次最省事
+
+**实测收益**（vitest + jsdom，把一页里所有字符串过一遍 `renderMath`，等价整页渲染一次）：
+
+| 页面 | 首次（冷） | 再来一次（命中缓存） |
 |---|---|---|
-| **保持同步** | `objectives` `knowledge` `tip` `warning` `formula` `table` | 覆盖 86–115 页；`formula` 依赖 KaTeX 同步性；组件本身仅 33–53 行，异步化只增加往返与占位闪烁 |
-| **保持同步** | `mindmap` | **96 页里 78 页首块就是它**，异步化会在最显眼位置加占位 |
-| **保持同步** | `quiz` `example` | 128/115 页，且带交互状态（选项选中、展开态），异步重挂载会**丢状态** |
-| **改异步** | `exam`（597 行，最大单文件，带计时器）、`desmos`、`diagram`（已是） | 合计仅 11 页用到 |
+| 数学「集合的概念与表示」117 条 / 5284 字符（公式多） | 13.40 ms | **0.07 ms** |
+| 计算机「循环结构程序设计」116 条 / 3878 字符（无公式） | 0.13 ms | 0.05 ms |
 
-另：`UnitView.vue:182` 与 `HomeView.vue` 的 `GeoGebraPlayground` 改 `defineAsyncComponent`。
+→ 收益集中在**公式密集页**（切回页面 / 区块重挂载时省掉一次整页 KaTeX 渲染）；
+无公式页本来就走短路径，memo 只值 0.08 ms，别把它当性能银弹。
 
-**Mermaid 的 CLS 用 CSS 解，不要全局预热**：mermaid 是 636 KB + cynefin 691 KB +
-cytoscape 444 KB 等一堆图类型 chunk，**全员预热是灾难**。
+**顺带记录一个既有行为**（不是本次改的）：文本**含**定界符时 `forceBlock` 不改变输出
+（`\(...\)` 始终按行内渲染），只有「纯 LaTeX 且无定界符」才走块级渲染分支。
+缓存键仍区分两种模式，避免这两条路径的真实差异被串味。
 
-⚠️ 但计划里那条具体做法（「给 `.mindmap-viewport` 加 `min-height: 320px`」）
-**很可能已经不需要了** —— `MindMapBlock.vue:243` 的 `.mindmap-viewport` 现在已经是
-**固定 `height: 460px`**，占位→SVG 本来就不改变页面总高度。给一个固定高度的元素加
-`min-height` 不产生任何效果。**先测量再动手**：用 DevTools 的 Layout Shift 区域
-实测一次，确认 CLS 到底还存不存在、来源是不是这里，不要照抄计划里的处方。
+**验收**：测试 208 → **213**；变异测试四处均如实失败 ——
+①把兜底结果写进缓存 ②关掉命中判定 ③关掉淘汰 ④键里去掉模式位。
+⚠️ 其中②会**遮蔽**①③（命中判定关掉后，缓存怎么写都测不出来），必须**单独**施加才能观测，
+本次已逐一验证。
+
+#### 7.3 区块异步化的取舍（**已完成**，工作区改动待提交）
+
+按计划只动 3 个（外加两处演练场），**没有贪**：
+- `registry.js`：`exam`（597 行）与 `desmos` 改 `asyncBlock`（`diagram` 本来就是），静态 import 已删
+- `UnitView` / `HomeView` 的 `GeoGebraPlayground` 改 `defineAsyncComponent`
+  （两处本来就是 `v-if` 之后才挂载，组件代码与自托管脚本一起推迟）
+- 刻意**保持同步**：`knowledge` / `objectives` / `formula` / `table` / `tip` / `warning` /
+  `quiz` / `example` / `mindmap`（覆盖 100+ 页；quiz/example 带交互状态，异步重挂载会丢状态）
+
+**实测收益**（`npm run build`）：
+
+| chunk | 改造前 | 改造后 |
+|---|---|---|
+| BlockRenderer JS | 57.26 kB | **47.89 kB**（−9.4 kB） |
+| BlockRenderer CSS | 26.09 kB | **17.39 kB**（−8.7 kB） |
+| ExamBlock（新独立 chunk） | — | 9.64 kB + CSS 8.70 kB（仅 11 页用到时才下） |
+| DesmosBlock / GeoGebraPlayground（新） | — | 0.55 kB / 5.44 kB（展开演练场才下） |
+
+→ 不含模拟卷的页面少下约 18 kB；139 个内容 chunk 不变，入口 48.62 kB。
+
+**Mermaid 的 CLS：实测后改的是「计划外的另一处」**
+- 计划里的处方（给 `.mindmap-viewport` 加 `min-height: 320px`）确认**无用** ——
+  它本来就是固定 `height: 460px`，占位→SVG 不改变页面总高度（已用测试钉死）
+- 真正的位移源在**视口上方**：`.mm-legend` 与 `.mm-toolbar` 原本是
+  `v-if="state === 'ready'"`，mermaid 渲染完成时这两行才插进 DOM，会把下方内容顶下去。
+  改法仍按「**用 CSS 解，不全局预热 mermaid**」：保留元素，未就绪时
+  `.mm-pending { visibility: hidden }` 占位 → 空间预留、内容不可见
+- 无副作用：脚本只用 `viewport` / `canvas` / `container` 三个 ref，图例与工具栏不参与逻辑；
+  `visibility: hidden` 下按钮不可点
+
+**验收**：测试 213 → **220**；新增 `tests/block-async.test.js`（7 例）做**双向**守卫 ——
+异步组必须异步且源码里无静态 import、同步白名单必须挂载即渲染，加上 CLS 的两条断言。
+变异测试两个方向都如实失败（exam 改回静态 import / 把 knowledge 异步化 → 4 条断言挂掉）。
 
 #### 7.4 搜索索引两级化
 
@@ -560,6 +617,7 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `scripts/migrate-content-style.mjs` | 引号键风格归一化（干跑默认，`--write` 落盘） | 改写前必做「临时文件 import 回来 + 数据深度比对」；带行注释的文件只去引号 |
 | `scripts/vite-plugin-content-write.mjs` | 开发期写回（`apply: 'serve'`） | `resolvePagePath` 是安全闸门（双重白名单），改动前读第三节安全约束；端点常量见 `src/utils/contentWrite.js` |
 | `src/utils/copyText.js` | 复制到剪贴板（Clipboard API + execCommand 兜底） | 代码块与编辑器共用，别再各写一份 |
+| `src/composables/useKatex.js` | 公式渲染（KaTeX 引擎，**异步预热** + 512 KB FIFO memo） | 引擎 523 KB 已移出关键路径：只能动态 import；`engineVersion` 是组件重渲染的显式依赖、**兜底结果绝不能进 memo** —— 两条都别删 |
 | `src/content/loadPage.js` | 浏览器侧唯一加载入口 | 动态导入的**字面量前缀**不可改成变量 |
 | `src/components/blocks/ColumnsBlock.vue` | 双/三栏容器（slot 注入子区块） | 只在 `@media (min-width: 1024px)` 分列；子元素需 `min-width: 0` |
 | `src/components/blocks/GroupBlock.vue` | 分组带 / 可折叠容器 | `variant` 是 computed，不是函数；见阶段 4 小节 |
@@ -570,7 +628,7 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `src/components/blocks/CodeBlock.vue` | 代码块（等宽 + 复制按钮） | 不引语法高亮库；复制优先 Clipboard API、失败退回 `execCommand`；`<pre>` 不换行（横向滚动） |
 | `src/components/blocks/ClozeBlock.vue` | 挖空默写（`{{答案}}` 点击揭晓） | 空位语法是 `{{...}}`，与 Vue 插值无关（这里是纯字符串解析）；已揭晓集合用 `ref(new Set())` |
 | `src/views/UnitView.vue` | 内容页；TOC、锚点、`.page-content` 间距 | 290 行附近的加载点、286 行的锚点跳转、550 行的间距 |
-| `src/components/blocks/MindMapBlock.vue` | 导图；`navigateToBlock()` 文字匹配跳转 | 阶段 4 已改为「全部标题元素 + `closest('.block-anchor')`」，改动前先读第二节阶段 4 小节 |
+| `src/components/blocks/MindMapBlock.vue` | 导图；`navigateToBlock()` 文字匹配跳转 | 阶段 4 已改为「全部标题元素 + `closest('.block-anchor')`」，改动前先读第二节阶段 4 小节；图例/工具栏**不得改回 `v-if="ready"`**（会引入 CLS，见 7.3） |
 
 ---
 
