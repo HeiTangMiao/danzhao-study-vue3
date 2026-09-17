@@ -137,18 +137,21 @@ jobs:
           # 第 1 步：上传 assets + vendor（含 GeoGebra 自托管资源），不删旧文件，期间旧页面仍可正常访问
           rsync -avz -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
           rsync -avz -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
-          # 第 2 步：切换 index.html + 搜索索引（指向新资源，无 404 窗口）
-          rsync -avz -e "ssh $SSH_ARGS" ./dist/index.html ./dist/search-index.json "$USER@$HOST:/var/www/danzhao-study/"
-          # 第 3 步：清理已被新版本替换的旧 assets / vendor，避免累积占用磁盘
+          # 第 2 步：切换 index.html + 搜索索引（两级：小 meta + 按学科正文分片，指向新资源，无 404 窗口）
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/index.html ./dist/search-meta.json "$USER@$HOST:/var/www/danzhao-study/"
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/search-body/ "$USER@$HOST:/var/www/danzhao-study/search-body/"
+          # 第 3 步：清理已被新版本替换的旧 assets / vendor / 正文分片，避免累积占用磁盘
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
+          rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/search-body/ "$USER@$HOST:/var/www/danzhao-study/search-body/"
 
       - name: 部署后验证
         env:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
+          # 顺带清掉旧版单文件索引（阶段 7.4 已下线，留着只是占 241 KB 磁盘）
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "rm -f /var/www/danzhao-study/search-index.json; sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
 
   deploy-backend:
     name: 部署后端到服务器
