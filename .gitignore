@@ -8,8 +8,9 @@ node_modules/
 dist/
 dist-ssr/
 
-# Generated search index（prebuild 按需生成，不入库）
-public/search-index.json
+# Generated search index（prebuild 按需生成，不入库）：标题级 meta + 按学科分片的正文
+public/search-meta.json
+public/search-body/
 
 # Rust / Tauri build outputs
 src-tauri/target/
