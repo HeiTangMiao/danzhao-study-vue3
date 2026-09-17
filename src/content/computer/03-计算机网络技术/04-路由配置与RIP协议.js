@@ -89,11 +89,21 @@ export default {
       title: "RIP 动态路由",
       paragraphs: [
         "**RIP 协议：**基于距离矢量算法的动态路由协议，以跳数（hop）作为度量值，最大跳数 15。",
-        "**配置步骤：**\n```\nRA(config)# router rip\nRA(config-router)# version 2\nRA(config-router)# no auto-summary\nRA(config-router)# network 192.168.1.0\nRA(config-router)# network 202.101.172.0\n```",
         "**version 2：**RIPv2 支持无类路由，考试要求配置 RIPv2。",
         "**network 宣告：**宣告直连网络号，告诉路由器哪些网络参与 RIP。",
         "**no auto-summary：**取消自动汇总功能，考试明确要求。"
       ]
+    },
+    // ---------- 配置命令（代码块：等宽 + 一键复制） ----------
+    {
+      type: "code",
+      title: "RIPv2 配置命令",
+      lang: "cmd",
+      code: `RA(config)# router rip
+RA(config-router)# version 2
+RA(config-router)# no auto-summary
+RA(config-router)# network 192.168.1.0
+RA(config-router)# network 202.101.172.0`
     },
     {
       type: "knowledge",

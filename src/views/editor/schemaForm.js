@@ -33,7 +33,9 @@ const LONG_FIELDS = new Set([
   'initCode',
   // 术语卡的释义与例句通常是一整句，单行输入框不够用
   'meaning',
-  'example'
+  'example',
+  // 代码块必须多行
+  'code'
 ])
 
 /**

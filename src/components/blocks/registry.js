@@ -28,6 +28,8 @@ import StepsBlock from './StepsBlock.vue'
 import SummaryBlock from './SummaryBlock.vue'
 import CompareBlock from './CompareBlock.vue'
 import VocabBlock from './VocabBlock.vue'
+import CodeBlock from './CodeBlock.vue'
+import ClozeBlock from './ClozeBlock.vue'
 
 /**
  * 类型 → 渲染组件
@@ -57,7 +59,9 @@ const BLOCK_COMPONENTS = {
   steps: StepsBlock,
   summary: SummaryBlock,
   compare: CompareBlock,
-  vocab: VocabBlock
+  vocab: VocabBlock,
+  code: CodeBlock,
+  cloze: ClozeBlock
 }
 
 /** 类型 → { component, label, icon }：渲染层视角的完整注册表 */

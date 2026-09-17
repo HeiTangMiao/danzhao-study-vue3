@@ -234,6 +234,36 @@ export function createBlockValidator(schema) {
           })
         }
         break
+      case 'code':
+        if (isEmpty(block.code)) errors.push('代码区块 code 为空')
+        // 围栏由渲染层提供；内容里再写 ``` 只会原样显示成三反引号
+        else if (block.code.includes('```')) errors.push('代码区块 code 里不要再写 ``` 围栏')
+        if (block.lang !== undefined && isEmpty(block.lang)) {
+          errors.push('代码区块 lang 为空（如需省略请删掉该字段）')
+        }
+        break
+      case 'cloze':
+        if (!Array.isArray(block.items) || block.items.length === 0) errors.push('挖空区块缺少 items')
+        else {
+          block.items.forEach((it, ii) => {
+            if (!it || typeof it !== 'object') {
+              errors.push(`挖空[${ii}] 不是对象`)
+              return
+            }
+            const text = String(it.text ?? '')
+            if (isEmpty(text)) {
+              errors.push(`挖空[${ii}] text 为空`)
+              return
+            }
+            // 挖空标记必须成对且至少一处；空挖空等于没挖，一并拦下
+            const openings = (text.match(/\{\{/g) || []).length
+            const closings = (text.match(/\}\}/g) || []).length
+            if (openings !== closings) errors.push(`挖空[${ii}] {{ }} 标记不配对`)
+            else if (openings === 0) errors.push(`挖空[${ii}] 没有 {{答案}} 标记`)
+            if (/\{\{\s*\}\}/.test(text)) errors.push(`挖空[${ii}] 存在空挖空 {{}}`)
+          })
+        }
+        break
       default:
         break
     }

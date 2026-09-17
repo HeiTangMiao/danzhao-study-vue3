@@ -171,6 +171,21 @@ describe('结构型区块（阶段 5）', () => {
     expect(f.itemFields.find((x) => x.name === 'example').kind).toBe('textarea')
     expect(f.itemFields.find((x) => x.name === 'pinyin').kind).toBe('string')
   })
+
+  it('code 的 code 走多行文本域，lang 是单行输入', () => {
+    const fields = blockFields(contentSchema, 'code')
+    expect(fields.map((f) => [f.name, f.required])).toEqual([['title', false], ['lang', false], ['code', true]])
+    expect(fields.find((f) => f.name === 'code').kind).toBe('textarea')
+    expect(fields.find((f) => f.name === 'lang').kind).toBe('string')
+    expect(fields.find((f) => f.name === 'code').label).toBe('代码文本')
+  })
+
+  it('cloze 的 items 推导为 objectList（clozeItem 只要求 text）', () => {
+    const f = blockFields(contentSchema, 'cloze').find((x) => x.name === 'items')
+    expect(f.kind).toBe('objectList')
+    expect(f.itemRef).toBe('clozeItem')
+    expect(f.itemFields.map((x) => [x.name, x.required])).toEqual([['text', true]])
+  })
 })
 
 describe('校验器与 CI 共用同一份规则', () => {

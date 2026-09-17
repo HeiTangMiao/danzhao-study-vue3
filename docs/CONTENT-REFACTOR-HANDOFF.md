@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-17，对应本地 `main` 分支 `fa7c237`（阶段 5 P1）+ 阶段 5 P2 工作区改动（尚未提交、尚未推送）。
+> 最后更新：2026-09-17，对应本地 `main` 分支 `b93ac84`（阶段 5 P1/P2）+ 阶段 5 P3 工作区改动（尚未提交、尚未推送）。
 
 ---
 
@@ -34,7 +34,8 @@
 ### 已完成并合入 `main`
 
 ```
-fa7c237  feat(blocks): 阶段5 P1 结构扩充——新增 steps/summary 区块              ← 阶段5 P1（本地，未推送）
+b93ac84  feat(blocks): 阶段5 P2 结构扩充——新增 compare/vocab 区块             ← 阶段5 P2（本地，未推送）
+fa7c237  feat(blocks): 阶段5 P1 结构扩充——新增 steps/summary 区块             ← 阶段5 P1（本地，未推送）
 081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块              ← 阶段4（本地，未推送）
 5c7c16b  refactor(blocks): 视觉降噪改版（极简留白）                          ← 阶段3 第二步
 bb576a2  deepseek修改                                    ← 用户自己提交的 GeoGebra 自托管文件（与本重构无关）
@@ -185,7 +186,7 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 
 **验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 135 → **148**。
 
-### 阶段 5 P2：双栏中性对照 + 术语卡（工作区改动，尚未提交）
+### 阶段 5 P2：双栏中性对照 + 术语卡（已提交 `b93ac84`）
 
 **新增两个结构型区块**（`schema/content-schema.json`）：
 - `compare`：**中性对照**，`left` / `right` 两侧名称 + `aspects`（`label` / `left` / `right`）
@@ -214,6 +215,36 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
   改为 `vocab`（原文全句作 `meaning`，「固定结构」作 `note`）
 
 **验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 148 → **162**。
+
+### 阶段 5 P3：代码块 + 挖空默写（工作区改动，尚未提交）
+
+**新增两个结构型区块**（`schema/content-schema.json`）：
+- `code`：`code` 必填 + `lang` 可选。**刻意不引 Prism / Shiki** —— `lang` 只做角标，
+  不做语法高亮；零依赖版即可交付绝大部分价值
+- `cloze`：`items` 是 `clozeItem` 数组，文本里用 `{{答案}}` 标出空位，点击揭晓
+  （内容里**不要**再写 `______`，空位由标记决定）
+
+**关键实现**：
+- `src/components/blocks/CodeBlock.vue` —— 外壳复用 `shell--formula`（浅底色），
+  `<pre>` 横向滚动不换行；复制优先 `navigator.clipboard`，
+  非安全上下文 / 老 WebView（Tauri 可能命中）退回 textarea + `execCommand`，
+  三种反馈：复制 / 已复制 / 复制失败
+- `src/components/blocks/ClozeBlock.vue` —— 把文本切成「文字 / 空位」两种片段，
+  空位是 `<button>`（默认虚线，揭晓后转主色实线），已揭晓集合用 `ref(new Set())` 记录
+- `src/utils/validateBlock.js` —— code 校验 `code` 非空、夹带 ``` 围栏报错、`lang` 给空串要删；
+  cloze 校验 `items` 非空、`text` 非空、`{{ }}` 配对、至少一处空位、不允许空挖空 `{{}}`
+- `src/views/editor/schemaForm.js` —— `code` 加入 `LONG_FIELDS`（多行文本域）
+- 测试：`tests/code-cloze.test.js`（10 例，jsdom）、`tests/editor-schema-form.test.js` 增 2 例
+- **变异测试**：故意让空挖空检查恒不命中 / 把「已复制」改回「复制」/ 让空位始终显示答案，
+  三处守卫均如实失败，随后已还原
+
+**内容回填（人工草稿，1 处 code + 1 处 cloze）**：
+- `computer/03-计算机网络技术/04-路由配置与RIP协议.js` —— 「RIP 动态路由」里的
+  ``` 围栏命令拆成独立的 `code` 块（原先围栏只是当作普通文字渲染，反引号会原样显示）
+- `chinese/05-文学常识/01-中国文学史.js` —— 新增「填空自测」，5 句全部取自本页
+  已有的常识/练习题（六义、诗仙诗圣诗佛、乐府双璧、元曲四大家、王勃名句）
+
+**验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 162 → **174**。
 
 ---
 
@@ -254,18 +285,18 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 
 ---
 
-### 阶段 5：结构扩充（P1 / P2 已完成，下一步 P3）
+### ~~阶段 5：结构扩充~~（P1 / P2 已提交，P3 工作区改动待提交；见第二节）
 
 按优先级：
 
 | 优先级 | 类型 | 形态 | 预期复用度 | 理由 |
 |---|---|---|---|---|
-| ~~**P1**~~ ✅ | `steps` | 编号步骤条（序号圆点 + 发丝竖线串联） | **60+ 页** | 数学「解题通法」、计算机「操作步骤」、语文「文言翻译四步法」现在被塞进 `knowledge.paragraphs` 手写「1. 2. 3.」，无法折叠、无法进 TOC、搜索片段命不中（**已完成，见第二节阶段 5 P1**） |
-| ~~**P1**~~ ✅ | `summary` | 「一页速记」卡（`points` / `formulas` / `mustKnow`） | **139 页** | 单招备考的核心场景是考前回看；现在复习要滚完 9 个块（**已完成，见第二节阶段 5 P1**） |
-| ~~**P2**~~ ✅ | `compare` | 双栏中性对照（`left`/`right`/`aspects`） | **40+ 页** | 「列举法 vs 描述法」「借代 vs 借喻」「栈 vs 队列」。**与 `errorfocus` 语义不同**（后者是错↔对），不能复用（**已完成，见第二节阶段 5 P2**） |
-| ~~**P2**~~ ✅ | `vocab` | 术语卡（`term`/`pinyin`/`meaning`/`example`/`note`） | **25+ 页** | 语文 33 页现在硬塞进 `table`，撑不住四字段（**已完成，见第二节阶段 5 P2**） |
-| **P3** | `code` | `<pre>` 等宽 + 复制按钮（**不引 Prism/Shiki**） | **15+ 页** | 计算机 26 页；零依赖版即可交付 80% 价值 |
-| **P3** | `cloze` | 挖空 + 点击展开 | **10+ 页** | 可先用 `quiz.fill` 顶 |
+| ~~**P1**~~ ✅ | `steps` | 编号步骤条（序号圆点 + 发丝竖线串联） | **60+ 页** | 数学「解题通法」、计算机「操作步骤」、语文「文言翻译四步法」现在被塞进 `knowledge.paragraphs` 手写「1. 2. 3.」，无法折叠、无法进 TOC、搜索片段命不中（**已完成**，见第二节） |
+| ~~**P1**~~ ✅ | `summary` | 「一页速记」卡（`points` / `formulas` / `mustKnow`） | **139 页** | 单招备考的核心场景是考前回看；现在复习要滚完 9 个块（**已完成**，见第二节） |
+| ~~**P2**~~ ✅ | `compare` | 双栏中性对照（`left`/`right`/`aspects`） | **40+ 页** | 「列举法 vs 描述法」「借代 vs 借喻」「栈 vs 队列」。**与 `errorfocus` 语义不同**（后者是错↔对），不能复用（**已完成**，见第二节） |
+| ~~**P2**~~ ✅ | `vocab` | 术语卡（`term`/`pinyin`/`meaning`/`example`/`note`） | **25+ 页** | 语文 33 页现在硬塞进 `table`，撑不住四字段（**已完成**，见第二节） |
+| ~~**P3**~~ ✅ | `code` | `<pre>` 等宽 + 复制按钮（**不引 Prism/Shiki**） | **15+ 页** | 计算机 26 页；零依赖版即可交付 80% 价值（**已完成**，见第二节阶段 5 P3） |
+| ~~**P3**~~ ✅ | `cloze` | 挖空 + 点击展开 | **10+ 页** | 可先用 `quiz.fill` 顶（**已完成**，见第二节） |
 
 **不做**：`timeline`（仅语文文学史少数页面，收益不抵成本）；`mindmap` 不加变体（96 页已充分覆盖）。
 
@@ -274,8 +305,10 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 `blockTypes.js` 加一行 + 同步 `.d.ts`。
 编辑器表单与校验白名单会**自动跟随**。`.d.ts` 由 `tests/block-registry.test.js` 守护。
 
-**内容回填**：P1 已按「人工确认的草稿」回填（1 处 steps + 2 处 summary，见第二节）；
-P2 / P3 建议照此办理 —— 先回填 1–2 个代表性页面验证链路，**不要自动批量发布**。
+**内容回填**：阶段 5 的六个类型都已各回填 1–2 处（见第二节，**全部为人工确认的草稿**；
+共 3 处是无损改写：knowledge→steps / table→compare / knowledge→vocab，另 1 处把围栏命令
+拆成 `code` 块，2 处是按页内既有内容新写的 `summary` / `cloze`）。
+继续铺量时照此办理：**不要自动批量发布**。
 
 ---
 
@@ -495,6 +528,8 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `src/components/blocks/SummaryBlock.vue` | 一页速记卡（三段可选） | 外框复用 `.block-card`，别自造；三段同时为空由 `validateBlock` 拦下；标题缺省时组件显示「一页速记」，但**本页目录只看内容里的 title** —— 想让速记进 TOC 就得显式写 title |
 | `src/components/blocks/CompareBlock.vue` | 双栏中性对照（维度 × 左 / 右） | 与 `errorfocus` 语义不同：**两侧地位对等**，不要引入对错色；≥768px 才分栏，窄屏靠 `.compare-who` 自带名称 |
 | `src/components/blocks/VocabBlock.vue` | 术语卡（term / pinyin / meaning / example / note） | 外框复用 `.block-card--md`；可选字段为空串时校验器报错（要求删字段而不是留空行） |
+| `src/components/blocks/CodeBlock.vue` | 代码块（等宽 + 复制按钮） | 不引语法高亮库；复制优先 Clipboard API、失败退回 `execCommand`；`<pre>` 不换行（横向滚动） |
+| `src/components/blocks/ClozeBlock.vue` | 挖空默写（`{{答案}}` 点击揭晓） | 空位语法是 `{{...}}`，与 Vue 插值无关（这里是纯字符串解析）；已揭晓集合用 `ref(new Set())` |
 | `src/views/UnitView.vue` | 内容页；TOC、锚点、`.page-content` 间距 | 290 行附近的加载点、286 行的锚点跳转、550 行的间距 |
 | `src/components/blocks/MindMapBlock.vue` | 导图；`navigateToBlock()` 文字匹配跳转 | 阶段 4 已改为「全部标题元素 + `closest('.block-anchor')`」，改动前先读第二节阶段 4 小节 |
 

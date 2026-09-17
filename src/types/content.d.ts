@@ -26,6 +26,8 @@ export type BlockType =
   | 'summary'    // 一页速记
   | 'compare'    // 双栏中性对照
   | 'vocab'      // 术语卡
+  | 'code'       // 代码块
+  | 'cloze'      // 挖空默写
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -235,6 +237,24 @@ export interface VocabBlock extends BaseBlock {
   items: VocabItem[]
 }
 
+/** 代码块（等宽显示 + 复制按钮，不做语法高亮） */
+export interface CodeBlock extends BaseBlock {
+  type: 'code'
+  lang?: string          // 语言标签（仅角标显示）
+  code: string           // 代码文本（不写行号与围栏）
+}
+
+/** 挖空条目：用 {{答案}} 标出空位 */
+export interface ClozeItem {
+  text: string           // 如「海内存知己，{{天涯若比邻}}。」
+}
+
+/** 挖空默写区块（点击空位揭晓） */
+export interface ClozeBlock extends BaseBlock {
+  type: 'cloze'
+  items: ClozeItem[]
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -256,6 +276,8 @@ export type Block =
   | SummaryBlock
   | CompareBlock
   | VocabBlock
+  | CodeBlock
+  | ClozeBlock
 
 /** 内容页面 */
 export interface ContentPage {
