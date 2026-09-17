@@ -28,7 +28,10 @@
       </select>
       <span v-if="errorTotal" class="toolbar-errors">{{ errorTotal }} 处待修</span>
       <span v-else class="toolbar-ok">校验通过</span>
-      <button class="toolbar-export" @click="exportContent">导出</button>
+      <button class="toolbar-export" @click="copySource">{{ copyLabel }}</button>
+      <button class="toolbar-export" @click="exportContent">导出文件</button>
+      <!-- 写回只在开发期可用（对应 vite 插件的 apply: 'serve'） -->
+      <button v-if="isDev" class="toolbar-export" @click="writeBack">{{ writeLabel }}</button>
     </header>
 
     <div class="editor-body">
@@ -92,9 +95,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
 import { loadPage as loadContentPage } from '@/content/loadPage'
+import { serializePage, buildHeader } from '@/content/serializePage'
+import { copyText } from '@/utils/copyText'
+import { WRITE_ENDPOINT } from '@/utils/contentWrite'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { BLOCK_TYPES, labelOf } from '@/components/blocks/registry'
 import { createBlockValidator } from '@/utils/validateBlock'
@@ -130,6 +136,35 @@ const fieldsOfBlock = (block) => blockFields(contentSchema, block.type)
 const validateBlock = createBlockValidator(contentSchema)
 const blockErrors = computed(() => editingBlocks.value.map((b) => validateBlock(b)))
 const errorTotal = computed(() => blockErrors.value.reduce((n, list) => n + list.length, 0))
+
+// 「复制 .js」按钮的反馈文案：默认 / 成功 / 失败
+const COPY_LABELS = { idle: '复制 .js', ok: '已复制', fail: '复制失败' }
+const copyState = ref('idle')
+const copyLabel = computed(() => COPY_LABELS[copyState.value])
+
+// 「写回文件」按钮：仅开发期存在（对应 vite 插件的 apply: 'serve'）
+const isDev = import.meta.env.DEV
+const WRITE_LABELS = { idle: '写回文件', ok: '已写回', fail: '写回失败' }
+const writeState = ref('idle')
+const writeLabel = computed(() => WRITE_LABELS[writeState.value])
+
+/** 生成「闪一下再复位」的反馈函数（复制 / 写回各一个），并在卸载时清掉计时器 */
+function makeFlash(stateRef) {
+  let timer = null
+  const flash = (state) => {
+    stateRef.value = state
+    clearTimeout(timer)
+    timer = setTimeout(() => { stateRef.value = 'idle' }, 1500)
+  }
+  flash.dispose = () => clearTimeout(timer)
+  return flash
+}
+const flashCopy = makeFlash(copyState)
+const flashWrite = makeFlash(writeState)
+onUnmounted(() => {
+  flashCopy.dispose()
+  flashWrite.dispose()
+})
 
 // 学科切换处理
 function onSubjectChange() {
@@ -176,24 +211,71 @@ function onTypeChange(i, type) {
 }
 
 // 导出内容
+/**
+ * 生成内容文件源码
+ * 说明：**只导出 blocks** —— 元信息唯一真相源是 site.js，内容文件里出现
+ *      id / unitNum / subject / title / subtitle 会被 validate:content 判为硬错误。
+ *      风格由 src/content/serializePage.js 统一（与迁移脚本共用同一份定义），
+ *      不得再用 JSON.stringify —— 那正是「引号键风格」的来源。
+ */
+function buildSource() {
+  const header = buildHeader({ title: curFile.value?.title, subtitle: curFile.value?.subtitle })
+  return serializePage(editingBlocks.value, { header })
+}
+
+/** 导出前提示：有校验问题时不阻止，但要让人知道导出物可能过不了 CI */
+function confirmWhenInvalid() {
+  if (errorTotal.value === 0) return true
+  return window.confirm(`当前有 ${errorTotal.value} 处校验问题，导出的内容可能无法通过 CI。仍要继续吗？`)
+}
+
+/** 复制 .js：日常比下载更常用（直接粘回内容文件） */
+async function copySource() {
+  if (!confirmWhenInvalid()) return
+  flashCopy((await copyText(buildSource())) ? 'ok' : 'fail')
+}
+
 function exportContent() {
-  // 只导出 blocks —— 元信息唯一真相源是 site.js，内容文件里出现
-  // id / unitNum / subject / title / subtitle 会被 validate:content 判为硬错误。
-  const page = { blocks: editingBlocks.value }
-  if (errorTotal.value > 0) {
-    const ok = window.confirm(`当前有 ${errorTotal.value} 处校验问题，导出的内容可能无法通过 CI。仍要导出吗？`)
-    if (!ok) return
-  }
-  // 生成 JS 模块代码
-  const code = `export default ${JSON.stringify(page, null, 2)}`
-  // 触发浏览器下载
-  const blob = new Blob([code], { type: 'text/javascript' })
+  if (!confirmWhenInvalid()) return
+  const blob = new Blob([buildSource()], { type: 'text/javascript' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = `${curFile.value.name}.js`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+/**
+ * 写回文件（**仅开发期**）：POST 给 scripts/vite-plugin-content-write.mjs 挂的中间件
+ * 安全约束在插件侧（只允许覆盖 site.js 注册表里的页面，写前先跑校验）；
+ * 失败时把服务端的错误明细原样显示出来，避免「点了没反应」。
+ */
+async function writeBack() {
+  if (!confirmWhenInvalid()) return
+  try {
+    const res = await fetch(WRITE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: editorSubject.value,
+        folder: currentUnit.value.folder,
+        name: curFile.value.name,
+        blocks: editingBlocks.value
+      })
+    })
+    const data = await res.json().catch(() => ({}))
+    if (res.ok && data.ok) {
+      flashWrite('ok')
+      return
+    }
+    flashWrite('fail')
+    const detail = [data.error, ...(data.errors || [])].filter(Boolean).join('\n')
+    window.alert(`写回失败：${detail || `HTTP ${res.status}`}`)
+  } catch (e) {
+    flashWrite('fail')
+    window.alert(`写回失败：${e.message}`)
+  }
 }
 
 // 初始加载第一个页面

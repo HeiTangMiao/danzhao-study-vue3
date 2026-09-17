@@ -56,6 +56,8 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 2. 在 `src/content/<学科>/<单元>/NN-<名称>.js` 下创建页面模块，`export default { blocks: [...] }`。
 3. 运行 `npm run validate:content`——CI 会拒绝非法内容。已知的严格规则：公式行结尾不能是单独的 `\`。
 
+**内容文件风格由 `src/content/serializePage.js` 统一定义**（无引号键、2 空格缩进、对象多行、短数组单行、顶层区块间空行、保留文件头注释）：编辑器「复制 .js / 导出文件」、开发期写回（`scripts/vite-plugin-content-write.mjs`，仅 `apply: 'serve'`）与迁移脚本共用这份定义，**不要再手写第二套序列化**。存量文件若还是引号键风格，跑 `node scripts/migrate-content-style.mjs`（默认干跑，`--write` 才落盘）。风格契约由 `tests/content-style.test.js` 守护（含「内容页不得出现引号键」的全库扫描）。
+
 **元信息只在 site.js 里写一份。** 页面对象**只能**导出 `blocks`——`id / unitNum / subject / title / subtitle / icon` 出现在内容文件中是**校验硬错误**。
 原因见 `src/content/pageMeta.js`：这批字段曾在 139 个文件里各手写一份、又在 site.js 各写一份，实测漂移了 19 页（页头与侧边栏显示两个版本）。现在 site.js 是唯一真相源，元信息由 `resolvePageMeta(学科配置, 单元号, fileIndex)` 推导并在加载时注入；`title`/`subtitle` 一律取自 site.js，页面文件里的同名字段即使写了也被忽略。
 若你接手的是 1B 之前的旧文件（还带着五元组），运行 `node scripts/migrate-content-meta.mjs --write` 剥离（默认干跑，不加 `--write` 不落盘）。

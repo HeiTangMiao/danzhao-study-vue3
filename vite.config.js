@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { fileURLToPath, URL } from 'node:url'
+import { contentWritePlugin } from './scripts/vite-plugin-content-write.mjs'
 
 /**
  * Vite 构建配置
@@ -13,6 +14,8 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [
     vue(),
+    // 开发期内容写回（apply: 'serve'，不会进构建产物）
+    contentWritePlugin(),
     // 体积分析开关：`ANALYZE=1` 时输出 bundle 明细到 dist/stats.html（网络图，便于人工排查大块）
     ...(process.env.ANALYZE === '1'
       ? [visualizer({ filename: 'dist/stats.html', gzipSize: true })]

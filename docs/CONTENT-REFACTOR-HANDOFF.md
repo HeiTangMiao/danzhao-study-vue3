@@ -1,7 +1,7 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-17，对应本地 `main` 分支 `7cad750`（阶段 5 六个类型已全部完成并提交，尚未推送）。
+> 最后更新：2026-09-17，对应本地 `main` 分支 `938d91c`（阶段 5 全部完成）+ 阶段 6 工作区改动（尚未提交、尚未推送）。
 
 ---
 
@@ -247,6 +247,54 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 
 **验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 162 → **174**。
 
+### 阶段 6：编辑器写回与序列化统一（工作区改动，尚未提交）
+
+**风格定义搬到 `src/content/serializePage.js`**（原计划写 `scripts/lib/serialize-page.mjs`，
+开工时按既有先例改成 `src/`：与 `pageMeta.js` 同理，两端共用的纯 ESM 放 src，Node 侧直接 import；
+**新增此类模块必须登记进 `scripts/lib/load-content.mjs` 的 `NON_PAGE_FILES`**，否则会被判成孤儿页）。
+固定手写风格 = 无引号键（仅非标识符才加引号）+ 2 空格缩进 + 对象一律多行 +
+短标量数组单行（整行 ≤ 100 列）+ **顶层区块之间空一行** + 保留文件头块注释。
+模块另导出 `extractHeader` / `buildHeader` / `stripKeyQuotes`。
+
+**迁移脚本 `scripts/migrate-content-style.mjs`**（默认干跑，`--write` 才落盘）：
+- 实测 139 个内容页里 **62 个是引号键风格**（全在语文 / 数学，计算机 26 页本来就是手写风格），
+  77 个不动 —— 原计划里「5 个是含注释的其他形态」经复核为 **2 个**（`chinese/01`、`chinese/02`
+  的 `07-复习测验.js`）：这类文件**只去引号、不重排**，因为行注释不在数据里，重排会丢
+- 每条改写都先写临时文件 import 回来，与改前数据做深度比对，不一致就跳过（只允许格式变化）
+- 结果：62 个文件全部改写成功，5019 增 / 6084 删（大量短数组由逐行展开变回单行）
+
+**编辑器导出（`EditorView.vue`）**：
+- `buildSource()` 统一走 `serializePage` + `buildHeader`（**不得再用 `JSON.stringify`**，
+  它正是引号键风格的来源）；导出物只有 `blocks`，不带任何元信息
+- 工具栏三按钮：**复制 .js**（新增，日常比下载更常用）/ 导出文件 / **写回文件**（`v-if="isDev"`）
+- 复制能力抽成 `src/utils/copyText.js`（Clipboard API + execCommand 兜底），
+  内容页的 `CodeBlock` 也改用它 —— 两处共用一份实现
+
+**写回插件 `scripts/vite-plugin-content-write.mjs`**（`apply: 'serve'`，产物里不会出现）：
+- 双重白名单：① `subject` 必须登记在 `SITE_FILES`，`folder`/`name` 不得含路径分隔符、`..`、盘符、通配
+  ② 拼出的相对路径必须命中 `buildMetaIndex()` 的 key 集合（即只能覆盖已注册页面，
+  不能新建文件、不能改 site.js 本身）
+- 写前跑与 CI 同一份 `validateBlock`，有错 **422 不落盘**；写回用 `serializePage` 并保留原文件头
+- 端点常量 `WRITE_ENDPOINT` 放在 `src/utils/contentWrite.js`，编辑器与插件共用（避免两边各写一份字面量）
+
+**不做**：File System Access API（Firefox/Safari 不可用、Tauri WebView 行为不确定）；
+Tauri 侧写回应走 Rust fs，属独立议题。
+
+**已知取舍**：写回 = 按数据重排，**块间注释会丢**（46 个手写文件带有 `// ---------- 分区 ----------`），
+文件头注释会保留。喜欢那些分区注释的话，写回后手工补一下。
+
+**验收**：门禁四条全过 + 139 chunk + 主包 47.3 KB（未变）；测试数 174 → **200**。
+除单测外还做了两轮真实验证（都不是纸上验收）：
+1. 起 `npm run dev` 直接打中间件：正常写回 **200**（返回文件路径与行数）/
+   路径穿越 **403** / 校验不通过 **422**（错误明细原样回传）/ 未登记学科 **403**
+2. **幂等**：把一页真实内容原样写回，磁盘内容逐字不变（`serializePage` 输出 == 现状）
+3. 变异测试：去掉注册表白名单 / 把 `apply` 改成 `'build'` / 让编辑器回退 `JSON.stringify`
+   三处守卫均如实失败（`..` 字符过滤与白名单重叠，单独去掉不可观测，属冗余兜底）
+
+**踩到的一个坑（复用注意）**：`dist` 里出现 `__content-write` 字样是**正常**的 ——
+编辑器 chunk 里带着端点常量；判断插件是否进产物要看
+`resolvePagePath` / `拒绝写入` 这类**插件专有字符串**（实测为 0 个）。
+
 ---
 
 ## 三、硬性约束（违反会破坏既有资产）
@@ -313,23 +361,7 @@ TOC 链路（按索引 `#block-{i}`）不受影响。
 
 ---
 
-### 阶段 6：编辑器写回与序列化统一（任意时机）
-
-- 新增 `scripts/lib/serialize-page.mjs` —— 固定手写风格（无引号键、2 空格缩进、块间空行、
-  保留文件头注释模板）。**迁移脚本与编辑器导出差共用**，从此不再产生「引号键风格」的新文件。
-  （背景：实测 144 个内容文件中，**62 个的顶层 `blocks` 键带引号**、77 个不带、5 个是含注释的
-  其他形态 —— 后 5 个不是纯 JSON，无法机械改写，需人工。阶段 1B 刻意跳过了引号归一化，
-  留到这里做。）
-- 新增 `scripts/vite-plugin-content-write.mjs`（**仅 `apply: 'serve'`**）——
-  开发期把编辑器内容写回 `src/content/`。**安全约束必写**：只允许写 site.js 注册表中
-  已存在的页面；`subject`/`folder`/`name` 白名单比对，拒绝 `..`；非 DEV 不注册中间件。
-- `EditorView.exportContent()` 加「复制 .js」按钮（`navigator.clipboard`，比下载更常用）。
-- **不做 File System Access API**（Firefox/Safari 不可用、Tauri WebView 行为不确定）。
-  Tauri 侧写回应走 Rust fs，属独立议题。
-
-**验收**：`npm run build`（`apply:'serve'` 不应出现在产物）；`npm run dev` 手测编辑 → 保存 →
-`git diff` 只含 blocks 且风格与手写一致 → `validate:content` 绿 → 热更新可见。
-**导出前先跑校验，有错不允许写回。**
+### ~~阶段 6：编辑器写回与序列化统一~~（已完成，见第二节阶段 6）
 
 ---
 
@@ -522,6 +554,10 @@ grep -c 'correctIndex' dist/assets/index-*.js   # schema 不应进主包，应�
 | `src/utils/validateBlock.js` | 语义校验（编辑器与 CI **共用**） | 纯函数，schema 由调用方注入 |
 | `src/views/editor/schemaForm.js` | 由 schema 推导编辑器表单字段 | 纯函数，零 import |
 | `src/content/pageMeta.js` | 页面元信息推导（两端共用） | 改这里等于改所有页面的元信息语义 |
+| `src/content/serializePage.js` | **内容文件风格的唯一真相源**（编辑器导出 / 迁移脚本 / 写回插件共用） | 纯 ESM、零 import；改风格要同步 `tests/content-style.test.js` 的快照 |
+| `scripts/migrate-content-style.mjs` | 引号键风格归一化（干跑默认，`--write` 落盘） | 改写前必做「临时文件 import 回来 + 数据深度比对」；带行注释的文件只去引号 |
+| `scripts/vite-plugin-content-write.mjs` | 开发期写回（`apply: 'serve'`） | `resolvePagePath` 是安全闸门（双重白名单），改动前读第三节安全约束；端点常量见 `src/utils/contentWrite.js` |
+| `src/utils/copyText.js` | 复制到剪贴板（Clipboard API + execCommand 兜底） | 代码块与编辑器共用，别再各写一份 |
 | `src/content/loadPage.js` | 浏览器侧唯一加载入口 | 动态导入的**字面量前缀**不可改成变量 |
 | `src/components/blocks/ColumnsBlock.vue` | 双/三栏容器（slot 注入子区块） | 只在 `@media (min-width: 1024px)` 分列；子元素需 `min-width: 0` |
 | `src/components/blocks/GroupBlock.vue` | 分组带 / 可折叠容器 | `variant` 是 computed，不是函数；见阶段 4 小节 |

@@ -38,7 +38,8 @@ export const NON_PAGE_FILES = new Set([
   'site.js', // 站点配置（files[] 数组顺序即 fileIndex，是页面的注册表）
   'index.js', // 多学科索引
   'pageMeta.js', // 页面元信息推导（纯 ESM，两端共用）
-  'loadPage.js' // 页面加载入口（浏览器侧）
+  'loadPage.js', // 页面加载入口（浏览器侧）
+  'serializePage.js' // 内容序列化风格定义（纯 ESM，两端共用，见阶段 6）
 ])
 
 /** 统一为正斜杠路径（兼容 Windows 的反斜杠） */

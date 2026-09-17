@@ -22,6 +22,7 @@
 <script setup>
 import { computed, onUnmounted, ref } from 'vue'
 import BlockShell from './BlockShell.vue'
+import { copyText } from '@/utils/copyText'
 
 const props = defineProps({
   // 区块数据：{ type:'code', title, lang?, code }
@@ -43,40 +44,9 @@ function flash(state) {
   timer = setTimeout(() => { copyState.value = 'idle' }, 1500)
 }
 
-/**
- * 复制到剪贴板
- * 优先 Clipboard API；非安全上下文 / 老 WebView（Tauri 可能命中）退回 textarea + execCommand
- */
+/** 复制整段代码（实现见 @/utils/copyText：Clipboard API + execCommand 兜底） */
 async function copyCode() {
-  const text = code.value
-  let ok = false
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text)
-      ok = true
-    }
-  } catch {
-    ok = false
-  }
-  if (!ok) ok = fallbackCopy(text)
-  flash(ok ? 'ok' : 'fail')
-}
-
-function fallbackCopy(text) {
-  try {
-    const ta = document.createElement('textarea')
-    ta.value = text
-    ta.setAttribute('readonly', '')
-    ta.style.position = 'fixed'
-    ta.style.opacity = '0'
-    document.body.appendChild(ta)
-    ta.select()
-    const ok = document.execCommand('copy')
-    document.body.removeChild(ta)
-    return ok
-  } catch {
-    return false
-  }
+  flash((await copyText(code.value)) ? 'ok' : 'fail')
 }
 
 onUnmounted(() => clearTimeout(timer))
