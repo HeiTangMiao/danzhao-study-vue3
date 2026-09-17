@@ -68,7 +68,7 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 - **`site.js` 的 `files[]` 数组顺序就是 `fileIndex`**，直接决定 URL 与历史进度语义——**绝不可重排**，只能追加。
 - 每个页面在 `site.js` 中有一组中文 `files` 名称；首页、侧边栏、目录都由这些站点配置派生（经 `src/content/index.js` → `SUBJECTS` / `getSubjectConfig`）。
 - 加载链路统一走 `src/content/loadPage.js`（浏览器）与 `scripts/lib/load-content.mjs`（Node）；两者共用 `pageMeta.js` 的推导规则，不要在任何地方另写一份。
-- 全文搜索索引由 `scripts/build-search-index.mjs` 生成到 `public/search-index.json`。`npm run build` 会自动执行；新增内容后请手动跑一次（`node scripts/build-search-index.mjs`）以保持开发环境搜索新鲜。
+- 全文搜索索引由 `scripts/build-search-index.mjs` 生成，**分两级**：`public/search-meta.json`（标题级，常驻）+ `public/search-body/{学科}.json`（正文分片，按需加载），形状定义在 `src/content/searchIndex.js`（两端共用，不要另写一份）。`npm run build` 会自动执行；新增内容后请手动跑一次（`node scripts/build-search-index.mjs`）以保持开发环境搜索新鲜。
 
 ## 渲染与重型依赖
 

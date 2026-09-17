@@ -1,7 +1,8 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-18，对应本地 `main` 分支 `501b713`（阶段 7.1-7.3 已完成，尚未推送）。
+> 最后更新：2026-09-18，对应本地 `main` 分支 `501b713`（阶段 7.1-7.3 已提交未推送；
+> 阶段 7.4 已完成、**待提交**）。
 
 ---
 
@@ -18,7 +19,7 @@
 |---|---|---|
 | 1 | **版式单一** | 全站唯一布局是 `.page-content` 的纵向 flex 流；schema **零**布局字段；139 页高度同构 —— 78 页以 `mindmap > objectives` 开场，另有 18 页共享 `warning>quiz>quiz>example`、16 页共享 `errorfocus>quiz` |
 | 2 | **视觉单一** | 设计 token 齐全但用得浅：9 个区块组件各写一遍卡片外框（共 14 处），实测聚成 8 个家族；区块间距只有 8px，视觉上就是「一摞白卡片」；全站**没有字号 token**，散落 31 种硬编码字号 |
-| 3 | **效率双重欠账** | **生产侧**：139 个文件各手写一份元信息（已修）；编辑器只支持 9/14 种类型（已修）。**运行侧**：KaTeX 523 KB / 155 KB gz 在内容页关键路径上；搜索索引 139/139 条的 keywords 恰好被截断到 800 字符，中位页面正文 3503 字符 → **77% 内容搜不到且静默无告警** |
+| 3 | **效率双重欠账** | **生产侧**：139 个文件各手写一份元信息（已修）；编辑器只支持 9/14 种类型（已修）。**运行侧**：KaTeX 523 KB / 155 KB gz 在内容页关键路径上；搜索索引 139/139 条的 keywords 恰好被截断到 800 字符，中位页面正文 3503 字符 → **77% 内容搜不到且静默无告警**（阶段 7.4 已修：两级索引 + 超限告警） |
 
 **目标调性（用户已确认）：极简留白** —— 大量留白、靠分层与字号对比而非阴影和颜色建立层次、动效克制。
 
@@ -477,19 +478,51 @@ Tauri 侧写回应走 Rust fs，属独立议题。
 异步组必须异步且源码里无静态 import、同步白名单必须挂载即渲染，加上 CLS 的两条断言。
 变异测试两个方向都如实失败（exam 改回静态 import / 把 knowledge 异步化 → 4 条断言挂掉）。
 
-#### 7.4 搜索索引两级化
+#### 7.4 搜索索引两级化（**已完成**，待提交）
 
-- `build-search-index.mjs` 输出改为 `public/search-meta.json`（约 20 KB）+
-  `public/search-body/{math,chinese,computer}.json` 分片。
-- 正文上限 800 → **12000**（覆盖实测 max 8797），且**对任何仍被截断的页面 `console.warn`
-  列出文件名** —— 把静默失败变成构建日志。
-- `SearchPanel`：挂载时**不加载任何索引**；改为 focus/首次输入时才 fetch meta，
-  并在 `requestIdleCallback` 里预取 meta（**不是**正文）。查询词长度 ≥ 2 时按当前 subject
-  取对应正文分片。`snippet` 改从正文取（现在从被截断的 keywords 取，命中后常常截不到上下文）。
+**索引形状定义收敛为一份**：`src/content/searchIndex.js`（零 import 纯 ESM，构建脚本与浏览器共用，
+已登记进 `NON_PAGE_FILES`）导出 `BODY_LIMIT`(12000) / `META_FILE` / `bodyShardPath(subject)` /
+`bodyKeyOf(meta)`。两端必须对这三件事看法一致（上限、分片文件名、正文键），
+分叉的后果是前端 fetch 一个不存在的分片 —— 所以只写一次。
 
-**验收**：`dist/search-meta.json` < 30 KB；DevTools「Slow 4G」下冷启动 `/#/study/math/01/0`，
-确认非公式部分先出现、公式在引擎就绪后替换；**搜一个只出现在某页后半段的词**，
-改造前搜不到、改造后能搜到。
+- `build-search-index.mjs`：输出 `public/search-meta.json` + `public/search-body/{学科}.json`；
+  meta 只保留检索与结果条目要用的 7 个字段（id/folder/name 等运行时字段不进索引）；
+  分片键 `${unitNum}/${fileIndex}`（= 路由身份，学科内唯一，已实测 0 重复）；
+  正文上限 800 → **12000**，**超限必点名**（`capBody` 返回 `truncated`，
+  由构建脚本 `console.warn` 列出文件与字符数）；落盘前清空 `search-body/`（学科下线不留残片）；
+  旧的 `public/search-index.json` 已删除，`.gitignore` 同步改为两个新产物。
+- `src/utils/search.js`：`prepareSearchIndex(items, bodies)` 把正文并进检索串，
+  `matchSearch(items, query, { limit, bodies })` 的 **snippet 改从正文取**
+  （旧实现从被截断的 keywords 取，命中后常常截不到上下文）；标题命中时 snippet 为空。
+  ⚠️ 契约：prepare 与 matchSearch 必须传**同一份 bodies**，否则正文命中被静默漏掉
+  （面板在分片到位后重新 prepare 一次，已有测试钉住）。
+- `SearchPanel.vue`：**挂载时零请求**；`requestIdleCallback`（1.5s `setTimeout` 兜底）预取 meta，
+  focus 也会补取；**查询词 ≥ 2 字**才按 `current_subject` 取该学科正文分片
+  （一次按键不该拉一份整学科正文；拿到分片后若学科已切走，会重新按新学科取）；
+  分片失败只降级为「仅按标题匹配」并在浮层里给重试入口，不再静默。
+
+**实测体积**（旧单文件 241 KB →）：meta **23.2 KB**（gzip 后更小）+
+分片 math 502.9 KB / chinese 237.2 KB / computer 157.5 KB（**按需**，只在 ≥2 字查询时取当前学科）。
+
+**验收**（全部实测，非纸上验收）：
+- 门禁四条全过 + 139 chunk + `dist/search-meta.json` 23.2 KB < 30 KB + 旧 `search-index.json` 已不在产物里
+- 测试 220 → **244**：`tests/search-index.test.js`（10 例，含 139 页逐页取**正文尾部**的词回搜本页）、
+  `tests/search-panel.test.js`（8 例，jsdom + mock fetch，钉住加载时机）、`tests/search.test.js`（12 例）
+- **旧 vs 新对照**（脚本实测）：取每页正文 800 字符之后的连续短语回搜，
+  旧索引（截断 800）命中 **1/84** → 新索引命中 **84/84**；样例 `math/01/4` 的
+  「条件与结论互换」（正文第 863 字符）旧搜不到、新搜得到
+- **真实浏览器**（`vite preview`）：首页输入「条件与结论互换」→ 浮层出现《命题与逻辑联结词》
+  且摘要取自正文，点击跳转 `#/study/math/01/4` 成功；控制台无 search 相关报错
+- 变异测试 7 处均如实失败：正文不进检索串 / 挂载即加载 meta / 去掉查询词长度门槛 /
+  硬编码 math 分片 / 分片键规则分叉 / `capBody` 不截断不报告 / snippet 恒为空
+
+**⚠️ CI 部署必须同步改**（`.github/workflows/ci.yml` 的 deploy 作业）：原步骤里 rsync 的是
+`./dist/search-index.json`，文件删掉后这一步会直接失败（部署挂掉）；现已改为
+`search-meta.json` + `search-body/`（分片按 assets 那套「先传不删、最后 `--delete` 清理」），
+并在部署后验证里 `rm -f` 掉服务器上的旧单文件索引。
+
+**记录一个既有行为**（不是本次改的）：meta 条目顺序 = **磁盘遍历序**（chinese → computer → math），
+不是 `site.js` 的学科顺序；检索结果顺序历来如此，本次未改。
 
 ---
 
