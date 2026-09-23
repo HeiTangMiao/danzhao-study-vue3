@@ -1,8 +1,8 @@
 # 内容系统重构 · 交接文档
 
 > 面向接手的 agent。**读完这一份就能开工，不需要先读任何对话历史。**
-> 最后更新：2026-09-18，对应本地 `main` 分支 `501b713`（阶段 7.1-7.3 已提交未推送；
-> 阶段 7.4 已完成、**待提交**）。
+> 最后更新：2026-09-23，对应 `main` 分支 `6b50e6c`（**阶段 0–7.4 全部完成**，
+> 已提交并推送到 origin，随 **v0.3.0** 发布）。
 
 ---
 
@@ -34,13 +34,15 @@
 
 ### 已完成并合入 `main`
 
+下列提交均已推送到 `origin/main`（此前文档里标注的「本地，未推送」已全部同步）：
+
 ```
-164b055  feat(editor): 阶段6 编辑器写回与序列化统一                            ← 阶段6（本地，未推送）
+164b055  feat(editor): 阶段6 编辑器写回与序列化统一                            ← 阶段6
 938d91c  docs: 交接文档标记阶段 5 完成（三个提交号与状态）
-7cad750  feat(blocks): 阶段5 P3 结构扩充——新增 code/cloze 区块                ← 阶段5 P3（本地，未推送）
-b93ac84  feat(blocks): 阶段5 P2 结构扩充——新增 compare/vocab 区块             ← 阶段5 P2（本地，未推送）
-fa7c237  feat(blocks): 阶段5 P1 结构扩充——新增 steps/summary 区块             ← 阶段5 P1（本地，未推送）
-081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块              ← 阶段4（本地，未推送）
+7cad750  feat(blocks): 阶段5 P3 结构扩充——新增 code/cloze 区块                ← 阶段5 P3
+b93ac84  feat(blocks): 阶段5 P2 结构扩充——新增 compare/vocab 区块             ← 阶段5 P2
+fa7c237  feat(blocks): 阶段5 P1 结构扩充——新增 steps/summary 区块             ← 阶段5 P1
+081a9c7  feat(blocks): 阶段4 版式层——新增 columns/group 容器区块              ← 阶段4
 5c7c16b  refactor(blocks): 视觉降噪改版（极简留白）                          ← 阶段3 第二步
 bb576a2  deepseek修改                                    ← 用户自己提交的 GeoGebra 自托管文件（与本重构无关）
 1720949  refactor(blocks): 卡片外框收敛为 .block-card 类族 + 设计 token 阶梯      ← 阶段3 第一步
@@ -478,7 +480,7 @@ Tauri 侧写回应走 Rust fs，属独立议题。
 异步组必须异步且源码里无静态 import、同步白名单必须挂载即渲染，加上 CLS 的两条断言。
 变异测试两个方向都如实失败（exam 改回静态 import / 把 knowledge 异步化 → 4 条断言挂掉）。
 
-#### 7.4 搜索索引两级化（**已完成**，待提交）
+#### 7.4 搜索索引两级化（**已完成**，见 `4192358` + CI 同步 `56ca2d2`）
 
 **索引形状定义收敛为一份**：`src/content/searchIndex.js`（零 import 纯 ESM，构建脚本与浏览器共用，
 已登记进 `NON_PAGE_FILES`）导出 `BODY_LIMIT`(12000) / `META_FILE` / `bodyShardPath(subject)` /
@@ -533,7 +535,7 @@ Tauri 侧写回应走 Rust fs，属独立议题。
 ```bash
 npm run validate:content   # 内容数据校验：139 个内容文件 + 3 个站点配置
 npm run lint               # eslint src tests --max-warnings 0
-npm test                   # vitest，13 个文件 148 个测试
+npm test                   # vitest，24 个文件 244 个测试
 npm run build              # 生产构建；会先跑 build-search-index
 ```
 
