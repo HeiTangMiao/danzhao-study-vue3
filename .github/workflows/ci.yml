@@ -137,8 +137,8 @@ jobs:
           # 第 1 步：上传 assets + vendor（含 GeoGebra 自托管资源），不删旧文件，期间旧页面仍可正常访问
           rsync -avz -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
           rsync -avz -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
-          # 第 2 步：切换 index.html + 搜索索引（两级：小 meta + 按学科正文分片，指向新资源，无 404 窗口）
-          rsync -avz -e "ssh $SSH_ARGS" ./dist/index.html ./dist/search-meta.json "$USER@$HOST:/var/www/danzhao-study/"
+          # 第 2 步：切换 index.html + 站点图标 + 搜索索引（两级：小 meta + 按学科正文分片，指向新资源，无 404 窗口）
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/index.html ./dist/favicon.ico ./dist/search-meta.json "$USER@$HOST:/var/www/danzhao-study/"
           rsync -avz -e "ssh $SSH_ARGS" ./dist/search-body/ "$USER@$HOST:/var/www/danzhao-study/search-body/"
           # 第 3 步：清理已被新版本替换的旧 assets / vendor / 正文分片，避免累积占用磁盘
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
