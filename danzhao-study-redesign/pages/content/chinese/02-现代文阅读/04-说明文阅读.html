@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>说明文阅读 · 语文 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../chinese/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">语文</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">✍️</span>
+      <span class="font-sans font-semibold text-sm">语文学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 语言文字运用</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 现代文阅读</p>
+            
+            <div class="space-y-1">
+              <a href="./02-现代文阅读/01-记叙文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="记叙文阅读">记叙文阅读</a><a href="./02-现代文阅读/02-散文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="散文阅读">散文阅读</a><a href="./02-现代文阅读/03-小说阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="小说阅读">小说阅读</a><a href="./02-现代文阅读/04-说明文阅读.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="说明文阅读">说明文阅读</a><a href="./02-现代文阅读/05-议论文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="议论文阅读">议论文阅读</a><a href="./02-现代文阅读/06-实用类文本阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="实用类文本阅读">实用类文本阅读</a><a href="./02-现代文阅读/07-复习测验.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="现代文阅读 · 复习测验">现代文阅读 · 复习测验</a><a href="./02-现代文阅读/08-易错专项与冲刺.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="现代文阅读 · 易错专项与冲刺">现代文阅读 · 易错专项与冲刺</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 古诗文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 写作</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 文学常识</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">06 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../chinese/index.html" class="hover:text-foreground transition-colors no-underline">语文</a>
+            <span>/</span>
+            <span class="text-foreground">现代文阅读</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">✍️</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 02 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">说明文阅读</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">说明顺序、说明方法、语言特点</p>
+            </div>
+          </div>
+        </div>
+
+        
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">知识结构导图</h2>
+  </div>
+  <div class="p-5 bg-card overflow-x-auto">
+    <pre class="mermaid text-center">graph LR
+  N0[&quot;说明文阅读&quot;]
+  N1[&quot;说明顺序&quot;]
+  N0 --&gt; N1
+  N2[&quot;时间顺序&quot;]
+  N1 --&gt; N2
+  N3[&quot;空间顺序&quot;]
+  N1 --&gt; N3
+  N4[&quot;逻辑顺序&quot;]
+  N1 --&gt; N4
+  N5[&quot;说明方法&quot;]
+  N0 --&gt; N5
+  N6[&quot;列数字&quot;]
+  N5 --&gt; N6
+  N7[&quot;举例子&quot;]
+  N5 --&gt; N7
+  N8[&quot;作比较&quot;]
+  N5 --&gt; N8
+  N9[&quot;打比方&quot;]
+  N5 --&gt; N9
+  N10[&quot;分类别&quot;]
+  N5 --&gt; N10
+  N11[&quot;下定义&quot;]
+  N5 --&gt; N11
+  N12[&quot;语言特点&quot;]
+  N0 --&gt; N12
+  N13[&quot;准确性&quot;]
+  N12 --&gt; N13
+  N14[&quot;严密性&quot;]
+  N12 --&gt; N14
+  N15[&quot;科学性&quot;]
+  N12 --&gt; N15
+  N16[&quot;常见考点&quot;]
+  N0 --&gt; N16
+  N17[&quot;提取信息&quot;]
+  N16 --&gt; N17
+  N18[&quot;分析方法&quot;]
+  N16 --&gt; N18
+  N19[&quot;品味语言&quot;]
+  N16 --&gt; N19
+  N20[&quot;拓展运用&quot;]
+  N16 --&gt; N20</pre>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">学习目标</h2>
+  </div>
+  <div class="p-5">
+    <ul class="space-y-1">
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">准确判断说明对象，概括被说明事物的特征</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">辨析时间顺序、空间顺序、逻辑顺序，理解说明顺序的合理性</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握九种常见说明方法及其作用，能准确判断并分析</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">体会说明文语言的准确性、严谨性、科学性</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">能分析加点词语能否删换，理解限制性词语的表达效果</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">理清说明文的结构层次，把握文章说明思路</span>
+    </li></ul>
+  </div>
+</section>
+
+<div class="card bg-success/8 text-success border-success/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg></span>
+  <div class="text-sm leading-relaxed">判断说明顺序：含时间词（年代、先后）多为时间顺序；含方位词（上下左右内外远近）多为空间顺序；有因果、主次、总分等关系多为逻辑顺序。</div>
+</div>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">说明文以&quot;说明&quot;为主要表达方式，目的是让人&quot;知&quot;；记叙文以记叙描写为主，目的是让人&quot;感&quot;；议论文以议论为主，目的是让人&quot;信&quot;。</div>
+</div>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">📝核心知识点</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">顺序</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">含义</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">适用</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">时间顺序</td><td class="px-4 py-3 text-sm text-foreground align-top">按时间先后安排</td><td class="px-4 py-3 text-sm text-foreground align-top">事物的发展演变、制作过程</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">空间顺序</td><td class="px-4 py-3 text-sm text-foreground align-top">按空间方位安排</td><td class="px-4 py-3 text-sm text-foreground align-top">建筑、名胜、事物的结构</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">逻辑顺序</td><td class="px-4 py-3 text-sm text-foreground align-top">按事物内在逻辑关系安排</td><td class="px-4 py-3 text-sm text-foreground align-top">事理说明、复杂事物</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">📝核心知识点</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">说明方法</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">作用</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">举例子</td><td class="px-4 py-3 text-sm text-foreground align-top">具体真切地说明事物的特征，增强说服力</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">列数字</td><td class="px-4 py-3 text-sm text-foreground align-top">准确具体地说明事物的特征，体现准确性</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">作比较</td><td class="px-4 py-3 text-sm text-foreground align-top">突出强调事物的特征，给人鲜明印象</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">打比方</td><td class="px-4 py-3 text-sm text-foreground align-top">生动形象地说明事物特征，增强趣味性</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">分类别</td><td class="px-4 py-3 text-sm text-foreground align-top">条理清楚地说明事物，使内容更有条理</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">下定义</td><td class="px-4 py-3 text-sm text-foreground align-top">准确简明地揭示事物本质特征</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">作诠释</td><td class="px-4 py-3 text-sm text-foreground align-top">解释说明事物的某些特征，较下定义灵活</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">摹状貌</td><td class="px-4 py-3 text-sm text-foreground align-top">生动形象地描摹事物外貌，使说明更具体</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">画图表</td><td class="px-4 py-3 text-sm text-foreground align-top">直观明了地说明事物，一目了然</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">引资料</td><td class="px-4 py-3 text-sm text-foreground align-top">引用文献资料增强说明的权威性、趣味性</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题1：判断说明方法及作用</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>&quot;赵州桥非常雄伟，全长50.82米，两端宽9.6米，中部略窄，宽9米。&quot;这句话运用了什么说明方法？有什么作用？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：句中用了具体的数字&quot;50.82米&quot;&quot;9.6米&quot;&quot;9米&quot;，属于列数字。同时&quot;两端宽9.6米，中部略窄，宽9米&quot;构成作比较。</p>
+<p>作用：列数字准确具体地说明了赵州桥的长度和宽度特征；作比较突出说明了桥&quot;中部略窄&quot;的特点，体现说明文语言的准确性。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：运用列数字和作比较。准确具体地说明了赵州桥的长度宽度特征，突出&quot;中部略窄&quot;的特点，体现语言的准确性。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题2：词语能否删去</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>&quot;石拱桥在世界桥梁史上出现得比较早。这种桥不但形式优美，而且结构坚固。&quot;问：&quot;不但……而且……&quot;能否删去？为什么？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：用&quot;四步法&quot;作答。</p>
+<p>①表态：不能删去。②定性：&quot;不但……而且……&quot;表递进关系，强调形式优美与结构坚固两层意思，且后者更进一层。③析意：删去后变成并列关系，失去了递进强调的意味，不能突出石拱桥&quot;结构坚固&quot;这一更重要特征，与原文强调的重点不符。④结论：体现了说明文语言的准确严密性，不能删。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：不能删。&quot;不但……而且……&quot;表递进，既说明形式优美又强调结构坚固且后者更进一层；删去则失去递进强调意味，不能突出&quot;结构坚固&quot;，体现了说明文语言的准确严密性。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题3：判断说明顺序</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>一篇介绍&quot;人工智能发展&quot;的说明文，先讲古代人类对智能机器的幻想，再讲20世纪计算机的出现，最后讲当今深度学习的应用。本文采用了什么说明顺序？有何好处？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：文章按&quot;古代—20世纪—当今&quot;的时间推移组织内容，属于时间顺序。</p>
+<p>好处：符合事物发展演变的过程，条理清楚，使读者清晰地了解人工智能从幻想到现实的发展脉络，便于理解。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：采用时间顺序。按古代—20世纪—当今的时间推移，条理清楚地展现人工智能的发展脉络，符合认识规律，便于读者理解。</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">练习题</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">下列不属于说明方法的是（　）
+A. 举例子　　B. 打比方　　C. 借代　　D. 列数字</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：C。借代属于修辞手法，不是说明方法。举例子、打比方、列数字都是常见说明方法。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">说明文按说明对象可分为______说明文和______说明文两类。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：事物说明文、事理说明文。事物说明文介绍具体事物的形态性质功能，事理说明文阐述事物的本质规律或事理成因。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">指出下列语句运用的说明方法：&quot;按塑料的用途，可分为通用塑料、工程塑料、特种塑料等几大类。&quot;</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：分类别。把塑料按用途分成几大类，条理清楚地说明了塑料的种类，使说明更有条理。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">4</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">&quot;这座桥大约建于隋代。&quot;句中&quot;大约&quot;能否删去？请说明理由。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：不能删。&quot;大约&quot;表估计、推测，说明桥建于隋代时间并不十分确切，只是一种推断。删去后变成肯定建于隋代，与事实不符（可能存在误差）。&quot;大约&quot;一词体现了说明文语言的准确性、严谨性，不能删。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">5</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge filled text-[10px] py-1 px-2">进阶</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">说明文语言的三大特点是什么？请举例说明如何体现&quot;准确性&quot;。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：三大特点是准确性、严谨性、科学性。准确性体现在使用修饰限制性词语，如&quot;目前&quot;&quot;大约&quot;&quot;之一&quot;&quot;可能&quot;等，使表述精确严密，留有余地而不武断绝对。例如&quot;目前已知最大的恐龙&quot;，&quot;目前已知&quot;限制了范围，避免绝对化。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">6</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge filled text-[10px] py-1 px-2">进阶</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">一篇介绍故宫的文章，按&quot;从南到北，由外到内&quot;的方位依次介绍各殿，这采用了什么说明顺序？</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：空间顺序。按&quot;南—北、外—内&quot;的方位推移，符合游览参观的路线，条理清楚地展现了故宫的建筑布局与结构，便于读者形成空间印象。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">说明文结构层次</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>说明文的结构层次，是指说明文内容的组织安排方式。常见的结构形式有<strong>总分式</strong>、<strong>并列式</strong>和<strong>递进式</strong>三种。</p>
+<p><strong>总分式</strong>：先总说，再分说，可分为&quot;总—分&quot;式、&quot;分—总&quot;式和&quot;总—分—总&quot;式三种。其中&quot;总—分—总&quot;式最为常见：开头总领全文，中间分项说明，结尾总结归纳，结构完整严谨。如《苏州园林》先总说苏州园林&quot;无论站在哪个点上，眼前总是一幅完美的图画&quot;，再分项说明亭台轩榭、假山池沼等的布局，最后总结，即属此类。</p>
+<p><strong>并列式</strong>：各层次之间是平等并列的关系，从不同方面、不同角度分别说明事物或事理。各分说部分相对独立又相互联系，共同构成对说明对象的完整说明。如说明&quot;水的用途&quot;，可分别从饮用、灌溉、发电、航运等方面并列展开。</p>
+<p><strong>递进式</strong>：各层次之间层层深入、由浅入深、由现象到本质地推进，后一层是前一层的深化。事理说明文多用此结构，如先说明现象，再分析原因，最后揭示规律。</p>
+<p><strong>段落层次分析方法</strong>：①抓中心句，说明文段落常有总起句或总结句，概括该段主要内容；②抓标志性词语，如&quot;首先&quot;&quot;其次&quot;&quot;再次&quot;&quot;最后&quot;&quot;一方面……另一方面&quot;等，可据此划分层次；③抓过渡句，承上启下的过渡句常是层次转换的标志；④理清说明顺序，说明顺序与结构层次密切相关，可依时间、空间或逻辑顺序划分层次。</p>
+
+  </div>
+</article>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>

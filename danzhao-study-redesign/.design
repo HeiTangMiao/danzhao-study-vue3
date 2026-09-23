@@ -1,0 +1,3236 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "单招学习之路 · 首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1726944000000,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 2804,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-57fe9186",
+          "measuredAt": 1789978440235
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-01-集合的概念与表示",
+      "title": "集合的概念与表示",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7029,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b767dc34",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/01-集合的概念与表示.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-02-集合间的基本关系",
+      "title": "集合间的基本关系",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6396,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6b3efdd5",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/02-集合间的基本关系.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-03-集合的基本运算",
+      "title": "集合的基本运算",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6918,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-260aa0b1",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/03-集合的基本运算.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-04-充分条件与必要条件",
+      "title": "充分条件与必要条件",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6367,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f85c7ee3",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/04-充分条件与必要条件.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-05-命题与逻辑联结词",
+      "title": "命题与逻辑联结词",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5427,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-025a7a6c",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/05-命题与逻辑联结词.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-06-量词与命题否定",
+      "title": "量词与命题否定",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4536,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-ec6f9bd6",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/06-量词与命题否定.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-07-复习测验",
+      "title": "集合与逻辑 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3724,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-034efc1b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/07-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-01-集合与逻辑-08-易错专项与冲刺",
+      "title": "集合与逻辑 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1198,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8ec8a20e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/01-集合与逻辑/08-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-01-不等式的基本性质",
+      "title": "不等式的基本性质",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5856,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-db379a6f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/01-不等式的基本性质.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-02-一元二次不等式",
+      "title": "一元二次不等式",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6187,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-dbff872c",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/02-一元二次不等式.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-03-绝对值不等式与分式不等式",
+      "title": "绝对值不等式与分式不等式",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5805,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-fd614256",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/03-绝对值不等式与分式不等式.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-04-基本不等式与最值",
+      "title": "基本不等式与最值",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6245,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-663a0551",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/04-基本不等式与最值.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-05-复习测验",
+      "title": "不等式 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3671,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9ceeeaa4",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-02-不等式-06-易错专项与冲刺",
+      "title": "不等式 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6dba1d6e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/02-不等式/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-01-函数的概念与性质",
+      "title": "函数的概念与性质",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7752,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a681f394",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/01-函数的概念与性质.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-02-一次函数与反比例函数",
+      "title": "一次函数与反比例函数",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6410,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7b38a10f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/02-一次函数与反比例函数.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-03-二次函数",
+      "title": "二次函数",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7039,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-40b88af7",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/03-二次函数.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-04-指数与指数函数",
+      "title": "指数与指数函数",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5661,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-0c380afa",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/04-指数与指数函数.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-05-对数与对数函数",
+      "title": "对数与对数函数",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6070,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-995afa31",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/05-对数与对数函数.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-06-幂函数",
+      "title": "幂函数",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5729,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7deebd7f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/06-幂函数.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-07-复习测验",
+      "title": "函数与基本初等函数 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3969,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-fd335563",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/07-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-03-函数与基本初等函数-08-易错专项与冲刺",
+      "title": "函数与基本初等函数 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-2a487d24",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/03-函数与基本初等函数/08-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-01-任意角与弧度制",
+      "title": "任意角与弧度制",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5646,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-032e64bc",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/01-任意角与弧度制.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-02-三角函数定义与同角关系",
+      "title": "三角函数定义与同角关系",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5863,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-31780dc8",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/02-三角函数定义与同角关系.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-03-诱导公式",
+      "title": "诱导公式",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5309,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7ec5d143",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/03-诱导公式.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-04-三角恒等变换",
+      "title": "三角恒等变换",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5288,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-3fa049f6",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/04-三角恒等变换.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-05-三角函数图像与性质",
+      "title": "三角函数图像与性质",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7339,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9df67386",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/05-三角函数图像与性质.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-06-复习测验",
+      "title": "三角函数 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3605,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-4f39c61c",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/06-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-04-三角函数-07-易错专项与冲刺",
+      "title": "三角函数 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-460c96d0",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/04-三角函数/07-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-05-解三角形-01-正弦定理与余弦定理",
+      "title": "正弦定理与余弦定理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6522,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-3b380f84",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/05-解三角形/01-正弦定理与余弦定理.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-05-解三角形-02-解三角形应用",
+      "title": "解三角形应用",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6173,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-597b2e5a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/05-解三角形/02-解三角形应用.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-05-解三角形-03-复习测验",
+      "title": "解三角形 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3741,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-1a7293ea",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/05-解三角形/03-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-05-解三角形-04-易错专项与冲刺",
+      "title": "解三角形 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-50f1de69",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/05-解三角形/04-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-01-数列基础",
+      "title": "数列基础",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6371,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-19dc7c81",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/01-数列基础.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-02-等差数列",
+      "title": "等差数列",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6478,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-4c87092c",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/02-等差数列.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-03-等比数列",
+      "title": "等比数列",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6322,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a0290d0b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/03-等比数列.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-04-数列求和方法",
+      "title": "数列求和方法",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6381,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-41925b27",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/04-数列求和方法.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-05-复习测验",
+      "title": "数列 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3673,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-0ad05331",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-06-数列-06-易错专项与冲刺",
+      "title": "数列 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a183f158",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/06-数列/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-01-向量的概念与线性运算",
+      "title": "向量的概念与线性运算",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4698,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9e2f6c42",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/01-向量的概念与线性运算.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-02-向量的坐标表示",
+      "title": "向量的坐标表示",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5569,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-909a61b9",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/02-向量的坐标表示.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-03-向量的数量积",
+      "title": "向量的数量积",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e84c9d8e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/03-向量的数量积.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-04-空间向量",
+      "title": "空间向量",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6532,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-dea7374e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/04-空间向量.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-05-复习测验",
+      "title": "平面向量 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-dc1f532e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-07-平面向量-06-易错专项与冲刺",
+      "title": "平面向量 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1161,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d6dfa1c0",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/07-平面向量/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-01-计数原理",
+      "title": "计数原理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3653,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-73ce0d64",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/01-计数原理.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-02-排列",
+      "title": "排列",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3673,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-56d2a007",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/02-排列.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-03-组合",
+      "title": "组合",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4627,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-283c70df",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/03-组合.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-04-二项式定理",
+      "title": "二项式定理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4559,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-136e9ed4",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/04-二项式定理.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-05-复习测验",
+      "title": "排列组合与二项式定理 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3491,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-5f978c24",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-08-排列组合与二项式定理-06-易错专项与冲刺",
+      "title": "排列组合与二项式定理 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-388a5303",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/08-排列组合与二项式定理/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-01-随机事件与概率",
+      "title": "随机事件与概率",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4756,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-aab40b88",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/01-随机事件与概率.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-02-古典概型",
+      "title": "古典概型",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4414,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d86b02b9",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/02-古典概型.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-03-几何概型",
+      "title": "几何概型",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4945,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d1fdd3a9",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/03-几何概型.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-04-条件概率与独立性",
+      "title": "条件概率与相互独立事件",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4276,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-df111ece",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/04-条件概率与独立性.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-05-随机变量及其分布",
+      "title": "随机变量及其分布",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5674,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-cb0062ff",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/05-随机变量及其分布.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-06-抽样方法",
+      "title": "抽样方法",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4796,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-77ca701f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/06-抽样方法.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-07-统计图表与数据分布",
+      "title": "统计图表与数据分布",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4154,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-11d682eb",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/07-统计图表与数据分布.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-08-样本数字特征",
+      "title": "样本数字特征",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4504,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-066d97e2",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/08-样本数字特征.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-09-统计案例",
+      "title": "统计案例",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5007,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-909e8fdc",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/09-统计案例.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-10-复习测验",
+      "title": "概率统计 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3445,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d1eed22a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/10-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-09-概率-11-易错专项与冲刺",
+      "title": "概率与统计 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-12f39c26",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/09-概率/11-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-01-空间几何体",
+      "title": "空间几何体",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5164,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-36412b18",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/01-空间几何体.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-02-表面积与体积",
+      "title": "表面积与体积",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6082,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6638330a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/02-表面积与体积.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-03-空间点线面位置关系",
+      "title": "空间点线面位置关系",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6376,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-2efd9dcb",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/03-空间点线面位置关系.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-04-平行与垂直关系",
+      "title": "平行与垂直关系",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5857,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-53576f6d",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/04-平行与垂直关系.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-05-复习测验",
+      "title": "立体几何 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3673,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-87fdc65b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-10-立体几何-06-易错专项与冲刺",
+      "title": "立体几何 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b111e455",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/10-立体几何/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-01-直线方程",
+      "title": "直线方程",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5269,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a96a35ce",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/01-直线方程.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-02-圆的方程",
+      "title": "圆的方程",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5143,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-39da7a77",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/02-圆的方程.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-03-椭圆",
+      "title": "椭圆",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5571,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-13064688",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/03-椭圆.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-04-双曲线",
+      "title": "双曲线",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5060,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-0eb2d515",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/04-双曲线.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-05-抛物线",
+      "title": "抛物线",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4855,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-56e6f78c",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/05-抛物线.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-06-直线与圆锥曲线",
+      "title": "直线与圆锥曲线",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4923,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a23d65ee",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/06-直线与圆锥曲线.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-07-曲线与方程",
+      "title": "曲线与方程",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4696,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e0dbfb5a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/07-曲线与方程.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-08-复习测验",
+      "title": "平面解析几何 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3559,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8d585bf6",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/08-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-11-平面解析几何-09-易错专项与冲刺",
+      "title": "平面解析几何 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-92030782",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/11-平面解析几何/09-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-12-模拟冲刺-01-考试技巧",
+      "title": "考试技巧与得分策略（数学）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-20328e71",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/12-模拟冲刺/01-考试技巧.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-12-模拟冲刺-02-真题模拟卷一",
+      "title": "真题模拟卷（一）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8946725f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/12-模拟冲刺/02-真题模拟卷一.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-math-12-模拟冲刺-03-真题模拟卷二",
+      "title": "真题模拟卷（二）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1128,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8e424feb",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/math/12-模拟冲刺/03-真题模拟卷二.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-01-字音字形",
+      "title": "字音字形",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6927,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-4f5a3f2f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/01-字音字形.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-02-词语与成语运用",
+      "title": "词语与成语运用",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 8468,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-230b0120",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/02-词语与成语运用.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-03-标点符号",
+      "title": "标点符号",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7061,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-eccf067b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/03-标点符号.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-04-病句修改",
+      "title": "病句修改",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5802,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b30e5f58",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/04-病句修改.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-05-句式变换与修辞手法",
+      "title": "句式变换与修辞手法",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5815,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6ef19476",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/05-句式变换与修辞手法.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-06-语言得体与口语交际",
+      "title": "语言得体与口语交际",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5011,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9ae784ac",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/06-语言得体与口语交际.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-07-复习测验",
+      "title": "语言文字运用 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4374,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-307e0f86",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/07-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-01-语言文字运用-08-易错专项与冲刺",
+      "title": "语言文字运用 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1070,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8f4853a8",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/01-语言文字运用/08-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-01-记叙文阅读",
+      "title": "记叙文阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4914,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-ef8f9ea0",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/01-记叙文阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-02-散文阅读",
+      "title": "散文阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5140,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8cdd212e",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/02-散文阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-03-小说阅读",
+      "title": "小说阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5007,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d98618f3",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/03-小说阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-04-说明文阅读",
+      "title": "说明文阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5810,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-88f8cdd0",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/04-说明文阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-05-议论文阅读",
+      "title": "议论文阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5206,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-74469934",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/05-议论文阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-06-实用类文本阅读",
+      "title": "实用类文本阅读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4109,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9dada085",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/06-实用类文本阅读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-07-复习测验",
+      "title": "现代文阅读 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4693,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a6e39eb0",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/07-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-02-现代文阅读-08-易错专项与冲刺",
+      "title": "现代文阅读 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1161,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-c07653d1",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/02-现代文阅读/08-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-01-古诗词鉴赏",
+      "title": "古诗词鉴赏",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7290,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-39e156d1",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/01-古诗词鉴赏.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-02-文言文实词与虚词",
+      "title": "文言文实词与虚词",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6689,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-fc0ce52a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/02-文言文实词与虚词.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-03-文言文特殊句式与翻译",
+      "title": "文言文特殊句式与翻译",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5427,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7b6abf4b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/03-文言文特殊句式与翻译.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-04-古代文化常识",
+      "title": "古代文化常识",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6251,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-57023325",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/04-古代文化常识.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-05-复习测验",
+      "title": "古诗文阅读 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3452,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-3f34d747",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/05-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-03-古诗文阅读-06-易错专项与冲刺",
+      "title": "古诗文阅读 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1070,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-c628f454",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/03-古诗文阅读/06-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-04-写作-01-基础文体写作",
+      "title": "基础文体写作",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5231,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8ac6ed41",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/04-写作/01-基础文体写作.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-04-写作-02-应用文写作",
+      "title": "应用文写作",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6513,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f943bbee",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/04-写作/02-应用文写作.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-04-写作-03-通用写作技巧",
+      "title": "通用写作技巧",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6280,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a7d468df",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/04-写作/03-通用写作技巧.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-04-写作-04-复习测验",
+      "title": "写作 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3520,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-cec51d67",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/04-写作/04-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-04-写作-05-易错专项与冲刺",
+      "title": "写作 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1093,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-22b68c88",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/04-写作/05-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-05-文学常识-01-中国文学史",
+      "title": "中国文学史",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5855,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f0acdfc1",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/05-文学常识/01-中国文学史.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-05-文学常识-02-外国文学与名著导读",
+      "title": "外国文学与名著导读",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5734,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-da71eea5",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/05-文学常识/02-外国文学与名著导读.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-05-文学常识-03-复习测验",
+      "title": "文学常识 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3498,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-dca48e2f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/05-文学常识/03-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-05-文学常识-04-易错专项与冲刺",
+      "title": "文学常识 · 易错专项与冲刺",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1070,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f0662139",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/05-文学常识/04-易错专项与冲刺.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-06-模拟冲刺-01-考试技巧",
+      "title": "考试技巧与得分策略（语文）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 957,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-30cb0f46",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/06-模拟冲刺/01-考试技巧.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-chinese-06-模拟冲刺-02-真题模拟卷一",
+      "title": "真题模拟卷（一）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-c458b512",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/chinese/06-模拟冲刺/02-真题模拟卷一.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-01-职业素养-01-计算机操作规范",
+      "title": "计算机操作规范",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4799,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f6658249",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/01-职业素养/01-计算机操作规范.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-01-职业素养-02-文件命名与安全管理",
+      "title": "文件命名与安全管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4165,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6d4080aa",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/01-职业素养/02-文件命名与安全管理.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-01-职业素养-03-复习测验",
+      "title": "职业素养 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3476,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e7f9cef8",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/01-职业素养/03-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-01-Python开发环境与基础语法",
+      "title": "Python 开发环境与基础语法",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4694,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-21943551",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/01-Python开发环境与基础语法.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-02-顺序结构程序设计",
+      "title": "顺序结构程序设计",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5032,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-89ff5798",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/02-顺序结构程序设计.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-03-选择结构程序设计",
+      "title": "选择结构程序设计",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 7059,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-7616a05f",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/03-选择结构程序设计.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-04-循环结构程序设计",
+      "title": "循环结构程序设计",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6141,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a9c27701",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/04-循环结构程序设计.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-05-常用算法基础",
+      "title": "常用算法基础",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6680,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-45af9fa9",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/05-常用算法基础.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-06-排序与字符处理",
+      "title": "排序与字符处理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6568,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d5f6b609",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/06-排序与字符处理.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-07-程序调试与运行",
+      "title": "程序调试与运行",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4536,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e71c09f5",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/07-程序调试与运行.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-02-程序设计技能-08-复习测验",
+      "title": "程序设计技能 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3963,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-05344784",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/02-程序设计技能/08-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-01-网络基础与PacketTracer入门",
+      "title": "网络基础与 PacketTracer 入门",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5391,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-195357c9",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/01-网络基础与PacketTracer入门.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-02-网络拓扑搭建",
+      "title": "网络拓扑搭建",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5612,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-484ddaa2",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/02-网络拓扑搭建.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-03-交换机配置与VLAN",
+      "title": "交换机配置与 VLAN",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5775,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-311d64d8",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/03-交换机配置与VLAN.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-04-路由配置与RIP协议",
+      "title": "路由配置与 RIP 协议",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5922,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6ec50ec6",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/04-路由配置与RIP协议.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-05-Windows网络配置与命令",
+      "title": "Windows 网络配置与命令",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5179,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-64cba53d",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/05-Windows网络配置与命令.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-06-网络服务配置",
+      "title": "网络服务配置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6110,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-14b5fc38",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/06-网络服务配置.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-03-计算机网络技术-07-复习测验",
+      "title": "计算机网络技术 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 3630,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b53d9332",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/03-计算机网络技术/07-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-01-Photoshop基础与常用工具",
+      "title": "Photoshop 基础与常用工具",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5564,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a3dfebac",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/01-Photoshop基础与常用工具.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-02-Photoshop图层与图像操作",
+      "title": "Photoshop 图层与图像操作",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5708,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-3eb69aaf",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/02-Photoshop图层与图像操作.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-03-Photoshop综合案例",
+      "title": "Photoshop 综合案例",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6358,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a56d976a",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/03-Photoshop综合案例.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-04-Premiere基础与视频编辑",
+      "title": "Premiere 基础与视频编辑",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 5910,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6777d712",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/04-Premiere基础与视频编辑.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-05-Premiere特效字幕与音频",
+      "title": "Premiere 特效字幕与音频",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 6098,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-25e7bb63",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/05-Premiere特效字幕与音频.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-04-数字媒体技术-06-复习测验",
+      "title": "数字媒体技术 · 复习测验",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4245,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b8f2e36b",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/04-数字媒体技术/06-复习测验.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-05-模拟冲刺-01-考试技巧",
+      "title": "考试技巧与得分策略（计算机）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1525,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-13974369",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/05-模拟冲刺/01-考试技巧.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-content-computer-05-模拟冲刺-02-真题模拟卷",
+      "title": "真题模拟卷（一）",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1789981589529,
+      "canvasData": {
+        "x": 40,
+        "y": 40,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-43b005f6",
+          "measuredAt": 1789981851816
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content/computer/05-模拟冲刺/02-真题模拟卷.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "designLibrary": {
+      "name": "Claude",
+      "id": "dl_builtin_claude",
+      "version": 0,
+      "scope": "built-in-global",
+      "path": "/Users/iras17514/.trae-cn/design_libraries/Claude",
+      "versionSource": "metadata.json"
+    }
+  }
+}

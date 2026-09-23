@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>解三角形应用 · 数学 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../math/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">数学</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">📐</span>
+      <span class="font-sans font-semibold text-sm">数学学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 集合与逻辑</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 不等式</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 函数与基本初等函数</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 三角函数</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 解三角形</p>
+            
+            <div class="space-y-1">
+              <a href="./05-解三角形/01-正弦定理与余弦定理.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="正弦定理与余弦定理">正弦定理与余弦定理</a><a href="./05-解三角形/02-解三角形应用.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="解三角形应用">解三角形应用</a><a href="./05-解三角形/03-复习测验.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="解三角形 · 复习测验">解三角形 · 复习测验</a><a href="./05-解三角形/04-易错专项与冲刺.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="解三角形 · 易错专项与冲刺">解三角形 · 易错专项与冲刺</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">06 · 数列</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">07 · 平面向量</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">08 · 排列组合与二项式定理</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">09 · 概率与统计</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">10 · 立体几何</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">11 · 平面解析几何</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">12 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../math/index.html" class="hover:text-foreground transition-colors no-underline">数学</a>
+            <span>/</span>
+            <span class="text-foreground">解三角形</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">📐</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 05 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">解三角形应用</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">面积公式与实际测量问题</p>
+            </div>
+          </div>
+        </div>
+
+        
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">知识结构导图</h2>
+  </div>
+  <div class="p-5 bg-card overflow-x-auto">
+    <pre class="mermaid text-center">graph LR
+  ROOT[&quot;解三角形应用&quot;]
+  ROOT --&gt; PRACT[&quot;实际问题&quot;]
+  ROOT --&gt; STEP[&quot;解题步骤&quot;]
+  ROOT --&gt; MODEL[&quot;常见模型&quot;]
+  ROOT --&gt; AREA[&quot;面积公式&lt;br/&gt;S = ½·ab·sinC&quot;]
+
+  PRACT --&gt; P_DIST[&quot;测量距离&quot;]
+  PRACT --&gt; P_HIGH[&quot;测量高度&quot;]
+  PRACT --&gt; P_ANG[&quot;测量角度&quot;]
+  P_DIST --&gt; P_DIST_M[&quot;构造三角形&lt;br/&gt;正弦/余弦定理&quot;]
+  P_HIGH --&gt; P_HIGH_M[&quot;仰角俯角&lt;br/&gt;构造直角三角形&quot;]
+  P_ANG --&gt; P_ANG_M[&quot;方位角/方向角构造&quot;]
+
+  STEP --&gt; S1[&quot;1. 建模抽象&quot;]
+  STEP --&gt; S2[&quot;2. 画示意图&quot;]
+  STEP --&gt; S3[&quot;3. 选择定理&quot;]
+  STEP --&gt; S4[&quot;4. 求解计算&quot;]
+  S3 --&gt; S3_SINE[&quot;两角一边 → 正弦定理&quot;]
+  S3 --&gt; S3_COS[&quot;三边/两边夹角 → 余弦定理&quot;]
+
+  MODEL --&gt; M_ELEV[&quot;仰角俯角&lt;br/&gt;以水平线为准&quot;]
+  MODEL --&gt; M_AZI[&quot;方位角&lt;br/&gt;以正北为 0°&quot;]
+  MODEL --&gt; M_DIR[&quot;方向角&lt;br/&gt;南偏东/西&quot;]
+
+  AREA -.-&gt;|关联| P_DIST_M
+  M_AZI -.-&gt;|关联| P_ANG_M
+  S3_SINE -.-&gt;|关联| P_HIGH_M</pre>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">学习目标</h2>
+  </div>
+  <div class="p-5">
+    <ul class="space-y-1">
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握三角形面积公式，能求三角形的面积</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">理解解三角形的四类基本场景，能选择合适的方法求解</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">能运用正弦定理和余弦定理解决实际测量问题</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">能综合运用三角公式解决解三角形的综合问题</span>
+    </li></ul>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">一、三角形面积公式</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>其他面积公式：</p>
+<p>• \\(S = \frac{1}{2} \times \text{底} \times \text{高}\\)</p>
+<p>• \\(S = \frac{abc}{4R}\\)（\\(R\\) 为外接圆半径）</p>
+<p>• \\(S = \sqrt{p(p-a)(p-b)(p-c)}\\)（海伦公式，\\(p = \frac{a+b+c}{2}\\)）</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">二、解三角形的四类场景</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">类型</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">已知条件</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">使用定理</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">解的情况</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">SSA</td><td class="px-4 py-3 text-sm text-foreground align-top">两边及对角</td><td class="px-4 py-3 text-sm text-foreground align-top">正弦定理</td><td class="px-4 py-3 text-sm text-foreground align-top">可能一解、两解或无解</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">SAS</td><td class="px-4 py-3 text-sm text-foreground align-top">两边及夹角</td><td class="px-4 py-3 text-sm text-foreground align-top">余弦定理</td><td class="px-4 py-3 text-sm text-foreground align-top">唯一解</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">SSS</td><td class="px-4 py-3 text-sm text-foreground align-top">三边</td><td class="px-4 py-3 text-sm text-foreground align-top">余弦定理</td><td class="px-4 py-3 text-sm text-foreground align-top">唯一解（需满足三角形不等式）</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">ASA/AAS</td><td class="px-4 py-3 text-sm text-foreground align-top">两角及一边</td><td class="px-4 py-3 text-sm text-foreground align-top">正弦定理</td><td class="px-4 py-3 text-sm text-foreground align-top">唯一解</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">三、SSA情况解的判断</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>已知 \\(a\\)、\\(b\\)、\\(A\\)（\\(A\\) 为锐角）：</p>
+<p>• 当 \\(a &lt; b\sin A\\) 时，无解</p>
+<p>• 当 \\(a = b\sin A\\) 时，一解（直角三角形）</p>
+<p>• 当 \\(b\sin A &lt; a &lt; b\\) 时，两解</p>
+<p>• 当 \\(a \geq b\\) 时，一解</p>
+
+  </div>
+</article>
+
+<div class="card bg-success/8 text-success border-success/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg></span>
+  <div class="text-sm leading-relaxed">当 \\(A\\) 为钝角或直角时，只有当 \\(a &gt; b\\) 时有一解，否则无解。</div>
+</div>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">四、实际应用中的常见模型</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>• 测量距离：两点间不可直达时，构造三角形利用正弦或余弦定理</p>
+<p>• 测量高度：利用仰角和俯角，构造直角三角形或一般三角形</p>
+<p>• 测量角度：利用方位角、方向角，构造三角形求解</p>
+<p>• 航海问题：利用航行方向和速度构造三角形</p>
+
+  </div>
+</article>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题1：求面积</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>在 \\(\triangle ABC\\) 中，已知 \\(a = 6\\)，\\(b = 8\\)，\\(C = 60°\\)，求三角形的面积 \\(S\\)。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解：</p>
+<p>由面积公式 \\(S = \frac{1}{2}ab\sin C\\)：</p>
+<p>\\(S = \frac{1}{2} \times 6 \times 8 \times \sin 60° = \frac{1}{2} \times 48 \times \frac{\sqrt{3}}{2} = 12\sqrt{3}\\)</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：\\(S = 12\sqrt{3}\\)。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题2：实际测量问题</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>如图，为测量河对岸 \\(A\\)、\\(B\\) 两点间的距离，在河岸边选取两点 \\(C\\)、\\(D\\)，测得 \\(CD = 100\\) m，\\(\angle ACD = 60°\\)，\\(\angle BCD = 30°\\)，\\(\angle ADC = 45°\\)，\\(\angle BDC = 75°\\)。求 \\(A\\)、\\(B\\) 两点间的距离。</p>
+<p>示意图：\\(C\\)、\\(D\\) 为河岸测量点，\\(A\\)、\\(B\\) 为河对岸目标点，基线 \\(CD = 100\\) m。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解：</p>
+<p>在 \\(\triangle ACD\\) 中：</p>
+<p>\\(\angle CAD = 180° - 60° - 45° = 75°\\)</p>
+<p>由正弦定理：\\(\frac{AC}{\sin 45°} = \frac{CD}{\sin 75°}\\)</p>
+<p>\\(AC = \frac{100\sin 45°}{\sin 75°} = \frac{100 \times \frac{\sqrt{2}}{2}}{\frac{\sqrt{6}+\sqrt{2}}{4}} = \frac{50\sqrt{2} \times 4}{\sqrt{6}+\sqrt{2}} = \frac{200\sqrt{2}}{\sqrt{6}+\sqrt{2}}\\)</p>
+<p>分母有理化：\\(\frac{200\sqrt{2}(\sqrt{6}-\sqrt{2})}{6-2} = \frac{200\sqrt{2}(\sqrt{6}-\sqrt{2})}{4} = 50\sqrt{2}(\sqrt{6}-\sqrt{2}) = 50(2\sqrt{3}-2) = 100(\sqrt{3}-1)\\)</p>
+<p>在 \\(\triangle BCD\\) 中：</p>
+<p>\\(\angle CBD = 180° - 30° - 75° = 75°\\)</p>
+<p>由正弦定理：\\(\frac{BC}{\sin 75°} = \frac{CD}{\sin 75°}\\)，所以 \\(BC = CD = 100\\) m</p>
+<p>在 \\(\triangle ABC\\) 中，\\(\angle ACB = \angle ACD - \angle BCD = 60° - 30° = 30°\\)</p>
+<p>由余弦定理：</p>
+<p>\\(AB^2 = AC^2 + BC^2 - 2 \cdot AC \cdot BC \cdot \cos 30°\\)</p>
+<p>\\(= [100(\sqrt{3}-1)]^2 + 100^2 - 2 \times 100(\sqrt{3}-1) \times 100 \times \frac{\sqrt{3}}{2}\\)</p>
+<p>\\(= 10000(4-2\sqrt{3}) + 10000 - 10000\sqrt{3}(\sqrt{3}-1)\\)</p>
+<p>\\(= 10000(4-2\sqrt{3}) + 10000 - 10000(3-\sqrt{3})\\)</p>
+<p>\\(= 10000(4-2\sqrt{3}+1-3+\sqrt{3}) = 10000(2-\sqrt{3})\\)</p>
+<p>\\(AB = 100\sqrt{2-\sqrt{3}} \approx 100 \times 0.5176 \approx 51.76\\) m</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：\\(AB = 100\sqrt{2-\sqrt{3}} \approx 51.76\\) m。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题3：综合应用</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>在 \\(\triangle ABC\\) 中，\\(a + b = 10\\)，\\(C = 60°\\)，求 \\(\triangle ABC\\) 面积的最大值。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解：</p>
+<p>面积 \\(S = \frac{1}{2}ab\sin C = \frac{1}{2}ab\sin 60° = \frac{\sqrt{3}}{4}ab\\)</p>
+<p>要使面积最大，需要 \\(ab\\) 最大。</p>
+<p>由 \\(a + b = 10\\)，根据基本不等式 \\(ab \leq \left(\frac{a+b}{2}\right)^2 = 25\\)，当且仅当 \\(a = b = 5\\) 时取等号。</p>
+<p>所以 \\(ab\\) 的最大值为 \\(25\\)。</p>
+<p>\\(S_{\max} = \frac{\sqrt{3}}{4} \times 25 = \frac{25\sqrt{3}}{4}\\)</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：面积最大值为 \\(\frac{25\sqrt{3}}{4}\\)，当 \\(a = b = 5\\) 时取得。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题4：推导面积公式 S = abc/(4R)</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>在 \\(\triangle ABC\\) 中，\\(a\\)、\\(b\\)、\\(c\\) 为三边，\\(R\\) 为外接圆半径，证明：\\(S = \dfrac{abc}{4R}\\)。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>证明：把正弦定理与面积公式结合起来。</p>
+<p>由正弦定理 \\(\dfrac{a}{\sin A} = 2R\\)，可得 \\(\sin A = \dfrac{a}{2R}\\)。</p>
+<p>由三角形面积公式 \\(S = \dfrac{1}{2}bc\sin A\\)，</p>
+<p>代入 \\(\sin A\\)：\\(S = \dfrac{1}{2}bc \cdot \dfrac{a}{2R} = \dfrac{abc}{4R}\\)。</p>
+<p>故 \\(S = \dfrac{abc}{4R}\\)，得证。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：\\(S = \dfrac{abc}{4R}\\) 得证。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题5：解三角形漏解（易错题）</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>在 \\(\triangle ABC\\) 中，已知 \\(b = 3\\)，\\(c = 3\sqrt{3}\\)，\\(B = 30°\\)，求角 \\(C\\) 和边 \\(a\\)。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>常见错误：由正弦定理 \\(\sin C = \dfrac{c\sin B}{b} = \dfrac{3\sqrt{3} \times \frac{1}{2}}{3} = \dfrac{\sqrt{3}}{2}\\)，直接得 \\(C = 60°\\)，再算 \\(A = 90°\\)，\\(a = \dfrac{b\sin A}{\sin B} = 6\\)。</p>
+<p>错误分析：\\(\sin C = \dfrac{\sqrt{3}}{2}\\) 时，\\(C\\) 可为 \\(60°\\) 或 \\(120°\\)。题中 \\(c = 3\sqrt{3} &gt; b = 3\\)，故 \\(C &gt; B = 30°\\)，两种情况均可能，不能只取一解。</p>
+<p>正确解法：由 \\(\sin C = \dfrac{\sqrt{3}}{2}\\)，得 \\(C = 60°\\) 或 \\(C = 120°\\)。</p>
+<p>当 \\(C = 60°\\) 时，\\(A = 180° - 30° - 60° = 90°\\)，由正弦定理 \\(a = \dfrac{b\sin A}{\sin B} = \dfrac{3 \times 1}{\frac{1}{2}} = 6\\)；</p>
+<p>当 \\(C = 120°\\) 时，\\(A = 180° - 30° - 120° = 30°\\)，由正弦定理 \\(a = \dfrac{b\sin A}{\sin B} = \dfrac{3 \times \frac{1}{2}}{\frac{1}{2}} = 3\\)。</p>
+<p>故 \\(C = 60°, a = 6\\) 或 \\(C = 120°, a = 3\\)。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：\\(C = 60°, a = 6\\) 或 \\(C = 120°, a = 3\\)（SSA 情况有两解）。</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">练习题</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">在 \\(\triangle ABC\\) 中，\\(a = 3\\)，\\(b = 4\\)，\\(C = 45°\\)，求三角形的面积。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>\\(S = \frac{1}{2}ab\sin C = \frac{1}{2} \times 3 \times 4 \times \sin 45° = 6 \times \frac{\sqrt{2}}{2} = 3\sqrt{2}\\)</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">在 \\(\triangle ABC\\) 中，已知 \\(a = 2\\)，\\(b = 2\sqrt{2}\\)，\\(A = 30°\\)，求 \\(B\\) 和面积 \\(S\\)。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>\\(\sin B = \frac{b\sin A}{a} = \frac{2\sqrt{2}\times\frac{1}{2}}{2} = \frac{\sqrt{2}}{2}\\)，\\(B = 45°\\) 或 \\(135°\\)。当 \\(B=45°\\) 时，\\(C=105°\\)；当 \\(B=135°\\) 时，\\(C=15°\\)。若 \\(B=45°\\)，\\(S=\frac{1}{2}ab\sin C=\frac{1}{2}\times 2\times 2\sqrt{2}\times\sin 105°=2\sqrt{2}\times\frac{\sqrt{6}+\sqrt{2}}{4}=\frac{2\sqrt{12}+2\sqrt{4}}{4}=\sqrt{3}+1\\)。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">某人在 \\(A\\) 处测得塔顶 \\(C\\) 的仰角为 \\(30°\\)，向塔方向前进 \\(100\\) m 到 \\(B\\) 处，测得仰角为 \\(60°\\)，求塔高。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>设塔高为 \\(h\\)。在 \\(A\\) 处，到塔底距离为 \\(\frac{h}{\tan 30°} = \sqrt{3}h\\)；在 \\(B\\) 处，距离为 \\(\frac{h}{\tan 60°} = \frac{h}{\sqrt{3}}\\)。\\(\sqrt{3}h - \frac{h}{\sqrt{3}} = 100\\)，\\(\frac{3h-h}{\sqrt{3}} = 100\\)，\\(\frac{2h}{\sqrt{3}} = 100\\)，\\(h = 50\sqrt{3}\\) m。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">4</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">在 \\(\triangle ABC\\) 中，\\(a = 5\\)，\\(b = 3\\)，\\(\sin A = \frac{5}{6}\\)，求 \\(\sin B\\) 的值。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>由正弦定理：\\(\sin B = \frac{b\sin A}{a} = \frac{3 \times \frac{5}{6}}{5} = \frac{\frac{15}{6}}{5} = \frac{15}{30} = \frac{1}{2}\\)</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">5</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge filled text-[10px] py-1 px-2">进阶</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">在 \\(\triangle ABC\\) 中，\\(a\cos B = b\cos A\\)，判断三角形形状。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>由正弦定理 \\(a = 2R\sin A, b = 2R\sin B\\) 代入：\\(2R\sin A\cos B = 2R\sin B\cos A\\)，即 \\(\sin A\cos B - \sin B\cos A = 0\\)，\\(\sin(A-B) = 0\\)。因为 \\(A, B \in (0, \pi)\\)，所以 \\(A - B = 0\\)，即 \\(A = B\\)。三角形为等腰三角形。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>

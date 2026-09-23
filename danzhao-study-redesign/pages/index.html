@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单招学习之路 · 首页</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand fonts — Anthropic official: Newsreader (editorial display/slogan) +
+   Poppins (compact UI) + Lora (reading). Mono kept for code/token surfaces. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+/* ============================================================
+   Token model
+   1) Primitives — 7 key color cards as 10-step scales (50→900).
+      These are the single source of truth (mirrored in the linshi
+      preview tool). The flagged "standard" step per group:
+        brand-500 · text-800 · bg-100 · icon-700 · border-300 · success-500 · error-500
+   2) Semantic tokens — reference the primitives above (no raw hex
+      duplicates). These are the API consumed by preview / ui_kits /
+      components.
+   3) Non-color tokens — font, spacing, radius, shadow, type.
+   ============================================================ */
+:root {
+  
+  /* solo-design consumption aliases: explicit prefix for fill-html-head.mjs */
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --claude-input: var(--input, var(--border));
+  --claude-ring: var(--ring, var(--primary));
+  --claude-chart-1: var(--chart-1, var(--primary));
+  --claude-chart-2: var(--chart-2, var(--secondary, var(--primary)));
+  --claude-chart-3: var(--chart-3, var(--accent, var(--primary)));
+  --claude-chart-4: var(--chart-4, var(--muted-foreground, var(--foreground)));
+  --claude-chart-5: var(--chart-5, var(--foreground));
+  --claude-sidebar: var(--sidebar, var(--background));
+  --claude-sidebar-foreground: var(--sidebar-foreground, var(--foreground));
+  --claude-sidebar-primary: var(--sidebar-primary, var(--primary));
+  --claude-sidebar-primary-foreground: var(--sidebar-primary-foreground, var(--primary-foreground));
+  --claude-sidebar-accent: var(--sidebar-accent, var(--accent, var(--muted, var(--card))));
+  --claude-sidebar-accent-foreground: var(--sidebar-accent-foreground, var(--accent-foreground, var(--foreground)));
+
+/* ===== 1) Primitive scales · key color cards (10 steps, 50→900) ===== */
+  /* brand — standard: --brand-500 #c96442 */
+  --brand-50: #fbf2ed;
+  --brand-100: #f4e0d5;
+  --brand-200: #ebc6b6;
+  --brand-300: #e0a892;
+  --brand-400: #d6866a;
+  --brand-500: #c96442;
+  --brand-600: #b0562f;
+  --brand-700: #934828;
+  --brand-800: #753a22;
+  --brand-900: #582e1d;
+  /* text — standard: --text-800 #3d3929 */
+  --text-50: #f6f5f0;
+  --text-100: #ece9de;
+  --text-200: #dad9d4;
+  --text-300: #c2c0b6;
+  --text-400: #9b988c;
+  --text-500: #6e6d68;
+  --text-600: #535146;
+  --text-700: #46443b;
+  --text-800: #3d3929;
+  --text-900: #28261b;
+  /* background — standard: --bg-100 #faf9f5 */
+  --bg-50: #ffffff;
+  --bg-100: #faf9f5;
+  --bg-200: #f5f4ef;
+  --bg-300: #ede9de;
+  --bg-400: #e3e0d4;
+  --bg-500: #dad9d4;
+  --bg-600: #cdcabf;
+  --bg-700: #b4b2a7;
+  --bg-800: #8a887e;
+  --bg-900: #535146;
+  /* icon — standard: --icon-700 #3d3929 */
+  --icon-50: #ffffff;
+  --icon-100: #dad9d4;
+  --icon-200: #c2c0b6;
+  --icon-300: #9b988c;
+  --icon-400: #6e6d68;
+  --icon-500: #535146;
+  --icon-600: #46443b;
+  --icon-700: #3d3929;
+  --icon-800: #28261b;
+  --icon-900: #141413;
+  /* border — standard: --border-300 #dad9d4 */
+  --border-50: #f0efe9;
+  --border-100: #ebebeb;
+  --border-200: #e3e0d4;
+  --border-300: #dad9d4;
+  --border-400: #cdcabf;
+  --border-500: #b4b2a7;
+  --border-600: #9b988c;
+  --border-700: #6e6d68;
+  --border-800: #535146;
+  --border-900: #3d3929;
+  /* state · success — standard: --success-500 #788c5d */
+  --success-50: #f0f3ea;
+  --success-100: #e7ecdd;
+  --success-200: #d3dcc1;
+  --success-300: #b8c69e;
+  --success-400: #9aac79;
+  --success-500: #788c5d;
+  --success-600: #647649;
+  --success-700: #4f5d3a;
+  --success-800: #3d482d;
+  --success-900: #2b331f;
+  /* state · error — standard: --error-500 #d64545 */
+  --error-50: #fcecea;
+  --error-100: #f7dedb;
+  --error-200: #f3c4bf;
+  --error-300: #eb9d96;
+  --error-400: #e0716a;
+  --error-500: #d64545;
+  --error-600: #b83636;
+  --error-700: #962c2c;
+  --error-800: #732222;
+  --error-900: #531818;
+
+  /* ===== 2) Semantic tokens (reference the primitives above) ===== */
+  /* bg */
+  --background: var(--bg-100);
+  --card: var(--bg-200);
+  --popover: var(--bg-50);
+  --muted: var(--bg-300);
+  /* text */
+  --foreground: var(--text-800);
+  --card-foreground: var(--icon-900);
+  --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff;
+  --secondary-foreground: var(--text-600);
+  --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900);
+  --destructive-foreground: #ffffff;
+  /* semantic */
+  --primary: var(--brand-500);
+  --secondary: #e9e6dc;
+  --accent: var(--secondary);
+  --input: var(--border-500);
+  --ring: var(--brand-500);
+  --border: var(--border-300);
+  /* status */
+  --destructive: var(--error-500);
+  --success: var(--success-500);
+  --success-foreground: #ffffff;
+  --error: var(--error-500);
+  --error-foreground: #ffffff;
+  /* chart */
+  --chart-1: #b05730;
+  --chart-2: #9c87f5;
+  --chart-3: #ded8c4;
+  --chart-4: #dbd3f0;
+  --chart-5: #b4552d;
+  /* sidebar */
+  --sidebar: #f5f4ee;
+  --sidebar-foreground: #3d3d3a;
+  --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb;
+  --sidebar-accent: #e9e6dc;
+  --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100);
+  --sidebar-ring: #b5b5b5;
+
+  /* ===== 3) Non-color tokens ===== */
+  /* font — display (Newsreader) for slogans/headlines, sans (Poppins) for compact UI, serif (Lora) for reading surfaces */
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  /* spacing */
+  --spacing: 0.25rem;
+  /* radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius: 1rem;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  /* shadow */
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: #000000;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 1px 3px 0px rgba(0, 0, 0, 0.25);
+  /* type */
+  --tracking-normal: 0em;
+}
+
+.dark {
+  /* ===== 1) Primitive scales · key color cards (10 steps, 50→900) ===== */
+  /* brand — standard: --brand-500 #d97757 */
+  --brand-50: #3a2a22;
+  --brand-100: #4d3528;
+  --brand-200: #6b4533;
+  --brand-300: #8a5740;
+  --brand-400: #b0683f;
+  --brand-500: #d97757;
+  --brand-600: #e08d6f;
+  --brand-700: #e8a98f;
+  --brand-800: #f0c6b3;
+  --brand-900: #f8e3d8;
+  /* text — standard: --text-800 #f1f1ef */
+  --text-50: #1b1b19;
+  --text-100: #2c2c2b;
+  --text-200: #46443b;
+  --text-300: #6e6d68;
+  --text-400: #908e84;
+  --text-500: #b7b5a9;
+  --text-600: #c3c0b6;
+  --text-700: #d8d6cd;
+  --text-800: #f1f1ef;
+  --text-900: #faf9f5;
+  /* background — standard: --bg-100 #262624 */
+  --bg-50: #1b1b19;
+  --bg-100: #262624;
+  --bg-200: #2c2c2b;
+  --bg-300: #30302e;
+  --bg-400: #3e3e38;
+  --bg-500: #4a4a43;
+  --bg-600: #52514a;
+  --bg-700: #6e6d68;
+  --bg-800: #908e84;
+  --bg-900: #b7b5a9;
+  /* icon — standard: --icon-700 #f1f1ef */
+  --icon-50: #1b1b19;
+  --icon-100: #2c2c2b;
+  --icon-200: #46443b;
+  --icon-300: #6e6d68;
+  --icon-400: #908e84;
+  --icon-500: #b7b5a9;
+  --icon-600: #d8d6cd;
+  --icon-700: #f1f1ef;
+  --icon-800: #f8f8f6;
+  --icon-900: #ffffff;
+  /* border — standard: --border-300 #3e3e38 */
+  --border-50: #1f1e1d;
+  --border-100: #2c2c2b;
+  --border-200: #343430;
+  --border-300: #3e3e38;
+  --border-400: #4a4a43;
+  --border-500: #52514a;
+  --border-600: #6e6d68;
+  --border-700: #908e84;
+  --border-800: #b7b5a9;
+  --border-900: #d8d6cd;
+  /* state · success — standard: --success-500 #8ca06f */
+  --success-50: #232a1c;
+  --success-100: #2e3823;
+  --success-200: #3f4d30;
+  --success-300: #556640;
+  --success-400: #708353;
+  --success-500: #8ca06f;
+  --success-600: #a3b58a;
+  --success-700: #bccaa8;
+  --success-800: #d6dfc8;
+  --success-900: #edf2e4;
+  /* state · error — standard: --error-500 #ef4444 */
+  --error-50: #3a1f1f;
+  --error-100: #4d2424;
+  --error-200: #6e2c2c;
+  --error-300: #93302f;
+  --error-400: #c43a39;
+  --error-500: #ef4444;
+  --error-600: #f26b6b;
+  --error-700: #f59292;
+  --error-800: #f9b9b9;
+  --error-900: #fcdede;
+
+  /* ===== 2) Semantic tokens (reference the primitives above) ===== */
+  /* bg */
+  --background: var(--bg-100);
+  --card: var(--bg-200);
+  --popover: var(--bg-300);
+  --muted: var(--bg-50);
+  /* text */
+  --foreground: var(--text-800);
+  --card-foreground: var(--text-900);
+  --popover-foreground: #e5e5e2;
+  --primary-foreground: #141413;
+  --secondary-foreground: var(--bg-300);
+  --muted-foreground: var(--text-500);
+  --accent-foreground: #f5f4ee;
+  --destructive-foreground: #ffffff;
+  /* accent */
+  --primary: var(--brand-500);
+  --secondary: var(--text-900);
+  --accent: #1a1915;
+  --input: var(--border-500);
+  --ring: var(--brand-500);
+  /* border */
+  --border: var(--border-300);
+  /* status */
+  --destructive: var(--error-500);
+  --success: var(--success-500);
+  --success-foreground: #141413;
+  --error: var(--error-500);
+  --error-foreground: #ffffff;
+  /* chart */
+  --chart-1: #b05730;
+  --chart-2: #9c87f5;
+  --chart-3: #1a1915;
+  --chart-4: #2f2b48;
+  --chart-5: #b4552d;
+  /* sidebar */
+  --sidebar: #1f1e1d;
+  --sidebar-foreground: #c3c0b6;
+  --sidebar-primary: #343434;
+  --sidebar-primary-foreground: #fbfbfb;
+  --sidebar-accent: #0f0f0e;
+  --sidebar-accent-foreground: #c3c0b6;
+  --sidebar-border: #ebebeb;
+  --sidebar-ring: #b5b5b5;
+
+  /* ===== 3) Non-color tokens ===== */
+  /* font — sans (Poppins) for headings + compact UI, serif (Lora) for reading surfaces */
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  /* radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius: 1rem;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  /* shadow */
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: #000000;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 1px 3px 0px rgba(0, 0, 0, 0.25);
+}
+
+    </style>
+    <style id="component-vars">
+/* ═══════════════════════════════════════════════════════════════
+   components.css — Design System Component Definitions
+   Auto-extracted from preview/component-*.html
+   DO NOT EDIT MANUALLY — regenerate via extract-components-css.mjs
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Badge ─────────────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">Filled</span>
+   <div class="row">
+   <span class="badge filled">Essay</span>
+   <span class="badge filled">Editorial</span>
+   <span class="badge filled is-disabled" aria-disabled="true">Essay</span>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Muted</span>
+   <div class="row">
+   <span class="badge muted">Editorial</span>
+   <span class="badge muted is-disabled" aria-disabled="true">Essay</span>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Outline</span>
+   <div class="row">
+   <span class="badge outline">Essay</span>
+   <span class="badge outline">Editorial</span>
+   <span class="badge outline is-disabled" aria-disabled="true">Editorial</span>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.preview{width:min(100%,760px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.2 var(--font-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 calc(var(--spacing)*3.5);border-radius:var(--radius);font:600 12px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap;transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,color .16s ease,border-color .16s ease}
+.badge:hover{transform:translateY(-1px)}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent;box-shadow:var(--shadow-xs)}
+.filled:hover{box-shadow:var(--shadow-sm)}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.is-disabled{pointer-events:none;box-shadow:none}
+.filled.is-disabled{background:var(--secondary);color:var(--muted-foreground);border-color:var(--border)}
+.muted.is-disabled{background:var(--card);color:var(--muted-foreground);border-color:transparent}
+.outline.is-disabled{background:var(--background);color:var(--muted-foreground)}
+@media (max-width:560px){
+  .row{padding:18px}
+}
+
+/* ── Button ────────────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">Primary</span>
+   <div class="examples">
+   <button class="btn primary" type="button">Start a new chat</button>
+   <button class="btn primary" type="button" disabled>Start a new chat</button>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Secondary</span>
+   <div class="examples">
+   <button class="btn secondary" type="button">Open design guide</button>
+   <button class="btn secondary" type="button" disabled>Open design guide</button>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Ghost</span>
+   <div class="examples">
+   <button class="btn ghost" type="button">Open design guide</button>
+   <button class="btn ghost" type="button" disabled>Open design guide</button>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font:14px/1.5 var(--font-sans)}
+.preview{width:min(100%,760px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.2 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-foreground)}
+.examples{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:center;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 14px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover,.btn:focus-visible{box-shadow:var(--shadow-md)}
+.btn:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.btn:disabled{cursor:not-allowed;box-shadow:none}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.primary:disabled{background:var(--secondary);color:var(--muted-foreground);border-color:var(--border)}
+.secondary{background:var(--secondary);color:var(--foreground);border-color:var(--border)}
+.secondary:disabled{background:var(--background);color:var(--muted-foreground);border-color:var(--border)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover,.ghost:focus-visible{background:var(--muted)}
+.ghost:disabled{background:transparent;color:var(--muted-foreground);border-color:transparent}
+@media (max-width:560px){
+  .examples{gap:10px;padding:18px}
+  .btn{width:100%}
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">Floating</span>
+   <div class="row">
+   <article class="card">
+   <p class="eyebrow">Reading Card</p>
+   <h2 class="title">Summarize this chapter</h2>
+   <p class="body">Claude Design System frames long-form AI assistant reading with soft elevation, calm spacing, and editorial rhythm.</p>
+   </article>
+   <article class="card disabled" aria-disabled="true">
+   <p class="eyebrow">Reading Card</p>
+   <h2 class="title">Context locked</h2>
+   <p class="body">This card shows the disabled state for unavailable annotations while keeping the same spacing and radius tokens.</p>
+   </article>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Surface Contrast</span>
+   <div class="row">
+   <article class="card sunken">
+   <p class="eyebrow">Editorial Sidebar</p>
+   <h2 class="title">Session notes</h2>
+   <p class="body">A recessed surface keeps supporting prompts close to the page without competing with the main response.</p>
+   </article>
+   <article class="card emphasis">
+   <p class="eyebrow">Claude Design System</p>
+   <h2 class="title">Review before publish</h2>
+   <p class="body">High-priority AI assistant guidance uses the strongest contrast and deepest shadow for emphasis.</p>
+   </article>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.preview{width:min(100%,860px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.2 var(--font-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px;align-items:stretch;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.card{width:100%;min-height:150px;display:flex;flex-direction:column;padding:18px;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.eyebrow{margin:0 0 10px;font:600 10px/1.2 var(--font-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-foreground)}
+.title{margin:0 0 10px;font:600 21px/1.18 var(--font-sans);color:var(--foreground)}
+.body{margin:0;flex:1;font-size:14px;line-height:1.6;color:var(--secondary-foreground)}
+.disabled{background:var(--card);box-shadow:none;border-color:var(--border);pointer-events:none}
+.disabled .eyebrow{color:var(--muted-foreground)}
+.disabled .title{color:var(--foreground)}
+.disabled .body{color:var(--muted-foreground)}
+.sunken{background:var(--card);box-shadow:none}
+.sunken .body{color:var(--foreground)}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.emphasis .eyebrow{color:var(--secondary)}
+.emphasis .body,.emphasis .title{color:var(--background)}
+@media (max-width:640px){
+  .row{grid-template-columns:1fr;padding:18px}
+}
+
+/* ── Chat Bubble ───────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">User</span>
+   <div class="row">
+   <div class="bubble user">
+   <span class="meta">You · now</span>
+   <p class="copy">Recommend a writer for light reading.</p>
+   </div>
+   <div class="bubble user disabled" aria-disabled="true">
+   <span class="meta">You · queued</span>
+   <p class="copy">Recommend a writer for light reading.</p>
+   </div>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Reply</span>
+   <div class="row">
+   <div class="bubble assistant">
+   <span class="meta">Claude Design System · 1m</span>
+   <p class="copy">Yes — start with Ordination.</p>
+   </div>
+   <div class="bubble assistant disabled" aria-disabled="true">
+   <span class="meta">Claude Design System · unavailable</span>
+   <p class="copy">Yes — start with Ordination.</p>
+   </div>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Thread</span>
+   <div class="row">
+   <div class="thread">
+   <div class="bubble user">
+   <span class="meta">You · now</span>
+   <p class="copy">Recommend a writer for light reading.</p>
+   </div>
+   <div class="bubble assistant">
+   <span class="meta">Claude Design System · 1m</span>
+   <p class="copy">Yes — start with Ordination. I can also suggest Wang Zengqi if you want something warmer and more observant.</p>
+   </div>
+   </div>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font:14px/1.55 var(--font-sans)}
+.preview{width:min(100%,760px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-foreground)}
+.row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.bubble{display:grid;gap:8px;max-width:280px;padding:calc(var(--spacing)*3.5) calc(var(--spacing)*4);border-radius:calc(var(--radius) + 2px);box-shadow:var(--shadow-sm)}
+.user{background:var(--primary);color:var(--primary-foreground)}
+.assistant{background:var(--popover);color:var(--card-foreground);border:1px solid var(--border)}
+.meta{display:block;font:500 11px/1.3 var(--font-sans);letter-spacing:.01em}
+.user .meta{color:var(--primary-foreground);opacity:.78}
+.assistant .meta{color:var(--muted-foreground)}
+.copy{margin:0;font-size:14px;line-height:1.6}
+.disabled{box-shadow:none}
+.user.disabled{background:var(--secondary);color:var(--secondary-foreground)}
+.user.disabled .meta{color:var(--secondary-foreground);opacity:1}
+.assistant.disabled{background:var(--card);color:var(--muted-foreground)}
+.thread{display:grid;gap:12px;width:min(100%,360px);padding:calc(var(--spacing)*4);background:var(--popover);border:1px solid var(--border);border-radius:calc(var(--radius) + 6px);box-shadow:var(--shadow-sm)}
+@media (max-width:640px){
+  .row{padding:18px}
+  .bubble,.thread{max-width:100%;width:100%}
+}
+
+/* ── Input ─────────────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">Plain</span>
+   <div class="row">
+   <input class="field" type="text" placeholder="Search components…" aria-label="Claude Design System search input">
+   <input class="field" type="text" placeholder="Search components…" aria-label="Claude Design System search input disabled" disabled>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Filled</span>
+   <div class="row">
+   <input class="field" type="text" value="Ask Claude anything" aria-label="Claude Design System prompt input">
+   <input class="field" type="text" value="Ask Claude anything" aria-label="Claude Design System prompt input disabled" disabled>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Embedded</span>
+   <div class="row">
+   <label class="bar">
+   <input type="text" placeholder="Search components…" aria-label="Embedded search input">
+   <span class="dot"></span>
+   </label>
+   <label class="bar disabled">
+   <input type="text" value="Ask Claude anything" aria-label="Embedded prompt input disabled" disabled>
+   <span class="dot"></span>
+   </label>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font:14px/1.4 var(--font-sans)}
+.preview{width:min(100%,760px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.2 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-foreground)}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.field,.bar{flex:1 1 280px;min-width:220px;height:40px;border:1px solid var(--border);border-radius:var(--radius);background:var(--background);box-shadow:var(--shadow-sm)}
+.field{padding:0 calc(var(--spacing)*3);color:var(--foreground);font:inherit}
+.field::placeholder,.bar input::placeholder{color:var(--muted-foreground)}
+.field:focus,.bar:focus-within{outline:none;border-color:var(--ring);box-shadow:var(--shadow-sm)}
+.field:disabled,.bar.disabled{background:var(--card);color:var(--muted-foreground);box-shadow:none}
+.bar{display:flex;align-items:center;gap:8px;padding:0 calc(var(--spacing)*3);background:var(--card);border-color:transparent}
+.bar input{flex:1;min-width:0;border:0;background:transparent;color:inherit;font:inherit;outline:none}
+.dot{width:8px;height:8px;border-radius:var(--radius-full);background:var(--muted-foreground);opacity:.5}
+@media (max-width:560px){
+  .row{padding:18px}
+  .field,.bar{flex-basis:100%;min-width:0}
+}
+
+/* ── Navigation ────────────────────────────────────────────── */
+/* @anatomy
+   <main class="preview">
+   <section class="section">
+   <span class="label">Tab Strip</span>
+   <div class="row">
+   <nav class="tabs" aria-label="Navigation tabs">
+   <button class="tab active" type="button">Web</button>
+   <button class="tab" type="button">Mobile</button>
+   <button class="tab" type="button">Library</button>
+   <button class="tab" type="button" disabled>Syncing</button>
+   </nav>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Sidebar List</span>
+   <div class="row">
+   <aside class="rail" aria-label="Sidebar navigation">
+   <p class="brand">Claude Design System</p>
+   <div class="stack">
+   <button class="item active" type="button">Web</button>
+   <button class="item" type="button">Mobile</button>
+   <button class="item" type="button">Library</button>
+   <button class="item" type="button" disabled>Offline</button>
+   </div>
+   </aside>
+   </div>
+   </section>
+   <section class="section">
+   <span class="label">Bottom Nav</span>
+   <div class="row">
+   <nav class="bottom-nav" aria-label="Bottom navigation">
+   <button class="nav-item active" type="button"><span>✦</span><span>Explore</span></button>
+   <button class="nav-item" type="button"><span>▥</span><span>Library</span></button>
+   <button class="nav-item" type="button"><span>⚙</span><span>Settings</span></button>
+   </nav>
+   </div>
+   </section>
+   </main>
+*/
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:clamp(20px,3vw,32px);background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.preview{width:min(100%,860px);margin:0 auto;display:grid;gap:clamp(24px,4vw,32px)}
+.section{display:grid;gap:14px}
+.label{display:block;font:600 10px/1.2 var(--font-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}
+.row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;padding:clamp(18px,3vw,24px);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);background:var(--popover);box-shadow:var(--shadow-xs)}
+.tabs,.rail,.bottom-nav{border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;max-width:100%;padding:6px;background:var(--card)}
+.tab,.item,.nav-item{appearance:none;border:1px solid transparent;background:transparent;color:var(--muted-foreground);font:600 13px/1.1 var(--font-sans);cursor:pointer;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.tab{padding:11px 15px;border-radius:calc(var(--radius) - 6px)}
+.tab:hover,.nav-item:hover{background:var(--popover);color:var(--foreground)}
+.item:hover{background:var(--sidebar-accent);color:var(--foreground)}
+.tab:focus-visible,.item:focus-visible,.nav-item:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.tab.active,.nav-item.active{background:var(--popover);color:var(--foreground);border-color:var(--border);box-shadow:var(--shadow-xs)}
+.tab.active{box-shadow:var(--shadow-sm)}
+.tab:disabled,.item:disabled,.nav-item:disabled{cursor:not-allowed;box-shadow:none;background:transparent;color:var(--muted-foreground)}
+.rail{width:236px;max-width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground)}
+.brand{margin:0 0 12px;font:600 11px/1.2 var(--font-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--sidebar-foreground)}
+.stack{display:grid;gap:8px}
+.item{width:100%;padding:12px 13px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.bottom-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,420px);padding:8px;background:var(--popover)}
+.nav-item{display:grid;gap:4px;justify-items:center;padding:12px 10px;border-radius:calc(var(--radius) - 6px)}
+@media (max-width:640px){
+  .row{padding:18px}
+  .tabs,.rail,.bottom-nav{width:100%}
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-xl: var(--radius-xl);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <style id="page-local">
+      :root {
+        --phase-1: #4f46e5;
+        --phase-2: #7c3aed;
+        --phase-3: #f59e0b;
+        --phase-4: #059669;
+        --phase-5: #a855f7;
+        --unit-02: #0d9488;
+        --unit-03: #7c3aed;
+        --unit-04: #2563eb;
+        --unit-05: #db2777;
+        --unit-06: #059669;
+        --unit-07: #0891b2;
+        --subject-math: #c96442;
+        --subject-chinese: #dc2626;
+        --subject-computer: #2563eb;
+      }
+      .icon-claude { width: 1.1em; height: 1.1em; color: currentColor; }
+      .site-header {
+        position: sticky; top: 0; z-index: 50;
+        backdrop-filter: blur(8px);
+        background: color-mix(in srgb, var(--background) 92%, transparent);
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-title { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.02em; }
+      .hero-subtitle { font-family: var(--font-serif); }
+      .section-label { font-family: var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; }
+      .subject-tab.active { border-color: var(--subject-math); background: color-mix(in srgb, var(--subject-math) 8%, var(--popover)); }
+      .progress-track { height: 6px; background: var(--muted); border-radius: var(--radius-full); overflow: hidden; }
+      .progress-fill { height: 100%; border-radius: var(--radius-full); transition: width .4s ease; }
+      .phase-accent-1 { color: var(--phase-1); }
+      .phase-accent-2 { color: var(--phase-2); }
+      .phase-accent-3 { color: var(--phase-3); }
+      .phase-accent-4 { color: var(--phase-4); }
+      .phase-accent-5 { color: var(--phase-5); }
+      .unit-card { border-left: 3px solid transparent; }
+      .unit-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+      .geo-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .25s ease; }
+      .geo-body.open { grid-template-rows: 1fr; }
+      .geo-inner { overflow: hidden; }
+      @media (max-width: 640px) {
+        .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .unit-header { flex-direction: column; align-items: flex-start; gap: .5rem; }
+      }
+    </style>
+
+    <header class="site-header">
+      <div class="max-w-5xl mx-auto px-5 py-3.5 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-2.5 text-foreground no-underline">
+          <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+          </span>
+          <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+        </a>
+        <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+          <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">仪表盘</a>
+          <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+          <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">编辑器</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-5 py-8 sm:py-12 space-y-10 sm:space-y-14">
+      <!-- Hero -->
+      <section class="text-center space-y-4">
+        <p class="section-label text-xs text-muted-foreground">多学科备考平台</p>
+        <h1 class="hero-title text-4xl sm:text-5xl text-foreground leading-tight">构建清晰、安静的学习路径</h1>
+        <p class="hero-subtitle text-lg text-secondary-foreground max-w-2xl mx-auto leading-relaxed">
+          知识体系、高效练习与低代码内容管理于一体，为浙江单招单考提供循序渐进的备考体验。
+        </p>
+      </section>
+
+      <!-- Continue learning -->
+      <section class="card emphasis p-0 overflow-hidden">
+        <a href="#" class="flex items-center gap-4 sm:gap-5 p-5 sm:p-6 no-underline text-inherit">
+          <span class="w-12 h-12 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
+            <i data-lucide="play-circle" class="w-6 h-6"></i>
+          </span>
+          <div class="min-w-0 flex-1 text-left">
+            <p class="eyebrow !text-primary-foreground/80">继续学习</p>
+            <h2 class="title !text-primary-foreground !text-lg sm:!text-xl truncate">01 · 集合与逻辑 · 集合的基本运算</h2>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-primary-foreground/70 shrink-0"></i>
+        </a>
+      </section>
+
+      <!-- Search -->
+      <section class="space-y-3">
+        <label class="bar w-full">
+          <i data-lucide="search" class="w-4 h-4 text-muted-foreground"></i>
+          <input type="text" placeholder="搜索知识点、单元或错题…" aria-label="全文搜索">
+          <span class="dot"></span>
+        </label>
+      </section>
+
+      <!-- Today's task -->
+      <section class="card border-l-4 border-l-primary p-0 overflow-hidden">
+        <a href="#" class="flex items-center gap-4 p-5 no-underline text-inherit hover:bg-muted/30 transition-colors">
+          <span class="w-11 h-11 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+          </span>
+          <div class="min-w-0 flex-1 text-left">
+            <p class="font-sans font-semibold text-foreground">今日待复习 <span class="text-primary">3</span> 道错题</p>
+            <p class="text-sm text-muted-foreground">按遗忘曲线安排复习，点击前往错题本</p>
+          </div>
+          <i data-lucide="arrow-right" class="w-5 h-5 text-muted-foreground shrink-0"></i>
+        </a>
+      </section>
+
+      <!-- Subject tabs -->
+      <section class="space-y-4">
+        <p class="section-label text-xs text-muted-foreground">选择学科</p>
+        <div class="tabs w-full" role="tablist" aria-label="学科切换">
+          <button class="tab active subject-tab" type="button" aria-selected="true">数学</button>
+          <button class="tab subject-tab" type="button" aria-selected="false">语文</button>
+          <button class="tab subject-tab" type="button" aria-selected="false">计算机</button>
+        </div>
+        <div class="text-center sm:text-left">
+          <h2 class="font-sans font-semibold text-xl text-foreground">浙江单招单考数学学习之路</h2>
+          <p class="text-sm text-muted-foreground mt-1">循序渐进的备考体系 · 公式 + 例题 + 练习 + 测验</p>
+        </div>
+      </section>
+
+      <!-- Tool shortcuts -->
+      <section class="space-y-4">
+        <p class="section-label text-xs text-muted-foreground">工具入口</p>
+        <div class="tool-grid grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <a href="#" class="card sunken p-4 no-underline text-inherit group">
+            <span class="w-9 h-9 rounded-lg bg-primary/10 text-primary inline-flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              <i data-lucide="bar-chart-2" class="w-[18px] h-[18px]"></i>
+            </span>
+            <p class="font-sans font-semibold text-sm text-foreground">学习仪表盘</p>
+            <p class="text-xs text-muted-foreground mt-0.5">进度与数据</p>
+          </a>
+          <a href="#" class="card sunken p-4 no-underline text-inherit group">
+            <span class="w-9 h-9 rounded-lg bg-error/10 text-error inline-flex items-center justify-center mb-3 group-hover:bg-error group-hover:text-error-foreground transition-colors">
+              <i data-lucide="book-x" class="w-[18px] h-[18px]"></i>
+            </span>
+            <p class="font-sans font-semibold text-sm text-foreground">错题本</p>
+            <p class="text-xs text-muted-foreground mt-0.5">回顾与复习</p>
+          </a>
+          <a href="#" class="card sunken p-4 no-underline text-inherit group">
+            <span class="w-9 h-9 rounded-lg bg-[var(--phase-5)]/10 text-[var(--phase-5)] inline-flex items-center justify-center mb-3 group-hover:bg-[var(--phase-5)] group-hover:text-primary-foreground transition-colors">
+              <i data-lucide="rocket" class="w-[18px] h-[18px]"></i>
+            </span>
+            <p class="font-sans font-semibold text-sm text-foreground">模拟冲刺</p>
+            <p class="text-xs text-muted-foreground mt-0.5">全真限时实战</p>
+          </a>
+          <a href="#" class="card sunken p-4 no-underline text-inherit group">
+            <span class="w-9 h-9 rounded-lg bg-muted text-foreground inline-flex items-center justify-center mb-3 group-hover:bg-foreground group-hover:text-background transition-colors">
+              <i data-lucide="pen-tool" class="w-[18px] h-[18px]"></i>
+            </span>
+            <p class="font-sans font-semibold text-sm text-foreground">内容编辑器</p>
+            <p class="text-xs text-muted-foreground mt-0.5">低代码内容管理</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- GeoGebra -->
+      <section class="card p-0 overflow-hidden">
+        <button type="button" class="w-full flex items-center justify-between p-5 text-left hover:bg-muted/30 transition-colors" aria-expanded="false" onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'); this.nextElementSibling.classList.toggle('open')">
+          <div class="flex items-center gap-4">
+            <span class="w-10 h-10 rounded-lg bg-muted text-foreground inline-flex items-center justify-center">
+              <i data-lucide="calculator" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <p class="font-sans font-semibold text-foreground">GeoGebra 图形计算器</p>
+              <p class="text-xs text-muted-foreground">函数图像即绘即览 · 点击展开</p>
+            </div>
+          </div>
+          <i data-lucide="chevron-down" class="w-5 h-5 text-muted-foreground transition-transform"></i>
+        </button>
+        <div class="geo-body border-t border-border">
+          <div class="geo-inner p-5 bg-card">
+            <div class="rounded-xl border border-border bg-popover min-h-[240px] flex items-center justify-center text-muted-foreground text-sm">
+              <span class="flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i>计算器组件在展开后加载</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 1 -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[var(--phase-1)]"></span>
+          <h3 class="phase-accent-1 font-sans font-semibold text-sm tracking-wide">第一阶段 · 代数基础</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--phase-1);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--phase-1)]/10 text-[var(--phase-1)] inline-flex items-center justify-center font-sans font-semibold text-sm">01</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">集合与逻辑</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">8 个知识点</p>
+                </div>
+              </div>
+              <span class="badge outline">进行中</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--phase-1)]" style="width: 25%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">2/8</span>
+            </div>
+          </article>
+
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-02);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-02)]/10 text-[var(--unit-02)] inline-flex items-center justify-center font-sans font-semibold text-sm">02</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">不等式</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">6 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-02)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/6</span>
+            </div>
+          </article>
+
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-03);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-03)]/10 text-[var(--unit-03)] inline-flex items-center justify-center font-sans font-semibold text-sm">03</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">函数与基本初等函数</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">8 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-03)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/8</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Phase 2 -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[var(--phase-2)]"></span>
+          <h3 class="phase-accent-2 font-sans font-semibold text-sm tracking-wide">第二阶段 · 三角与向量</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-04);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-04)]/10 text-[var(--unit-04)] inline-flex items-center justify-center font-sans font-semibold text-sm">04</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">三角函数</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">7 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-04)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/7</span>
+            </div>
+          </article>
+
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-05);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-05)]/10 text-[var(--unit-05)] inline-flex items-center justify-center font-sans font-semibold text-sm">05</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">解三角形</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">4 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-05)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/4</span>
+            </div>
+          </article>
+
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-06);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-06)]/10 text-[var(--unit-06)] inline-flex items-center justify-center font-sans font-semibold text-sm">06</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">数列</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">6 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-06)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/6</span>
+            </div>
+          </article>
+
+          <article class="card unit-card p-5 cursor-pointer" style="border-left-color: var(--unit-07);">
+            <div class="unit-header flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-[var(--unit-07)]/10 text-[var(--unit-07)] inline-flex items-center justify-center font-sans font-semibold text-sm">07</span>
+                <div>
+                  <h4 class="font-sans font-semibold text-foreground">平面向量</h4>
+                  <p class="text-xs text-muted-foreground mt-0.5">6 个知识点</p>
+                </div>
+              </div>
+              <span class="badge muted">未开始</span>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="progress-track flex-1"><div class="progress-fill bg-[var(--unit-07)]" style="width: 0%;"></div></div>
+              <span class="text-xs text-muted-foreground font-mono">0/6</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- More phases teaser -->
+      <section class="card sunken p-5 text-center">
+        <p class="text-sm text-muted-foreground">后续阶段：计数与概率、几何模块、模拟冲刺</p>
+        <button type="button" class="btn ghost mt-3 text-sm">查看全部单元<i data-lucide="chevrons-down" class="w-4 h-4 ml-1.5 inline-block align-middle"></i></button>
+      </section>
+    </main>
+
+    <footer class="border-t border-border mt-16">
+      <div class="max-w-5xl mx-auto px-5 py-10 sm:py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="text-center sm:text-left">
+          <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+          <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+          <p class="text-xs text-muted-foreground mt-2">© 2026 Crafted with care by 黑糖＆菜菜</p>
+        </div>
+        <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+          <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">仪表盘</a>
+          <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">错题本</a>
+          <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">模拟冲刺</a>
+          <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">内容编辑器</a>
+          <a href="#" class="text-muted-foreground hover:text-foreground transition-colors">返回首页</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

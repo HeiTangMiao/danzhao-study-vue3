@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文件命名与安全管理 · 计算机 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../computer/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">计算机</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">💻</span>
+      <span class="font-sans font-semibold text-sm">计算机学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 职业素养</p>
+            
+            <div class="space-y-1">
+              <a href="./01-职业素养/01-计算机操作规范.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="计算机操作规范">计算机操作规范</a><a href="./01-职业素养/02-文件命名与安全管理.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="文件命名与安全管理">文件命名与安全管理</a><a href="./01-职业素养/03-复习测验.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="职业素养 · 复习测验">职业素养 · 复习测验</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 程序设计技能</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 计算机网络技术</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 数字媒体技术</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../computer/index.html" class="hover:text-foreground transition-colors no-underline">计算机</a>
+            <span>/</span>
+            <span class="text-foreground">职业素养</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">💻</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 01 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">文件命名与安全管理</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">命名规则、文件安全与数据备份</p>
+            </div>
+          </div>
+        </div>
+
+        
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">知识结构导图</h2>
+  </div>
+  <div class="p-5 bg-card overflow-x-auto">
+    <pre class="mermaid text-center">graph LR
+  N0[&quot;文件命名与安全管理&quot;]
+  N1[&quot;命名规则&quot;]
+  N0 --&gt; N1
+  N2[&quot;文件名组成&quot;]
+  N1 --&gt; N2
+  N3[&quot;主名 + 扩展名&quot;]
+  N2 --&gt; N3
+  N4[&quot;禁用字符&quot;]
+  N1 --&gt; N4
+  N5[&quot;长度限制&quot;]
+  N1 --&gt; N5
+  N6[&quot;命名规范&quot;]
+  N0 --&gt; N6
+  N7[&quot;见名知意&quot;]
+  N6 --&gt; N7
+  N8[&quot;统一格式&quot;]
+  N6 --&gt; N8
+  N9[&quot;文件安全管理&quot;]
+  N0 --&gt; N9
+  N10[&quot;权限管理&quot;]
+  N9 --&gt; N10
+  N11[&quot;数据备份&quot;]
+  N9 --&gt; N11
+  N12[&quot;防病毒&quot;]
+  N9 --&gt; N12
+  N13[&quot;考试保存要求&quot;]
+  N0 --&gt; N13
+  N14[&quot;按指定位置保存&quot;]
+  N13 --&gt; N14
+  N15[&quot;及时保存&quot;]
+  N13 --&gt; N15
+  N16[&quot;提交前校对&quot;]
+  N13 --&gt; N16</pre>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">学习目标</h2>
+  </div>
+  <div class="p-5">
+    <ul class="space-y-1">
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握文件命名的基本规则（主名、扩展名、禁用字符、长度限制）</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">养成&quot;见名知意&quot;、统一规范的命名习惯</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">理解文件安全管理要求：权限、备份、防病毒</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握考试中文件的保存要求与提交前校对方法</span>
+    </li></ul>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">文件命名规则</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p><strong>文件名组成：</strong>文件名由&quot;主文件名.扩展名&quot;组成，如 <code class="inline-code">report.docx</code>，主名是 report，扩展名是 docx，扩展名决定文件类型。</p>
+<p><strong>禁用字符：</strong>Windows 文件名中不能包含以下字符：<code class="inline-code">\ / : * ? &quot; &lt; &gt; |</code>。</p>
+<p><strong>长度限制：</strong>Windows 完整路径长度一般不超过 260 个字符，文件名不宜过长。</p>
+<p><strong>不区分大小写：</strong>Windows 中文件名不区分大小写，但 Linux 中区分。</p>
+<p><strong>扩展名作用：</strong>扩展名标识文件类型，如 .txt 文本、.docx 文档、.xlsx 表格、.py Python 程序、.jpg 图片、.mp4 视频。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">常见文件扩展名</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">扩展名</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">文件类型</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">常用软件</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.txt</td><td class="px-4 py-3 text-sm text-foreground align-top">纯文本文件</td><td class="px-4 py-3 text-sm text-foreground align-top">记事本</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.docx</td><td class="px-4 py-3 text-sm text-foreground align-top">Word 文档</td><td class="px-4 py-3 text-sm text-foreground align-top">Microsoft Word / WPS</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.xlsx</td><td class="px-4 py-3 text-sm text-foreground align-top">Excel 表格</td><td class="px-4 py-3 text-sm text-foreground align-top">Microsoft Excel / WPS</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.pptx</td><td class="px-4 py-3 text-sm text-foreground align-top">PowerPoint 演示文稿</td><td class="px-4 py-3 text-sm text-foreground align-top">Microsoft PowerPoint / WPS</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.py</td><td class="px-4 py-3 text-sm text-foreground align-top">Python 源程序</td><td class="px-4 py-3 text-sm text-foreground align-top">Python 解释器 / IDLE</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.jpg / .png</td><td class="px-4 py-3 text-sm text-foreground align-top">图片文件</td><td class="px-4 py-3 text-sm text-foreground align-top">看图软件 / Photoshop</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.mp4 / .wmv</td><td class="px-4 py-3 text-sm text-foreground align-top">视频文件</td><td class="px-4 py-3 text-sm text-foreground align-top">视频播放软件 / Premiere</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">.psd</td><td class="px-4 py-3 text-sm text-foreground align-top">Photoshop 源文件</td><td class="px-4 py-3 text-sm text-foreground align-top">Adobe Photoshop</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">考试中保存文件时，扩展名不能随意更改！例如把 .py 改成 .txt 会导致程序无法运行，把 .psd 改成 .jpg 会导致文件损坏。</div>
+</div>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">命名规范要求</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p><strong>见名知意：</strong>文件名应能反映文件内容，如 <code class="inline-code">成绩统计.xlsx</code> 比 <code class="inline-code">新建文档1.xlsx</code> 更规范。</p>
+<p><strong>统一格式：</strong>同一批文件采用统一的命名格式，如 <code class="inline-code">01-试题一.py</code>、<code class="inline-code">02-试题二.py</code>。</p>
+<p><strong>避免特殊字符：</strong>不使用空格开头、不连续使用空格，避免使用中文全角符号。</p>
+<p><strong>考试命名：</strong>考试中常要求以准考证号、题目编号等作为文件名，必须严格按题目要求命名。</p>
+
+  </div>
+</article>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">文件安全管理</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p><strong>权限管理：</strong>合理设置文件访问权限，重要文件设置只读或密码保护，防止被他人修改。</p>
+<p><strong>数据备份：</strong>重要数据定期备份到其他磁盘、U 盘或云盘，防止磁盘损坏导致数据丢失。</p>
+<p><strong>防病毒：</strong>定期查杀病毒，不打开来历不明的邮件附件，不随意下载安装软件。</p>
+<p><strong>网络安全：</strong>不访问非法网站，不下载不明文件，防止木马病毒窃取文件。</p>
+
+  </div>
+</article>
+
+<div class="card bg-success/8 text-success border-success/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg></span>
+  <div class="text-sm leading-relaxed">考试操作提醒（来自考试说明）：① 考试前新建以准考证号为名称的考生文件夹；② 答题过程中注意及时保存；③ 提交前校对所有文件是否存在；④ 考试结束不得关闭计算机。</div>
+</div>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">快速检测</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">文件名 <code class="inline-code">a/b.txt</code> 在 Windows 中是合法的。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>错误。</strong><code class="inline-code">/</code> 是 Windows 文件名中的禁用字符，不能出现在文件名中。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">下列文件名中，最规范的是（　）</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：B。&quot;成绩统计&quot;见名知意，能反映文件内容。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">考试中保存文件时，扩展名可以随意更改。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>错误。</strong>扩展名决定文件类型，随意更改会导致文件无法打开或程序无法运行。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题1：判断文件名合法性</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>判断下列文件名在 Windows 中是否合法，并说明理由：<br>
+（1）<code class="inline-code">考试成绩.xlsx</code><br>
+（2）<code class="inline-code">a:b.txt</code><br>
+（3）<code class="inline-code">我的*作业.docx</code><br>
+（4）<code class="inline-code">report_2024.py</code></p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解：</strong><br>
+（1）合法。主名&quot;考试成绩&quot;、扩展名 xlsx，无禁用字符。<br>
+（2）不合法。<code class="inline-code">:</code> 是 Windows 文件名的禁用字符。<br>
+（3）不合法。<code class="inline-code">*</code> 是禁用字符。<br>
+（4）合法。下划线、数字均可使用，见名知意。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：（1）合法；（2）不合法，含冒号；（3）不合法，含星号；（4）合法。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">例题2：考试文件保存</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>考试要求将程序保存到&quot;考生文件夹\程序设计\试题一&quot;文件夹中，文件名按题目要求命名。请写出正确的保存步骤。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解：</strong><br>
+① 打开&quot;考生文件夹\程序设计\试题一&quot;文件夹；<br>
+② 在代码编辑器中执行&quot;文件→另存为&quot;；<br>
+③ 选择目标文件夹，输入规范文件名（如 <code class="inline-code">试题一.py</code>）；<br>
+④ 确认扩展名正确后保存；<br>
+⑤ 提交前打开文件夹，校对该文件是否存在、内容是否完整。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>保存到指定文件夹 → 规范命名 → 确认扩展名 → 保存 → 提交前校对。</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">练习题</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">Windows 文件名中不能包含的字符是（　）</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：D。<code class="inline-code">?</code> 是 Windows 文件名禁用字符之一。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">重要文件应定期备份，防止磁盘损坏导致数据丢失。</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>正确。</strong>数据备份是文件安全管理的重要措施。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge filled text-[10px] py-1 px-2">进阶</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">考试提交前，下列做法最恰当的是（　）</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p>答案：B。提交前必须校对所有文件是否存在、保存位置是否正确、内容是否完整。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>

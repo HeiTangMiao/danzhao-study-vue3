@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>标点符号 · 语文 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../chinese/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">语文</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">✍️</span>
+      <span class="font-sans font-semibold text-sm">语文学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 语言文字运用</p>
+            
+            <div class="space-y-1">
+              <a href="./01-语言文字运用/01-字音字形.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="字音字形">字音字形</a><a href="./01-语言文字运用/02-词语与成语运用.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="词语与成语运用">词语与成语运用</a><a href="./01-语言文字运用/03-标点符号.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="标点符号">标点符号</a><a href="./01-语言文字运用/04-病句修改.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="病句修改">病句修改</a><a href="./01-语言文字运用/05-句式变换与修辞手法.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="句式变换与修辞手法">句式变换与修辞手法</a><a href="./01-语言文字运用/06-语言得体与口语交际.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言得体与口语交际">语言得体与口语交际</a><a href="./01-语言文字运用/07-复习测验.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言文字运用 · 复习测验">语言文字运用 · 复习测验</a><a href="./01-语言文字运用/08-易错专项与冲刺.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言文字运用 · 易错专项与冲刺">语言文字运用 · 易错专项与冲刺</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 现代文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 古诗文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 写作</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 文学常识</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">06 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../chinese/index.html" class="hover:text-foreground transition-colors no-underline">语文</a>
+            <span>/</span>
+            <span class="text-foreground">语言文字运用</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">✍️</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 01 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">标点符号</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">顿号、冒号、问号、引号等规范用法</p>
+            </div>
+          </div>
+        </div>
+
+        
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">知识结构导图</h2>
+  </div>
+  <div class="p-5 bg-card overflow-x-auto">
+    <pre class="mermaid text-center">graph LR
+  N0[&quot;标点符号&quot;]
+  N1[&quot;顿号&quot;]
+  N0 --&gt; N1
+  N2[&quot;并列词语&quot;]
+  N1 --&gt; N2
+  N3[&quot;不用顿号的情况&quot;]
+  N1 --&gt; N3
+  N4[&quot;冒号&quot;]
+  N0 --&gt; N4
+  N5[&quot;提示下文&quot;]
+  N4 --&gt; N5
+  N6[&quot;总结上文&quot;]
+  N4 --&gt; N6
+  N7[&quot;引号&quot;]
+  N0 --&gt; N7
+  N8[&quot;直接引用&quot;]
+  N7 --&gt; N8
+  N9[&quot;特殊含义&quot;]
+  N7 --&gt; N9
+  N10[&quot;注意标点位置&quot;]
+  N7 --&gt; N10
+  N11[&quot;问号&quot;]
+  N0 --&gt; N11
+  N12[&quot;疑问句&quot;]
+  N11 --&gt; N12
+  N13[&quot;选择问句&quot;]
+  N11 --&gt; N13
+  N14[&quot;倒装句&quot;]
+  N11 --&gt; N14
+  N15[&quot;省略号与破折号&quot;]
+  N0 --&gt; N15
+  N16[&quot;省略号用法&quot;]
+  N15 --&gt; N16
+  N17[&quot;破折号用法&quot;]
+  N15 --&gt; N17</pre>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">学习目标</h2>
+  </div>
+  <div class="p-5">
+    <ul class="space-y-1">
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握顿号、逗号、分号的使用规范，能正确区分三者的层级关系</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">理解冒号的使用场景，避免冒号滥用或错用</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握问号的特殊用法，能正确处理无疑而问和选择问句</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">熟悉引号、破折号、省略号等多种标点的功能与用法</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">了解书名号、括号的使用规范，避免常见错误</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">能准确判断并修改标点符号使用中的错误</span>
+    </li></ul>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">📝核心知识点</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>示例对比：</p>
+<p>• 用逗号（分句简单）：他喜欢读书，她喜欢画画，我喜欢运动。</p>
+<p>• 用分号（分句内部有逗号）：他喜欢读古典名著，尤其是《红楼梦》；她喜欢画水墨画，擅长画竹子；我喜欢运动，篮球打得好。</p>
+
+  </div>
+</article>
+
+<div class="card bg-success/8 text-success border-success/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg></span>
+  <div class="text-sm leading-relaxed">判断是否用问号的口诀：有疑问词但不表疑问的句子不用问号，如&quot;我不知道他去了哪里&quot;是陈述句，不用问号。</div>
+</div>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">顿号使用的常见错误：
+
+      ① 并列的词语后有&quot;啊&quot;&quot;呀&quot;等语气词时，不用顿号用逗号：苹果啊，香蕉啊，橘子啊，都是他爱吃的。
+
+      ② 并列词语之间有连词&quot;和、与、及、或&quot;等时，连词前不用顿号：苹果、香蕉和橘子（不是&quot;苹果、香蕉、和橘子&quot;）。
+
+      ③ 概数之间不用顿号：三四天（不是&quot;三、四天&quot;）、十七八岁（不是&quot;十七、八岁&quot;）。
+
+      ④ 相邻数字表概数不用顿号，但表确数要用顿号：第三、四、五章。</div>
+</div>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">冒号使用注意事项：
+
+      ① 冒号后的内容必须与冒号前的内容有提示或总结关系。
+
+      ② 一个句子中不宜使用多个冒号，避免层级混乱。
+
+      ③ &quot;某某说&quot;在引语前用冒号，在引语中或引语后不用冒号。
+
+        正确：老师说：&quot;下课。&quot;
+
+        正确：&quot;下课，&quot;老师说，&quot;同学们可以走了。&quot;
+
+      ④ 冒号后到句号前为一个整体，中间不能有与冒号无关的句子。</div>
+</div>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">引号与点号的配合：引文是完整的一句话，句号在引号内；引文是句子的一部分，句号在引号外。
+
+      • 完整引用：他说：&quot;今天天气很好。&quot;（句号在引号内）
+
+      • 部分引用：他说今天&quot;天气很好&quot;，可以出去玩了。（句号在引号外）</div>
+</div>
+
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">省略号使用注意：
+
+      ① 省略号不能与&quot;等&quot;&quot;等等&quot;连用。如&quot;苹果、香蕉……等&quot;是错误的，应为&quot;苹果、香蕉……&quot;或&quot;苹果、香蕉等&quot;。
+
+      ② 省略号后面一般不再加标点（如逗号、句号等）。
+
+      ③ 省略号占两个字的位置，共六个点。</div>
+</div>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题1：问号使用辨析</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子中标点符号使用正确的一项是（　）</p>
+<p>A. 我不知道他为什么没有来？</p>
+<p>B. 你是去图书馆，还是去体育馆？</p>
+<p>C. 请你告诉我，他究竟去了哪里？发生了什么事？</p>
+<p>D. 你是参加篮球比赛？还是参加足球比赛？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;我不知道他为什么没有来&quot;是陈述句（宾语从句中有疑问词但不独立提问），不用问号，应为句号。</p>
+<p>B项正确。选择问句，中间用逗号，末尾用问号。</p>
+<p>C项前一个&quot;他究竟去了哪里&quot;是&quot;告诉我&quot;的宾语，不是独立提问，不用问号，应为逗号。后一个&quot;发生了什么事&quot;同样是宾语，应为句号。</p>
+<p>D项选择问句，中间不用问号用逗号，应为&quot;你是参加篮球比赛，还是参加足球比赛？&quot;</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：B</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题2：顿号与逗号辨析</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子中标点符号使用正确的一项是（　）</p>
+<p>A. 他买了三、四本书和五、六个本子。</p>
+<p>B. 我国科学界、文化界、教育界的代表参加了会议。</p>
+<p>C. 这里的水果有苹果啊，香蕉啊，橘子啊，品种丰富。</p>
+<p>D. 他今年十七、八岁，个子却很高。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;三四&quot;&quot;五六&quot;都是概数，概数之间不用顿号，应为&quot;三四本书&quot;&quot;五六个本子&quot;。</p>
+<p>B项&quot;科学界&quot;&quot;文化界&quot;&quot;教育界&quot;是并列名词短语，用顿号正确。</p>
+<p>C项并列词语后有语气词&quot;啊&quot;，应用逗号不用顿号，但此处已用逗号，正确。</p>
+<p>D项&quot;十七八岁&quot;是概数，不用顿号，应为&quot;十七八岁&quot;。</p>
+<p>B和C都看似正确，但C项中&quot;苹果啊，香蕉啊，橘子啊&quot;末尾的逗号应改为逗号连接&quot;品种丰富&quot;——实际是&quot;品种丰富&quot;前应有停顿。综合来看B最规范。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：B</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题3：引号与句号位置</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子标点符号使用正确的一项是（　）</p>
+<p>A. 他说&quot;今天天气很好&quot;。</p>
+<p>B. 他说：&quot;今天天气很好。&quot;</p>
+<p>C. 他说，&quot;今天天气很好。&quot;</p>
+<p>D. 他说：&quot;今天天气很好&quot;。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>关键在于&quot;他说&quot;后面是否跟完整引用的句子。</p>
+<p>A项&quot;他说&quot;后如果引语是完整独立的一句，应在&quot;说&quot;后加冒号，此处缺少冒号。</p>
+<p>B项正确。&quot;他说&quot;后用冒号，引语是完整的一句话，句号放在引号内。</p>
+<p>C项&quot;他说&quot;后用逗号时，通常引语是作为句子的一个成分，不独立。此处引语是独立完整句，应用冒号。</p>
+<p>D项引语是完整独立句，句号应在引号内，不应在引号外。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：B</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题4：省略号与冒号辨析</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子标点使用完全正确的一项是（　）</p>
+<p>A. 花园里种着菊花、月季、牡丹……等各种花卉。</p>
+<p>B. 他只有两种选择：要么坚持到底，要么半途而废。</p>
+<p>C. &quot;呜——&quot;汽笛长鸣，火车缓缓驶出车站。</p>
+<p>D. 这篇文章选自《散文精选》（人民文学出版社）。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项省略号与&quot;等&quot;连用，语义重复。应去掉省略号或去掉&quot;等&quot;。</p>
+<p>B项冒号引出后文两种选择，使用正确；中间用逗号分隔两个并列成分，正确。</p>
+<p>C项破折号表示声音延长，正确。</p>
+<p>D项书名号后用括号注明出版社，规范正确。</p>
+<p>B、C、D均正确，但B项最为典型地展示了冒号的正确用法。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：B</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">破折号用法</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>破折号（——）占两个字的位置，表示文中注释、补充说明、话题转换、声音延长等。</p>
+<p>① 表示解释说明：如&quot;亚洲大陆有世界上最高的山系——喜马拉雅山&quot;。</p>
+<p>② 表示话题转换：如&quot;今天天气真好——你作业写完了吗？&quot;</p>
+<p>③ 表示声音延长：如&quot;呜——&quot;火车汽笛长鸣。</p>
+<p>④ 表示意思递进：如&quot;团结——批评——团结&quot;。</p>
+<p>⑤ 表示意思转折：如&quot;他十分努力——可是成绩还是上不去&quot;。</p>
+<p>注意：破折号与冒号都可用于解释说明，但破折号后的解释是正文的一部分，冒号后的内容常是并列列举。</p>
+
+  </div>
+</article>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">书名号与括号规范</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>书名号（《》）用于标示书名、篇名、报刊名、文件名、影视作品名、歌曲名等。</p>
+<p>使用范围：书籍《红楼梦》、文章《背影》、报纸《人民日报》、电影《流浪地球》、歌曲《义勇军进行曲》。</p>
+<p>注意：书名号内再用书名号时，外层用双书名号，内层用单书名号，如《〈呐喊〉自序》。</p>
+<p>括号（（））用于标示注释性文字。圆括号用于注释、补充说明，方括号〔〕多用于标示公文发文字号等。</p>
+<p>括号的位置：注释词语的括号紧跟在被注释词语之后；注释整个句子的括号放在句末标点之后。</p>
+<p>注意：括号内的文字末尾一般不加句号。</p>
+
+  </div>
+</article>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">标点改错高频题型</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>标点改错是考试中的高频题型，常见错误类型有：顿号误用、冒号误用、问号误用、引号与句号位置错误、省略号与&quot;等&quot;连用等。</p>
+<p>顿号误用：概数之间用顿号（&quot;三、四天&quot;错误）；并列词语后有语气词仍用顿号。</p>
+<p>冒号误用：一个句子中多个冒号；&quot;某某说&quot;在引语中时误用冒号。</p>
+<p>问号误用：有疑问词但不表疑问的句子误用问号；选择问句中间误用问号。</p>
+<p>引号与句号位置：完整引用句号在引号内，部分引用句号在引号外。</p>
+<p>改错方法：先通读全句判断标点是否影响语义表达，再针对具体标点逐一检查。</p>
+
+  </div>
+</article>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">标点改错典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题1：标点使用正误判断</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子中，标点符号使用正确的一项是（　）</p>
+<p>A. 他买了三、四本书和五、六个本子。</p>
+<p>B. 花园里种着菊花、月季、牡丹……等花卉。</p>
+<p>C. 我不知道他为什么没有来。</p>
+<p>D. 你是参加篮球比赛？还是参加足球比赛？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;三四本书&quot;&quot;五六个本子&quot;都是概数，概数之间不用顿号，&quot;三、四本书&quot;错误。</p>
+<p>B项省略号与&quot;等&quot;连用，语义重复，应去掉省略号或去掉&quot;等&quot;，错误。</p>
+<p>C项&quot;我不知道他为什么没有来&quot;是陈述句，虽有疑问词&quot;为什么&quot;但不表疑问，用句号正确。</p>
+<p>D项选择问句，中间应用逗号，不能连用两个问号，应为&quot;你是参加篮球比赛，还是参加足球比赛？&quot;</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：C</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题2：标点改错</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子中，标点符号使用有误的一项是（　）</p>
+<p>A. 他说：&quot;今天天气很好。&quot;</p>
+<p>B. 我国科学界、文化界、教育界的代表参加了会议。</p>
+<p>C. 他今年十七、八岁，个子却很高。</p>
+<p>D. 这篇文章选自《散文精选》（人民文学出版社）。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;他说&quot;后用冒号，引语是完整句，句号在引号内，使用正确。</p>
+<p>B项&quot;科学界&quot;&quot;文化界&quot;&quot;教育界&quot;是并列名词短语，用顿号正确。</p>
+<p>C项&quot;十七八岁&quot;是概数，概数之间不用顿号，应为&quot;十七八岁&quot;，此处使用有误。</p>
+<p>D项书名号后用括号注明出版社，规范正确。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：C</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>现代文阅读 · 复习测验 · 语文 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../chinese/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">语文</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">✍️</span>
+      <span class="font-sans font-semibold text-sm">语文学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 语言文字运用</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 现代文阅读</p>
+            
+            <div class="space-y-1">
+              <a href="./02-现代文阅读/01-记叙文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="记叙文阅读">记叙文阅读</a><a href="./02-现代文阅读/02-散文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="散文阅读">散文阅读</a><a href="./02-现代文阅读/03-小说阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="小说阅读">小说阅读</a><a href="./02-现代文阅读/04-说明文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="说明文阅读">说明文阅读</a><a href="./02-现代文阅读/05-议论文阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="议论文阅读">议论文阅读</a><a href="./02-现代文阅读/06-实用类文本阅读.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="实用类文本阅读">实用类文本阅读</a><a href="./02-现代文阅读/07-复习测验.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="现代文阅读 · 复习测验">现代文阅读 · 复习测验</a><a href="./02-现代文阅读/08-易错专项与冲刺.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="现代文阅读 · 易错专项与冲刺">现代文阅读 · 易错专项与冲刺</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 古诗文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 写作</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 文学常识</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">06 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../chinese/index.html" class="hover:text-foreground transition-colors no-underline">语文</a>
+            <span>/</span>
+            <span class="text-foreground">现代文阅读</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">✍️</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 02 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">现代文阅读 · 复习测验</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">本单元知识综合检测</p>
+            </div>
+          </div>
+        </div>
+
+        
+<div class="card bg-error/8 text-error border-error/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></span>
+  <div class="text-sm leading-relaxed">建议用时 45 分钟，满分 100 分。请先独立作答，再点击「查看答案」核对解析。本测验覆盖记叙文、散文、小说、说明文、议论文、实用类文本阅读六大板块。</div>
+</div>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">一、单项选择题（每题 5 分，共 40 分）</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">记叙文的六要素中，居于核心地位的是（　）
+A. 时间　　B. 人物　　C. 经过　　D. 结果</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。事件的&quot;经过&quot;是叙事的主体部分，是六要素的核心，人物的性格、事件的意义主要通过&quot;经过&quot;来呈现。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">把后发生的事或结局写在开头，再按顺序叙述，这种叙事顺序叫（　）
+A. 顺叙　　B. 倒叙　　C. 插叙　　D. 补叙</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。倒叙是把结局或关键情节提前，制造悬念、避免平铺直叙。插叙是叙述中暂时中断主线插入内容；补叙是在叙述结束后补充交代；顺叙是按事件先后顺序叙述。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">文章中写道&quot;窗外的雨下个不停，灰蒙蒙的天空压得人喘不过气来&quot;，这段环境描写最主要的作用是（　）
+A. 交代人物的身份职业
+B. 渲染气氛、烘托人物心情
+C. 推动情节发展到高潮
+D. 交代事件发生的具体时间地点</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。&quot;灰蒙蒙&quot;&quot;压得人喘不过气&quot;营造了沉闷压抑的氛围，烘托了人物沮丧、失落、沉重的心情，属以景衬情。A、C、D均非该描写的主要作用。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">4</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">散文被称为&quot;形散而神不散&quot;，其中所指的&quot;神&quot;是（　）
+A. 文章的取材内容　　B. 文章的表现手法　　C. 文章的中心主旨　　D. 文章的语言风格</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。&quot;神&quot;指贯穿全文的中心主旨、思想感情以及作者的情感脉络。&quot;形散&quot;指取材自由、结构灵活，但万变不离其&quot;神&quot;。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">5</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">&quot;那满池的荷花，你挨着我，我挤着你，像一群撑着绿伞嬉闹的孩子。&quot;这句话运用了哪些修辞手法（　）
+A. 拟人、比喻　　B. 排比、夸张　　C. 对偶、借代　　D. 设问、反问</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>A</strong>。&quot;你挨着我，我挤着你&quot;赋予荷花以人的情态，是拟人；&quot;像一群嬉闹的孩子&quot;把荷花比作孩子，是比喻。其余选项中的修辞手法在本句中没有体现。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">6</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">小说三要素中，居于中心地位的是（　）
+A. 情节　　B. 环境　　C. 人物　　D. 主题</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。小说以塑造人物形象为中心，情节的发展、环境的描写都是为了表现人物的性格、凸显主题服务的。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">7</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">介绍事物的制作过程、起源演变等内容的说明文，一般采用的说明顺序是（　）
+A. 时间顺序　　B. 空间顺序　　C. 逻辑顺序　　D. 主次顺序</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>A</strong>。事物的发展演变、制作过程多按时间先后安排，属时间顺序。空间顺序多用于介绍建筑、方位；逻辑顺序多用于事理说明、复杂事物。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">8</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">议论文的三要素是（　）
+A. 论点、论题、论据　　B. 论点、论据、论证　　C. 论点、论据、论题　　D. 论题、论据、论证</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。议论文三要素是论点（证明什么）、论据（用什么证明）、论证（怎样证明）。&quot;论题&quot;是论述的话题范围，不属于三要素。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">二、单项选择题（每题 5 分，共 40 分）</h2>
+  <div class="space-y-3">
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">1</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">&quot;赵州桥非常雄伟，全长 50.82 米，两端宽约 9.6 米。&quot;这句话主要运用的说明方法是（　）
+A. 举例子　　B. 列数字　　C. 打比方　　D. 分类别</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。句中用&quot;50.82 米&quot;&quot;9.6 米&quot;等具体数据说明桥的长度宽度，是列数字，体现了说明文语言的准确性、科学性。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">2</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">说明文&quot;我国石拱桥几乎到处都有&quot;中的&quot;几乎&quot;一词能否删去？下列分析正确的是（　）
+A. 能删，删去更简洁，不影响语义
+B. 不能删，删去后变成&quot;到处都有&quot;过于绝对，不能准确反映实际情况
+C. 不能删，因为它起修饰强调的作用
+D. 能删，删去后表达更肯定有力</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。&quot;几乎&quot;是表程度的限制性词语，删去后&quot;到处都有&quot;过于绝对，不符合实际，破坏了说明文语言的准确严密性，故不能删。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">3</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">&quot;逆境是造就人才的磨刀石。&quot;这句话在议论文中运用了哪种论证方法（　）
+A. 举例论证　　B. 道理论证　　C. 比喻论证　　D. 对比论证</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。把&quot;逆境&quot;比作&quot;磨刀石&quot;，运用比喻论证，将抽象的道理说得生动形象、通俗易懂。举例论证列举事例，道理论证引用名言，对比论证正反对比。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">4</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">下列句子中，适合作为议论文中心论点的一项是（　）
+A. 谈毅力　　B. 毅力是什么？　　C. 毅力是成功的保证　　D. 像毅力这样的品质</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。中心论点应是明确的判断句，表明作者的主张。A是论题（话题），B是疑问句，D表述不明确，C&quot;毅力是成功的保证&quot;是明确的判断，符合要求。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">5</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">议论文&quot;提出问题—分析问题—解决问题&quot;的基本思路，对应文章的三个部分是（　）
+A. 引论、本论、结论　　B. 开端、发展、结局　　C. 总说、分说、总结　　D. 铺垫、高潮、结局</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>A</strong>。引论（提出问题）、本论（分析问题）、结论（解决问题）是议论文最基本的论证结构。B、D属于叙事类文本的情节结构；C&quot;总分总&quot;是一种具体的论证结构而非三大部分。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">6</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge muted text-[10px] py-1 px-2">基础</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">新闻开头第一段或第一句话，简明概括新闻核心事实的部分叫做（　）
+A. 标题　　B. 导语　　C. 主体　　D. 结语</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。导语位于新闻开头，概括核心事实，通常包含时间、地点、人物、事件等要素，是新闻的&quot;灵魂&quot;。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">7</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">关于小说&quot;出人意料&quot;式（欧·亨利式）结尾的作用，下列表述不正确的一项是（　）
+A. 情节陡然反转，使行文跌宕起伏
+B. 使人物形象更加丰满深刻
+C. 结尾完全脱离前文，与前文毫无关联
+D. 揭示主题，震撼人心，引人深思</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>C</strong>。出人意料式结尾虽情节反转，但前文往往有伏笔与照应，讲究&quot;出人意料又合乎情理&quot;，并非与之前内容毫无关联。A、B、D都是其作用。</p>
+
+        </div>
+      </div>
+    </details>
+    <details class="quiz-item group border border-border rounded-xl bg-popover overflow-hidden">
+      <summary class="flex items-start gap-3 p-4 cursor-pointer list-none hover:bg-muted/30 transition-colors">
+        <span class="w-6 h-6 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 font-sans font-semibold text-xs">8</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge outline text-[10px] py-1 px-2">中等</span>
+          </div>
+          <div class="text-foreground text-sm leading-relaxed">下列关于实用类文本阅读的说法，正确的一项是（　）
+A. 实用类文本重在文学鉴赏，需细细品味语言
+B. 阅读时应先看题目，带着问题有目的地读
+C. 答案必须完全照抄原文，不能改动
+D. 只需读懂标题即可，无需读全文</div>
+        </div>
+        <span class="text-muted-foreground shrink-0 transition-transform group-open:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </summary>
+      <div class="px-4 pb-4 pt-0">
+        <div class="pl-9 border-t border-border pt-3 text-sm text-foreground leading-relaxed">
+          <p><strong>B</strong>。实用类文本重&quot;信息提取&quot;轻文学鉴赏；阅读应先看题、带问题读，抓标题、导语、中心句和关键数据；答案多源于原文，但需注意信息整合与表述转换，不必照抄；也不能只读标题。</p>
+
+        </div>
+      </div>
+    </details></div>
+</section>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">三、阅读文段综合练习（每题 5 分，共 20 分）</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">第 1 题：记叙文阅读</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>阅读下面的文段，回答问题：<br>
+&quot;那一年，我背起行囊离开小山村去省城求学。临行前，母亲在灶台旁为我煮了一锅鸡蛋，又红着眼眶把那叠皱巴巴的钱塞进我兜里。车子开动的那一刻，我回头，看见她把头埋得很低，肩膀微微耸动……如今，每当看到行李箱里那张泛黄的车票，我总会想起母亲的手。&quot;<br>
+（1）文段开头写&quot;如今，每当看到…总会想起&quot;，采用了哪种叙事顺序？有何作用？<br>
+（2）赏析&quot;母亲红着眼眶把钱塞进我兜里&quot;一句的表达效果。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解析：</strong>（1）先写&quot;如今&quot;的眼前感受，再回忆&quot;那一年&quot;往事，是倒叙。作用：由眼前旧物自然引出回忆，设置悬念激发读者兴趣，避免平铺直叙，结尾又回到&quot;如今&quot;形成首尾呼应。（2）&quot;红着眼眶&quot;&quot;塞&quot;是对母亲的神态和动作描写，&quot;塞&quot;字写出母亲急于给予的关切，&quot;红着眼眶&quot;流露不舍与牵挂，生动表现母亲勤劳坚韧、深爱孩子的形象。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>答案：</strong>（1）倒叙。由眼前旧物引出回忆，设置悬念、吸引读者，避免平铺直叙，首尾呼应、结构严谨。（2）运用神态描写（&quot;红着眼眶&quot;）和动作描写（&quot;塞&quot;），细腻传神地写出母亲的爱子之心与临别的不舍，使人物形象生动感人。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">第 2 题：散文阅读</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>阅读下面的文段，回答问题：<br>
+&quot;老屋门前那棵梧桐树，是我童年的乐园……每当深秋叶落，母亲便拣拾桐叶，为我缝制枕芯。离家多年，那幽幽的桐香仍萦绕心头。如今老屋重建，我特意在院里又栽下一株梧桐。&quot;<br>
+（1）本文的线索是什么？请说明理由。<br>
+（2）&quot;梧桐&quot;这一物象的深层含义是什么？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解析：</strong>（1）&quot;梧桐&quot;（桐树、桐叶、桐香、新栽的梧桐）在文中反复出现，贯穿童年、离家、如今三个时段，是文章的物线，把零散的材料连成整体。（2）表层指现实中的梧桐树；深层象征乡愁与亲情——桐香萦绕心头代表对故土和母亲的思念，旧树换新苗象征乡愁与亲情的延续和传承，深化&quot;思念故土&quot;的主旨。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>答案：</strong>（1）以&quot;梧桐&quot;这一物线贯穿全文，串联童年、离家、如今等不同时段的材料，使结构紧凑集中。（2）&quot;梧桐&quot;象征乡愁与亲情：承载着对故土和母亲的思念，旧树与初栽新苗又象征乡愁与亲情的延续传承，深化主旨。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">第 3 题：说明文阅读</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>阅读下面的文段，回答问题：<br>
+&quot;碳酸饮料主要由水、甜味剂、二氧化碳和着色剂等成分组成。其中水约占 90%，甜味剂提供甜味，二氧化碳溶于水形成碳酸，赋予饮料刺激的口感，着色剂则调节色泽。&quot;<br>
+（1）文中&quot;约&quot;一词可否删去？为什么？<br>
+（2）本段采用了哪种说明顺序？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解析：</strong>（1）&quot;约&quot;是表约数的限制性词语，说明水的含量大致在 90%，并非确切数据。删去后&quot;水占 90%&quot;过于绝对，与实际情况不符，破坏说明文语言的准确性，故不能删。（2）先总说成分，再依次说明各成分的作用，由总到分、由主要到次要，是逻辑顺序。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>答案：</strong>（1）不能删。&quot;约&quot;表约数，删去后&quot;占 90%&quot;过于绝对，不符合实际，体现不出说明文语言的准确严密性。（2）逻辑顺序（先总后分，逐一说明各成分及其作用）。</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">第 4 题：议论文阅读</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>阅读下面的文段，回答问题：<br>
+&quot;读书要讲究方法。赵括纸上谈兵、空谈兵法，终致全军覆没；而匡衡凿壁偷光、发愤苦读，终成一代学者。可见，读书重在学以致用、知行合一，若只是纸上谈兵，读再多的书也只是空中楼阁。&quot;<br>
+（1）本段的中心论点是什么？<br>
+（2）画线内容运用了哪种论证方法？有何作用？</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>解析：</strong>（1）开头提出&quot;读书要讲究方法&quot;，结尾归纳&quot;读书重在学以致用、知行合一&quot;，本段中心论点可概括为：读书要讲究方法、重在学以致用，不能纸上谈兵。（2）将赵括（纸上谈兵致败）与匡衡（发愤苦读成才）正反对比，是举例论证与对比论证相结合，具体有力地证明了&quot;读书要知行合一&quot;的论点，是非分明、增强说服力。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p><strong>答案：</strong>（1）中心论点：读书要讲究方法，重在学以致用、知行合一，不能纸上谈兵。（2）运用举例论证和对比论证，以赵括与匡衡正反相对的事例，具体有力地证明&quot;读书要身体力行&quot;的观点，是非分明、说服力强。</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>

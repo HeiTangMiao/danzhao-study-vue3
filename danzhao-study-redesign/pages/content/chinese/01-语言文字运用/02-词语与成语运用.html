@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>词语与成语运用 · 语文 · 单招学习之路</title>
+  <style id="theme-vars">
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,18..72,300;0,18..72,400;0,18..72,500;1,18..72,400&family=Geist+Mono:wght@400;500&display=swap');
+:root {
+  --claude-background: var(--background, #ffffff);
+  --claude-foreground: var(--foreground, #0f172a);
+  --claude-card: var(--card, var(--background));
+  --claude-card-foreground: var(--card-foreground, var(--foreground));
+  --claude-popover: var(--popover, var(--card));
+  --claude-popover-foreground: var(--popover-foreground, var(--card-foreground, var(--foreground)));
+  --claude-primary: var(--primary, #111827);
+  --claude-primary-foreground: var(--primary-foreground, #ffffff);
+  --claude-secondary: var(--secondary, var(--muted, var(--card)));
+  --claude-secondary-foreground: var(--secondary-foreground, var(--foreground));
+  --claude-muted: var(--muted, var(--card));
+  --claude-muted-foreground: var(--muted-foreground, var(--foreground));
+  --claude-accent: var(--accent, var(--secondary, var(--muted, var(--card))));
+  --claude-accent-foreground: var(--accent-foreground, var(--foreground));
+  --claude-destructive: var(--destructive, #ef4444);
+  --claude-destructive-foreground: var(--destructive-foreground, #ffffff);
+  --claude-border: var(--border, currentColor);
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --icon-50: #ffffff; --icon-100: #dad9d4; --icon-200: #c2c0b6; --icon-300: #9b988c;
+  --icon-400: #6e6d68; --icon-500: #535146; --icon-600: #46443b; --icon-700: #3d3929;
+  --icon-800: #28261b; --icon-900: #141413;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+  --background: var(--bg-100); --card: var(--bg-200); --popover: var(--bg-50); --muted: var(--bg-300);
+  --foreground: var(--text-800); --card-foreground: var(--icon-900); --popover-foreground: var(--text-900);
+  --primary-foreground: #ffffff; --secondary-foreground: var(--text-600); --muted-foreground: var(--text-500);
+  --accent-foreground: var(--text-900); --destructive-foreground: #ffffff;
+  --primary: var(--brand-500); --secondary: #e9e6dc; --accent: var(--secondary);
+  --input: var(--border-500); --ring: var(--brand-500); --border: var(--border-300);
+  --destructive: var(--error-500); --success: var(--success-500); --success-foreground: #ffffff;
+  --error: var(--error-500); --error-foreground: #ffffff;
+  --chart-1: #b05730; --chart-2: #9c87f5; --chart-3: #ded8c4; --chart-4: #dbd3f0; --chart-5: #b4552d;
+  --sidebar: #f5f4ee; --sidebar-foreground: #3d3d3a; --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: #fbfbfb; --sidebar-accent: #e9e6dc; --sidebar-accent-foreground: #343434;
+  --sidebar-border: var(--border-100); --sidebar-ring: #b5b5b5;
+  --font-display: Newsreader, Georgia, ui-serif, serif;
+  --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: Lora, Georgia, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --spacing: 0.25rem;
+  --radius-sm: 8px; --radius-md: 12px; --radius: 1rem; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-2xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+}
+  </style>
+  <style id="component-vars">
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--foreground);font-family:var(--font-serif)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 calc(var(--spacing)*3);border-radius:var(--radius);font:600 11px/1 var(--font-sans);letter-spacing:.01em;white-space:nowrap}
+.filled{background:var(--primary);color:var(--primary-foreground);border:1px solid transparent}
+.muted{background:var(--muted);color:var(--foreground);border:1px solid transparent}
+.outline{background:var(--popover);color:var(--foreground);border:1px solid var(--border)}
+.card{width:100%;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--popover);box-shadow:var(--shadow-sm);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.card:hover{box-shadow:var(--shadow-md)}
+.sunken{background:var(--card);box-shadow:none}
+.emphasis{background:var(--foreground);color:var(--background);border-color:transparent;box-shadow:var(--shadow-xl)}
+.rail{width:100%;padding:14px;background:var(--sidebar);color:var(--sidebar-foreground);border:1px solid var(--sidebar-border);border-radius:var(--radius);box-shadow:var(--shadow-xs)}
+.stack{display:grid;gap:6px}
+.item{width:100%;padding:10px 12px;border-radius:calc(var(--radius) - 8px);text-align:left;color:var(--sidebar-foreground);background:transparent;border:1px solid transparent;font:500 12px/1.4 var(--font-sans);text-decoration:none;transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.item:hover{background:var(--sidebar-accent);color:var(--sidebar-accent-foreground)}
+.item.active{background:var(--popover);color:var(--foreground);border-color:var(--sidebar-border);box-shadow:var(--shadow-xs)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid transparent;border-radius:var(--radius);box-shadow:var(--shadow-sm);background:transparent;color:var(--foreground);font:600 13px/1.1 var(--font-sans);white-space:nowrap;transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{box-shadow:var(--shadow-md)}
+.primary{background:var(--primary);color:var(--primary-foreground)}
+.ghost{background:transparent;color:var(--foreground);box-shadow:none}
+.ghost:hover{background:var(--muted)}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      svg: { fontCache: 'global' },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f4ef', primaryTextColor: '#3d3929', primaryBorderColor: '#c96442', lineColor: '#6e6d68', secondaryColor: '#faf9f5', tertiaryColor: '#fff' } });
+  </script>
+  <style type="text/tailwindcss">
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground);
+  --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground);
+  --radius-sm: var(--radius-sm); --radius-md: var(--radius-md); --radius-xl: var(--radius-xl);
+}
+@layer base {
+  body { background: var(--background); color: var(--foreground); }
+  td, th { word-break: break-word; }
+}
+  </style>
+  <style>
+    .site-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); background: color-mix(in srgb, var(--background) 92%, transparent); border-bottom: 1px solid var(--border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .prose-content p { margin: 0 0 0.75rem; }
+    .prose-content p:last-child { margin-bottom: 0; }
+    .code-block { background: var(--bg-200); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; color: var(--foreground); margin: 0.75rem 0; }
+    .code-block code { background: transparent; padding: 0; font-family: inherit; }
+    .inline-code { background: var(--bg-300); padding: 0.15em 0.4em; border-radius: 6px; font-family: var(--font-mono); font-size: 0.9em; color: var(--foreground); }
+    .quiz-item summary::-webkit-details-marker { display: none; }
+    .mermaid { font-family: var(--font-sans) !important; }
+    .bg-success\/8 { background-color: color-mix(in srgb, var(--success) 8%, transparent); }
+    .bg-error\/8 { background-color: color-mix(in srgb, var(--error) 8%, transparent); }
+    .border-success\/20 { border-color: color-mix(in srgb, var(--success) 20%, transparent); }
+    .border-error\/20 { border-color: color-mix(in srgb, var(--error) 20%, transparent); }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="site-header">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-foreground no-underline">
+        <span class="w-8 h-8 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+        </span>
+        <span class="font-sans font-semibold text-base tracking-tight">单招学习之路</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-1" aria-label="主导航">
+        <a href="../../index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">首页</a>
+        <a href="../chinese/index.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-muted transition-colors">语文</a>
+        <a href="#" class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">错题本</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 py-8 sm:py-10">
+    <div class="flex gap-8 items-start">
+      
+<aside class="hidden lg:block w-64 shrink-0">
+  <div class="rail sticky top-24">
+    <a href="../../index.html" class="flex items-center gap-2 mb-5 text-foreground no-underline hover:opacity-80 transition-opacity">
+      <span class="text-lg">✍️</span>
+      <span class="font-sans font-semibold text-sm">语文学习导航</span>
+    </a>
+    <div class="stack max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar">
+      
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg bg-popover border border-border shadow-xs">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">01 · 语言文字运用</p>
+            
+            <div class="space-y-1">
+              <a href="./01-语言文字运用/01-字音字形.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="字音字形">字音字形</a><a href="./01-语言文字运用/02-词语与成语运用.html" class="item active text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="词语与成语运用">词语与成语运用</a><a href="./01-语言文字运用/03-标点符号.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="标点符号">标点符号</a><a href="./01-语言文字运用/04-病句修改.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="病句修改">病句修改</a><a href="./01-语言文字运用/05-句式变换与修辞手法.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="句式变换与修辞手法">句式变换与修辞手法</a><a href="./01-语言文字运用/06-语言得体与口语交际.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言得体与口语交际">语言得体与口语交际</a><a href="./01-语言文字运用/07-复习测验.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言文字运用 · 复习测验">语言文字运用 · 复习测验</a><a href="./01-语言文字运用/08-易错专项与冲刺.html" class="item  text-xs py-2 px-2.5 rounded-lg no-underline block truncate" title="语言文字运用 · 易错专项与冲刺">语言文字运用 · 易错专项与冲刺</a>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">02 · 现代文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">03 · 古诗文阅读</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">04 · 写作</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">05 · 文学常识</p>
+            
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="px-3 py-2 rounded-lg ">
+            <p class="font-sans font-semibold text-xs text-foreground mb-1.5">06 · 模拟冲刺</p>
+            
+          </div>
+        </div>
+    </div>
+  </div>
+</aside>
+      <div class="flex-1 min-w-0 space-y-8">
+        <div class="space-y-2">
+          <nav aria-label="面包屑" class="flex items-center gap-2 text-xs text-muted-foreground">
+            <a href="../../index.html" class="hover:text-foreground transition-colors no-underline">首页</a>
+            <span>/</span>
+            <a href="../chinese/index.html" class="hover:text-foreground transition-colors no-underline">语文</a>
+            <span>/</span>
+            <span class="text-foreground">语言文字运用</span>
+          </nav>
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">✍️</span>
+            <div>
+              <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground">第 01 单元</p>
+              <h1 class="font-sans font-semibold text-2xl sm:text-3xl text-foreground leading-tight mt-1">词语与成语运用</h1>
+              <p class="text-muted-foreground mt-2 text-sm sm:text-base">实词虚词辨析、成语七大误用类型</p>
+            </div>
+          </div>
+        </div>
+
+        
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">知识结构导图</h2>
+  </div>
+  <div class="p-5 bg-card overflow-x-auto">
+    <pre class="mermaid text-center">graph LR
+  N0[&quot;词语与成语运用&quot;]
+  N1[&quot;实词辨析&quot;]
+  N0 --&gt; N1
+  N2[&quot;同义词&quot;]
+  N1 --&gt; N2
+  N3[&quot;近义词&quot;]
+  N1 --&gt; N3
+  N4[&quot;语境搭配&quot;]
+  N1 --&gt; N4
+  N5[&quot;虚词运用&quot;]
+  N0 --&gt; N5
+  N6[&quot;关联词&quot;]
+  N5 --&gt; N6
+  N7[&quot;介词&quot;]
+  N5 --&gt; N7
+  N8[&quot;副词&quot;]
+  N5 --&gt; N8
+  N9[&quot;成语运用&quot;]
+  N0 --&gt; N9
+  N10[&quot;七大误用类型&quot;]
+  N9 --&gt; N10
+  N11[&quot;望文生义&quot;]
+  N9 --&gt; N11
+  N12[&quot;褒贬误用&quot;]
+  N9 --&gt; N12
+  N13[&quot;对象误用&quot;]
+  N9 --&gt; N13
+  N14[&quot;谦敬错位&quot;]
+  N9 --&gt; N14</pre>
+  </div>
+</section>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-5 border-b border-border">
+    <h2 class="font-sans font-semibold text-lg text-foreground">学习目标</h2>
+  </div>
+  <div class="p-5">
+    <ul class="space-y-1">
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握实词和虚词的辨析方法，能准确区分近义词的细微差别</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">理解词语的色彩义（感情色彩、语体色彩），做到用词得体</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">熟悉词语搭配的基本规范，避免搭配不当</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">识别成语运用的七大常见误用类型，能准确判断并纠正</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">掌握近义成语的辨析方法，能根据语境选择恰当的成语</span>
+    </li>
+    <li class="flex items-start gap-3 py-2">
+      <span class="w-5 h-5 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span class="text-foreground leading-relaxed">提高在具体语境中准确理解和运用词语的能力</span>
+    </li></ul>
+  </div>
+</section>
+
+<div class="card bg-success/8 text-success border-success/20 border p-4 flex items-start gap-3">
+  <span class="shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg></span>
+  <div class="text-sm leading-relaxed">辨析近义词口诀：看词义轻重，看范围大小，看侧重点，看搭配对象，看感情色彩，看语体色彩。</div>
+</div>
+
+<section class="space-y-4">
+  <h2 class="font-sans font-semibold text-lg text-foreground">典型例题</h2>
+  <div class="space-y-4">
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题1：近义词辨析</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>依次填入下列各句横线处的词语，最恰当的一项是（　）</p>
+<p>① 这部小说的情节十分____，吸引了大量读者。</p>
+<p>② 他在会上____了自己的观点，得到了大家的支持。</p>
+<p>③ 这项工程____了三年，终于在去年完工了。</p>
+<p>A. 精彩　阐述　延续　　B. 精彩　阐明　延续</p>
+<p>C. 精美　阐述　延续　　D. 精彩　阐述　持续</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>①&quot;精彩&quot;指优美出色，常修饰情节、表演等；&quot;精美&quot;指精致美好，常修饰物品。此处修饰&quot;情节&quot;，应选&quot;精彩&quot;。</p>
+<p>②&quot;阐述&quot;指详尽深入地说明，&quot;阐明&quot;指讲明白。此处是&quot;阐述观点&quot;，更强调深入论述，选&quot;阐述&quot;。</p>
+<p>③&quot;延续&quot;指照原来的样子继续下去，&quot;持续&quot;指延续不断。&quot;工程持续了三年&quot;指工程延续了三年时间，用&quot;持续&quot;更恰当，表示状态延续不断。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：D</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题2：成语误用判断</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列各句中，加点的成语使用恰当的一项是（　）</p>
+<p>A. 他这个人一向骄傲自满，同学们都对他侧目而视。</p>
+<p>B. 这部电影的情节真是差强人意，观众们看完后都很失望。</p>
+<p>C. 他经过刻苦训练，球技进步显著，让人刮目相看。</p>
+<p>D. 两位老朋友萍水相逢，格外高兴，聊了很久。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;侧目而视&quot;是贬义词，形容憎恨或畏惧而又愤恨，不能用于&quot;对骄傲的人表示不满&quot;。误用感情色彩。</p>
+<p>B项&quot;差强人意&quot;是大体上还能使人满意的意思，不是&quot;使人不满意&quot;。与&quot;观众们都很失望&quot;矛盾。望文生义。</p>
+<p>C项&quot;刮目相看&quot;指用新眼光看待，形容对方进步显著。此处&quot;球技进步显著，让人刮目相看&quot;使用正确。</p>
+<p>D项&quot;萍水相逢&quot;指像浮萍随水漂泊一样偶然相遇，用于不认识的人。两位老朋友相见不能用&quot;萍水相逢&quot;。对象误用。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：C</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题3：谦敬错位辨析</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列句子中，加点词语使用得体的一项是（　）</p>
+<p>A. 我明天一定光临贵公司，与您面谈此事。</p>
+<p>B. 这是我的拙作，请您不吝斧正。</p>
+<p>C. 你的孩子真聪明，犬子也不错，以后多交流。</p>
+<p>D. 感谢您的鼎力相助，下次我一定尽力帮忙。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;光临&quot;是敬辞，用于欢迎别人来自己处，不能用于自己去别人处。应改为&quot;拜访&quot;。</p>
+<p>B项&quot;拙作&quot;是谦辞，称自己的作品；&quot;斧正&quot;是敬辞，请人修改文章。使用得体。</p>
+<p>C项&quot;犬子&quot;是谦辞，称自己的儿子，不能用于称呼别人的孩子。应将&quot;犬子&quot;改为&quot;令郎&quot;或直接说&quot;我的孩子&quot;。</p>
+<p>D项&quot;鼎力相助&quot;是敬辞，感谢别人的帮助，但&quot;我一定尽力帮忙&quot;中&quot;尽力帮忙&quot;用于自己，此处整体句意是感谢对方，但第二句说&quot;我一定尽力帮忙&quot;逻辑上不通——应为&quot;我一定尽力回报&quot;。不过主要错误在于D项前后逻辑不连贯。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：B</p>
+</div>
+        </div>
+      </div>
+    </article>
+    <article class="card p-0 overflow-hidden">
+      <div class="p-4 border-b border-border bg-muted/30">
+        <h3 class="font-sans font-semibold text-base text-foreground">📌 例题4：成语望文生义</h3>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">题目</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>下列各句中，加点成语使用正确的一项是（　）</p>
+<p>A. 他这番话真是文不加点，让人叹服他的文采。</p>
+<p>B. 这篇文章的观点真是不刊之论，完全不能发表。</p>
+<p>C. 这次展览会上，各种精美的艺术品让人目不暇接。</p>
+<p>D. 他做事总是首当其冲，从不退缩。</p>
+</div>
+        </div>
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">解析</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>解析：</p>
+<p>A项&quot;文不加点&quot;形容写文章一气呵成、不用涂改，文思敏捷。此处&quot;让人叹服他的文采&quot;语境吻合，使用正确。</p>
+<p>B项&quot;不刊之论&quot;指不能删改的言论，形容言论确当。此处理解为&quot;不能发表&quot;是望文生义。</p>
+<p>C项&quot;目不暇接&quot;指东西太多，眼睛看不过来。此处形容艺术品多，使用正确。</p>
+<p>D项&quot;首当其冲&quot;比喻最先受到攻击或遭到灾难。此处理解为&quot;冲在最前面&quot;是望文生义。</p>
+<p>A和C都正确，但A项&quot;文不加点&quot;是指写文章，而句中&quot;这番话&quot;是口头语言，不是写文章，存在轻微不妥。综合比较C项最恰当。</p>
+</div>
+        </div>
+        
+        <div class="border-t border-border pt-4">
+          <p class="text-xs font-sans font-semibold uppercase tracking-wider text-muted-foreground mb-2">答案</p>
+          <div class="text-foreground text-sm leading-relaxed"><p>答案：C</p>
+</div>
+        </div>
+      </div>
+    </article></div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">实词辨析</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>实词包括名词、动词、形容词、数词、量词、代词。辨析近义实词，可从词义、用法、色彩三个角度入手。</p>
+<p>名词辨析：注意所指对象、范围大小、词义轻重。如&quot;边疆/边境&quot;，&quot;边疆&quot;范围大，&quot;边境&quot;范围小。</p>
+<p>动词辨析：注意动作的施受对象、动作的方式与结果。如&quot;改进/改善&quot;，&quot;改进&quot;多用于方法、工作，&quot;改善&quot;多用于生活、关系。</p>
+<p>形容词辨析：注意适用对象、感情色彩、程度轻重。如&quot;优秀/优异&quot;，&quot;优异&quot;程度更重。</p>
+<p>数量词辨析：注意量词与名词的搭配习惯，如&quot;一头牛&quot;&quot;一匹马&quot;&quot;一条鱼&quot;，不能混用。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">近义实词辨析示例</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">词语</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">辨析要点</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">例句</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">边疆/边境</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;边疆&quot;范围大，指靠近国界的广大地区；&quot;边境&quot;指靠近国界的狭长地带</td><td class="px-4 py-3 text-sm text-foreground align-top">保卫边疆 / 边境线上</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">改进/改善</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;改进&quot;多用于方法、制度、工作；&quot;改善&quot;多用于生活、条件、关系</td><td class="px-4 py-3 text-sm text-foreground align-top">改进学习方法 / 改善生活条件</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">优秀/优异</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;优异&quot;程度比&quot;优秀&quot;更重，多用于成绩、贡献</td><td class="px-4 py-3 text-sm text-foreground align-top">成绩优秀 / 成绩优异</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">爱护/爱惜</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;爱护&quot;重在保护，对象多为人或物；&quot;爱惜&quot;重在珍惜，对象多为时间、物品</td><td class="px-4 py-3 text-sm text-foreground align-top">爱护公物 / 爱惜时间</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">虚词辨析</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>虚词包括副词、介词、连词、助词、叹词、拟声词。虚词虽不表示实在意义，但在句中起着重要的语法作用。</p>
+<p>副词：修饰动词、形容词，表程度、范围、时间、频率、语气等。如&quot;很、非常、都、只、曾经、立刻、不、没有&quot;。</p>
+<p>介词：用在名词、代词前，组成介词短语，表时间、处所、方式、对象等。如&quot;在、从、对、向、把、被、关于、由于&quot;。</p>
+<p>连词：连接词、短语、分句，表并列、转折、因果、递进、条件等关系。如&quot;和、而、但是、因为、所以、不但……而且&quot;。</p>
+<p>助词：包括结构助词&quot;的、地、得&quot;，动态助词&quot;着、了、过&quot;，语气助词&quot;吗、呢、吧&quot;。</p>
+<p>辨析方法：先判断词性，再看在句中的作用，结合语境选择。尤其注意&quot;的/地/得&quot;的区分：修饰名词用&quot;的&quot;，修饰动词用&quot;地&quot;，补语用&quot;得&quot;。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">常见虚词辨析</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">虚词</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">用法</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">例句</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">的/地/得</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;的&quot;修饰名词；&quot;地&quot;修饰动词；&quot;得&quot;用在动词后表程度或结果</td><td class="px-4 py-3 text-sm text-foreground align-top">美丽的花朵 / 认真地学习 / 跑得快</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">对于/关于</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;对于&quot;引进对象；&quot;关于&quot;引进涉及的范围</td><td class="px-4 py-3 text-sm text-foreground align-top">对于这个问题 / 关于改革的意见</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">由于/因为</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;由于&quot;多用于书面语；&quot;因为&quot;口语书面语都常用</td><td class="px-4 py-3 text-sm text-foreground align-top">由于天气原因 / 因为下雨</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">而且/反而</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;而且&quot;表递进；&quot;反而&quot;表转折</td><td class="px-4 py-3 text-sm text-foreground align-top">不但聪明而且勤奋 / 不但没退步反而进步了</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">反义词运用</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>反义词指意义相反或相对的词。反义词分为绝对反义词和相对反义词两类。</p>
+<p>绝对反义词：意义完全相反，非此即彼，中间没有第三种情况。如&quot;生/死&quot;&quot;动/静&quot;&quot;对/错&quot;。</p>
+<p>相对反义词：意义相对，中间存在其他情况。如&quot;大/小&quot;&quot;高/低&quot;&quot;冷/热&quot;。</p>
+<p>语境运用：反义词常用于对比、衬托，使表达鲜明有力。如&quot;虚心使人进步，骄傲使人落后&quot;。</p>
+<p>注意：一个词可能有多个反义词，要根据语境选择。如&quot;深&quot;的反义词可以是&quot;浅&quot;，也可以是&quot;淡&quot;。</p>
+
+  </div>
+</article>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">词语搭配规范</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>词语搭配要符合语法规则和语言习惯。常见搭配不当类型有：主谓搭配不当、动宾搭配不当、修饰语与中心语搭配不当、关联词搭配不当。</p>
+<p>主谓搭配不当：如&quot;他的生活水平有了很大的改善&quot;，&quot;水平&quot;应搭配&quot;提高&quot;。</p>
+<p>动宾搭配不当：如&quot;扩大视野&quot;应为&quot;开阔视野&quot;，&quot;增长知识&quot;正确。</p>
+<p>修饰语与中心语搭配不当：如&quot;激烈的掌声&quot;应为&quot;热烈的掌声&quot;。</p>
+<p>关联词搭配不当：如&quot;不但……而且&quot;&quot;虽然……但是&quot;&quot;因为……所以&quot;等固定搭配不能混用。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">常见搭配不当示例</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">错误搭配</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">正确搭配</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">说明</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">改善水平</td><td class="px-4 py-3 text-sm text-foreground align-top">提高水平</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;水平&quot;与&quot;提高&quot;搭配</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">培养习惯</td><td class="px-4 py-3 text-sm text-foreground align-top">养成习惯</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;培养&quot;搭配&quot;能力&quot;，&quot;养成&quot;搭配&quot;习惯&quot;</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">改正困难</td><td class="px-4 py-3 text-sm text-foreground align-top">克服困难</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;克服&quot;搭配&quot;困难&quot;，&quot;改正&quot;搭配&quot;缺点&quot;</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">激烈的掌声</td><td class="px-4 py-3 text-sm text-foreground align-top">热烈的掌声</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;激烈&quot;用于竞争、战斗，&quot;热烈&quot;用于气氛、掌声</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">语体色彩</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>语体色彩指词语适用的文体和场合。分为口语色彩和书面语色彩。</p>
+<p>口语：通俗自然，多用于日常交谈、口语交际。如&quot;聊天、爸爸、吃饭、好看&quot;。</p>
+<p>书面语：庄重典雅，多用于正式场合、书面表达。如&quot;交谈、父亲、用餐、美观&quot;。</p>
+<p>运用原则：根据交际场合和对象选择语体。正式场合、书面表达用书面语；日常交流、口语表达用口语。</p>
+<p>注意：同一意思有口语和书面语两种表达，不能混用。如&quot;商量/磋商&quot;&quot;生日/诞辰&quot;。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">口语与书面语对照</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">口语</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">书面语</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">适用场合</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">聊天</td><td class="px-4 py-3 text-sm text-foreground align-top">交谈</td><td class="px-4 py-3 text-sm text-foreground align-top">书面语用于正式场合</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">爸爸</td><td class="px-4 py-3 text-sm text-foreground align-top">父亲</td><td class="px-4 py-3 text-sm text-foreground align-top">书面语用于正式场合</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">商量</td><td class="px-4 py-3 text-sm text-foreground align-top">磋商</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;磋商&quot;多用于正式会谈</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">生日</td><td class="px-4 py-3 text-sm text-foreground align-top">诞辰</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;诞辰&quot;用于庄重场合</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">语境不合</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>成语使用必须与语境相符合，包括与句子的感情色彩、语义、逻辑关系一致。语境不合是成语误用的常见类型。</p>
+<p>常见情况：成语的感情色彩与语境不符（褒贬误用）；成语的语义与句子表达的意思矛盾；成语的适用对象与语境不符。</p>
+<p>例：&quot;他这个人骄傲自满，同学们都对他侧目而视&quot;——&quot;侧目而视&quot;是贬义，此处语境是表达不满，使用不当。</p>
+<p>例：&quot;这部电影的情节差强人意&quot;——&quot;差强人意&quot;是大体上还能使人满意，与&quot;观众失望&quot;的语境矛盾。</p>
+<p>辨析方法：先理解成语的确切含义和感情色彩，再判断是否与语境吻合。</p>
+
+  </div>
+</article>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">成语语义重复</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>成语语义重复指成语本身已包含的意思，在句子中又被其他词语重复表达，造成赘余。</p>
+<p>常见错误：&quot;忍俊不禁地笑了&quot;——&quot;忍俊不禁&quot;本身就含有&quot;忍不住笑&quot;的意思，再加&quot;笑了&quot;语义重复。</p>
+<p>常见错误：&quot;莘莘学子们&quot;——&quot;莘莘学子&quot;中的&quot;莘莘&quot;是&quot;众多&quot;的意思，已含复数，再加&quot;们&quot;重复。</p>
+<p>常见错误：&quot;被人贻笑大方&quot;——&quot;贻笑大方&quot;已含&quot;被人笑话&quot;的意思，再加&quot;被人&quot;重复。</p>
+<p>常见错误：&quot;目前的当务之急&quot;——&quot;当务之急&quot;已含&quot;当前&quot;的意思，再加&quot;目前&quot;重复。</p>
+<p>辨析方法：理解成语的完整含义，检查句中是否有与成语语义重复的成分。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">成语语义重复典型错误</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">错误表达</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">正确表达</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">说明</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">忍俊不禁地笑了</td><td class="px-4 py-3 text-sm text-foreground align-top">忍俊不禁</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;忍俊不禁&quot;已含&quot;笑&quot;意</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">莘莘学子们</td><td class="px-4 py-3 text-sm text-foreground align-top">莘莘学子</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;莘莘&quot;已含&quot;众多&quot;意</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">被人贻笑大方</td><td class="px-4 py-3 text-sm text-foreground align-top">贻笑大方</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;贻笑大方&quot;已含&quot;被人笑话&quot;意</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">目前的当务之急</td><td class="px-4 py-3 text-sm text-foreground align-top">当务之急</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;当务之急&quot;已含&quot;当前&quot;意</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+<article class="card p-5 ">
+  <h3 class="font-sans font-semibold text-base text-foreground mb-3">近义成语区分</h3>
+  <div class="prose-content text-foreground leading-relaxed space-y-3">
+    <p>近义成语指意义相近但有细微差别的成语。辨析近义成语，要从语义侧重点、感情色彩、适用对象、搭配习惯等方面入手。</p>
+<p>辨析方法：先找出两个成语的共同点和不同点，再结合语境选择最恰当的一个。</p>
+<p>例：&quot;不胫而走/不翼而飞&quot;——&quot;不胫而走&quot;多指消息、言论迅速传播；&quot;不翼而飞&quot;多指东西突然不见了，也可指消息传得快。</p>
+<p>例：&quot;骇人听闻/耸人听闻&quot;——&quot;骇人听闻&quot;指使人听了非常震惊，多指真实的事；&quot;耸人听闻&quot;指故意夸大事实使人震惊，多含贬义。</p>
+
+  </div>
+</article>
+
+<section class="card p-0 overflow-hidden">
+  <div class="p-4 border-b border-border"><h3 class="font-sans font-semibold text-base text-foreground">近义成语辨析示例</h3></div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">成语</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">语义侧重点</th><th class="text-left px-4 py-3 font-sans font-semibold text-sm text-foreground bg-muted border-b border-border">例句</th></thead>
+      <tbody>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">不胫而走/不翼而飞</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;不胫而走&quot;侧重消息传播快；&quot;不翼而飞&quot;侧重东西突然不见</td><td class="px-4 py-3 text-sm text-foreground align-top">消息不胫而走 / 钱包不翼而飞</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">骇人听闻/耸人听闻</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;骇人听闻&quot;多指真实的事；&quot;耸人听闻&quot;多指故意夸大</td><td class="px-4 py-3 text-sm text-foreground align-top">骇人听闻的罪行 / 耸人听闻的谣言</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">目不暇接/应接不暇</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;目不暇接&quot;侧重眼睛看不过来；&quot;应接不暇&quot;侧重接待应付不过来</td><td class="px-4 py-3 text-sm text-foreground align-top">琳琅满目目不暇接 / 顾客太多应接不暇</td>
+    </tr>
+    <tr class="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors">
+      <td class="px-4 py-3 text-sm text-foreground align-top">东山再起/卷土重来</td><td class="px-4 py-3 text-sm text-foreground align-top">&quot;东山再起&quot;多用于人重新得势；&quot;卷土重来&quot;多含贬义</td><td class="px-4 py-3 text-sm text-foreground align-top">失败后东山再起 / 敌人卷土重来</td>
+    </tr></tbody>
+    </table>
+  </div>
+</section>
+
+        <div class="flex items-center justify-between pt-6 border-t border-border">
+          <a href="../../index.html" class="btn ghost text-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5 inline-block align-middle"></i>返回首页
+          </a>
+          <a href="#" class="btn primary text-sm">
+            下一节<i data-lucide="arrow-right" class="w-4 h-4 ml-1.5 inline-block align-middle"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-border mt-16">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left">
+        <p class="font-sans font-semibold text-foreground">单招学习之路</p>
+        <p class="text-xs text-muted-foreground mt-1">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-4 text-xs" aria-label="页脚导航">
+        <a href="../../index.html" class="text-muted-foreground hover:text-foreground transition-colors no-underline">返回首页</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+      window.MathJax.startup.promise.then(() => window.MathJax.typesetPromise());
+    }
+  </script>
+</body>
+</html>
