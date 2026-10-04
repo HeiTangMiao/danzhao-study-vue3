@@ -20,9 +20,10 @@ if (NODE_ENV === 'production' && !process.env.JWT_SECRET) {
 }
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
 
-// 允许的跨域来源（逗号分隔）。生产同源（nginx 反代 + 域名）通常无需 CORS，
-// 此处兼容本地开发（5173）与可能的跨域调试。
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || 'http://localhost:5173,http://localhost:3000,https://520305.top')
+// 允许的跨域来源（逗号分隔），完全由环境变量 ALLOWED_ORIGIN 驱动。
+// 未设置时只回退到「本地开发地址」，代码中不含任何硬编码域名 ——
+// 线上域名请在 server/.env 里配置（生产同源经 nginx 反代通常无需 CORS）。
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || 'http://localhost:5173,http://localhost:3000')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean)

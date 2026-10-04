@@ -47,7 +47,7 @@ let siteCount = 0
  */
 const registeredFiles = new Set()
 
-for (const { name, key, path: sitePath } of siteConfigs) {
+for (const { name, key } of siteConfigs) {
   try {
     const site = await loadSite(key)
     if (!site || !site.units || !Array.isArray(site.units)) {

@@ -2,6 +2,10 @@
 
 > 浙江单招学习应用 —— 从原生 JS PWA 迁移到 Vue3 + Tauri 2.0
 
+> ⚠️ **本文档为迁移期（v0.1 ~ v0.2）的历史记录，部分写法已过时。**
+> 涉及「内容文件格式」「IndexedDB 版本」「进度模型」「同步/删除语义」等**现行事实**，一律以 [`CLAUDE.md`](./CLAUDE.md) 为准。
+> 已知过时点已在正文就地标注（`⚠️ 已废弃`）。本文档保留仅用于理解迁移过程与命名意图。
+
 ---
 
 ## 项目概况
@@ -116,6 +120,9 @@ vue3-refactor/
 
 数据库版本 v5：已删除游戏化 `achievements` 仓库，并清理 `daily_stats` 中的 `xp`/`checkin` 等字段。除学习记录（访问/答题/测验/学习时长/错题/笔记/书签）外不再存储任何游戏化数据。
 
+> ⚠️ **已过时**：当前实际版本为 **v6**（`src/stores/studyDb.js`）。v6 去掉了 `error_book` / `study_log` 的自增主键（改业务层 UUID），并引入软删墓碑 `deleted`（删除可跨设备传播）。
+> 另：`user_progress` **已退役**（v4 分支仍创建但代码不再使用），完成状态改由 `page_progress` 推导。以 `CLAUDE.md` 的数据层章节为准。
+
 ## 多学科架构
 
 ### 概述
@@ -166,7 +173,11 @@ getSubjectConfig('chinese') // 按学科 key 获取配置（未知学科回退�
 ### 方式一：手动创建数据文件
 
 1. 在 `src/content/math/单元文件夹/` 或 `src/content/chinese/单元文件夹/` 下新建 `.js` 文件
-2. 按 content-schema 格式编写内容（文件需 `export default { subject, unitNum, blocks: [...] }`）
+2. 按 content-schema 格式编写内容
+   > ⚠️ **已废弃**：此处原写「文件需 `export default { subject, unitNum, blocks: [...] }`」。
+   > 现行铁律 —— 页面文件**只允许导出 `blocks`**（`export default { blocks: [...] }`）；
+   > `id / unitNum / subject / title / subtitle / icon` 写进内容文件是**校验硬错误**，
+   > 元信息唯一真相源是 `src/content/site.js`。以 `CLAUDE.md` 的内容铁律为准。
 3. 在对应学科的站点配置（`src/content/site.js` 或 `src/content/chinese/site.js`）的 `files` 数组中注册
 4. 运行 `npm run validate:content` 校验
 

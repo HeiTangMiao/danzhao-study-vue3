@@ -99,6 +99,11 @@ jobs:
         working-directory: server
         run: npm ci
 
+      # server/ 是独立工作区（非 npm workspace），根目录 lint 覆盖不到，需单独跑
+      - name: 代码规范检查
+        working-directory: server
+        run: npm run lint
+
       - name: 单元测试
         working-directory: server
         run: npm test

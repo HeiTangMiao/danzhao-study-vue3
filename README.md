@@ -1,6 +1,6 @@
 # 浙江单招学习打卡（danzhao-study-vue3）
 
-> 面向浙江单招单考考生的学习应用，覆盖数学、语文与计算机三大科目。基于 Vue 3 + Vite + Tauri 2 构建，采用 Schema 驱动的数据渲染架构，支持桌面端、移动端与浏览器多端运行。
+> 面向浙江单招单考考生的学习应用，覆盖数学、语文与计算机三大科目。基于 Vue 3 + Vite + Tauri 2 构建，采用 Schema 驱动的数据渲染架构，支持桌面端、移动端与浏览器多端运行；学习数据存本地 IndexedDB，并可通过独立的 Fastify 后端在多设备间同步。
 
 [![CI](https://github.com/HeiTangMiao/danzhao-study-vue3/actions/workflows/ci.yml/badge.svg)](https://github.com/HeiTangMiao/danzhao-study-vue3/actions/workflows/ci.yml)
 [![Release](https://github.com/HeiTangMiao/danzhao-study-vue3/actions/workflows/release.yml/badge.svg)](https://github.com/HeiTangMiao/danzhao-study-vue3/actions/workflows/release.yml)
@@ -33,7 +33,8 @@
 
 ### 数据与工具
 
-- **本地存储**：IndexedDB 数据层（学习日志、进度、错题、笔记、书签），数据完全离线可用
+- **本地存储**：IndexedDB 数据层（学习日志、进度、错题、笔记、书签），离线可读写
+- **账号与跨设备同步**：注册/登录后，学习数据通过 Fastify 后端在多设备间同步（见「运行与登录」）
 - **数据导出/导入**：一键备份与迁移全部学习数据
 - **低代码内容编辑器**：内置 `/editor` 页面，可视化编辑内容区块，公式模板快捷插入，一键导出数据文件
 - **番茄钟**：内置专注计时器，辅助高效学习
@@ -46,17 +47,69 @@
 |----|------|
 | 前端框架 | Vue 3（Composition API）+ Vite 6 |
 | 状态管理 | Pinia 3（含持久化插件） |
-| 路由 | Vue Router 4（hash 模式，兼容本地文件协议） |
-| 桌面端 | Tauri 2（Rust 后端） |
-| 公式渲染 | KaTeX |
-| 图表 | Mermaid + JSXGraph |
-| 本地存储 | IndexedDB + localStorage |
+| 路由 | Vue Router 4（**hash 模式**，兼容 Tauri 本地文件协议；全站强制登录守卫） |
+| 桌面端 / 移动端 | Tauri 2（Rust 外壳，Android APK 同源） |
+| **认证** | **JWT（access + refresh），自建账号体系** |
+| **同步后端** | **Fastify 5 + PostgreSQL / 内嵌 PGlite，独立部署于 `server/`；`/api/sync` 基于 `updated_at` 做 LWW 合并** |
+| 公式渲染 | KaTeX（异步懒加载 + 预热，不进关键路径） |
+| 图表 | Mermaid（异步懒加载）、JSXGraph（动态导入） |
+| 渲染管线 | KaTeX / Mermaid / JSXGraph **全部异步按需加载**，重型依赖不进主 chunk |
+| 本地存储 | IndexedDB（`study_game_db`，当前版本 v6）+ localStorage |
+| 密码哈希 | Argon2id（后端） |
 | 数据校验 | JSON Schema + 自定义校验脚本 |
-| 测试 | Vitest |
+| 测试 | Vitest（前端）+ node:test（后端） |
 
 ---
 
-## 🚀 快速开始
+## 🚀 运行与登录
+
+> ⚠️ **应用首屏会跳转到 `/login`。** `src/router/index.js` 有全局前置守卫：**除 `/login` 外所有路由都要求已登录**，未登录一律重定向到登录页（带 `redirect` 回跳参数）；`/admin` 还额外要求 `role === 'admin'`。
+> 因此**必须先启动 `server/` 后端并注册一个账号**，才能进入内容页。纯离线打开前端只会停在登录页。
+
+### 最小启动步骤
+
+**1）后端（`server/`）——先起这一个**
+
+```bash
+cd server
+npm install
+cp .env.example .env     # 首次必须执行：npm run dev 用 --env-file=.env 启动，缺文件会直接报错
+npm run dev              # 默认监听 3000
+```
+
+- 未设置 `DATABASE_URL` 时自动使用**内嵌 PGlite**（文件库落在 `server/data/`），无需装 PostgreSQL。
+- 本地开发同样建议把 `.env` 里的 `JWT_SECRET` 改成一个随机值；`NODE_ENV=production` 下未设置 `JWT_SECRET` 会拒绝启动。
+
+**2）前端（仓库根目录）**
+
+```bash
+npm install
+npm run dev              # Vite 开发服务器 http://localhost:5173
+```
+
+- 开发期 Vite 已配好代理：`/api/*` → `http://127.0.0.1:3000`，前端代码里一律用相对路径 `/api`，无需配域名。
+- 打开 http://localhost:5173 → 自动落到 `#/login` → 注册账号后即可进入。
+
+### 常用命令
+
+前端（根目录）：
+
+```bash
+npm run validate:content  # 校验内容数据合法性（Schema 校验）
+npm run lint              # ESLint 代码检查（--max-warnings 0）
+npm test                  # 单元测试（Vitest）
+npm run build             # 前端生产构建（会先跑 prebuild 生成搜索索引）
+npm run tauri:dev         # Tauri 桌面开发模式
+npm run tauri:build       # 构建桌面安装包
+```
+
+后端（`server/` 目录下）：
+
+```bash
+npm run dev               # node --watch 开发模式
+npm test                  # node --test
+npm start                 # 生产式启动（node --env-file=.env）
+```
 
 ### 环境要求
 
@@ -64,54 +117,53 @@
 - Rust（仅 Tauri 桌面端需要）
 - Tauri 2 平台依赖（[官方文档](https://v2.tauri.app/start/prerequisites/)）
 
-### 安装与开发
-
-```bash
-cd vue3-refactor
-npm install          # 安装依赖
-npm run dev          # 启动开发服务器（默认 5173）
-```
-
-### 常用命令
-
-```bash
-npm run validate:content  # 校验内容数据合法性（Schema 校验）
-npm run lint              # ESLint 代码检查
-npm test                  # 单元测试
-npm run build             # 前端生产构建
-npm run tauri:dev         # Tauri 桌面开发模式
-npm run tauri:build       # 构建桌面安装包
-```
-
 ---
 
 ## 📁 项目结构
 
 ```
-vue3-refactor/
+danzhao-study-vue3/
 ├── schema/                     # JSON Schema 定义
-│   ├── content-schema.json     # 内容页面结构（22 种区块）
+│   ├── content-schema.json     # 内容页面结构（22 种区块；顶层仅 blocks 为必填）
 │   └── site-schema.json        # 站点配置结构
 ├── src/
-│   ├── content/                # 内容数据（Schema 实例，多学科）
-│   │   ├── index.js            # 多学科内容索引
-│   │   ├── site.js             # 数学站点配置
-│   │   ├── math/               # 数学内容（12 单元）
-│   │   └── chinese/            # 语文内容（6 单元）
+│   ├── content/                # 内容数据（页面文件只允许导出 blocks）
+│   │   ├── index.js            # 多学科内容索引（SUBJECTS / getSubjectConfig）
+│   │   ├── site.js             # 数学站点配置（元信息唯一真相源）
+│   │   ├── pageMeta.js         # 元信息推导（浏览器 / Node 共用）
+│   │   ├── loadPage.js         # 浏览器侧加载链路
+│   │   ├── serializePage.js    # 内容文件序列化风格（唯一定义）
+│   │   ├── searchIndex.js      # 搜索索引形状定义（两端共用）
+│   │   ├── math/               # 数学内容
+│   │   ├── chinese/            # 语文内容（含自己的 site.js）
+│   │   └── computer/           # 计算机内容（含自己的 site.js）
 │   ├── components/             # Vue 组件
 │   │   ├── BlockRenderer.vue   # 区块分发器
 │   │   ├── MathJaxRender.vue   # 公式渲染（KaTeX 引擎）
 │   │   ├── JsxGraphBoard.vue   # 几何画板
-│   │   └── blocks/             # 14 个区块渲染组件
-│   ├── composables/            # 组合式函数（笔记/书签/主题/番茄钟/间隔复习等）
-│   ├── stores/                 # Pinia 状态管理（progress/studyDb/auth）
-│   ├── views/                  # 页面视图（首页/内容页/仪表盘/错题本/编辑器）
-│   ├── router/index.js         # 路由配置
-│   └── types/                  # TypeScript 类型声明（.d.ts）
-├── scripts/validate-content.mjs # Schema 校验脚本
+│   │   ├── GeoGebraPlayground.vue
+│   │   └── blocks/             # 区块渲染组件 + registry.js 映射表
+│   ├── composables/            # 组合式函数（KaTeX/Mermaid/笔记/书签/主题/番茄钟/间隔复习）
+│   ├── stores/                 # Pinia 状态管理（auth / progress / studyDb）
+│   ├── sync/                   # 同步层（api.js 请求封装 + engine.js push/pull + LWW）
+│   ├── router/index.js         # 路由配置（hash 模式 + 强制登录守卫）
+│   ├── utils/                  # 工具（validateBlock / contentSchema / search 等）
+│   ├── views/                  # 页面视图（首页/登录/内容页/仪表盘/错题本/编辑器/管理）
+│   └── types/                  # TypeScript 类型声明（.d.ts，仅文档用途）
+├── scripts/
+│   ├── validate-content.mjs    # Schema 校验脚本（npm run validate:content）
+│   ├── build-search-index.mjs  # 生成两级搜索索引
+│   ├── migrate-content-*.mjs   # 内容迁移脚本（默认干跑）
+│   ├── deploy-backend.sh       # 后端一键部署
+│   └── lib/load-content.mjs    # Node 侧内容加载（与浏览器共用推导规则）
+├── server/                     # 独立后端工程（Fastify + JWT；自带 package.json）
+│   ├── src/                    # app.js / auth.js / sync.js / admin.js / db.js
+│   └── test/                   # node --test 用例
+├── tests/                      # 前端 Vitest 用例
 ├── src-tauri/                  # Tauri 配置与 Rust 后端
 ├── .github/workflows/          # CI 与 Release 工作流
-└── MIGRATION-README.md         # 迁移开发文档
+├── docs/                       # 组件清单与重构交接文档
+└── CLAUDE.md / MIGRATION-README.md
 ```
 
 ---
@@ -120,12 +172,14 @@ vue3-refactor/
 
 内容以数据文件形式存储在 `src/content/` 下，遵循 `schema/content-schema.json` 定义：
 
-1. 在对应学科的单元文件夹下新建 `.js` 数据文件
+1. 在对应学科的单元文件夹下新建 `.js` 数据文件，**只导出 `blocks`**（`export default { blocks: [...] }`）
 2. 按 Schema 编写区块（知识点、公式、例题、练习题、易错专项、模拟卷等）
-3. 在站点配置（`src/content/site.js` 或 `src/content/chinese/site.js`）的 `files` 数组中注册
+3. 在站点配置（`src/content/site.js` / `chinese/site.js` / `computer/site.js`）的 `files` 数组中注册——**页面元信息（id/unitNum/subject/title/subtitle/icon）只写在这里**，写进内容文件是校验硬错误
 4. 运行 `npm run validate:content` 校验数据合法性
 
 也可以使用内置低代码编辑器（`/editor` 路由）可视化创作并导出数据文件。
+
+> 历史文档 `MIGRATION-README.md` 里「内容文件需 `export default { subject, unitNum, blocks }`」的写法**已废弃**，以 `CLAUDE.md` 的内容铁律为准。
 
 ---
 
@@ -148,6 +202,18 @@ git push origin v0.1.0
 npm run tauri:build   # 桌面安装包
 npm run tauri:android:build  # Android APK（需配置 Android SDK/NDK）
 ```
+
+---
+
+## 🔒 安全说明
+
+- 桌面端在 `src-tauri/tauri.conf.json` 的 `app.security.csp` 中启用了 CSP（`devCsp` 为 `tauri dev` 下的宽松版本）。CSP 收紧了 `script-src` / `connect-src`；`connect-src` 保留 `ipc: http://ipc.localhost` 以保证 `invoke` 可用。**若将来要让桌面端访问外部后端域名，必须手动把它加进 `connect-src`。**
+- 后端的跨域白名单完全由环境变量 `ALLOWED_ORIGIN` 驱动（逗号分隔），代码中不含任何硬编码域名；未设置时回退到仅本地开发地址。
+- 生产环境必须设置 `JWT_SECRET`；永远不要提交 `server/.env`。
+
+### 已知技术债（暂不处理）
+
+- `public/vendor/geogebra` 为 GeoGebra 自托管离线资源，约 **48 MB**，直接进仓库。它是可选功能（几何演练场），后续应考虑移出仓库、改为按需下载或 CDN。
 
 ---
 

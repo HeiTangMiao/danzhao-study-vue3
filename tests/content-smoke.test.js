@@ -16,6 +16,24 @@ import { CONTENT_DIR, collectFiles } from '../scripts/lib/load-content.mjs'
 
 const pages = collectFiles(CONTENT_DIR)
 
+// 页面模块缓存：139 个内容页会被多条用例复用。原先每条用例各自 for-await import 一遍，
+// 首次 Vite transform 的开销被重复支付；这里并发加载一次供全部用例共享，
+// I/O 并行也能显著压低墙钟耗时。
+const pageModules = new Map()
+const loadAllPages = async () => {
+  if (pageModules.size) return pageModules
+  await Promise.all(
+    pages.map(async (file) => {
+      pageModules.set(file, await import(pathToFileURL(file).href))
+    })
+  )
+  return pageModules
+}
+
+// 超时放宽说明（勿删）：本文件会真实 import 全部 139 个内容页并递归遍历区块，
+// 绝大部分耗时是 Vite 首次 transform 的开销。全量并行执行时 CPU 竞争会把耗时
+// 推过 vitest 默认 5s 上限，造成 CI 上间歇性假失败（超时而非断言失败）。
+// 下面两条用例单独放宽超时到 30s，不影响其他测试文件的严格度。
 describe('内容文件渲染侧冒烟测试', () => {
   it('能扫描到内容页文件', () => {
     // 仅防止「扫描逻辑坏掉后测试静默通过」，不锁定具体页数以免新增内容时误报
@@ -39,21 +57,22 @@ describe('内容文件渲染侧冒烟测试', () => {
         walk(childBlocksOf(b), file, loc)
       })
     }
+    const mods = await loadAllPages()
     for (const file of pages) {
-      const mod = await import(pathToFileURL(file).href)
-      walk(mod.default?.blocks || [], relative(CONTENT_DIR, file), '区块')
+      walk(mods.get(file).default?.blocks || [], relative(CONTENT_DIR, file), '区块')
     }
     expect(unknown).toEqual([])
-  })
+  }, 30000)
 
   it('每个内容页都有非空的 blocks 数组', async () => {
     const broken = []
+    const mods = await loadAllPages()
     for (const file of pages) {
-      const mod = await import(pathToFileURL(file).href)
+      const mod = mods.get(file)
       if (!Array.isArray(mod.default?.blocks) || mod.default.blocks.length === 0) {
         broken.push(relative(CONTENT_DIR, file))
       }
     }
     expect(broken).toEqual([])
-  })
+  }, 30000)
 })

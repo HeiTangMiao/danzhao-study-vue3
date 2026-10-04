@@ -29,7 +29,7 @@ npm run dev                # Vite 开发服务器，端口 5173；/api 代理到
 npm run build              # 生产构建（会先执行 build-search-index）
 npm test                   # 运行 Vitest（node 环境，tests/**/*.test.js）
 npx vitest run tests/useKatex.test.js   # 运行单个测试文件
-npm run lint               # 对 src+tests 执行 ESLint，--max-warnings 0（CI 会卡这一项）
+npm run lint               # 对 src+tests+scripts 执行 ESLint，--max-warnings 0（CI 会卡这一项）
 npm run lint:fix
 npm run validate:content   # 内容数据的 JSON-Schema 校验——改完内容必须通过
 npm run format             # 对 src/tests 执行 Prettier
@@ -45,6 +45,10 @@ npm run dev                # node --watch；未设置 DATABASE_URL 时使用 PGl
 npm test                   # node --test（test/sync-core.test.js）
 node --env-file=.env src/index.js   # 生产式启动
 ```
+
+> 注意：`server/` 是**独立工程**（自带 `package.json`、不共用根目录的 ESLint 配置，也**没有自己的 ESLint 配置与依赖**）。
+> 因此根目录的 `npm run lint` **不包含** `server/`，CI 的 server job 也只跑 `npm test`。
+> 已登记待办：若后端要纳入 lint，需先在 `server/` 内单独引入 ESLint 配置与依赖，不要直接把它塞进根 lint 命令（会配置冲突）。
 
 CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容校验 → lint → vitest → `vite build`，另外还有 Tauri 的 `cargo check` 和后端测试。CI 通过后有两个额外任务分别部署前端（零停机 rsync）和后端。
 
@@ -62,6 +66,9 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 原因见 `src/content/pageMeta.js`：这批字段曾在 139 个文件里各手写一份、又在 site.js 各写一份，实测漂移了 19 页（页头与侧边栏显示两个版本）。现在 site.js 是唯一真相源，元信息由 `resolvePageMeta(学科配置, 单元号, fileIndex)` 推导并在加载时注入；`title`/`subtitle` 一律取自 site.js，页面文件里的同名字段即使写了也被忽略。
 若你接手的是 1B 之前的旧文件（还带着五元组），运行 `node scripts/migrate-content-meta.mjs --write` 剥离（默认干跑，不加 `--write` 不落盘）。
 
+这条规则在**三处**各自钉死，改任何一处都要同步另外两处：`src/content/pageMeta.js` 的 `PAGE_META_KEYS`（常量清单）、`scripts/validate-content.mjs` 的 `residue` 检查（CI 关卡，命中即 `errorCount += residue.length`）、`schema/content-schema.json` 顶层 `required`（**只有 `["blocks"]`**——那 6 个元信息键保留在 `properties` 里但全部标了 `deprecated: true`，仅供编辑器识别遗留字段，**绝不是必填**）。
+另注意：校验器**不跑通用 JSON-Schema 引擎**，走的是 `src/utils/validateBlock.js` 的自定义规则（schema 只被用来派生类型白名单 / 难度 / 题型枚举，以及给 `/editor` 推导表单），所以改了 schema 不等于改了校验口径——语义规则要改 `validateBlock.js`。
+
 - Block 结构由 `schema/content-schema.json` 约束（22 种类型：mindmap / objectives / knowledge / formula / table / warning / tip / example / quiz / diagram / errorfocus / strategy / exam / desmos / columns / group / steps / summary / compare / vocab / code / cloze）。该 schema 是**类型白名单的唯一真相源**，validator 的白名单从它派生，`tests/block-registry.test.js` 负责钉死它与渲染注册表 `registry.js`、`.d.ts` 三者一致。
   新增类型 = schema 加 allOf 分支（+ 子对象 definition）+ 新建组件 + `registry.js` / `blockTypes.js` 各加一行 + 同步 `.d.ts`；编辑器表单与校验白名单会自动跟随，不要再手写字段表。
 - `UnitView.vue` 把路由参数解析为 学科/单元/fileIndex，再动态导入内容文件，因此**每个内容文件都是独立的懒加载 chunk**（139 个页面）。内容文件需自包含；每个页面文件都单独打包发布。
@@ -77,24 +84,25 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 - KaTeX——公式（`FormulaCard` 等），通过 `useKatex` 组合式函数。**523 KB 引擎已移出内容页关键路径**：`warmKatex()` 幂等异步加载（路由守卫 / 空闲回调 / `MathJaxRender.onMounted` 三处预热），`renderMath` 保持同步、引擎未就绪时返回纯文本兜底，组件靠 `engineVersion` 在就绪后重渲染；渲染结果另有 512 KB FIFO memo（`clearMathCache()` 可清）。**不要**把 `import katex` 或 `katex.min.css` 改回静态 import。
 - Mermaid——思维导图/流程图，异步加载（`useMermaid`）。
 - JSXGraph——`GeometryBlock`/`JsxGraphBoard`，约 1MB，仅动态导入。
-- GeoGebra——自托管离线资源放在 `public/vendor` 下（不走外部 CDN），用于 `GeoGebraPlayground.vue`。
+- GeoGebra——自托管离线资源放在 `public/vendor` 下（不走外部 CDN），用于 `GeoGebraPlayground.vue`。⚠️ **已知技术债（暂不动）：该目录约 48 MB 且直接进 git，是仓库体积的主要来源。** 它是可选功能（几何演练场），后续应移出仓库改为按需下载。
 
 `vite.config.js` 的 `manualChunks` 会拆分 vendor chunk，并设置 `chunkSizeWarningLimit: 1000`；不要把大库强行塞进主包。
 
 ## 数据层与 store
 
-- 单一 IndexedDB 数据库 **`study_game_db`（v5）**，由 `src/stores/studyDb.js`（一个提供 CRUD actions 的 Pinia store）打开并封装。Object store：`study_log`、`daily_stats`、`page_progress`、`error_book`、`notes`、`bookmarks`、`user_progress`。
-- **Schema 演进规则：** 新增/重命名 store 时，要升 `DB_VERSION` 并按 `oldVersion` 添加对应的 `onupgradeneeded` 分支——`DB_NAME` 保持不变以兼容旧数据（v5 删除了遗留的 `achievements` store；历史升级分支保留，供老安装包升级用）。
+- 单一 IndexedDB 数据库 **`study_game_db`（v6）**，由 `src/stores/studyDb.js`（一个提供 CRUD actions 的 Pinia store）打开并封装。Object store：`study_log`、`daily_stats`、`page_progress`、`error_book`、`notes`、`bookmarks`（`user_progress` 见下条）。
+- **Schema 演进规则：** 新增/重命名 store 时，要升 `DB_VERSION` 并按 `oldVersion` 添加对应的 `onupgradeneeded` 分支——`DB_NAME` 保持不变以兼容旧数据（历史升级分支保留，供老安装包升级用）。已知版本：v5 删除了遗留的 `achievements` store；**v6** 去掉了 `error_book` / `study_log` 的自增主键（改由业务层生成 UUID，避免跨设备撞键）并引入软删墓碑 `deleted`。
+- **`user_progress` 已退役**：v4 分支里那个 store 仍会被创建（兼容老库），但代码已不再读写它——完成状态改由 `page_progress` 推导，导入/导出也不再包含它。不要再用它做新的进度功能。
 - 功能类组合式函数（`useNotes`、`useBookmarks`、`useSpacedReview`、`usePomodoro`、`useTheme` 等）都是薄封装，内部调用 `studyDb` 的 actions。
-- `src/stores/progress.js` 维护 `学科→单元→fileIndex` 的完成度映射，并持久化到 `user_progress` store（`'main'` 行）。它还会一次性迁移遗留的 localStorage 进度。
+- `src/stores/progress.js` 是**只读缓存**：它维护 `学科→单元→fileIndex` 的完成度快照，唯一数据源是 `studyDb` 的 `page_progress`（完成语义 = 访问过，测验/模拟卷页还需已交卷）。写入侧是 `markPageVisited` / `recordTest`，进度变化后调 `refresh()` 重建快照；它不再持久化到 `user_progress`。
 - 游戏化（XP / 成就 / 连续天数 / 热力图 / 打卡）已在 **v0.2.0 中刻意移除**。残留的提到 XP/打卡 的注释是过时的——不要复活该功能或那些字段，把游戏化概念一律视为已删除。
 - `src/types/*.d.ts` **仅为文档**——从不做类型检查（没有 `vue-tsc` 脚本；tsconfig 排除了普通 `.js`，代码是 JS 不是 TS）。不要把它们当作强制契约。
 
 ### 已知的设计张力（不要再增加）
 
-- **两套进度模型并存：** `page_progress.visited`（每次访问页面自动写入；驱动仪表盘）vs `user_progress.completed`（手动切换；驱动首页/单元 UI）。两者可能不一致，测试页还会被双份记录。不要再引入第三套追踪器；理想情况下在做新的进度功能之前先把这两者收敛。
-- **同步主键：** `error_book` / `study_log` 用本地自增数字 `id` 同步，这在**跨设备时不是防冲突的**（两台设备都从 1 开始，LWW 相互覆盖）。新增需要同步的数据时，优先用 UUID / 语义主键（notes 和 bookmarks 已按 `pageKey` 做键，是安全的）。
-- **删除不会传播：** 本地删除只是删掉 IndexedDB 行；同步层只会*应用*从服务端拉到的墓碑，从不写入墓碑。不要假设删除会到达其他设备。
+- **进度模型已收敛为一套：** 唯一事实来源是 `page_progress`（每次访问页面自动写入 `visited`，测验页记 `testScore`）。旧的 `user_progress.completed`（手动勾选）已随 v6 退役。不要再引入第二套追踪器。
+- **同步主键：** v6 起 `error_book` / `study_log` 的主键由业务层生成 UUID，**不再**用本地自增数字（自增 id 跨设备不防冲突，两台设备都从 1 开始会 LWW 相互覆盖）。新增需要同步的数据时，一律用 UUID / 语义主键（notes 和 bookmarks 按 `pageKey` 做键，是安全的）。
+- **删除会传播（v6 起）：** 删除是**软删**——置 `deleted: true` 墓碑而非物理删行，`src/sync/engine.js` 会把 `deleted:true` 一并推送到服务端，服务端按 `updated_at` 做 LWW 裁决后再下发到其他设备。因此读取侧一律要 `.filter(r => !r.deleted)`；**不要**把删除改回物理删行，那会让删除无法到达其他设备。
 
 ## 认证与同步架构
 
@@ -103,6 +111,10 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 - 后端路由：`/api/auth/*`（注册/登录/刷新/me）、`/api/sync`（一次 push+pull 调用，基于 `sync_items` 的 LWW 冲突解决）、`/api/admin/*`。密码用 Argon2id 哈希。设置 `DATABASE_URL` 时用 PostgreSQL，否则用内嵌 PGlite 文件。
 - **同步引擎原则：IndexedDB 是唯一事实来源，网络只是通道。** `src/sync/engine.js` 收集本地所有带 `updatedAt` 的行并推送，再按游标拉取变更并应用（墓碑，或按服务端时间戳覆盖）。它**只**在 `App.vue` 中被接线（手动按钮、挂载时、5 分钟间隔）——不在各个 store 中调用。
 - 后端配置由环境变量驱动：`JWT_SECRET`、`ALLOWED_ORIGIN`、`DATABASE_URL`（见 `server/.env.example`）。生产环境必须设置 `JWT_SECRET`；永远不要提交 `server/.env`。开发用兜底密钥刻意是不安全的——本地开发之外不要依赖它。
+- **跨域白名单不含硬编码域名**：`server/src/index.js` 只在 `ALLOWED_ORIGIN` 未设置时回退到「仅本地开发地址」。要放开线上域名，改环境变量，**不要**把域名写回代码。
+- **桌面端 CSP 已开启**（`src-tauri/tauri.conf.json` 的 `app.security.csp`；`tauri dev` 走同文件里的 `devCsp`）。`connect-src` 里的 `ipc: http://ipc.localhost` 是 `invoke` 的通道，**不能删**；桌面端若要访问外部后端域名，必须同步把它加进 `connect-src`。
+  - 已放行：`style-src 'self' 'unsafe-inline'`（KaTeX 的行内 style、Mermaid 的内联 `<style>`、JSXGraph 的 SVG 属性都必须）、`img-src 'self' data: blob:`、`font-src 'self' data:`。Tauri 编译期会自动把打包内联脚本的 hash / 外部脚本 nonce 追加进 CSP，所以 `script-src 'self'` 不需要 `'unsafe-inline'`。
+  - ⚠️ **未经实机验证的风险（已登记）**：`desmos` 区块（`GeoGebraPlayground.vue`）依赖 GeoGebra 的 GWT 引导脚本，它用 `eval` 且动态注入脚本，在 `script-src 'self'`（无 `'unsafe-eval'`）下**大概率加载不了**。全库只有 1 页用到（`src/content/math/03-函数与基本初等函数/03-二次函数.js`），且组件已有「无法加载 GeoGebra 计算器」降级 UI。**若确认必须保住这一页，把 `script-src` 改成 `'self' 'unsafe-eval'` 即可**（其余指令不变）。改动 CSP 后请务必跑一次 `tauri build` 并开着 WebView 控制台看有没有 violation —— CSP 违规只是 console 警告，不会弹窗。
 
 ## 值得了解的约定
 

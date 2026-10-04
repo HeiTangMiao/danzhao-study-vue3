@@ -57,11 +57,17 @@ describe('区块类型清单一致性', () => {
 })
 
 describe('区块类型与渲染组件的绑定', () => {
-  it('每个类型都绑定了渲染组件', async () => {
-    const { componentOf } = await import('@/components/blocks/registry')
-    const unbound = BLOCK_TYPES.filter((t) => !componentOf(t))
-    expect(unbound).toEqual([])
-  })
+  // 单跑约 1.2s（动态 import 22 个 Vue SFC 的 transform 开销），但全量并行执行时
+  // CPU 竞争会把它推过 vitest 默认 5s 上限，导致 CI 间歇性假失败。单独放宽到 30s。
+  it(
+    '每个类型都绑定了渲染组件',
+    async () => {
+      const { componentOf } = await import('@/components/blocks/registry')
+      const unbound = BLOCK_TYPES.filter((t) => !componentOf(t))
+      expect(unbound).toEqual([])
+    },
+    30000
+  )
 
   it('未知类型不返回组件（由 BlockRenderer 渲染显式降级提示）', async () => {
     const { componentOf } = await import('@/components/blocks/registry')

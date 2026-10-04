@@ -51,7 +51,7 @@ function extractText(value, seen = new Set()) {
 function clean(t) {
   return (t || '')
     .replace(/\\([(){}[\]|])/g, '$1')
-    .replace(/[_\*\#\`\$\~]/g, ' ')
+    .replace(/[`*#$~_]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }

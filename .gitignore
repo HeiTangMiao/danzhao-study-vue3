@@ -46,3 +46,18 @@ Thumbs.db
 *.apk
 *.aab
 *.keystore
+
+# 打包产物 / 离线安装包（含历史误入库的便携版 zip）
+release/
+*.zip
+
+# 第三方下载缓存（WiX 工具链等，8MB+ 二进制，非源码）
+.wix-dl/
+
+# 后端本地数据（PGlite 文件库；server/ 自带 .gitignore 已覆盖，此处显式兜底）
+server/data/
+
+# GeoGebra 离线资源（48MB / 203 文件，原直接入库拖慢 clone 与 rsync 部署）
+# 改为按需拉取：node scripts/fetch-geogebra.mjs
+# 缺失不影响功能 —— GeoGebraPlayground.vue 会自动回退官方 CDN
+public/vendor/geogebra/
