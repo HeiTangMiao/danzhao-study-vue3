@@ -441,7 +441,7 @@ onBeforeUnmount(() => {
 
 /* 交卷失败提示 */
 .exam-error {
-  background: rgba(224, 49, 49, 0.1);
+  background: rgba(var(--danger-rgb), 0.1);
   border: 1px solid var(--danger);
   color: var(--danger);
   border-radius: var(--radius-md);
@@ -459,7 +459,7 @@ onBeforeUnmount(() => {
 .exam-unanswered-tag {
   font-size: var(--fs-2xs); padding: 1px 8px;
   border-radius: var(--radius-full);
-  background: rgba(240, 140, 0, 0.15); color: var(--warning);
+  background: rgba(var(--warning-rgb), 0.15); color: var(--warning);
   font-weight: 600;
 }
 /* 跳转目标短暂闪烁 */
@@ -502,8 +502,8 @@ onBeforeUnmount(() => {
 .self-assess { display: flex; align-items: center; gap: var(--spacer-8); flex-wrap: wrap; }
 .self-label { font-size: var(--fs-md); color: var(--text-muted); }
 .self-btn { padding: 5px 14px; border-radius: var(--radius-full); font-size: var(--fs-md); border: 1px solid var(--border); background: var(--surface); }
-.self-ok.active { border-color: var(--success); color: var(--success); background: rgba(47, 158, 68, 0.1); }
-.self-no.active { border-color: var(--danger); color: var(--danger); background: rgba(224, 49, 49, 0.1); }
+.self-ok.active { border-color: var(--success); color: var(--success); background: rgba(var(--success-rgb), 0.1); }
+.self-no.active { border-color: var(--danger); color: var(--danger); background: rgba(var(--danger-rgb), 0.1); }
 
 /* 结果页（极简：无卡片，靠发丝线与留白分段） */
 .result-hero {
@@ -513,8 +513,8 @@ onBeforeUnmount(() => {
   border-radius: 0;
   margin-bottom: var(--spacer-16);
 }
-.result-pass { background: rgba(47, 158, 68, 0.08); border: 2px solid var(--success); }
-.result-fail { background: rgba(224, 49, 49, 0.06); border: 2px solid var(--danger); }
+.result-pass { background: rgba(var(--success-rgb), 0.08); border: 2px solid var(--success); }
+.result-fail { background: rgba(var(--danger-rgb), 0.06); border: 2px solid var(--danger); }
 .result-icon { font-size: 2.5rem; margin-bottom: var(--spacer-8); }
 .result-score { font-size: 2.6rem; font-weight: 800; }
 .result-total { font-size: 1.2rem; font-weight: 400; color: var(--text-muted); }
@@ -550,13 +550,13 @@ onBeforeUnmount(() => {
 .review-label { font-weight: 600; color: var(--text-muted); }
 .review-user {
   font-size: var(--fs-base);
-  background: rgba(240, 140, 0, 0.08);
+  background: rgba(var(--warning-rgb), 0.08);
   border: 1px dashed var(--warning);
   border-radius: var(--radius-md);
   padding: var(--spacer-10);
   margin-top: 6px;
 }
-.review-no .review-user { border-color: var(--danger); background: rgba(224, 49, 49, 0.06); }
+.review-no .review-user { border-color: var(--danger); background: rgba(var(--danger-rgb), 0.06); }
 
 /* 提前交卷确认弹窗 */
 .submit-confirm-overlay {

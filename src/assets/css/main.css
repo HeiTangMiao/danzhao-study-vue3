@@ -12,30 +12,88 @@
 /* ---------- 亮色主题（默认） ---------- */
 :root {
   color-scheme: light dark;
-  /* 色彩降噪：背景由偏蓝的 #f6f7fb 改为近白暖灰 #fbfbfa；
-   * 语义色统一降饱和（warning/accent/success/danger 都往沉稳方向调了一档），
-   * 层次改由发丝线（--line）与字号对比建立，而不是靠大面积彩色。 */
-  --bg: #fbfbfa;
-  --surface: #ffffff;
-  --surface-muted: #f2f2ef;
-  --text: #1f2430;
-  --text-primary: #1f2430;
-  --text-muted: #5b6472;
-  --text-secondary: #5b6472;
-  --border: #e4e6e0;
-  --line: #e9eae4; /* 发丝线：分隔区块/题目 */
-  --line-strong: #d6d8d0; /* 更强发丝线：需要更强分隔的边框 */
-  --primary: #2f6fed;
-  --primary-soft: #eef2fc;
-  --accent: #c2500c;
-  --success: #2f8f44;
-  --warning: #b26a00;
+  /* ===== Claude Design System 迁移（2026-10-05）=====
+   * 来源：~/.trae-cn/design_libraries/Claude/colors_and_type.css（权威 token）
+   *      静态稿目录 danzhao-study-redesign 即由该库生成。本次迁移把它的设计语言
+   *      引入主应用后，该目录已从仓库移除 —— 设计库本身在 ~/.trae-cn 下，不受影响。
+   *
+   * 迁移策略 =「只换 token，不换写法」。
+   *   实测 src/ 下 39 个组件的样式累计引用 CSS 变量 700+ 次
+   *   （--primary 110 / --text-muted 98 / --border 85 / --spacer-* 300+ …），
+   *   而硬编码色值仅 37 处。因此重定义变量值即可让全站视觉整体切换，
+   *   无需重写任何组件 —— 这也是本次改动能保持低风险的原因。
+   *
+   * 设计基调（SKILL.md）："Make the interface feel like a beautifully typeset book."
+   *   主色 terra-cotta #c96442 作为全站唯一的情感强调色；中性色为纸质暖灰；
+   *   圆角 8/12/16/20/24；阴影克制。
+   *
+   * ⚠️ 刻意不做的事（否则会破坏主应用已有的能力）：
+   *   1. 不引入 Tailwind —— 静态稿靠 Tailwind CDN，主应用需离线可用且是原生 CSS
+   *   2. 不把 KaTeX 换成 MathJax —— 保留本地 KaTeX（v0.3.0 刚做完异步优化）
+   *   3. 不 @import Google Fonts —— 会阻塞渲染且离线必然失败；
+   *      改为把字体名写进字体栈：本机已装则生效，未装自动降级，零网络开销
+   */
+
+  /* ---------- Claude 色板（9 级色阶）---------- */
+  --brand-50: #fbf2ed; --brand-100: #f4e0d5; --brand-200: #ebc6b6; --brand-300: #e0a892;
+  --brand-400: #d6866a; --brand-500: #c96442; --brand-600: #b0562f; --brand-700: #934828;
+  --brand-800: #753a22; --brand-900: #582e1d;
+  --text-50: #f6f5f0; --text-100: #ece9de; --text-200: #dad9d4; --text-300: #c2c0b6;
+  --text-400: #9b988c; --text-500: #6e6d68; --text-600: #535146; --text-700: #46443b;
+  --text-800: #3d3929; --text-900: #28261b;
+  --bg-50: #ffffff; --bg-100: #faf9f5; --bg-200: #f5f4ef; --bg-300: #ede9de;
+  --bg-400: #e3e0d4; --bg-500: #dad9d4; --bg-600: #cdcabf; --bg-700: #b4b2a7;
+  --bg-800: #8a887e; --bg-900: #535146;
+  --border-50: #f0efe9; --border-100: #ebebeb; --border-200: #e3e0d4; --border-300: #dad9d4;
+  --border-400: #cdcabf; --border-500: #b4b2a7; --border-600: #9b988c; --border-700: #6e6d68;
+  --border-800: #535146; --border-900: #3d3929;
+  --success-50: #f0f3ea; --success-100: #e7ecdd; --success-200: #d3dcc1; --success-300: #b8c69e;
+  --success-400: #9aac79; --success-500: #788c5d; --success-600: #647649; --success-700: #4f5d3a;
+  --success-800: #3d482d; --success-900: #2b331f;
+  --error-50: #fcecea; --error-100: #f7dedb; --error-200: #f3c4bf; --error-300: #eb9d96;
+  --error-400: #e0716a; --error-500: #d64545; --error-600: #b83636; --error-700: #962c2c;
+  --error-800: #732222; --error-900: #531818;
+
+  /* ---------- 语义色 ----------
+   * 变量名**全部沿用主项目旧名**，这是本次零重写的关键：
+   * 39 个组件、blocks.css、jsxgraph.css 里引用的还是 --bg / --text / --primary 这些名字，
+   * 值指向 Claude 色板后，全站配色随之整体切换。 */
+  --bg: var(--bg-100); /* 页面底：纸质暖白（原 #fbfbfa → #faf9f5） */
+  --surface: var(--bg-50); /* 卡片：比页面亮，浮起层次；正文保持高对比 */
+  --surface-muted: var(--bg-200); /* 次级容器：Claude 的 card 色 */
+  --text: var(--text-800); /* 正文：暖黑（原冷调 #1f2430） */
+  --text-primary: var(--text-900);
+  --text-muted: var(--text-500);
+  --text-secondary: var(--text-600);
+  --border: var(--border-300);
+  --line: var(--border-200); /* 发丝线：分隔区块/题目 */
+  --line-strong: var(--border-400); /* 更强发丝线：需要更强分隔的边框 */
+  --primary: var(--brand-500); /* terra-cotta 陶土橙（原蓝色 #2f6fed）—— 最直观的风格转变 */
+  --primary-soft: var(--brand-100);
+  --accent: var(--brand-600); /* 强调：主色深一档，避免与主色争注意力 */
+  --success: var(--success-500);
+  --warning: #b26a00; /* Claude 色板无 warning 档，保留降饱和琥珀以保证警示辨识度 */
   --tone-warn: #b26a00; /* 语义警告色的新名；--warning 保留兼容旧引用 */
-  --danger: #c92a2a;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius: 12px;
-  --radius-lg: 16px;
+  --danger: var(--error-500);
+
+  /* ---------- RGB 分量（供带透明度的淡背景使用）----------
+   * 背景：ExamBlock / ErrorFocusBlock / ContentSidebar / ExampleBlock 等组件里
+   *       直接写了 rgba(47,158,68,.08) 这类**硬编码 RGB**做淡色底（对应旧主题的
+   *       绿 / 红 / 橙 / 蓝）。这些值不跟随上面的语义色，迁移后会出现
+   *       「陶土橙边框 + 旧蓝色淡背景」的不协调，因此统一换成变量版本。
+   * 用法：background: rgba(var(--success-rgb), 0.08); */
+  --primary-rgb: 201, 100, 66; /* #c96442 */
+  --success-rgb: 120, 140, 93; /* #788c5d */
+  --danger-rgb: 214, 69, 69; /* #d64545 */
+  --warning-rgb: 178, 106, 0; /* #b26a00 */
+  --accent-rgb: 176, 86, 47; /* #b0562f */
+
+  /* 圆角：对齐 Claude 几何（8 / 12 / 16 / 20 / 24） */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
   --radius-full: 999px;
 
   /* ---------- 间距阶梯（4px 基数） ----------
@@ -104,9 +162,22 @@
   --fw-semibold: 600;
   --fw-bold: 700;
 
-  --shadow-xs: 0 1px 3px rgba(31, 36, 48, 0.10); /* 只给 sticky 顶栏 */
-  --shadow-pop: 0 8px 30px rgba(31, 36, 48, 0.16); /* 只给浮层（搜索下拉 / TOC / 遮罩面板） */
-  --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  /* ---------- 字体栈 ----------
+   * Claude 官方四款（Newsreader 展示 / Poppins 紧凑 UI / Lora 阅读面 / Geist Mono 代码）
+   * **全是拉丁字体，对中文无效**。本项目正文以中文为主，因此：
+   *   中文系统字体写在最前 → 中文永不错位；
+   *   拉丁字体紧随其后   → 数字与英文用 Claude 字体呈现；
+   *   末位通用字体族兜底 → 未装也能正常显示。
+   * 不主动 @import Google Fonts：既避免阻塞首屏，也保证离线可用，
+   * 本机已装对应字体的用户会自动获得更完整的 Claude 观感。 */
+  --font-base: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Poppins, ui-sans-serif, system-ui, sans-serif;
+  --font-display: "PingFang SC", "Microsoft YaHei", Newsreader, Georgia, ui-serif, serif; /* 大标题 */
+  --font-serif: "Songti SC", "SimSun", Lora, Georgia, ui-serif, serif; /* 阅读面：衬线更贴「排版书」质感 */
+  --font-mono: "SF Mono", "Menlo", Geist Mono, ui-monospace, monospace; /* 代码 / token 展示 */
+
+  /* 阴影：Claude 主张「quiet and paper-like」，比原值更轻 */
+  --shadow-xs: 0 1px 3px rgba(40, 38, 27, 0.05); /* 只给 sticky 顶栏 */
+  --shadow-pop: 0 8px 30px rgba(40, 38, 27, 0.10); /* 只给浮层（搜索下拉 / TOC / 遮罩面板） */
 
   /* ---------- 动效 token ----------
    * 极简路线：动效克制。全站交互动效只留 5 处（折叠展开 / 悬停 / 浮层进出 /
@@ -123,23 +194,33 @@
 /* ---------- 暗色主题 ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #16181f;
-  --surface: #1f232c;
-  --surface-muted: #282d38;
-  --text: #e6e9ef;
-  --text-primary: #e6e9ef;
-  --text-muted: #aab2c0;
-  --text-secondary: #aab2c0;
-  --border: #333a47;
-  --line: #2b313c; /* 发丝线（暗色：比背景略亮即可） */
-  --line-strong: #3a4250;
-  --primary: #6a9bff;
-  --primary-soft: #24334d;
-  --accent: #ff8a4c;
-  --success: #69db7c;
+  /* Claude 暗色色阶
+   * ⚠️ 注意：Claude 在暗色下**反转了色阶方向**（50 最暗、900 最亮），
+   *    因此这里必须重定义整批 primitive，不能沿用亮色那批值。 */
+  --brand-100: #4d3528; --brand-500: #d97757; --brand-600: #e08d6f;
+  --text-500: #b7b5a9; --text-600: #c3c0b6; --text-800: #f1f1ef; --text-900: #faf9f5;
+  --bg-50: #1b1b19; --bg-100: #262624; --bg-200: #2c2c2b; --bg-300: #30302e;
+  --border-200: #343430; --border-300: #3e3e38; --border-400: #4a4a43;
+  --success-500: #8ca06f;
+  --error-500: #ef4444;
+
+  --bg: var(--bg-100); /* 页面底 #262624 */
+  --surface: var(--bg-200); /* 卡片 #2c2c2b：暗色下卡片需比页面亮才「浮得起」 */
+  --surface-muted: var(--bg-300);
+  --text: var(--text-800);
+  --text-primary: var(--text-900);
+  --text-muted: var(--text-500);
+  --text-secondary: var(--text-600);
+  --border: var(--border-300);
+  --line: var(--border-200); /* 发丝线（暗色：比背景略亮即可） */
+  --line-strong: var(--border-400);
+  --primary: var(--brand-500); /* 暗色 terra-cotta #d97757，比亮色更亮以保证暗底对比度 */
+  --primary-soft: var(--brand-100);
+  --accent: var(--brand-600);
+  --success: var(--success-500);
   --warning: #d9a64b; /* 降饱和警告色（暗色下提亮保证对比度） */
   --tone-warn: #d9a64b;
-  --danger: #ff6b6b;
+  --danger: var(--error-500);
   --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
@@ -203,9 +284,10 @@ button {
   padding: var(--spacer-16);
 }
 
-/* 重点高亮标记（==高亮== 语法渲染结果） */
+/* 重点高亮标记（==高亮== 语法渲染结果）
+ * 原本硬编码 rgba(240,140,0,.28)，对应旧主题的琥珀橙；改用变量后随 --warning 联动 */
 mark.katex-hl {
-  background: linear-gradient(180deg, transparent 30%, rgba(240, 140, 0, 0.28) 30%);
+  background: linear-gradient(180deg, transparent 30%, rgba(var(--warning-rgb), 0.28) 30%);
   color: inherit;
   padding: 0 2px;
   border-radius: 3px;

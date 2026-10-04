@@ -512,7 +512,7 @@ watch(
   border-radius: var(--radius-full);
   padding: 6px 16px;
 }
-.done-btn.done { background: rgba(47, 158, 68, 0.12); border-color: var(--success); color: var(--success); }
+.done-btn.done { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
 
 .fade-enter-active, .fade-leave-active { transition: opacity var(--dur-3) var(--ease-standard); }
 

@@ -398,8 +398,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   transition: all 0.15s;
 }
 .sb-act:hover { border-color: var(--primary); color: var(--primary); }
-.sb-act.on { background: rgba(47, 158, 68, 0.12); border-color: var(--success); color: var(--success); }
-.sb-desmos { background: rgba(226, 128, 52, 0.14); border-color: var(--accent); color: var(--accent); }
+.sb-act.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
+.sb-desmos { background: rgba(var(--accent-rgb), 0.14); border-color: var(--accent); color: var(--accent); }
 
 .sb-nav { border-top: 1px dashed var(--border); }
 .sb-nav ul { list-style: none; }
@@ -584,7 +584,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   }
   .sb-grid__cell:active { transform: scale(0.94); }
   .sb-grid__cell.done {
-    background: rgba(47, 158, 68, 0.12);
+    background: rgba(var(--success-rgb), 0.12);
     border-color: var(--success);
     color: var(--success);
   }
@@ -622,9 +622,9 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   }
   .sb-more__item:active { transform: scale(0.95); }
   .sb-more__item span { font-size: 0.75rem; color: var(--text-muted); }
-  .sb-more__item.on { background: rgba(47, 158, 68, 0.12); border-color: var(--success); }
+  .sb-more__item.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); }
   .sb-more__item.on span { color: var(--success); }
-  .sb-more__calc { background: rgba(226, 128, 52, 0.12); border-color: var(--accent); }
+  .sb-more__calc { background: rgba(var(--accent-rgb), 0.12); border-color: var(--accent); }
   .sb-more__calc span { color: var(--accent); }
 
   /* ===== 底部常驻操作栏：目录 / 上页 / 下页（主操作）/ 更多 ===== */

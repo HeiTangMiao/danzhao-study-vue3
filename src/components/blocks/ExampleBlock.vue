@@ -91,7 +91,7 @@ function toggle(kind, index) {
   margin-top: var(--spacer-8);
 }
 .ex-answer {
-  background: rgba(47, 158, 68, 0.08);
+  background: rgba(var(--success-rgb), 0.08);
   border: 1px solid var(--success);
   border-radius: var(--radius-md);
   padding: var(--spacer-12);

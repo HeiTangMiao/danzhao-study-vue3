@@ -314,12 +314,19 @@ describe('难度标签共用规则', () => {
     expect(rule['white-space']).toBeUndefined()
   })
 
-  it('difficulty-* 四个难度色与原版逐字相同', () => {
+  // 2026-10-05 Claude Design System 迁移后更新：
+  //   原先这里的四组背景是**硬编码 RGB**（rgba(47,158,68,.15) 等），对应旧主题的绿/红/橙/紫。
+  //   迁移到 Claude 色板后它们必须跟随 --success/--warning/--danger 联动，否则会出现
+  //   「陶土橙语义色 + 旧绿色淡背景」的不协调，因此改为 rgba(var(--*-rgb), alpha) 写法。
+  //   详见 src/assets/css/main.css 的「RGB 分量」注释块。
+  // 该用例的定位不变：锁住这四个标签的具体取值，防止后续改动造成无意漂移。
+  it('difficulty-* 四个难度色与当前实现逐字相同', () => {
     const rules = CLASS_RULES
-    expect(rules['difficulty-basic']).toEqual({ background: 'rgba(47, 158, 68, 0.15)', color: 'var(--success)' })
-    expect(rules['difficulty-medium']).toEqual({ background: 'rgba(240, 140, 0, 0.15)', color: 'var(--warning)' })
-    expect(rules['difficulty-advanced']).toEqual({ background: 'rgba(224, 49, 49, 0.12)', color: 'var(--danger)' })
-    expect(rules['difficulty-sprint']).toEqual({ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' })
+    expect(rules['difficulty-basic']).toEqual({ background: 'rgba(var(--success-rgb), 0.15)', color: 'var(--success)' })
+    expect(rules['difficulty-medium']).toEqual({ background: 'rgba(var(--warning-rgb), 0.15)', color: 'var(--warning)' })
+    expect(rules['difficulty-advanced']).toEqual({ background: 'rgba(var(--danger-rgb), 0.12)', color: 'var(--danger)' })
+    // 冲刺标签原用鲜艳紫 #a855f7，在 Claude 的低饱和纸质基调下过于跳脱，改为 chart-2 同色系的淡紫
+    expect(rules['difficulty-sprint']).toEqual({ background: 'rgba(156, 135, 245, 0.18)', color: '#7c6bc9' })
   })
 })
 

@@ -45,7 +45,7 @@ defineProps({
 .ef-scenario { display: flex; align-items: flex-start; gap: var(--spacer-8); margin-bottom: var(--spacer-12); }
 .ef-badge {
   flex-shrink: 0; font-size: var(--fs-xs); font-weight: 700;
-  background: rgba(240, 140, 0, 0.15); color: var(--warning);
+  background: rgba(var(--warning-rgb), 0.15); color: var(--warning);
   padding: 2px 10px; border-radius: var(--radius-full);
 }
 .ef-scenario-text { flex: 1; font-weight: 600; }
@@ -55,8 +55,8 @@ defineProps({
   flex: 1; border-radius: var(--radius-md); padding: var(--spacer-12);
   font-size: var(--fs-base);
 }
-.ef-wrong { background: rgba(224, 49, 49, 0.06); border: 1px solid rgba(224, 49, 49, 0.25); }
-.ef-right { background: rgba(47, 158, 68, 0.06); border: 1px solid rgba(47, 158, 68, 0.25); }
+.ef-wrong { background: rgba(var(--danger-rgb), 0.06); border: 1px solid rgba(var(--danger-rgb), 0.25); }
+.ef-right { background: rgba(var(--success-rgb), 0.06); border: 1px solid rgba(var(--success-rgb), 0.25); }
 .ef-side-title { font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; }
 .ef-wrong .ef-side-title { color: var(--danger); }
 .ef-right .ef-side-title { color: var(--success); }
@@ -66,7 +66,7 @@ defineProps({
 
 .ef-tip {
   display: flex; gap: var(--spacer-8);
-  background: rgba(47, 111, 237, 0.08); border: 1px solid var(--primary);
+  background: rgba(var(--primary-rgb), 0.08); border: 1px solid var(--primary);
   border-radius: var(--radius-md); padding: var(--spacer-10) var(--spacer-12);
   font-size: var(--fs-base);
 }

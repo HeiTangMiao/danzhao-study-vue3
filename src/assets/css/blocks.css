@@ -92,9 +92,11 @@
   padding: 1px 10px;
   border-radius: var(--radius-full);
 }
-.difficulty-basic { background: rgba(47, 158, 68, 0.15); color: var(--success); }
-.difficulty-medium { background: rgba(240, 140, 0, 0.15); color: var(--warning); }
-.difficulty-advanced { background: rgba(224, 49, 49, 0.12); color: var(--danger); }
-.difficulty-sprint { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.difficulty-basic { background: rgba(var(--success-rgb), 0.15); color: var(--success); }
+.difficulty-medium { background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
+.difficulty-advanced { background: rgba(var(--danger-rgb), 0.12); color: var(--danger); }
+/* 冲刺难度：原为鲜艳紫 #a855f7，在 Claude 的低饱和纸质基调下过于跳脱，
+   改用 Claude chart-2 的淡紫以保持同一个色系语汇 */
+.difficulty-sprint { background: rgba(156, 135, 245, 0.18); color: #7c6bc9; }
 /* 暗色模式下提高冲刺难度标签对比度 */
 :root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }

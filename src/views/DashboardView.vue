@@ -264,7 +264,7 @@ onMounted(load)
   font-size: 0.9rem; margin-bottom: var(--spacer-10);
 }
 .insight-due strong { color: var(--warning); }
-.insight-clear { background: rgba(47, 158, 68, 0.1); }
+.insight-clear { background: rgba(var(--success-rgb), 0.1); }
 .insight-link {
   margin-left: auto; color: var(--primary); font-weight: 600;
   padding: 4px 12px; border: 1px solid var(--primary); border-radius: var(--radius-full);
