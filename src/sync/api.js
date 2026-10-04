@@ -5,13 +5,14 @@
  *  - 统一抛出后端 error 信息
  */
 import { useAuthStore } from '@/stores/auth'
+import { API_BASE } from './apiBase'
 
 async function request(path, { method = 'GET', body, auth = true, retry = true } = {}) {
   const authStore = useAuthStore()
   const headers = { 'Content-Type': 'application/json' }
   if (auth && authStore.accessToken) headers.Authorization = `Bearer ${authStore.accessToken}`
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined

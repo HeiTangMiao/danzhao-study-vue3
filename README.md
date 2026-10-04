@@ -203,17 +203,43 @@ npm run tauri:build   # 桌面安装包
 npm run tauri:android:build  # Android APK（需配置 Android SDK/NDK）
 ```
 
+#### ⚠️ 桌面端必须显式配置后端地址
+
+桌面端打包后前端运行在 `tauri://localhost` 下 —— **既没有 vite proxy，也没有 nginx**。
+默认的相对路径 `/api` 会被解析成 `tauri://localhost/api`，该协议下不存在后端，请求必然失败。
+
+因此 `tauri:build` 执行的是 `build:tauri`（即 `vite build --mode tauri`），
+它会加载 `.env.tauri` 注入绝对地址。
+
+**改后端地址时，以下三处必须一致，缺一处就会失败：**
+
+| 位置 | 作用 | 缺了会怎样 |
+|---|---|---|
+| `.env.tauri` 的 `VITE_API_BASE` | 决定前端把请求发往哪里 | 请求打到 `tauri://localhost/api` |
+| `src-tauri/tauri.conf.json` 的 `csp.connect-src` | 放行该域名 | **被 WebView 拦下**，控制台报 CSP violation |
+| 后端 `server/.env` 的 `ALLOWED_ORIGIN` | 放行桌面端来源 | **被 CORS 拦下**，浏览器报跨域错误 |
+
+后端的放行来源需包含 `tauri://localhost`（macOS/Linux）与 `http://tauri.localhost`（Windows）。
+
+`npm run build`（Web 构建）不受以上影响，仍使用相对路径 `/api`，由 nginx 同源反代。
+
 ---
 
 ## 🔒 安全说明
 
-- 桌面端在 `src-tauri/tauri.conf.json` 的 `app.security.csp` 中启用了 CSP（`devCsp` 为 `tauri dev` 下的宽松版本）。CSP 收紧了 `script-src` / `connect-src`；`connect-src` 保留 `ipc: http://ipc.localhost` 以保证 `invoke` 可用。**若将来要让桌面端访问外部后端域名，必须手动把它加进 `connect-src`。**
-- 后端的跨域白名单完全由环境变量 `ALLOWED_ORIGIN` 驱动（逗号分隔），代码中不含任何硬编码域名；未设置时回退到仅本地开发地址。
+- 桌面端在 `src-tauri/tauri.conf.json` 的 `app.security.csp` 中启用了 CSP（`devCsp` 为 `tauri dev` 下的宽松版本）。CSP 收紧了 `script-src` / `connect-src`；`connect-src` 保留 `ipc: http://ipc.localhost` 以保证 `invoke` 可用，并放行了桌面端需要访问的后端域名。**改动后端地址时，务必同步这里的 `connect-src`**（详见上文「本地构建」的三处一致性说明）。
+- 后端的跨域白名单完全由环境变量 `ALLOWED_ORIGIN` 驱动（逗号分隔），代码中不含任何硬编码域名；未设置时回退到仅本地开发地址。**要让桌面端访问，需把 `tauri://localhost` 加进白名单。**
+- 前端后端地址统一由 `src/sync/apiBase.js` 提供（读 `VITE_API_BASE`，缺省 `/api`），
+  `api.js` 与 `auth.js` 均从它取地址 —— 新增请求时不要再自己写 `/api`。
 - 生产环境必须设置 `JWT_SECRET`；永远不要提交 `server/.env`。
 
 ### 已知技术债（暂不处理）
 
-- `public/vendor/geogebra` 为 GeoGebra 自托管离线资源，约 **48 MB**，直接进仓库。它是可选功能（几何演练场），后续应考虑移出仓库、改为按需下载或 CDN。
+- 桌面端**依赖网络**：当前方案下桌面端指向远程后端，断网时登录与同步不可用。
+  若要完全离线，需改为 Tauri sidecar 内嵌本地后端（后端已支持 PGlite 嵌入式数据库，
+  具备该方案的可行性前提；主要障碍是 `@node-rs/argon2` 为 Rust native 模块，单文件打包需先替换为纯 JS 实现）。
+- GeoGebra 离线资源（约 48 MB）已移出仓库，改为按需拉取：`npm run geogebra`。
+  未拉取时几何演练场会自动回退官方在线 CDN，功能不丢失（仅失去离线可用性）。
 
 ---
 

@@ -8,6 +8,7 @@
     "dev": "vite",
     "prebuild": "node scripts/build-search-index.mjs",
     "build": "vite build",
+    "build:tauri": "vite build --mode tauri",
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",

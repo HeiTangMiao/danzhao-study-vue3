@@ -4,8 +4,11 @@
  * 说明：tryRefresh 用裸 fetch 而非 api 客户端，避免循环依赖。
  */
 import { defineStore } from 'pinia'
+import { API_BASE } from '@/sync/apiBase'
 
-const BASE = '/api'
+// 地址集中配置（见 src/sync/apiBase.js）。此前这里写死 '/api'，
+// 导致 Tauri 打包后请求被解析到 tauri://localhost/api 而必然失败。
+const BASE = API_BASE
 
 function post(path, body) {
   return fetch(`${BASE}${path}`, {

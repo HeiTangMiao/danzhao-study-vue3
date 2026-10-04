@@ -108,11 +108,14 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 
 - **除 `/login` 外所有路由都需要登录**（`src/router/index.js` 守卫）；`/admin` 还额外要求 `role === 'admin'`。切换完成状态 / 访问记录等操作仅在登录状态下发生。
 - Token（`access` + `refresh`）通过 `auth` Pinia store 持久化到 localStorage。`sync/api.js` 会附加 Bearer，并在 401 时自动刷新一次。
+- **API 地址统一从 `src/sync/apiBase.js` 取**（读 `VITE_API_BASE`，缺省 `/api`）——`sync/api.js` 与 `stores/auth.js` 都已改用它。**新增任何请求都不要自己写死 `/api` 相对路径。**
+  - 三种环境的行为：dev 走 vite proxy、Web 生产走 nginx 同源反代（两者都用相对路径 `/api`）；**Tauri 桌面端没有转发层**，相对路径会解析成 `tauri://localhost/api` 而必然失败，因此桌面构建走 `npm run build:tauri`，由 `.env.tauri` 注入绝对地址。
+  - ⚠️ 改后端地址时**三处必须同步**：`.env.tauri` 的 `VITE_API_BASE`、`tauri.conf.json` 的 `csp.connect-src`、后端 `ALLOWED_ORIGIN`（需含 `tauri://localhost`）。漏改的表现各不相同——分别是「请求打到错误地址」「CSP violation 被 WebView 拦下」「CORS 跨域错误」，排查时先确认这三处。
 - 后端路由：`/api/auth/*`（注册/登录/刷新/me）、`/api/sync`（一次 push+pull 调用，基于 `sync_items` 的 LWW 冲突解决）、`/api/admin/*`。密码用 Argon2id 哈希。设置 `DATABASE_URL` 时用 PostgreSQL，否则用内嵌 PGlite 文件。
 - **同步引擎原则：IndexedDB 是唯一事实来源，网络只是通道。** `src/sync/engine.js` 收集本地所有带 `updatedAt` 的行并推送，再按游标拉取变更并应用（墓碑，或按服务端时间戳覆盖）。它**只**在 `App.vue` 中被接线（手动按钮、挂载时、5 分钟间隔）——不在各个 store 中调用。
 - 后端配置由环境变量驱动：`JWT_SECRET`、`ALLOWED_ORIGIN`、`DATABASE_URL`（见 `server/.env.example`）。生产环境必须设置 `JWT_SECRET`；永远不要提交 `server/.env`。开发用兜底密钥刻意是不安全的——本地开发之外不要依赖它。
 - **跨域白名单不含硬编码域名**：`server/src/index.js` 只在 `ALLOWED_ORIGIN` 未设置时回退到「仅本地开发地址」。要放开线上域名，改环境变量，**不要**把域名写回代码。
-- **桌面端 CSP 已开启**（`src-tauri/tauri.conf.json` 的 `app.security.csp`；`tauri dev` 走同文件里的 `devCsp`）。`connect-src` 里的 `ipc: http://ipc.localhost` 是 `invoke` 的通道，**不能删**；桌面端若要访问外部后端域名，必须同步把它加进 `connect-src`。
+- **桌面端 CSP 已开启**（`src-tauri/tauri.conf.json` 的 `app.security.csp`；`tauri dev` 走同文件里的 `devCsp`）。`connect-src` 里的 `ipc: http://ipc.localhost` 是 `invoke` 的通道，**不能删**；桌面端访问外部后端域名必须同步写进 `connect-src`（当前已放行线上后端域名，与 `.env.tauri` 的 `VITE_API_BASE` 保持一致）。
   - 已放行：`style-src 'self' 'unsafe-inline'`（KaTeX 的行内 style、Mermaid 的内联 `<style>`、JSXGraph 的 SVG 属性都必须）、`img-src 'self' data: blob:`、`font-src 'self' data:`。Tauri 编译期会自动把打包内联脚本的 hash / 外部脚本 nonce 追加进 CSP，所以 `script-src 'self'` 不需要 `'unsafe-inline'`。
   - ⚠️ **未经实机验证的风险（已登记）**：`desmos` 区块（`GeoGebraPlayground.vue`）依赖 GeoGebra 的 GWT 引导脚本，它用 `eval` 且动态注入脚本，在 `script-src 'self'`（无 `'unsafe-eval'`）下**大概率加载不了**。全库只有 1 页用到（`src/content/math/03-函数与基本初等函数/03-二次函数.js`），且组件已有「无法加载 GeoGebra 计算器」降级 UI。**若确认必须保住这一页，把 `script-src` 改成 `'self' 'unsafe-eval'` 即可**（其余指令不变）。改动 CSP 后请务必跑一次 `tauri build` 并开着 WebView 控制台看有没有 violation —— CSP 违规只是 console 警告，不会弹窗。
 
