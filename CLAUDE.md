@@ -110,7 +110,8 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 - Token（`access` + `refresh`）通过 `auth` Pinia store 持久化到 localStorage。`sync/api.js` 会附加 Bearer，并在 401 时自动刷新一次。
 - **API 地址统一从 `src/sync/apiBase.js` 取**（读 `VITE_API_BASE`，缺省 `/api`）——`sync/api.js` 与 `stores/auth.js` 都已改用它。**新增任何请求都不要自己写死 `/api` 相对路径。**
   - 三种环境的行为：dev 走 vite proxy、Web 生产走 nginx 同源反代（两者都用相对路径 `/api`）；**Tauri 桌面端没有转发层**，相对路径会解析成 `tauri://localhost/api` 而必然失败，因此桌面构建走 `npm run build:tauri`，由 `.env.tauri` 注入绝对地址。
-  - ⚠️ 改后端地址时**三处必须同步**：`.env.tauri` 的 `VITE_API_BASE`、`tauri.conf.json` 的 `csp.connect-src`、后端 `ALLOWED_ORIGIN`（需含 `tauri://localhost`）。漏改的表现各不相同——分别是「请求打到错误地址」「CSP violation 被 WebView 拦下」「CORS 跨域错误」，排查时先确认这三处。
+  - ⚠️ 改后端地址时**三处必须同步**：`.env.tauri` 的 `VITE_API_BASE`、`tauri.conf.json` 的 `csp.connect-src`、后端 `ALLOWED_ORIGIN`。漏改的表现各不相同——分别是「请求打到错误地址」「CSP violation 被 WebView 拦下」「CORS 跨域错误」，排查时先确认这三处。
+  - **后端 CORS 需要放行 Tauri 的三种可能 origin**（平台不同 origin 不同，漏配则客户端被 CORS 拒绝）：`tauri://localhost`（macOS/Linux/iOS）、`http://tauri.localhost`（Windows/Android）、`https://tauri.localhost`（Win/Android 启用 `useHttpsScheme` 后）。三种都建议配 —— `http://tauri.localhost` 不是 secure context，Tauri 正在推动切 https，只配前者未来会失效。
 - 后端路由：`/api/auth/*`（注册/登录/刷新/me）、`/api/sync`（一次 push+pull 调用，基于 `sync_items` 的 LWW 冲突解决）、`/api/admin/*`。密码用 Argon2id 哈希。设置 `DATABASE_URL` 时用 PostgreSQL，否则用内嵌 PGlite 文件。
 - **同步引擎原则：IndexedDB 是唯一事实来源，网络只是通道。** `src/sync/engine.js` 收集本地所有带 `updatedAt` 的行并推送，再按游标拉取变更并应用（墓碑，或按服务端时间戳覆盖）。它**只**在 `App.vue` 中被接线（手动按钮、挂载时、5 分钟间隔）——不在各个 store 中调用。
 - 后端配置由环境变量驱动：`JWT_SECRET`、`ALLOWED_ORIGIN`、`DATABASE_URL`（见 `server/.env.example`）。生产环境必须设置 `JWT_SECRET`；永远不要提交 `server/.env`。开发用兜底密钥刻意是不安全的——本地开发之外不要依赖它。

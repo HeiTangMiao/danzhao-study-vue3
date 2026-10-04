@@ -219,7 +219,16 @@ npm run tauri:android:build  # Android APK（需配置 Android SDK/NDK）
 | `src-tauri/tauri.conf.json` 的 `csp.connect-src` | 放行该域名 | **被 WebView 拦下**，控制台报 CSP violation |
 | 后端 `server/.env` 的 `ALLOWED_ORIGIN` | 放行桌面端来源 | **被 CORS 拦下**，浏览器报跨域错误 |
 
-后端的放行来源需包含 `tauri://localhost`（macOS/Linux）与 `http://tauri.localhost`（Windows）。
+后端的放行来源需包含 Tauri 的**三种可能 origin**（客户端平台不同则 origin 不同）：
+
+| origin | 适用平台 |
+|---|---|
+| `tauri://localhost` | macOS / Linux / **iOS** |
+| `http://tauri.localhost` | Windows / **Android** |
+| `https://tauri.localhost` | Windows / Android（启用 `useHttpsScheme` 后） |
+
+三种都建议配置：`http://tauri.localhost` 并非 secure context，Tauri 正在推动切换到
+`https://tauri.localhost`，只配前者会在未来启用时立刻失效。
 
 `npm run build`（Web 构建）不受以上影响，仍使用相对路径 `/api`，由 nginx 同源反代。
 
