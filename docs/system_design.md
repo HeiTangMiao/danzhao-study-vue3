@@ -1,6 +1,8 @@
 # 移动端体验大改造 · 系统设计 v1
 
-> 状态：**v1.3（架构师并入学习页 v4 + 手势翻页技术可行性，2026-10-07）**。
+> 状态：**v1.4（并入两条已拍板决策：翻页并行档 + 进度条双端策略，2026-10-07）**。
+> **v1.4 本轮变更**：①**翻页时长定为并行档**——出场启动后 120ms 入场（总时长 400ms；与 team-lead 给出的"约 380ms"差 20ms，口径差异已在 §5.7.6 标注待实测定档），`--swipe-out/in/overlap` 三 token 落地 `reader.css`；并在 **§5.3 新增「两档转场时长」对照表**，明确 R2 的 ≤300ms **只约束路由级转场（P3-T2、不放宽）**，内容换页属另一档（P4-T5），两者不冲突（§11-16 关闭）；②**进度条双端策略定死**——移动端只留页眉 2px 分段刻度、删除 `.reading-progress`（不挂载），桌面端保留（§5.6.1 / §5.6.3 / §5.7.0-3，P4-T4 注明按断点拆渲染分支；§11-20 关闭）。
+> v1.3 记录：**新增 §5.7 学习页 v4**（页眉/页脚可插拔功能条 + 滑动翻页转场），回答六个技术问题：手势实现选型（自写 Pointer Events，**不引库**）、边缘右滑返回与内容右滑翻页的判定规则（起手 x 阈值 24px）、View Transitions **不适用于**本场景（改手动三态机）、backdrop root 解耦写法（并列 + 玻璃条恒常）、性能/降级/`prefetchPage` 时机；并入 D15/D16；更新 §5.2 分层与 §5.3 两条硬规则；§10 更新 P4-T4、新增 P4-T5；§11 新增 16-20。
 > 本轮变更：①**新增 §5.7 学习页 v4**（页眉/页脚可插拔功能条 + 滑动翻页转场），回答六个技术问题：手势实现选型（自写 Pointer Events，**不引库**）、边缘右滑返回与内容右滑翻页的判定规则（起手 x 阈值 24px）、View Transitions **不适用于**本场景（改手动三态机）、backdrop root 解耦写法（并列 + 玻璃条恒常）、性能/降级/`prefetchPage` 时机；②并入 **D15/D16**；③更新 §5.2 动效分层（新增「内容换页层」）、§5.3 新增路由级转场不得用 transform 的硬规则；④§10 更新 P4-T4、新增 **P4-T5**；⑤§11 新增 16-20。
 > v1.2 记录：①并入 **D11-D14**（练习自评强制 / 自动组卷 / 署名块 / 克制+关键处加强）与 **v2 风格细则**（玻璃 30-42% + 内侧高光、TabBar 液态悬浮 pill、陶土橙加至 ~6 处）；②新增 §5.6 学习页视觉改进（玻璃迷你顶栏可行性、区块差异化最小改动路径、进度条统一）；③**正确性体检**（§12）：修正「147 页」→ **139 页**（147 = 139 数据页 + 3 site.js + 5 基建文件）等多处数字/表述；④§13 给出 `docs/csp-guard-plan.md` 处置结论。
 > v1.1 记录：复核结论「无失真」；更正 geogebra「已无 src 引用」不实；精化 §5.1 WebKit bug 触发条件；补 §2 `/practice` 路由；补全 §9 / §10。
@@ -251,6 +253,14 @@
 - `will-change` 生命周期：进入前加、`animationend` 后移除
 - 三层降级：`prefers-reduced-motion`（已有）→ 能力分级（hardwareConcurrency/deviceMemory 或首帧 FPS 采样）→ 低端机仅 opacity 或全关
 - 验收：低端安卓真机 + `chrome://inspect` Performance 面板必测
+- **⚠️ 转场时长有两档口径，禁止混用（2026-10-07 已定）** —— 见下表
+
+| 档 | 适用范围 | 时长约束 | 落地位置 |
+| --- | --- | --- | --- |
+| **路由级转场** | P3-T2，接在 `router-view` 上，跨路由记录（Tab 切换、进/出详情页） | **≤ 300ms**（R2 验收项，**不因内容换页放宽**） | `src/utils/viewTransition.js` + `App.vue` |
+| **内容换页** | P4-T5，`UnitView` 内部三态机，同路由记录的 `fileIndex` 变化 | **并行档：出启动后 120ms 入场，总时长 = 120+280 = 400ms**（口径差异见 §5.7.6，380 与 400 差 20ms，真机定档） | `useSwipePaging.js` + `reader.css` 的 `--swipe-out/in/overlap` |
+
+- 上表两档是**不同层级**：路由级转场在内容换页时**根本不会被触发**（§5.7.3），因此内容换页的 400ms **不违反** R2。真机实测后若内容换页仍偏钝，**只调 `--swipe-*`，不动 R2 的 300ms**
 - **⚠️ 硬规则（v4 新增，跨阶段生效）**：**路由级转场（P3-T2）不得对 `router-view` 包裹元素做 `transform`**。该包裹元素是 `AppTabBar` / 学习页页眉 / 页脚三条 `position: fixed` 玻璃层的祖先，一旦带 `transform` 会同时破坏 backdrop root（玻璃静默失效）与固定定位（§5.1）。路由级转场**只用 `opacity`**；需要位移感的场合用 View Transitions 或把位移放到页面内部元素上
 - **⚠️ 硬规则（v4 新增）**：任何被动画（transform/opacity/`will-change`）的容器内**不得**放 `backdrop-filter` 玻璃层；玻璃层必须是被动画元素的**兄弟**而非后代（§5.7.4）
 
@@ -278,6 +288,8 @@
 
 **职责承载（TabBar 在阅读页隐藏时）**：返回首页（现有 `.topbar-back`，`UnitView.vue:21`）+ 页面标题（`.topbar-title`）+ 阅读进度（`.topbar-progress`）——三者现成，缺的是**目录/书签/笔记**入口（移动端已收进 ContentSidebar 底栏，不重复放顶栏）。
 
+**⚠️ 进度承载按已定双端策略执行（见 §5.6.3 / §5.7.0 第 3 条）**：v4 顶栏的进度区——**移动端只放「2px 分段刻度 + 页码数字」**（单元内第几页），**不再放页内滚动进度**（`.topbar-progress` 的百分比在移动端移除）；**桌面端保留**页内滚动进度。即：移动端顶部只出现**一条**进度指示。
+
 **v2 改造点**：半透明降到 30-42% + 内侧高光边 + 圆角（改为**悬浮胶囊**，与底部 pill 呼应：顶栏也可做成 28px 圆角的悬浮条，`top: calc(var(--space-3) + var(--sat))`）+ 陶土橙用于进度数字。
 
 **`backdrop-filter` 在滚动时的表现与降级（⚠️ 必须实测）**：
@@ -303,11 +315,16 @@
 
 #### 5.6.3 阅读进度条与 v2 统一
 
-**现状**：`UnitView.vue:465-473` —— `.reading-progress` 固定顶部 `height: 3px`；`.reading-progress__bar` 用 `linear-gradient(90deg, var(--primary), var(--accent))`（`--primary` 已是陶土橙 `brand-500`，见 `main.css:76`）。**已基本符合 v2**，只需三点：
+> **✅ 双端策略已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：
+> - **移动端（< 900px）只留分段条**——v4 页眉内底边的 2px 分段刻度（"单元内第几页"）；`.reading-progress` 滚动进度线**删除**（不挂载，非仅隐藏）。理由：同屏两个进度指示读数冲突，且移动端的"第几页"比"页内滚动百分比"更有位置感
+> - **桌面端（≥ 900px）保留 `.reading-progress`**（页内滚动进度），分段条同时显示
+> - 完整口径见 §5.7.0 第 3 条；`UnitView` 的渲染分支要求见 **P4-T4**
 
-1. 与悬浮顶栏**合并承载**：进度条移到顶栏内/紧贴顶栏底部，避免顶部出现两条横线；`z-index` 需高于顶栏玻璃层（现 `.reading-progress` 为 100、`.mobile-topbar` 为 99 → 已正确）
+**现状**：`UnitView.vue:465-473` —— `.reading-progress` 固定顶部 `height: 3px`；`.reading-progress__bar` 用 `linear-gradient(90deg, var(--primary), var(--accent))`（`--primary` 已是陶土橙 `brand-500`，见 `main.css:76`）。**已基本符合 v2**，只需三点（**第 1 点按上表分端**）：
+
+1. 与悬浮顶栏**合并承载**：进度条移到顶栏内/紧贴顶栏底部，避免顶部出现两条横线；`z-index` 需高于顶栏玻璃层（现 `.reading-progress` 为 100、`.mobile-topbar` 为 99 → 已正确）。⚠️ **仅桌面端需要这条**（移动端该元素不渲染）；移动端的位置感由页眉的 2px 分段条承担
 2. 圆角与 token 化：进度条端点圆角 `var(--radius-full)`，颜色走 `--primary → --accent`（已是陶土橙系，属 v2 的 6 处橙之一）
-3. 动效统一：进度条宽度过渡**只动 `width` 会触发布局** → 改为 `transform: scaleX()` + `transform-origin: left`（§5.3「只动 transform/opacity」）；`prefers-reduced-motion` 下直接跳变
+3. 动效统一：进度条宽度过渡**只动 `width` 会触发布局** → 改为 `transform: scaleX()` + `transform-origin: left`（§5.3「只动 transform/opacity」）；`prefers-reduced-motion` 下直接跳变。⚠️ 移动端不渲染该元素后，`updateReadProgress()` 里的进度计算也应跳过（否则白算一遍）
 
 ---
 
@@ -328,7 +345,7 @@
 
 1. **"不加投影"与 §5.1 的 `.glass` 默认冲突** → 页眉用 `.glass--flat` 变体：只保留 `inset 0 1px 0 var(--glass-hl)`，去掉外投影（`--glass-shadow`）。页脚是否加投影由 PM 定，技术侧建议**也不加**（底部已有系统导航栏/手势区，加投影会与系统视觉打架）
 2. **分段进度的"段数自适应"实现口径**：段数 `segs = min(unit.files.length, 12)`；超过 12 页时每段代表 `ceil(n / 12)` 页（保证每段视觉宽度 ≥8px 可辨）。用 `display:flex` + `flex:1` 的 `<i>`，当前段 `--primary`、已完成段 `--primary` 40% 透明、未完成段 `--line`。**放在页眉内底边**（`position:absolute; bottom:0; height:2px`），不另起 fixed 元素 → 少一个层叠上下文，也避免与页眉玻璃层的叠放顺序问题
-3. **分段进度与现有 `.reading-progress` 语义不同**（`UnitView.vue:465-473` 是**页内滚动**进度，分段条是**单元内第几页**）→ 建议移动端只保留分段条（页级位置感），删掉页内滚动进度条；桌面端保留滚动进度条。**待 PM 确认**（§11-20）
+3. **两条进度条的双端策略 —— ✅ 已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：`UnitView.vue:465-473` 的 `.reading-progress` 是**页内滚动**进度，v4 页眉的 2px 分段条是**单元内第几页**；语义不同，**同屏并存会读数冲突**（PM 从产品侧独立得出同一结论）。已定口径：**移动端（< 900px，§4.3 断点）只显示分段条，`.reading-progress` 删除（不挂载，不是仅 `display:none`）；桌面端（≥ 900px）分段条与 `.reading-progress` 同时保留**（长文页内定位仍有价值）。实施要求已写入 **P4-T4**：`UnitView` 需按断点拆出两条进度条各自的渲染分支，移动端**不挂载** `.reading-progress`（避免它继续参与滚动监听与 `scaleX` 计算）。另见 §5.6.1 / §5.6.3
 4. **`[返回]` 按钮是唯一可靠的返回通道**（见 5.7.2），必须常驻且触控区 ≥44×44
 
 #### 5.7.1 手势实现方案（Q1 结论）：**原生 Pointer Events + `touch-action: pan-y` + 自写方向锁，不引库**
@@ -470,9 +487,25 @@ idle ──(手势判定成功)──> leaving(260ms) ──(路由已确认 且
 
 **⚠️ 页脚与 Android 底部系统手势区**：底部 home / quick-switch 手势位于屏幕底部，**应用不可申索**（与返回手势不同）。52px 页脚若 `position: fixed` 贴底会与之重叠 → 建议 `padding-bottom: max(var(--sab), var(--sys-gesture-bottom, 24px))`；`--sys-gesture-bottom` 由 P5-T3 真机实测定值（Android 的 `WindowInsets.getMandatorySystemGestureInsets()` 能否经 Tauri 拿到**待确认**，拿不到就用保守值 24px）。同时：**不要把唯一的主行动按钮放在最底部 24px 内**。
 
-#### 5.7.6 时序冲突提醒（需拍板，见 §11-16）
+#### 5.7.6 翻页时长 —— ✅ 已定：并行档（出场后 120ms 入场，2026-10-07 用户拍板）
 
-用户定值的 **260 + 280 = 540ms 串行**，与 R2「转场 ≤300ms」冲突（R2 原指路由转场，但用户体感是连着的）。技术侧建议：**默认并行档**——出动画启动后 **120ms** 启动入动画，总时长约 **380ms**；串行档保留为可调。两个时长都写成 token（`--swipe-out` / `--swipe-in` / `--swipe-overlap`），真机实测后定。
+**结论**：采用并行档 —— **出场动画启动后 120ms 入场**（原串行 260+280 = 540ms 作废）。三个时长全部 token 化，写在 `src/assets/css/reader.css`：
+
+```css
+:root {
+  --swipe-out: 260ms;      /* 旧页出场 */
+  --swipe-in: 280ms;       /* 新页入场 */
+  --swipe-overlap: 120ms;  /* 入场相对出场的延迟（>0 即并行） */
+}
+```
+
+**⚠️ 算术口径（请确认，差 20ms）**：按上面三个值，**总时长 = `--swipe-overlap` + `--swipe-in` = 120 + 280 = 400ms**，不是 380ms。若要落在"总 380ms"，则 `--swipe-overlap` 应取 **100ms**。文档默认按 team-lead 明确给出的 **120ms** 延迟落地，真机实测时与 380/400 一并定档；**两者只差 20ms，不影响任何实现结构**，仅需在实测后确认一个数字。串行档（把 `--swipe-overlap` 设为等于 `--swipe-out`）保留为可调，不删。
+
+**⚠️ 与 R2「转场 ≤300ms」不冲突（两条口径，禁止混用）**：
+
+- **R2 的 ≤300ms = 路由级转场**（P3-T2，接在 `router-view` 上，跨路由记录），该约束**继续有效、不放宽**
+- **内容换页（并行档，总时长 400ms）是另一档**（P4-T5，`UnitView` 内部三态机，同路由记录的 `fileIndex` 变化）；路由级转场在内容换页时**根本不会被触发**（§5.7.3），两者不在同一条时间线上
+- 适用范围对照表见 **§5.3**，两处表述必须一致
 
 ---
 
@@ -481,7 +514,7 @@ idle ──(手势判定成功)──> leaving(260ms) ──(路由已确认 且
 | ID | 需求              | 优先级   | 验收要点                                                 |
 | -- | --------------- | ----- | ---------------------------------------------------- |
 | R1 | 底部 Tab Bar 一级导航 | P0    | 4 Tab 触控 ≥44×44；内容页自动隐藏；任意一级页 1 次点击可达其余 3 个          |
-| R2 | 路由转场 + 返回手势     | P0    | ≤300ms 转场；边缘右滑返回；reduced-motion 兜底                   |
+| R2 | 路由转场 + 返回手势     | P0    | ≤300ms 转场（**仅指路由级转场**，P3-T2，不放宽；内容换页约 400ms 是另一档，见 §5.3 两档对照表）；边缘右滑返回（§5.7.2：边缘交系统，页眉返回按钮为唯一可靠通道）；reduced-motion 兜底                   |
 | R3 | 去 Web 味         | P0    | 删 960px 居中 / 面包屑 / 页脚 nav+版权 / 站点 header；有转场；触控原生反馈  |
 | R4 | 页面级布局自由度        | P0    | ≥3 种 layout 模板落真实页面；同数据不同排布；缺省回退 reading             |
 | R5 | 内容差异化（三轴）       | P0-P1 | 题型（例题渐进/练习专注/错题对比）、学科（三科调性）、层次节奏（≥2 级视觉层次）           |
@@ -798,8 +831,8 @@ sequenceDiagram
 | P4-T1 layout 落地 ≥3 页 | `src/content/` 高价值页改用 layout 原语（导航 hero、重点页定制布局）；schema 不变 | P0 | — |
 | P4-T2 三轴差异化 + 骨架屏（R9） | 新增 `src/components/SkeletonBlock.vue`；改 `src/views/UnitView.vue`（加载骨架）；区块 tone/variant 扩展（schema + 对应 block 组件） | P0、P2 | — |
 | P4-T3 区块差异化（data-kind，见 §5.6.2） | 改 `src/views/UnitView.vue`（`.block-anchor` 加 `data-kind`）；改 `src/components/blocks/blockTypes.js`（新增 `kind` 字段：概念/要点/例题/练习/小结 五类映射）；改 `src/assets/css/blocks.css`（`[data-kind=...]` 差异化）；扩展 `tests/block-registry.test.js` 守卫 | P0-T1（建议与 `iconOf` 契约变更同批，避免两次改同一张表） | ✅ 与 T4/T5 |
-| **P4-T4 学习页 v4 功能条（取代原「迷你顶栏 v2」，见 §5.7.0）** | 新增 `src/components/reader/ReaderTopbar.vue`（~44px 玻璃 `.glass--flat` 不加投影；`[返回][标题][页码] + 右侧插槽`；2px 分段进度 `segs = min(n,12)`）；新增 `src/components/reader/ReaderFooter.vue`（~52px；`[主行动] + 次级图标插槽 ×N`；底部 `max(--sab, --sys-gesture-bottom, 24px)` 留白）；新增 `src/assets/css/reader.css`；改 `src/views/UnitView.vue`（拆出两条功能条、移动端去掉旧 `page-header`/`page-nav` 呈现、桌面端保留）；改 `src/assets/css/main.css`（新增 `.glass--flat` 变体 + `--sys-gesture-bottom`）。⚠️ §5.6.1 的「滚动 >200px 才出现」改为**常驻**，须按 §5.1 处理首帧「玻璃 + 内联 SVG」 | P2-T3（玻璃 token 先落地） | ✅ 与 T3 |
-| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext` + 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`、`--swipe-out/in/overlap` token、中/低档与 `prefers-reduced-motion` 降级）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
+| **P4-T4 学习页 v4 功能条（取代原「迷你顶栏 v2」，见 §5.7.0）** | 新增 `src/components/reader/ReaderTopbar.vue`（~44px 玻璃 `.glass--flat` 不加投影；`[返回][标题][页码] + 右侧插槽`；2px 分段进度 `segs = min(n,12)`）；新增 `src/components/reader/ReaderFooter.vue`（~52px；`[主行动] + 次级图标插槽 ×N`；底部 `max(--sab, --sys-gesture-bottom, 24px)` 留白）；新增 `src/assets/css/reader.css`；改 `src/views/UnitView.vue`（拆出两条功能条、移动端去掉旧 `page-header`/`page-nav` 呈现、桌面端保留）；改 `src/assets/css/main.css`（新增 `.glass--flat` 变体 + `--sys-gesture-bottom`）。**⚠️ 进度条按断点拆两条渲染分支**（已定，§5.6.3）：移动端（<900px）**不挂载** `.reading-progress` 并跳过 `updateReadProgress()` 的进度计算，只渲染页眉 2px 分段条 + 页码数字；桌面端（≥900px）保留 `.reading-progress` 并改为 `scaleX`。⚠️ §5.6.1 的「滚动 >200px 才出现」改为**常驻**，须按 §5.1 处理首帧「玻璃 + 内联 SVG」 | P2-T3（玻璃 token 先落地） | ✅ 与 T3 |
+| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext` + 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 120ms` 三 token，**并行档：入场延迟 = `--swipe-overlap`**，总时长 = 120+280 = 400ms；380/400 的 20ms 口径差异见 §5.7.6；中/低档与 `prefers-reduced-motion` 降级）。⚠️ 这三个 token **只管内容换页**，路由级转场仍受 R2 ≤300ms 约束（§5.3 两档口径表）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
 
 ### P5 Android 打包（依赖 P1-P3 + 工具链）
 
@@ -837,11 +870,12 @@ sequenceDiagram
 13. ⬜ `docs/csp-guard-plan.md`（411 行）：**架构师结论 = 保留不删**，并入本文档 §13（L1-L5 仍有效，D10 下线后 L4 归零）；已失效段落（演练场相关）列出待更新项；落地任务见 **P1-T5**。最终归档/更新由 team-lead 决定（**未删文件**）
 14. ⬜ v2 风格参数**尚未真机验证**：玻璃 30-42% 不透明度、液态 pill 的 `backdrop-filter` 在滚动时的表现、圆角玻璃在 WebKit 的锯齿——三项均列为 **P5-T3 真机验证必测项**（低端安卓机优先）
 15. ⬜ 学习页「区块差异化」的**语义映射表**（22 个 `type` → 5 类 `kind`）需 PM 与架构师共同定稿；技术侧已给最小改动路径（§5.6.2 的 `data-kind`），不阻塞 P0-P2
-16. ⬜ **v4 翻页时长待拍板**：用户定值 260+280 = **540ms 串行**，与 R2「转场 ≤300ms」冲突（R2 原指路由转场，体感相连）。架构师建议默认**并行档**（出启动后 120ms 入，总 ~380ms），两者都写成 token 由真机定。→ 需用户/PM 拍板
+16. ✅ **v4 翻页时长已定（2026-10-07 用户拍板）**：采用**并行档**——出场启动后 **120ms** 入场（原串行 540ms 作废）；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 120ms` 三 token 落地在 `reader.css`，最终值由 P5-T3 低端安卓真机实测定。⚠️ 算术口径：按此三值总时长 = **400ms**（120+280），与 team-lead 给出的"约 380ms"差 20ms（380 对应 `--swipe-overlap: 100ms`）——**不影响实现结构**，实测时定一个数字即可（见 §5.7.6）。**与 R2「≤300ms」不冲突**：R2 约束的是**路由级转场**（P3-T2，≤300ms，**不放宽**），内容换页是另一档（P4-T5，同路由 `fileIndex` 变化，路由级转场在此不触发）。两档口径对照表已写入 §5.3，§5.7.6 同步标注 —— 本条**关闭**
 17. ⬜ **Tauri Android 的系统手势能力待确认**：能否申索边缘区域（`View.setSystemGestureExclusionRects()`，Android 10/API 29）、能否读到 `WindowInsets.getMandatorySystemGestureInsets()`。**当前设计不依赖这两项**（边缘完全交系统、页脚用保守 24px 留白），故不阻塞 P4；若将来要做"应用内边缘返回"则需写 Kotlin 插件
 18. ⬜ **翻页路由用 `push` 还是 `replace`**：暂定 `push`（返回键 = 上一页，符合 Android 心智），代价是历史条目累积（单元内连翻需多次返回才能离开）。是否改为 `replace` 或"跨单元时 replace"待定
 19. ⬜ **系统 WebView 版本与 View Transitions 可用性：待实测**（Tauri Android 用系统 WebView，VT 需 Chromium 111+）。**不阻塞**：§5.7.3 已定主方案不依赖 VT
-20. ⬜ **两种进度条的语义取舍待 PM 确认**：`UnitView.vue:465-473` 的页内滚动进度 vs v4 页眉的 2px 分段进度（单元内第几页）。架构师建议移动端只留分段条、删滚动进度条，桌面端保留（见 §5.7.0 第 3 条）。另：PM 的 `docs/prd-mobile.md` §7 落盘后需与 §5.7 逐条对齐（尤其"段数自适应"与"页脚主行动是什么"）
+20. ✅ **两种进度条已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：**移动端只留 v4 页眉的 2px 分段刻度**（"单元内第几页"），**删除** `.reading-progress` 滚动进度线（不挂载，非仅隐藏）；**桌面端保留** `.reading-progress`。理由：同屏两个进度指示读数冲突。已写入 §5.6.1 / §5.6.3 / §5.7.0 第 3 条，实施分支要求见 **P4-T4** —— 本条**关闭**。
+    ⬜ **仍遗留**：PM 的 `docs/prd-mobile.md` §7 落盘后需与 §5.7 逐条对齐 —— 主要剩两项：①"段数自适应"的口径（技术侧给的是 `segs = min(n, 12)`，超过 12 页时每段代表 `ceil(n/12)` 页）②"页脚主行动按钮是什么"（决定 `[主行动] + 次级图标插槽 ×N` 的插槽内容）
 
 ---
 
@@ -909,3 +943,4 @@ sequenceDiagram
 *v1.1 复核补全：架构师（高见远），2026-10-07 —— 复核忠实性、更正 geogebra 事实、补 §9 classDiagram/sequenceDiagram、§10 任务分解、§11 新增 9-12。*
 *v1.2 并入新决策与体检：架构师（高见远），2026-10-07 —— 并入 D11-D14 与 v2 风格（§5.1/§4.1）、新增 §5.6 学习页改进、§12 正确性体检（修正 147→139 等 2 处错误）、§13 CSP 护栏处置结论、§10 新增 P1-T5/P2-T5/P4-T3/P4-T4/P6。*
 *v1.3 学习页 v4 与手势翻页：架构师（高见远），2026-10-07 —— 新增 §5.7（手势选型/边缘手势判定规则/View Transitions 不适用/backdrop root 并列解耦/性能与预取）、并入 D15-D16、更新 §5.2 分层与 §5.3 两条硬规则、§10 改 P4-T4 并新增 P4-T5、§11 新增 16-20。**只改本文档，未开工写代码。***
+*v1.4 两条决策落定：架构师（高见远），2026-10-07 —— 翻页改并行档（出 260ms、延迟 120ms 入场、入 280ms）+ §5.3 两档转场时长对照表（R2 ≤300ms 仅约束路由级转场，不放宽）；进度条双端策略（移动端只分段条、删滚动条，桌面端保留）写入 §5.6.1/§5.6.3/§5.7.0 与 P4-T4；关闭 §11-16 与 §11-20。**只改本文档，未开工写代码。***
