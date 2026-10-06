@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "单招学习打卡",
         "width": 1080,
         "height": 720,
