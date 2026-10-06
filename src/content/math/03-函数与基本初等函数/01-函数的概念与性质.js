@@ -72,8 +72,7 @@ export default {
       type: "diagram",
       title: "单调性图像演示",
       boardId: "monotonic-func",
-      caption: "蓝色为 y = x²（在 (-∞,0) 递减、(0,+∞) 递增），橙色为 y = x³（在 R 上单调递增）。",
-      initCode: "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nboard.create('functiongraph', [function(x){ return x*x; }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('functiongraph', [function(x){ return x*x*x; }, -6, 6], {strokeColor: colors.accent, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, 'y = x²（蓝）在 (-∞,0) 递减、(0,+∞) 递增'], {fontSize:13, color: colors.text});\nboard.create('text', [-5.6, 3.5, 'y = x³（橙）在 R 上单调递增'], {fontSize:13, color: colors.muted});"
+      caption: "蓝色为 y = x²（在 (-∞,0) 递减、(0,+∞) 递增），橙色为 y = x³（在 R 上单调递增）。"
     },
 
     {

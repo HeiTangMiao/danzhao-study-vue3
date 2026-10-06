@@ -44,8 +44,7 @@ export default {
       boardId: "trig-func",
       caption: "蓝色为 y = sin x，橙色为 y = cos x，二者周期均为 2π，值域为 [-1,1]。",
       boundingbox: [-6.5, 2, 6.5, -2],
-      height: 280,
-      initCode: "board.create('segment', [[-6.5,0],[6.5,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-2],[0,2]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [6.3,-0.3, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.2,1.9, 'y'], {fontSize:14, color: colors.muted});\nboard.create('functiongraph', [function(x){ return Math.sin(x); }, -6.5, 6.5], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('functiongraph', [function(x){ return Math.cos(x); }, -6.5, 6.5], {strokeColor: colors.accent, strokeWidth:2});\nboard.create('text', [-6.3, 1.8, 'y = sin x（蓝）'], {fontSize:13, color: colors.text});\nboard.create('text', [-6.3, 1.5, 'y = cos x（橙）'], {fontSize:13, color: colors.muted});"
+      height: 280
     },
 
     {

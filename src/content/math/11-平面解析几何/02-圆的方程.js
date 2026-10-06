@@ -21,8 +21,7 @@ export default {
       type: "diagram",
       title: "圆的标准方程演示",
       boardId: "circle-standard",
-      caption: "拖动圆心 C 或半径控制点 P，实时显示圆的标准方程。",
-      initCode: "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst C = board.create('point', [0,0], {name:'C', size:2, color: colors.accent});\nconst P = board.create('point', [2,0], {name:'P', size:2, color: colors.primary});\nboard.create('circle', [C, P], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('segment', [C, P], {strokeColor: colors.accent, strokeWidth:1, dash:2});\nboard.create('text', [-5.8, 3.6, function(){\n  const a = Math.round(C.X()*100)/100, b = Math.round(C.Y()*100)/100;\n  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;\n  const sa = a >= 0 ? '-' : '+', sb = b >= 0 ? '-' : '+';\n  return '(x' + sa + Math.abs(a) + ')² + (y' + sb + Math.abs(b) + ')² = ' + Math.round(r*r*100)/100;\n}], {fontSize:14, color: colors.text});\nboard.create('text', [-5.8, 3.0, function(){\n  const r = Math.round(Math.hypot(P.X()-C.X(), P.Y()-C.Y())*100)/100;\n  return '圆心 (' + Math.round(C.X()*100)/100 + ', ' + Math.round(C.Y()*100)/100 + ')，半径 r = ' + r;\n}], {fontSize:13, color: colors.muted});"
+      caption: "拖动圆心 C 或半径控制点 P，实时显示圆的标准方程。"
     },
 
     {

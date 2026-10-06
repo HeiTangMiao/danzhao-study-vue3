@@ -37,16 +37,14 @@ export default {
       type: "diagram",
       title: "棱柱结构演示（三棱柱）",
       boardId: "solid-prism",
-      caption: "两底面平行且全等（三角形），侧棱平行且相等，侧面为平行四边形。",
-      initCode: "const back = board.create('polygon', [[1.2,1.2],[5.2,1.2],[3.2,3.7]], {fillColor: colors.accent, fillOpacity:0.08, borders:{strokeColor: colors.muted, strokeWidth:1.5, dash:2}});\nboard.create('segment', [[0,0],[1.2,1.2]], {strokeColor: colors.text, strokeWidth:1.5, dash:1});\nboard.create('segment', [[4,0],[5.2,1.2]], {strokeColor: colors.text, strokeWidth:1.5, dash:1});\nboard.create('segment', [[2,2.5],[3.2,3.7]], {strokeColor: colors.text, strokeWidth:1.5, dash:1});\nconst front = board.create('polygon', [[0,0],[4,0],[2,2.5]], {fillColor: colors.primary, fillOpacity:0.15, borders:{strokeColor: colors.primary, strokeWidth:2}});\nboard.create('text', [2, -0.8, '底面（三角形）'], {fontSize:13, color: colors.muted});\nboard.create('text', [3.4, 4.2, '顶面（全等三角形）'], {fontSize:13, color: colors.muted});\nboard.create('text', [5.6, 0.6, '侧棱平行且相等'], {fontSize:13, color: colors.muted});"
+      caption: "两底面平行且全等（三角形），侧棱平行且相等，侧面为平行四边形。"
     },
 
     {
       type: "diagram",
       title: "棱锥结构演示（四棱锥）",
       boardId: "solid-pyramid",
-      caption: "底面是多边形，各侧面为三角形，所有侧棱交于顶点 S。",
-      initCode: "const base = board.create('polygon', [[-2.5,-1.2],[2.5,-1.2],[2,1.2],[-2,1.2]], {fillColor: colors.primary, fillOpacity:0.15, borders:{strokeColor: colors.primary, strokeWidth:2}});\nconst S = board.create('point', [0,3.4], {name:'S', size:2, color: colors.accent});\nboard.create('segment', [S, [-2.5,-1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [S, [2.5,-1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [S, [2,1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [S, [-2,1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('text', [0, 3.9, '顶点 S'], {fontSize:13, color: colors.accent});\nboard.create('text', [0, -1.8, '底面（四边形）'], {fontSize:13, color: colors.muted});"
+      caption: "底面是多边形，各侧面为三角形，所有侧棱交于顶点 S。"
     },
 
     {
@@ -61,8 +59,7 @@ export default {
       type: "diagram",
       title: "圆柱与圆锥结构演示",
       boardId: "solid-cylinder-cone",
-      caption: "圆柱由矩形绕轴旋转形成，圆锥由直角三角形绕直角边旋转形成，虚线为旋转轴。",
-      initCode: "function ellipse(cx, cy, rx, ry) {\n  board.create('curve', [function(t){return cx + rx*Math.cos(t);}, function(t){return cy + ry*Math.sin(t);}, 0, 2*Math.PI], {strokeColor: colors.text, strokeWidth:1.5});\n}\nellipse(-2.5, -1.2, 1.6, 0.6);\nellipse(-2.5, 1.2, 1.6, 0.6);\nboard.create('segment', [[-4.1,-1.2],[-4.1,1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [[-0.9,-1.2],[-0.9,1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [[-2.5,-1.2],[-2.5,1.2]], {strokeColor: colors.accent, strokeWidth:1.5, dash:2});\nboard.create('text', [-2.5, 1.7, '圆柱'], {fontSize:14, color: colors.primary});\nellipse(3, -1.2, 1.6, 0.6);\nboard.create('segment', [[3,1.6],[1.4,-1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [[3,1.6],[4.6,-1.2]], {strokeColor: colors.text, strokeWidth:1.5});\nboard.create('segment', [[3,-1.2],[3,1.6]], {strokeColor: colors.accent, strokeWidth:1.5, dash:2});\nboard.create('point', [3,1.6], {name:'顶点', size:2, color: colors.accent});\nboard.create('text', [3, 2.1, '圆锥'], {fontSize:14, color: colors.primary});"
+      caption: "圆柱由矩形绕轴旋转形成，圆锥由直角三角形绕直角边旋转形成，虚线为旋转轴。"
     },
 
     {

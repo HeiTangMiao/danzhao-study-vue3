@@ -65,8 +65,7 @@ export default {
       type: "diagram",
       title: "二次函数图像演示",
       boardId: "quadratic-func",
-      caption: "拖动滑块改变 a、b、c，观察抛物线开口方向、对称轴与顶点变化。",
-      initCode: "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst a = board.create('slider', [[-5.6, 3.0], [-2.6, 3.0], [-2, 1, 2]], {name:'a', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nconst b = board.create('slider', [[-5.6, 2.2], [-2.6, 2.2], [-3, 0, 3]], {name:'b', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nconst c = board.create('slider', [[-5.6, 1.4], [-2.6, 1.4], [-3, 0, 3]], {name:'c', snapWidth:0.1, strokeColor: colors.accent, fillColor: colors.accent, highlight:false});\nboard.create('functiongraph', [function(x){ return a.Value()*x*x + b.Value()*x + c.Value(); }, -6, 6], {strokeColor: colors.primary, strokeWidth:2});\nboard.create('text', [-5.6, 3.8, function(){\n  const av = a.Value(), bv = b.Value(), cv = c.Value();\n  return 'y = ' + av.toFixed(1) + 'x² ' + (bv>=0?'+ ':'- ') + Math.abs(bv).toFixed(1) + 'x ' + (cv>=0?'+ ':'- ') + Math.abs(cv).toFixed(1);\n}], {fontSize:14, color: colors.text});\nboard.create('text', [-5.6, 3.5, function(){\n  const av = a.Value();\n  return 'a = ' + av.toFixed(1) + '，开口' + (av>0?'向上':'向下') + '；对称轴 x = ' + (-b.Value()/(2*av)).toFixed(2);\n}], {fontSize:13, color: colors.muted});"
+      caption: "拖动滑块改变 a、b、c，观察抛物线开口方向、对称轴与顶点变化。"
     },
 
     {

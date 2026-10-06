@@ -60,16 +60,14 @@ export default {
       type: "diagram",
       title: "三角形法则演示",
       boardId: "vector-triangle-law",
-      caption: "首尾相接：\\(\\vec{AB} + \\vec{BC} = \\vec{AC}\\)。拖动点 B、C 可改变向量，和向量自动更新。",
-      initCode: "const A = board.create('point', [-4,-1], {name:'A', size:2, color: colors.text, fixed:true});\nconst B = board.create('point', [-1,2], {name:'B', size:2, color: colors.text});\nconst C = board.create('point', [2,-1], {name:'C', size:2, color: colors.text});\nboard.create('arrow', [A, B], {color: colors.primary, strokeWidth:3, firstArrow:false, lastArrow:true});\nboard.create('arrow', [B, C], {color: colors.accent, strokeWidth:3, firstArrow:false, lastArrow:true});\nboard.create('arrow', [A, C], {color: colors.text, strokeWidth:2, firstArrow:false, lastArrow:true, dash:1});\nboard.create('text', [-2.8, 1.0, 'a'], {fontSize:16, color: colors.primary});\nboard.create('text', [0.8, 1.0, 'b'], {fontSize:16, color: colors.accent});\nboard.create('text', [-1.4, -1.6, 'a + b'], {fontSize:16, color: colors.text});"
+      caption: "首尾相接：\\(\\vec{AB} + \\vec{BC} = \\vec{AC}\\)。拖动点 B、C 可改变向量，和向量自动更新。"
     },
 
     {
       type: "diagram",
       title: "平行四边形法则演示",
       boardId: "vector-parallelogram-law",
-      caption: "共起点：以 \\(\\boldsymbol{a}\\)、\\(\\boldsymbol{b}\\) 为邻边作平行四边形，对角线即和向量。拖动点 A、B 观察变化。",
-      initCode: "const O = board.create('point', [-3,-1.5], {name:'O', size:2, color: colors.text, fixed:true});\nconst A = board.create('point', [0,1.5], {name:'A', size:2, color: colors.text});\nconst B = board.create('point', [2,-0.5], {name:'B', size:2, color: colors.text});\nconst C = board.create('point', [function(){return A.X()+B.X()-O.X();}, function(){return A.Y()+B.Y()-O.Y();}], {name:'C', size:2, color: colors.accent});\nboard.create('arrow', [O, A], {color: colors.primary, strokeWidth:3, firstArrow:false, lastArrow:true});\nboard.create('arrow', [O, B], {color: colors.accent, strokeWidth:3, firstArrow:false, lastArrow:true});\nboard.create('arrow', [O, C], {color: colors.text, strokeWidth:2, firstArrow:false, lastArrow:true, dash:1});\nboard.create('segment', [A, C], {color: colors.muted, strokeWidth:1, dash:2});\nboard.create('segment', [B, C], {color: colors.muted, strokeWidth:1, dash:2});\nboard.create('text', [-1.8, 0.6, 'a'], {fontSize:16, color: colors.primary});\nboard.create('text', [-0.2, -1.5, 'b'], {fontSize:16, color: colors.accent});\nboard.create('text', [1.4, 1.0, 'a + b'], {fontSize:16, color: colors.text});"
+      caption: "共起点：以 \\(\\boldsymbol{a}\\)、\\(\\boldsymbol{b}\\) 为邻边作平行四边形，对角线即和向量。拖动点 A、B 观察变化。"
     },
 
     {
@@ -102,8 +100,7 @@ export default {
       type: "diagram",
       title: "数乘的几何意义演示",
       boardId: "vector-scalar-multiplication",
-      caption: "\\(\\lambda > 0\\) 时 \\(\\lambda\\boldsymbol{a}\\) 与 \\(\\boldsymbol{a}\\) 同向，\\(\\lambda < 0\\) 时反向，模长为 \\(|\\lambda|\\) 倍。拖动点 A 观察。",
-      initCode: "const O = board.create('point', [-3,0], {name:'O', size:2, color: colors.text, fixed:true});\nconst A = board.create('point', [1,1.2], {name:'A', size:2, color: colors.primary});\nboard.create('arrow', [O, A], {color: colors.primary, strokeWidth:3, firstArrow:false, lastArrow:true});\nconst B = board.create('point', [function(){return O.X()+2*(A.X()-O.X());}, function(){return O.Y()+2*(A.Y()-O.Y());}], {name:'2a', size:2, color: colors.accent});\nboard.create('arrow', [O, B], {color: colors.accent, strokeWidth:3, firstArrow:false, lastArrow:true});\nconst C = board.create('point', [function(){return O.X()-0.5*(A.X()-O.X());}, function(){return O.Y()-0.5*(A.Y()-O.Y());}], {name:'-0.5a', size:2, color: colors.accent});\nboard.create('arrow', [O, C], {color: colors.accent, strokeWidth:3, firstArrow:false, lastArrow:true});\nboard.create('text', [-0.6, 1.2, 'a'], {fontSize:16, color: colors.primary});\nboard.create('text', [1.4, 1.8, '2a'], {fontSize:16, color: colors.accent});\nboard.create('text', [-5.2, -1.0, '-0.5a'], {fontSize:16, color: colors.accent});"
+      caption: "\\(\\lambda > 0\\) 时 \\(\\lambda\\boldsymbol{a}\\) 与 \\(\\boldsymbol{a}\\) 同向，\\(\\lambda < 0\\) 时反向，模长为 \\(|\\lambda|\\) 倍。拖动点 A 观察。"
     },
 
     {

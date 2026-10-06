@@ -29,8 +29,7 @@ export default {
       type: "diagram",
       title: "抛物线定义演示",
       boardId: "parabola-definition",
-      caption: "拖动点 P 沿抛物线移动，观察 |PF| 恒等于点 P 到准线的距离 d。",
-      initCode: "board.create('segment', [[-6,0],[6,0]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('segment', [[0,-4],[0,4]], {strokeColor: colors.muted, strokeWidth:1});\nboard.create('text', [5.8,-0.4, 'x'], {fontSize:14, color: colors.muted});\nboard.create('text', [0.3,3.8, 'y'], {fontSize:14, color: colors.muted});\nconst F = board.create('point', [1,0], {name:'F', size:2, color: colors.accent, fixed:true});\nboard.create('line', [[-1,-4],[-1,4]], {strokeColor: colors.muted, strokeWidth:1.5, dash:2});\nboard.create('text', [-1.4, 3.8, '准线 x = -1'], {fontSize:12, color: colors.muted});\nconst par = board.create('curve', [function(t){ return t*t/4; }, function(t){ return t; }, -4, 4], {strokeColor: colors.primary, strokeWidth:2});\nconst P = board.create('glider', [1,2, par], {name:'P', size:2, color: colors.primary});\nboard.create('segment', [F, P], {strokeColor: colors.primary, strokeWidth:1.5});\nboard.create('segment', [[-1, P.Y()], P], {strokeColor: colors.accent, strokeWidth:1.5, dash:2});\nboard.create('text', [-5.8, 3.6, function(){\n  const d1 = Math.hypot(P.X()-F.X(), P.Y()-F.Y());\n  const d2 = Math.abs(P.X()+1);\n  return '|PF| = ' + Math.round(d1*100)/100 + '，d = ' + Math.round(d2*100)/100;\n}], {fontSize:13, color: colors.muted});\nboard.create('text', [-5.8, 3.0, function(){\n  const d1 = Math.hypot(P.X()-F.X(), P.Y()-F.Y());\n  const d2 = Math.abs(P.X()+1);\n  return '|PF| - d = ' + Math.round((d1-d2)*100)/100 + ' ≈ 0';\n}], {fontSize:14, color: colors.primary});"
+      caption: "拖动点 P 沿抛物线移动，观察 |PF| 恒等于点 P 到准线的距离 d。"
     },
 
     {
