@@ -114,8 +114,7 @@ export interface QuizBlock extends BaseBlock {
 /** 可视化图区块 */
 export interface DiagramBlock extends BaseBlock {
   type: 'diagram'
-  boardId: string       // JSXGraph 画板 ID
-  initCode: string      // JSXGraph 初始化代码
+  boardId: string       // JSXGraph 画板 ID（对应 src/geometry/boards/<boardId>.js 模块）
   caption?: string      // 图注
 }
 
