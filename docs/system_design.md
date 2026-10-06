@@ -1,9 +1,9 @@
 # 移动端体验大改造 · 系统设计 v1
 
-> 状态：**v1.4（并入两条已拍板决策：翻页并行档 + 进度条双端策略，2026-10-07）**。
-> **v1.4 本轮变更**：①**翻页时长定为并行档**——出场启动后 100ms 入场（总时长 380ms，口径已统一），`--swipe-out/in/overlap` 三 token 落地 `reader.css`；并在 **§5.3 新增「两档转场时长」对照表**，明确 R2 的 ≤300ms **只约束路由级转场（P3-T2、不放宽）**，内容换页属另一档（P4-T5），两者不冲突（§11-16 关闭）；②**进度条双端策略定死**——移动端只留页眉 2px 分段刻度、删除 `.reading-progress`（不挂载），桌面端保留（§5.6.1 / §5.6.3 / §5.7.0-3，P4-T4 注明按断点拆渲染分支；§11-20 关闭）。
+> 状态：**v1.5（翻页口径定档 380ms + 「已掌握」数据落点定论 + `data-kind` 映射定稿，2026-10-07）**。
+> **v1.5 本轮变更**：①翻页时长**定档**：`--swipe-overlap: 100ms`，总时长 **380ms**（此前 120/400 口径差统一，全文档唯一口径；调试口径改为"整档缩放 `--swipe-out/in`，不动 overlap 语义"，§5.7.6）；②新增 **§5.7.7「标记已掌握」数据落点定论**：`page_progress` 行内加 `masteredAt`（毫秒时间戳）、`engine.js` 零改动（ENTITIES 已含 page_progress）、三个「掌握」语义命名表（completed / mastered / masteredAt+isPageMastered），落地清单并入 P4-T4，页脚主行动定为「标记已掌握」；③**`data-kind` 映射定稿**（§5.6.2：concept/point/example/practice/note 五值域 + 覆盖 16/22 类型，其余缺省不输出；与 `iconOf` Lucide 契约同批，P4-T3 已更新依赖）；④§5.6.3 补「桌面端 `.reading-progress` 渐变改纯色 `--primary`」（橙色渐变违规，PM 发现）；⑤§11-15/16/20 关闭，删除头部重复的 v1.3 残段。
+> v1.4 记录：**翻页并行档 + 进度条双端策略**——出场 100ms 入场（总 380ms）落 `reader.css` 三 token；§5.3 新增「两档转场时长」对照表（R2 ≤300ms 只约束路由级转场、不放宽）；移动端只留页眉 2px 分段刻度、删除 `.reading-progress`（不挂载），桌面端保留（§5.6.1 / §5.6.3 / §5.7.0-3，P4-T4 按断点拆渲染分支）。
 > v1.3 记录：**新增 §5.7 学习页 v4**（页眉/页脚可插拔功能条 + 滑动翻页转场），回答六个技术问题：手势实现选型（自写 Pointer Events，**不引库**）、边缘右滑返回与内容右滑翻页的判定规则（起手 x 阈值 24px）、View Transitions **不适用于**本场景（改手动三态机）、backdrop root 解耦写法（并列 + 玻璃条恒常）、性能/降级/`prefetchPage` 时机；并入 D15/D16；更新 §5.2 分层与 §5.3 两条硬规则；§10 更新 P4-T4、新增 P4-T5；§11 新增 16-20。
-> 本轮变更：①**新增 §5.7 学习页 v4**（页眉/页脚可插拔功能条 + 滑动翻页转场），回答六个技术问题：手势实现选型（自写 Pointer Events，**不引库**）、边缘右滑返回与内容右滑翻页的判定规则（起手 x 阈值 24px）、View Transitions **不适用于**本场景（改手动三态机）、backdrop root 解耦写法（并列 + 玻璃条恒常）、性能/降级/`prefetchPage` 时机；②并入 **D15/D16**；③更新 §5.2 动效分层（新增「内容换页层」）、§5.3 新增路由级转场不得用 transform 的硬规则；④§10 更新 P4-T4、新增 **P4-T5**；⑤§11 新增 16-20。
 > v1.2 记录：①并入 **D11-D14**（练习自评强制 / 自动组卷 / 署名块 / 克制+关键处加强）与 **v2 风格细则**（玻璃 30-42% + 内侧高光、TabBar 液态悬浮 pill、陶土橙加至 ~6 处）；②新增 §5.6 学习页视觉改进（玻璃迷你顶栏可行性、区块差异化最小改动路径、进度条统一）；③**正确性体检**（§12）：修正「147 页」→ **139 页**（147 = 139 数据页 + 3 site.js + 5 基建文件）等多处数字/表述；④§13 给出 `docs/csp-guard-plan.md` 处置结论。
 > v1.1 记录：复核结论「无失真」；更正 geogebra「已无 src 引用」不实；精化 §5.1 WebKit bug 触发条件；补 §2 `/practice` 路由；补全 §9 / §10。
 
@@ -311,7 +311,19 @@
 | **L2 组件内形态调整** | 各 block 组件内部改模板（如「要点」卡片化、「例题」渐进折叠） | 仅涉及被改的 2-5 个 block 组件 | PM 的「例题渐进 / 练习专注」这类形态差异 |
 | **L3 布局原语（方案 A）** | 用 P0 的 layout 原语重排页面 | 需 P0 完成 | 真正不同的**排布**（非样式差异） |
 
-**`data-kind` 映射表放哪**：`type` 有 22 种，PM 的语义类只有 5 类（概念/要点/例题/练习/小结）→ 需在 `src/components/blocks/blockTypes.js` 新增 `kind` 字段（该文件已有 `label`/`icon` 元信息，是唯一真相源），并沿用 `tests/block-registry.test.js` 的守卫模式加测试（与 §5.4 的 `iconOf` 契约变更同批处理，避免两次改同一张表）。
+**`data-kind` 映射表 —— ✅ 已定稿（2026-10-07，值域用英文，PRD 侧跟随此命名）**：
+
+| `kind` 值 | 内容角色 | 覆盖的 `type` |
+|---|---|---|
+| `concept` | 概念 | knowledge / objectives / vocab / strategy / mindmap |
+| `point` | 要点 | formula / table / summary / compare / steps / cloze |
+| `example` | 例题 | example |
+| `practice` | 练习 | quiz |
+| `note` | 小结 / 警示 | warning / tip / errorfocus |
+| （无 `kind`） | 布局原语与功能区块 | columns / group（布局类无语义角色）；exam / diagram 等功能区块默认不出 `data-kind` |
+
+- 覆盖 22 种 `type` 中的 **16 种**；其余（布局原语与 asyncBlock 功能区块）**缺省不输出 `data-kind` 属性**，CSS 只按 `[data-kind=...]` 匹配、无缺省样式 → 未列出的 type 自动"无角色"，不会被误样式化。实施时以 `blockTypes.js` 现有 22 项逐一核对归入
+- **落点与依赖**：映射放 `src/components/blocks/blockTypes.js` 的 **`kind` 字段**（该文件已有 `label`/`icon` 元信息，是唯一真相源），**与 §5.4 的 `iconOf` → Lucide 契约变更同批修改，避免两次改同一张表**（任务依赖已写入 **P4-T3**）；沿用 `tests/block-registry.test.js` 的守卫模式加"22 项必有 kind 或显式豁免"的测试
 
 #### 5.6.3 阅读进度条与 v2 统一
 
@@ -323,7 +335,7 @@
 **现状**：`UnitView.vue:465-473` —— `.reading-progress` 固定顶部 `height: 3px`；`.reading-progress__bar` 用 `linear-gradient(90deg, var(--primary), var(--accent))`（`--primary` 已是陶土橙 `brand-500`，见 `main.css:76`）。**已基本符合 v2**，只需三点（**第 1 点按上表分端**）：
 
 1. 与悬浮顶栏**合并承载**：进度条移到顶栏内/紧贴顶栏底部，避免顶部出现两条横线；`z-index` 需高于顶栏玻璃层（现 `.reading-progress` 为 100、`.mobile-topbar` 为 99 → 已正确）。⚠️ **仅桌面端需要这条**（移动端该元素不渲染）；移动端的位置感由页眉的 2px 分段条承担
-2. 圆角与 token 化：进度条端点圆角 `var(--radius-full)`，颜色走 `--primary → --accent`（已是陶土橙系，属 v2 的 6 处橙之一）
+2. 圆角与 token 化：进度条端点圆角 `var(--radius-full)`；颜色改**纯色 `var(--primary)`** —— 现有 `linear-gradient(90deg, var(--primary), var(--accent))`（`UnitView.vue:470`）是**橙色渐变**，违反 v2「禁用橙色渐变」（PM 已发现此违规），桌面端保留时必须改为纯色
 3. 动效统一：进度条宽度过渡**只动 `width` 会触发布局** → 改为 `transform: scaleX()` + `transform-origin: left`（§5.3「只动 transform/opacity」）；`prefers-reduced-motion` 下直接跳变。⚠️ 移动端不渲染该元素后，`updateReadProgress()` 里的进度计算也应跳过（否则白算一遍）
 
 ---
@@ -507,6 +519,38 @@ idle ──(手势判定成功)──> leaving(260ms) ──(路由已确认 且
 - **R2 的 ≤300ms = 路由级转场**（P3-T2，接在 `router-view` 上，跨路由记录），该约束**继续有效、不放宽**
 - **内容换页（并行档，总时长 380ms）是另一档**（P4-T5，`UnitView` 内部三态机，同路由记录的 `fileIndex` 变化）；路由级转场在内容换页时**根本不会被触发**（§5.7.3），两者不在同一条时间线上
 - 适用范围对照表见 **§5.3**，两处表述必须一致
+
+#### 5.7.7 页脚主行动「标记已掌握」—— 数据落点定论（2026-10-07，架构师）
+
+**背景（PM 已查证，架构师复核一致）**：现有完成语义**完全自动**——`src/stores/progress.js:1-7` 文件头「内容页打开即完成；测验页需交卷」「旧版手动勾选完成 / user_progress.completed 已完成迁移，不再使用」；判定式 `progress.js:31`：`done = !!(row && row.visited && (!file.isTest || row.testScore != null))`。因此「已掌握」必须是**新增的独立语义**，不能复用「已完成」。
+
+**四问结论**：
+
+**Q1 落点：进 `page_progress` 现有行加字段，不建独立表。**
+- IndexedDB 是行式存储、无列 schema：行内加字段**零迁移**（`studyDb.js:68-69` 的 objectStore 结构不变，不加索引就不动 `onupgradeneeded`）；旧行读出该字段为 `undefined`，`masteredAt != null` 判定天然向后兼容
+- 「已完成 / 已掌握」是**同一页面的两种状态**，同主键（`subject_unitNum_fileName`）一行承载是内聚（§1.5）；独立表会造成两表按同一 key 双读双写，且要在 `engine.js` ENTITIES、`studyDb.js:686-687` 导入导出清单、服务端**三处重复登记**
+- 独立表唯一的"语义干净"优势，抵不过三处登记的耦合成本
+
+**Q2 类型：`masteredAt: number | null`（毫秒时间戳），不用 `0/1`。**
+- `masteredAt != null` 即布尔判定，不损失 0/1 能力；反向则丢掉"**何时掌握**"——这是 P6 薄弱专项权重（错题复现、练习推荐）的必要输入
+- 取消掌握 = 置回 `null`（不记历史；"何时掌握/取消"的时间线由 `study_log` 事件承担：写入 `action: 'master_page' / 'unmaster_page'`，复用 `markPageVisited` 的既有写法 `studyDb.js:538-543`）；**不进 `daily_stats`**（统计口径不扩，等 PM 提需求再加）
+
+**Q3 同步：`src/sync/engine.js` 零改动，字段自动随行同步。**
+- `engine.js:19-27` 的 `ENTITIES` 已含 `{ entity: 'page_progress', store: 'page_progress', keyPath: 'key' }`，同步按**整行**采集、按 `updatedAt`（`dbPut` 自动盖章，`studyDb.js:205-208`）与服务端 LWW 裁决 → 新字段随行推送，学生换设备自动保留
+- 唯一连带登记点：`src/types/store.d.ts` 的 `PageProgress` 类型加可选字段 `masteredAt?: number`
+- ⚠️ **待确认（一项）**：服务端对 `page_progress` 实体是否做字段白名单过滤——若整行透传则零改动；若白名单制需服务端加字段。实施前用一次真实同步验证
+
+**Q4 三个「掌握」语义的统一命名（代码与文案，全文档唯一口径）**：
+
+| 语义 | 触发方式 | 代码命名 | 文案 | 状态 |
+|---|---|---|---|---|
+| ① 页面自动完成 | 访问即完成；测验页交卷 | `isCompleted` / 快照 `completed`（`progress.js` 现有，**不改名**） | 「已完成」 | 存量 |
+| ② 错题 SM-2 掌握 | `repetitions`/`interval` 达阈值（复习算法） | `mastered`（`src/types/composable.d.ts:120` 现有，**不改名**） | 「复习掌握」 | 存量 |
+| ③ 页面手动已掌握 | 用户点页脚主行动按钮 | 存储 `page_progress.masteredAt`；UI 派生 `isPageMastered`（progress store 新增 getter） | 「已掌握」 | **v4 新增** |
+
+三者**互不派生**：①不是③的前置，③也不回写①；②只作用于错题卡片（error_book 的 SM-2 字段），与页面级③无外键关系。仪表盘若要"掌握率"，按 `masteredAt != null` 计数。
+
+**落地清单（并入 P4-T4）**：改 `src/stores/studyDb.js`（新增 `markPageMastered / unmarkPageMastered` 两个方法，内部 `getPageProgress` + 补 `masteredAt` + `savePageProgress` + 写 study_log）；改 `src/stores/progress.js`（新增 `isPageMastered` getter，随 `refresh()` 重建快照）；改 `src/types/store.d.ts`；`src/sync/engine.js` **不动**。
 
 ---
 
@@ -831,9 +875,9 @@ sequenceDiagram
 |---|---|---|---|
 | P4-T1 layout 落地 ≥3 页 | `src/content/` 高价值页改用 layout 原语（导航 hero、重点页定制布局）；schema 不变 | P0 | — |
 | P4-T2 三轴差异化 + 骨架屏（R9） | 新增 `src/components/SkeletonBlock.vue`；改 `src/views/UnitView.vue`（加载骨架）；区块 tone/variant 扩展（schema + 对应 block 组件） | P0、P2 | — |
-| P4-T3 区块差异化（data-kind，见 §5.6.2） | 改 `src/views/UnitView.vue`（`.block-anchor` 加 `data-kind`）；改 `src/components/blocks/blockTypes.js`（新增 `kind` 字段：概念/要点/例题/练习/小结 五类映射）；改 `src/assets/css/blocks.css`（`[data-kind=...]` 差异化）；扩展 `tests/block-registry.test.js` 守卫 | P0-T1（建议与 `iconOf` 契约变更同批，避免两次改同一张表） | ✅ 与 T4/T5 |
-| **P4-T4 学习页 v4 功能条（取代原「迷你顶栏 v2」，见 §5.7.0）** | 新增 `src/components/reader/ReaderTopbar.vue`（~44px 玻璃 `.glass--flat` 不加投影；`[返回][标题][页码] + 右侧插槽`；2px 分段进度 `segs = min(n,12)`）；新增 `src/components/reader/ReaderFooter.vue`（~52px；`[主行动] + 次级图标插槽 ×N`；底部 `max(--sab, --sys-gesture-bottom, 24px)` 留白）；新增 `src/assets/css/reader.css`；改 `src/views/UnitView.vue`（拆出两条功能条、移动端去掉旧 `page-header`/`page-nav` 呈现、桌面端保留）；改 `src/assets/css/main.css`（新增 `.glass--flat` 变体 + `--sys-gesture-bottom`）。**⚠️ 进度条按断点拆两条渲染分支**（已定，§5.6.3）：移动端（<900px）**不挂载** `.reading-progress` 并跳过 `updateReadProgress()` 的进度计算，只渲染页眉 2px 分段条 + 页码数字；桌面端（≥900px）保留 `.reading-progress` 并改为 `scaleX`。⚠️ §5.6.1 的「滚动 >200px 才出现」改为**常驻**，须按 §5.1 处理首帧「玻璃 + 内联 SVG」 | P2-T3（玻璃 token 先落地） | ✅ 与 T3 |
-| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext` + 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 120ms` 三 token，**并行档：入场延迟 = `--swipe-overlap`**，总时长 = 120+280 = 400ms；380/400 的 20ms 口径差异见 §5.7.6；中/低档与 `prefers-reduced-motion` 降级）。⚠️ 这三个 token **只管内容换页**，路由级转场仍受 R2 ≤300ms 约束（§5.3 两档口径表）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
+| P4-T3 区块差异化（data-kind，映射已定稿见 §5.6.2） | 改 `src/views/UnitView.vue`（`.block-anchor` 加 `data-kind`，值取 `blockTypes.js` 的 `kind`）；改 `src/components/blocks/blockTypes.js`（新增 `kind` 字段，**值域已定**：concept/point/example/practice/note，22 项逐一归入或显式豁免）；改 `src/assets/css/blocks.css`（`[data-kind=...]` 差异化）；扩展 `tests/block-registry.test.js` 守卫（每项必有 `kind` 或显式豁免 + `kind` 值域校验）。**必须与 `iconOf` → Lucide 契约变更同批**（同一张表） | P0-T1、P2-T1（`iconOf` 契约变更先行或同批） | ✅ 与 T4/T5 |
+| **P4-T4 学习页 v4 功能条（取代原「迷你顶栏 v2」，见 §5.7.0 / §5.7.7）** | 新增 `src/components/reader/ReaderTopbar.vue`（~44px 玻璃 `.glass--flat` 不加投影；`[返回][标题][页码] + 右侧插槽`；2px 分段进度 `segs = min(n,12)`）；新增 `src/components/reader/ReaderFooter.vue`（~52px；**`[标记已掌握]` 主行动 + 次级图标插槽 ×N**；底部 `max(--sab, --sys-gesture-bottom, 24px)` 留白）；新增 `src/assets/css/reader.css`；改 `src/views/UnitView.vue`（拆出两条功能条、移动端去掉旧 `page-header`/`page-nav` 呈现、桌面端保留）；改 `src/assets/css/main.css`（新增 `.glass--flat` 变体 + `--sys-gesture-bottom`）。**「已掌握」数据落点（定论见 §5.7.7）**：改 `src/stores/studyDb.js`（`markPageMastered / unmarkPageMastered` + 写 `study_log`）、`src/stores/progress.js`（`isPageMastered` getter）、`src/types/store.d.ts`（`masteredAt?`）；`engine.js` 不动。**⚠️ 进度条按断点拆两条渲染分支**（已定，§5.6.3）：移动端（<900px）**不挂载** `.reading-progress` 并跳过 `updateReadProgress()` 的进度计算，只渲染页眉 2px 分段条 + 页码数字；桌面端（≥900px）保留 `.reading-progress`（渐变改纯色 `--primary`）并改为 `scaleX`。⚠️ §5.6.1 的「滚动 >200px 才出现」改为**常驻**，须按 §5.1 处理首帧「玻璃 + 内联 SVG」 | P2-T3（玻璃 token 先落地） | ✅ 与 T3 |
+| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext` + 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 100ms` 三 token，**并行档：入场延迟 = `--swipe-overlap`，总时长 = 100+280 = 380ms**；调试时整档缩放 out/in，不动 overlap 语义；中/低档与 `prefers-reduced-motion` 降级）。⚠️ 这三个 token **只管内容换页**，路由级转场仍受 R2 ≤300ms 约束（§5.3 两档口径表）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
 
 ### P5 Android 打包（依赖 P1-P3 + 工具链）
 
@@ -875,8 +919,8 @@ sequenceDiagram
 17. ⬜ **Tauri Android 的系统手势能力待确认**：能否申索边缘区域（`View.setSystemGestureExclusionRects()`，Android 10/API 29）、能否读到 `WindowInsets.getMandatorySystemGestureInsets()`。**当前设计不依赖这两项**（边缘完全交系统、页脚用保守 24px 留白），故不阻塞 P4；若将来要做"应用内边缘返回"则需写 Kotlin 插件
 18. ⬜ **翻页路由用 `push` 还是 `replace`**：暂定 `push`（返回键 = 上一页，符合 Android 心智），代价是历史条目累积（单元内连翻需多次返回才能离开）。是否改为 `replace` 或"跨单元时 replace"待定
 19. ⬜ **系统 WebView 版本与 View Transitions 可用性：待实测**（Tauri Android 用系统 WebView，VT 需 Chromium 111+）。**不阻塞**：§5.7.3 已定主方案不依赖 VT
-20. ✅ **两种进度条已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：**移动端只留 v4 页眉的 2px 分段刻度**（"单元内第几页"），**删除** `.reading-progress` 滚动进度线（不挂载，非仅隐藏）；**桌面端保留** `.reading-progress`。理由：同屏两个进度指示读数冲突。已写入 §5.6.1 / §5.6.3 / §5.7.0 第 3 条，实施分支要求见 **P4-T4** —— 本条**关闭**。
-    ⬜ **仍遗留**：PM 的 `docs/prd-mobile.md` §7 落盘后需与 §5.7 逐条对齐 —— 主要剩两项：①"段数自适应"的口径（技术侧给的是 `segs = min(n, 12)`，超过 12 页时每段代表 `ceil(n/12)` 页）②"页脚主行动按钮是什么"（决定 `[主行动] + 次级图标插槽 ×N` 的插槽内容）
+20. ✅ **两种进度条已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：**移动端只留 v4 页眉的 2px 分段刻度**（"单元内第几页"），**删除** `.reading-progress` 滚动进度线（不挂载，非仅隐藏）；**桌面端保留** `.reading-progress`（须把橙色渐变改**纯色 `--primary`**，见 §5.6.3）。理由：同屏两个进度指示读数冲突。已写入 §5.6.1 / §5.6.3 / §5.7.0 第 3 条，实施分支要求见 **P4-T4** —— 本条**关闭**。
+    ✅ **原遗留两项也已定（2026-10-07）**：①"段数自适应"口径 = **`segs = min(n, 12)`**（超过 12 页时每段代表 `ceil(n/12)` 页，§5.7.0 第 2 条），PM 侧跟随此口径不再另写；②页脚主行动 = **「标记已掌握」**，其数据落点已由架构师定论（**§5.7.7**：`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表）。**唯一待确认**：服务端对 `page_progress` 是否做字段白名单过滤（§5.7.7 Q3，实施前一次真实同步验证）
 
 ---
 
@@ -945,3 +989,4 @@ sequenceDiagram
 *v1.2 并入新决策与体检：架构师（高见远），2026-10-07 —— 并入 D11-D14 与 v2 风格（§5.1/§4.1）、新增 §5.6 学习页改进、§12 正确性体检（修正 147→139 等 2 处错误）、§13 CSP 护栏处置结论、§10 新增 P1-T5/P2-T5/P4-T3/P4-T4/P6。*
 *v1.3 学习页 v4 与手势翻页：架构师（高见远），2026-10-07 —— 新增 §5.7（手势选型/边缘手势判定规则/View Transitions 不适用/backdrop root 并列解耦/性能与预取）、并入 D15-D16、更新 §5.2 分层与 §5.3 两条硬规则、§10 改 P4-T4 并新增 P4-T5、§11 新增 16-20。**只改本文档，未开工写代码。***
 *v1.4 两条决策落定：架构师（高见远），2026-10-07 —— 翻页改并行档（出 260ms、延迟 100ms 入场、入 280ms，总 380ms）+ §5.3 两档转场时长对照表（R2 ≤300ms 仅约束路由级转场，不放宽）；进度条双端策略（移动端只分段条、删滚动条，桌面端保留）写入 §5.6.1/§5.6.3/§5.7.0 与 P4-T4；关闭 §11-16 与 §11-20。**只改本文档，未开工写代码。***
+*v1.5 定档与定论：架构师（高见远），2026-10-07 —— 翻页口径定档 `overlap=100ms` / 总 380ms（唯一口径，调试改整档缩放）；新增 §5.7.7「标记已掌握」数据落点定论（`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表）；`data-kind` 映射定稿（§5.6.2 五值域，P4-T3 同批依赖）；§5.6.3 桌面端进度条渐变改纯色。**只改本文档，未开工写代码。***
