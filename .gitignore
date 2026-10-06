@@ -8,6 +8,13 @@ node_modules/
 dist/
 dist-ssr/
 
+# 验证期临时产物（浏览器探针目录 / 临时构建配置 / 一次性脚本），不入库
+dist-probe*/
+dist-verify*/
+tmp-*.mjs
+vite.*-tmp.config.mjs
+tests/tmp-*.test.js
+
 # Generated search index（prebuild 按需生成，不入库）：标题级 meta + 按学科分片的正文
 public/search-meta.json
 public/search-body/
