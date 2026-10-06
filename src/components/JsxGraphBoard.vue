@@ -9,6 +9,10 @@
 -->
 <template>
   <div ref="container" class="jxg-board" :style="{ minHeight: height + 'px' }">
+    <!-- jsxgraph 专用宿主：仅由 jsxgraph 填充，Vue 不管理其子节点。
+         init()/重试时只清空这里，绝不触碰下面 Vue 的 v-if 状态节点 ——
+         否则 Vue 更新时会向已分离的父节点插入占位注释，产生 [AppError] insertBefore 噪声。 -->
+    <div ref="boardHost" class="jxg-host"></div>
     <!-- 加载中 / 失败占位 -->
     <div v-if="state !== 'ready'" class="jxg-status">
       <div v-if="state === 'loading'" class="jxg-status__inner">
@@ -39,6 +43,8 @@ const props = defineProps({
 })
 
 const container = ref(null)
+// jsxgraph 专用宿主节点：其子节点只属于 jsxgraph，Vue 不管理，故可安全清空
+const boardHost = ref(null)
 // 加载状态：loading 加载中 / ready 就绪 / error 失败
 const state = ref('loading')
 let board = null
@@ -57,10 +63,12 @@ async function loadJsxGraph() {
 
 async function init() {
   state.value = 'loading'
-  if (container.value) container.value.innerHTML = ''
+  // 只清空 jsxgraph 宿主（重试时移除上一个画板）；绝不清空 container.value，
+  // 那会连 Vue 管理的 v-if 状态节点一起抹掉 → Vue 更新时向已分离父节点插入 → [AppError] insertBefore
+  if (boardHost.value) boardHost.value.innerHTML = ''
 
   const JXG = await loadJsxGraph()
-  if (!JXG || !container.value) {
+  if (!JXG || !boardHost.value) {
     state.value = 'error'
     return
   }
@@ -76,7 +84,7 @@ async function init() {
   }
 
   // 初始化画板（固定模式禁用平移与缩放）
-  board = JXG.JSXGraph.initBoard(container.value, {
+  board = JXG.JSXGraph.initBoard(boardHost.value, {
     boundingbox: props.boundingbox,
     axis: false,
     showCopyright: false,
@@ -87,11 +95,15 @@ async function init() {
   })
 
   // 调用业务方回调绘制图形
+  // setup 抛错必须落到 error 态：否则会留下一块已经 initBoard 但空无一物的画布，
+  // 用户看到的是「加载完成」的空白图，比显式报错更难排查。
   if (props.setup) {
     try {
       props.setup(board, colors, JXG)
     } catch (e) {
       console.error('[JsxGraphBoard] setup 回调执行失败:', e)
+      state.value = 'error'
+      return
     }
   }
 
@@ -122,10 +134,13 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.jxg-board { width: 100%; border-radius: var(--radius-md); overflow: hidden; }
+.jxg-board { position: relative; width: 100%; border-radius: var(--radius-md); overflow: hidden; }
+/* jsxgraph 宿主：撑起画板高度（继承 .jxg-board 的 min-height） */
+.jxg-host { width: 100%; min-height: inherit; }
+/* 状态占位绝对定位覆盖在画板之上：不参与布局、也不会被 jsxgraph 的清空动作波及 */
 .jxg-status {
+  position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  min-height: inherit; /* 继承画板高度，占位铺满 */
 }
 .jxg-status__inner {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
