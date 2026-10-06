@@ -15,7 +15,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { CONTENT_DIR, ROOT, SITE_FILES, buildMetaIndex } from './lib/load-content.mjs'
+import { CONTENT_DIR, ROOT, SITE_FILES, buildMetaIndex, collectBoardIds } from './lib/load-content.mjs'
 import { serializePage, extractHeader } from '../src/content/serializePage.js'
 import { createBlockValidator } from '../src/utils/validateBlock.js'
 import { WRITE_ENDPOINT } from '../src/utils/contentWrite.js'
@@ -25,7 +25,9 @@ export { WRITE_ENDPOINT }
 const MAX_BODY = 2 * 1024 * 1024
 
 const SCHEMA = JSON.parse(readFileSync(join(ROOT, 'schema', 'content-schema.json'), 'utf-8'))
-const validateBlock = createBlockValidator(SCHEMA)
+// 与 CI（scripts/validate-content.mjs）同一份注入：diagram 的 boardId 必须能解析到
+// src/geometry/boards/<boardId>.js。缺了 knownBoardIds，写回路径会静默失去这层校验。
+const validateBlock = createBlockValidator(SCHEMA, { knownBoardIds: new Set(collectBoardIds()) })
 
 /**
  * 解析并校验目标路径（纯函数，便于测试）

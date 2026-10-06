@@ -9,7 +9,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import {
-  ROOT, CONTENT_DIR, SITE_FILES, collectFiles, loadSite, importFresh, relPathOf
+  ROOT, CONTENT_DIR, SITE_FILES, BOARD_DIR, collectFiles, collectBoardIds, loadSite, importFresh, relPathOf
 } from './lib/load-content.mjs'
 import { PAGE_META_KEYS } from '../src/content/pageMeta.js'
 import { createBlockValidator } from '../src/utils/validateBlock.js'
@@ -22,10 +22,20 @@ import { createBlockValidator } from '../src/utils/validateBlock.js'
  *      schema 用 fs 读而非 import：本脚本跑在裸 Node 下，不走 Vite 的 JSON 导入。
  */
 const SCHEMA = JSON.parse(readFileSync(join(ROOT, 'schema', 'content-schema.json'), 'utf-8'))
-const validateBlock = createBlockValidator(SCHEMA)
+
+// diagram 区块的画板代码已迁到 src/geometry/boards/<boardId>.js，
+// 校验规则从「initCode 非空」变成「boardId 能在该目录解析到模块」。
+const knownBoardIds = new Set(collectBoardIds())
+const validateBlock = createBlockValidator(SCHEMA, { knownBoardIds })
 
 let errorCount = 0
 let fileCount = 0
+
+// 画板目录缺失 / 为空属于工程配置错误，单独报一条，避免 20 个 diagram 逐个报错把输出淹没
+if (knownBoardIds.size === 0) {
+  console.error(`✗ 未找到任何画板模块：${BOARD_DIR}`)
+  errorCount++
+}
 
 // 校验站点配置（数学 + 语文 + 计算机），先于内容文件校验以建立注册关系
 // 站点文件路径统一来自 scripts/lib/load-content.mjs，与搜索索引脚本共用一份

@@ -133,8 +133,14 @@ const newBlockType = ref('knowledge')
 // 区块类型中文名统一取自渲染注册表，避免编辑器与渲染层各写一份
 const fieldsOfBlock = (block) => blockFields(contentSchema, block.type)
 
+// 合法画板标识：取自 src/geometry/boards/ 下的真实模块（浏览器侧只能靠 import.meta.glob 枚举，
+// 与 Node 侧「读目录」是同一份真相的两种取法）
+const BOARD_IDS = new Set(
+  Object.keys(import.meta.glob('@/geometry/boards/*.js')).map((p) => p.split('/').pop().replace(/\.js$/, ''))
+)
+
 // 校验器与 CI（scripts/validate-content.mjs）用的是同一份实现，只是注入了同一份 schema
-const validateBlock = createBlockValidator(contentSchema)
+const validateBlock = createBlockValidator(contentSchema, { knownBoardIds: BOARD_IDS })
 const blockErrors = computed(() => editingBlocks.value.map((b) => validateBlock(b)))
 const errorTotal = computed(() => blockErrors.value.reduce((n, list) => n + list.length, 0))
 

@@ -16,12 +16,15 @@
 /**
  * 创建校验器
  * @param {object} schema content-schema 对象
+ * @param {object} [options] 可选注入项
+ * @param {Set<string>|null} [options.knownBoardIds] 合法的画板标识集合（src/geometry/boards/ 下的模块名）。
+ *          不传则跳过「boardId 能解析到模块」这条校验（保持向后兼容，且本模块不能自己读目录）。
  * @returns {(block:object) => string[]} 返回的数组是**相对该区块**的错误描述，
  *          不含「哪个文件 / 第几个区块」的前缀，由调用方补。
  *          例：Node 侧拼成 `math/01-xxx.js 区块[3] 题目[0] 未知难度: foo`，
  *          编辑器侧则把同一份描述直接列在该区块下方。
  */
-export function createBlockValidator(schema) {
+export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
   const BLOCK_TYPES = schema.definitions.block.properties.type.enum
   const DIFFICULTY = schema.definitions.exampleItem.properties.difficulty.enum
   // 题型取 quiz 与 exam 的并集（exam 额外支持解答题 solve）
@@ -130,7 +133,13 @@ export function createBlockValidator(schema) {
         break
       case 'diagram':
         if (isEmpty(block.boardId)) errors.push('图形区块缺少 boardId')
-        if (isEmpty(block.initCode)) errors.push('图形区块缺少 initCode')
+        else if (knownBoardIds && !knownBoardIds.has(block.boardId)) {
+          // 画板代码已从「内容里的 initCode 字符串」迁到 src/geometry/boards/<boardId>.js，
+          // 因此「非空」这层保证没了，改为校验 boardId 能解析到真实模块。
+          // 「哪些 boardId 合法」由调用方注入：Node 侧读目录、浏览器侧走 import.meta.glob，
+          // 本模块保持零 import（与 schema 注入同理）。
+          errors.push(`图形区块 boardId "${block.boardId}" 未找到对应画板模块`)
+        }
         break
       case 'desmos':
         if (block.initialExpressions !== undefined) {

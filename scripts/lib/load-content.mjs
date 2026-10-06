@@ -59,6 +59,27 @@ export function collectFiles(dir, acc = []) {
   return acc
 }
 
+/** 几何画板模块目录（src/geometry/boards/<boardId>.js） */
+export const BOARD_DIR = join(ROOT, 'src', 'geometry', 'boards')
+
+/**
+ * 枚举现有画板标识（即 boards 目录下的模块名，去扩展名）
+ * 说明：diagram 区块的 boardId 必须命中这里，由 validateBlock 校验、并由
+ *       tests/geometry-board.test.js 反向查孤儿。Node 侧只能读目录，
+ *       浏览器侧（编辑器）走 import.meta.glob，两边是同一份真相的两种取法。
+ * @returns {string[]} boardId 列表（未排序）
+ */
+export function collectBoardIds() {
+  try {
+    return readdirSync(BOARD_DIR)
+      .filter((name) => name.endsWith('.js'))
+      .map((name) => name.slice(0, -'.js'.length))
+  } catch {
+    // 目录不存在（如首次克隆尚未生成）：返回空，交由上层校验报错而非本库崩溃
+    return []
+  }
+}
+
 /**
  * 动态 import 且绕过 ESM 模块缓存
  * 说明：脚本可能在同一进程内被反复调用（如 watch 模式），不加时间戳会读到旧内容

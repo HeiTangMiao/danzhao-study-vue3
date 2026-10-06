@@ -30,7 +30,6 @@ const LONG_FIELDS = new Set([
   'correctApproach',
   'tip',
   'mermaid',
-  'initCode',
   // 术语卡的释义与例句通常是一整句，单行输入框不够用
   'meaning',
   'example',
@@ -55,7 +54,6 @@ const FIELD_LABEL = {
   mermaid: 'Mermaid 源码',
   boardId: '画板 ID',
   caption: '图注',
-  initCode: '初始化代码',
   duration: '考试时长（分钟）',
   totalScore: '满分',
   passingScore: '及格分',
