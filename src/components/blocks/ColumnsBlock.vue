@@ -60,14 +60,31 @@ const columns = computed(() => {
   gap: var(--spacer-16);
 }
 
-/* 桌面端 ≥ 1024px 才分列；1024~375 之间降为单列，
- * 避免窄屏下公式/表格被挤坏 */
-@media (min-width: 1024px) {
+/* 分列判定按「本区块所处容器的实际可用宽度」（system_design §4.2）：
+ * 同一 ColumnsBlock 可能被放进很窄的容器（如桌面侧栏、多栏嵌套），
+ * 此时即便视口很宽也应降为单列 —— 媒体查询按视口判断会误判。
+ * 查询容器 = 本区块根节点（.block-columns），故其子孙按容器宽度响应。 */
+.block-columns {
+  container-type: inline-size;
+}
+@container (min-width: 1024px) {
   .columns-grid.cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .columns-grid.cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 兜底：宿主不支持容器查询时退回媒体查询（等价迁移前的行为） */
+@supports not (container-type: inline-size) {
+  @media (min-width: 1024px) {
+    .columns-grid.cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .columns-grid.cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 }
 </style>

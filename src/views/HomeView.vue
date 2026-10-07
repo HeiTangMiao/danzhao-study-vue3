@@ -4,7 +4,8 @@
    - 展示学科选择卡片（数学 / 语文 / 计算机）+ 对各学科的单元进度
    - 顶部提供工具快捷入口（仪表盘 / 错题本 / 模拟冲刺 / 编辑器）
    - 记忆用户选择的学科（localStorage）
-   - 页脚：版权信息 + 工具链接导航
+   - 「继续学习」位置读 progress store（唯一事实源，具备换设备能力）
+  R3 去 Web 味（system_design §2 / P1-T3）：已移除页脚 nav + 版权行（署名块仅保留在「我的」页）。
 -->
 <template>
   <div class="home">
@@ -136,22 +137,6 @@
         </article>
       </div>
     </section>
-
-    <!-- 页脚 -->
-    <footer class="home-footer">
-      <div class="footer-info">
-        <div class="footer-name">📚 单招学习之路</div>
-        <div class="footer-desc">多学科备考平台 · 知识体系 + 高效练习 + 低代码内容管理</div>
-        <div class="footer-copy">© 2026 Crafted with ❤️ by <span class="footer-author">黑糖＆菜菜</span></div>
-      </div>
-      <nav class="footer-nav" aria-label="页脚导航">
-        <router-link to="/dashboard">学习仪表盘</router-link>
-        <router-link to="/error-book">错题本</router-link>
-        <router-link v-if="sprintUnit" :to="mockRoute">模拟冲刺</router-link>
-        <router-link to="/editor">内容编辑器</router-link>
-        <router-link to="/">返回首页</router-link>
-      </nav>
-    </footer>
   </div>
 </template>
 
@@ -171,11 +156,10 @@ const subjectList = SUBJECT_LIST
 // 当前选中的学科（从 localStorage 读取，默认 math）
 const currentSubject = ref(localStorage.getItem('current_subject') || 'math')
 
-// 最近学习位置（UnitView 每次加载内容页时写入）
-const lastStudy = ref(null)
-try {
-  lastStudy.value = JSON.parse(localStorage.getItem('last_study') || 'null')
-} catch { lastStudy.value = null }
+// 最近学习位置：唯一事实源 = progress store（由 page_progress.visitTime 推导，
+// 具备 IndexedDB + 同步链的换设备能力）。原实现读 localStorage.last_study，
+// 与 store 派生值构成双存储，已在架构审计 §2-2 收敛 —— 现只读 store。
+const lastStudy = computed(() => progress.lastStudied)
 
 // 今日待复习错题数（SM-2 到期）：首页复习提醒
 const dueCount = ref(null)
@@ -399,37 +383,6 @@ const mockRoute = computed(() => sprintUnit.value
   transition: width 0.3s ease;
 }
 .progress-text { font-size: 0.8rem; color: var(--text-muted); }
-
-/* 页脚 */
-.home-footer {
-  margin-top: var(--spacer-32);
-  padding: var(--spacer-20) 0 var(--spacer-12);
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacer-16);
-}
-.footer-info { text-align: center; }
-.footer-name { font-weight: 700; font-size: 1rem; }
-.footer-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-.footer-copy { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
-.footer-author {
-  font-weight: 700;
-  background: linear-gradient(135deg, #f43f5e, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.footer-nav {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: var(--spacer-8) var(--spacer-16);
-  font-size: 0.82rem;
-}
-.footer-nav a {
-  color: var(--text-muted);
-  transition: color 0.15s ease;
-}
-.footer-nav a:hover { color: var(--primary); }
 
 /* 移动端适配 */
 @media (max-width: 600px) {

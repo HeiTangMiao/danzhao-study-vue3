@@ -189,6 +189,29 @@
   --dur-3: 240ms;
   --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* ---------- 断点阶梯（P1-T1，收敛原有 6 个碎片值 → 4 级）----------
+   * ⚠️ 这是「口径的单一来源」，不是可被 @media 直接引用的值：
+   *   CSS 媒体查询不解析 var()（@media (min-width: var(--bp-lg)) 无效），
+   *   因此下列 token 供 JS（matchMedia / 断点判断）与文档引用；
+   *   样式里的媒体查询仍必须写字面量，并在注释中标注对应 token（见各组件）。
+   * 语义：sm 手机竖屏 / md 平板横屏 / lg 桌面↔移动分界 / xl 宽桌面。 */
+  --bp-sm: 600px;
+  --bp-md: 900px;
+  --bp-lg: 1150px;
+  --bp-xl: 1280px;
+
+  /* ---------- 导航条高度（P1-T2）----------
+   * 底部 pill 与桌面顶栏共用同一高度，保证双形态同构；内容区据此让位。 */
+  --tabbar-h: 56px;
+
+  /* ---------- 玻璃层 token（P1-T2 起用；P2-T3 将扩展为 .glass 工具类）----------
+   * 三要素必须 token 化：暗色主题与 @supports 降级各需一份取值。
+   * 不透明度取 42%（v2 参数，比 v1 的 55-72% 更轻盈）。 */
+  --glass-bg: rgba(255, 255, 255, 0.42);
+  --glass-hl: rgba(255, 255, 255, 0.9); /* 内侧高光：模拟折射边缘 */
+  --glass-shadow: 0 8px 24px rgba(88, 46, 29, 0.1); /* 暖可可投影（禁纯黑） */
+  --glass-active: rgba(201, 100, 66, 0.1); /* 激活项底色（陶土橙 10%） */
 }
 
 /* ---------- 暗色主题 ---------- */
@@ -223,6 +246,8 @@
   --danger: var(--error-500);
   --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.55);
+  /* 玻璃底：暗色下改为近黑半透明（与亮色的纸白 .42 对应） */
+  --glass-bg: rgba(28, 28, 26, 0.42);
 }
 
 /* ---------- 基础样式复位 ---------- */
@@ -255,6 +280,30 @@ body {
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
+}
+
+/* ============================================================
+ * P1-T1 容器查询基础设施 + 移动端密度
+ * ============================================================ */
+
+/* 容器查询：需要「按所处容器的实际可用宽度」而非视口宽度判定时，
+ * 给查询容器的祖先加 .cq（组件内也可直接写 container-type）。
+ * 依据：同一区块会被放进不同宽度的容器（桌面侧栏里的区块很窄，但视口很宽），
+ *       媒体查询按视口判断会误判（system_design §4.2）。
+ * 兼容：Android WebView 105+ / Safari iOS 16+ / WKWebView macOS 13+；
+ *       不支持的宿主由各组件用 @supports not (container-type: inline-size) 退回媒体查询。 */
+.cq {
+  container-type: inline-size;
+}
+
+/* 移动端密度：只换 token 值，不改任何组件写法（system_design §4.3 / PRD §6.4）。
+ * 视口 ≤ 600px（即 --bp-sm）时收紧页面留白与区块间距，让窄屏不至于过松。 */
+@media (max-width: 600px) {
+  :root {
+    --pad-page: var(--space-4); /* 24 → 16 */
+    --gap-block: var(--space-5); /* 32 → 24 */
+    --gap-block-tight: var(--space-3); /* 16 → 12 */
+  }
 }
 
 /* 通用标题层级 */

@@ -17,7 +17,16 @@ const routes = [
     // 首页：学科选择 + 单元列表
     path: '/',
     name: 'home',
+    // 一级 Tab「学习」。tabOrder 决定 AppTabBar 的呈现顺序，与 AppTabBar.tabs 保持一致。
+    meta: { tab: 'study', tabOrder: 0 },
     component: () => import('@/views/HomeView.vue')
+  },
+  {
+    // 练习：聚合层（P6 实施；P1 先占位，保证一级导航 4 Tab 全部可达）
+    path: '/practice',
+    name: 'practice',
+    meta: { tab: 'practice', tabOrder: 1 },
+    component: () => import('@/views/PracticeView.vue')
   },
   {
     // 内容页：按学科 + 单元号 + 页面索引渲染
@@ -46,12 +55,14 @@ const routes = [
     // 错题本
     path: '/error-book',
     name: 'error-book',
+    meta: { tab: 'review', tabOrder: 2 },
     component: () => import('@/views/ErrorBookView.vue')
   },
   {
     // 个人主页
     path: '/profile',
     name: 'profile',
+    meta: { tab: 'me', tabOrder: 3 },
     component: () => import('@/views/ProfileView.vue')
   },
   {

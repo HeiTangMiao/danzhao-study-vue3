@@ -7,18 +7,31 @@ import type { Subject } from './site'
 
 // ===== Progress Store =====
 
+/** 最近学习位置（由 page_progress.visitTime 推导，供首页「继续学习」直达） */
+export interface LastStudied {
+  subject: Subject
+  unitNum: string
+  fileIndex: number
+  unitTitle: string
+  fileTitle: string
+  time: number
+}
+
 /** 进度 Store 的 State */
 export interface ProgressState {
   /** 进度记录：按学科 → 单元号 → 文件索引 */
   completed: Record<string, Record<string, Record<number, boolean>>>
   /** 最近学习时间戳 */
   lastStudiedAt: number | null
+  /** 最近学习位置坐标（唯一事实源，替代原 localStorage.last_study） */
+  lastStudied: LastStudied | null
 }
 
 /** 进度 Store 实例类型 */
 export interface ProgressStore {
   completed: ProgressState['completed']
   lastStudiedAt: ProgressState['lastStudiedAt']
+  lastStudied: ProgressState['lastStudied']
   completedCount: (subject: Subject, unitNum: string) => number
   isCompleted: (subject: Subject, unitNum: string, fileIndex: number) => boolean
   subjectTotalCompleted: (subject: Subject) => number

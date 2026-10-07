@@ -14,7 +14,7 @@ import { SUBJECTS } from '@/content/index'
 /**
  * 从 page_progress 记录推导完成快照
  * @param {Array<object>} rows - 全部 page_progress 记录
- * @returns {{ completed: object, lastStudiedAt: number|null }}
+ * @returns {{ completed: object, lastStudiedAt: number|null, lastStudied: object|null }}
  */
 function buildSnapshot(rows) {
   const byKey = new Map()
@@ -23,6 +23,10 @@ function buildSnapshot(rows) {
   }
   const completed = {}
   let lastStudiedAt = 0
+  // 最近学习位置：取 page_progress 中 visitTime 最大的页面坐标。
+  // 与 lastStudiedAt 同源推导，作为首页「继续学习」的唯一事实源
+  //（原实现另存一份 localStorage.last_study，属双存储；见架构审计 §2-2）。
+  let lastStudied = null
   for (const subject of Object.keys(SUBJECTS)) {
     const config = SUBJECTS[subject]
     for (const unit of config.units || []) {
@@ -38,11 +42,21 @@ function buildSnapshot(rows) {
           if (!completed[subject][unit.num]) completed[subject][unit.num] = {}
           completed[subject][unit.num][i] = true
         }
-        if (row && row.visitTime && row.visitTime > lastStudiedAt) lastStudiedAt = row.visitTime
+        if (row && row.visitTime && row.visitTime > lastStudiedAt) {
+          lastStudiedAt = row.visitTime
+          lastStudied = {
+            subject,
+            unitNum: unit.num,
+            fileIndex: i,
+            unitTitle: unit.title,
+            fileTitle: file.title,
+            time: row.visitTime
+          }
+        }
       }
     }
   }
-  return { completed, lastStudiedAt: lastStudiedAt || null }
+  return { completed, lastStudiedAt: lastStudiedAt || null, lastStudied }
 }
 
 export const useProgressStore = defineStore('progress', {
@@ -51,6 +65,8 @@ export const useProgressStore = defineStore('progress', {
     completed: {},
     // 最近学习时间戳（取 page_progress 最新 visitTime）
     lastStudiedAt: null,
+    // 最近学习位置坐标（与 lastStudiedAt 同源；供首页「继续学习」直达，具备跨设备能力）
+    lastStudied: null,
     // 是否已完成一次快照（幂等保护）
     _loaded: false
   }),
@@ -109,6 +125,7 @@ export const useProgressStore = defineStore('progress', {
       const s = buildSnapshot(rows)
       this.completed = s.completed
       this.lastStudiedAt = s.lastStudiedAt
+      this.lastStudied = s.lastStudied
       this._loaded = true
     },
 

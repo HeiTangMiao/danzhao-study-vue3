@@ -6,7 +6,8 @@
      那是 ErrorFocusBlock（错对）的语义，两者不可互相顶替
   视觉（极简留白）：
    - 无卡片外框，靠中缝发丝线与行间发丝线建立「两栏一张表」的结构
-   - ≥768px 三栏（维度 | 左 | 右）；窄屏降为「维度一行 + 左右各自带名」，避免挤坏
+   - 容器宽 ≥768px 三栏（维度 | 左 | 右）；窄则降为「维度一行 + 左右各自带名」，避免挤坏
+     （按容器查询判定，不按视口；见 system_design §4.2）
 -->
 <template>
   <BlockShell :title="block.title" variant="plain">
@@ -64,7 +65,9 @@ const aspects = computed(() =>
 </script>
 
 <style scoped>
-.compare-grid { display: flex; flex-direction: column; }
+/* 查询容器 = 对照表本身（.compare-grid），确保按该表的实际可用宽度切换三栏/单栏
+ *（system_design §4.2：同区块可能被放进不同宽度容器，媒体查询按视口判断会误判）。 */
+.compare-grid { display: flex; flex-direction: column; container-type: inline-size; }
 
 /* 窄屏：表头整体隐藏（名称由每个格子自带），维度标签独占一行 */
 .compare-row {
@@ -95,7 +98,8 @@ const aspects = computed(() =>
   margin-bottom: var(--space-1);
 }
 
-@media (min-width: 768px) {
+/* ≥768px（按容器宽度）三栏：维度 | 左 | 右 */
+@container (min-width: 768px) {
   .compare-row {
     grid-template-columns: 7rem minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--space-5);
@@ -115,6 +119,30 @@ const aspects = computed(() =>
   .compare-cell--right {
     border-left: 1px solid var(--line);
     padding-left: var(--space-5);
+  }
+}
+
+/* 兜底：宿主不支持容器查询时退回媒体查询（等价迁移前的行为） */
+@supports not (container-type: inline-size) {
+  @media (min-width: 768px) {
+    .compare-row {
+      grid-template-columns: 7rem minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-5);
+      align-items: start;
+    }
+    .compare-row--head {
+      display: grid;
+      padding-top: 0;
+    }
+    .compare-row--head + .compare-row { border-top: 1px solid var(--line); }
+
+    .compare-who { display: none; }
+
+    .compare-name--right,
+    .compare-cell--right {
+      border-left: 1px solid var(--line);
+      padding-left: var(--space-5);
+    }
   }
 }
 </style>

@@ -7,6 +7,13 @@
    - 学习追踪：记录页面访问、答题与测验成绩（无游戏化奖励）
    - 笔记功能：每页可记录学习笔记
    - 书签功能：收藏当前页面
+  导航互斥（system_design §4.1 / §9.3）：
+   - 本视图为详情页（路由不携带 meta.tab），故 AppTabBar 的底部 pill 自动隐藏，
+     由 ContentSidebar 的底部操作栏接管 —— 两个底栏不同屏。
+   - 桌面端顶栏仍常驻（承载用户区入口）；其与阅读进度条的层叠由本文件 `.reading-progress`
+     的桌面端 top 下移解决（进度条降至顶栏下方）。
+   - 完成状态不再在页眉重复渲染（原 `.done-chip` 为第 4 份拷贝）；
+     统一由 ContentSidebar 的只读状态徽章承担（每端 1 处，见架构审计 §2-3）。
 -->
 <template>
   <div class="unit-view">
@@ -49,7 +56,6 @@
           <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes">📝</button>
         </div>
       </div>
-      <span v-if="isDone" class="done-chip">✅ 已完成</span>
     </header>
 
     <!-- 目录导航（折叠式） -->
@@ -338,30 +344,15 @@ async function loadPage() {
       isTest: fileMeta.value.isTest || false
     })
     // 刷新完成快照（内容页打开即完成，测验页等交卷后再由 ExamBlock 刷新）
+    // 「最近学习」位置不再另存 localStorage —— progress 由 page_progress 推导
+    // （含 lastStudied 坐标），首页「继续学习」直接读 store（见架构审计 §2-2）。
     progress.refresh().catch((e) => console.error('[UnitView] 刷新进度失败:', e))
-    // 记录最近学习位置（首页「继续学习」直达）
-    saveLastStudy()
   } catch (e) {
     console.error('[UnitView] 内容加载失败:', e)
     page.value = null
   } finally {
     loading.value = false
   }
-}
-
-// 写入最近学习位置（localStorage，轻量同步读取）
-function saveLastStudy() {
-  if (!unit.value || !fileMeta.value) return
-  try {
-    localStorage.setItem('last_study', JSON.stringify({
-      subject: subject.value,
-      unitNum: unit.value.num,
-      fileIndex: fileIndex.value,
-      unitTitle: unit.value.title,
-      fileTitle: fileMeta.value.title,
-      time: Date.now()
-    }))
-  } catch (e) { /* 存储不可用时静默忽略 */ }
 }
 
 loadPage()
@@ -446,6 +437,12 @@ watch(
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   height: 3px; background: transparent;
 }
+/* 桌面端顶栏常驻所有页面（z-index 110、高 calc(--tabbar-h + --sat)），会盖住 top:0 的进度条 →
+ * 桌面端把进度条挪到顶栏正下方，避免遮挡冲突；移动端详情页无顶栏，保持 top:0 不变。
+ * 注：「进度条并入顶栏」是 system_design §4.4 列的 P4 工作，本轮不做，先降至顶栏下方。 */
+@media (min-width: 1150px) {
+  .reading-progress { top: calc(var(--tabbar-h) + var(--sat)); }
+}
 .reading-progress__bar {
   height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
   border-radius: 0 3px 3px 0;
@@ -472,12 +469,6 @@ watch(
 .page-header h1 { font-size: 1.6rem; }
 .page-subtitle { color: var(--text-muted); margin-top: var(--spacer-8); }
 .page-tools { display: flex; gap: var(--spacer-8); }
-.done-chip {
-  display: inline-flex; align-items: center;
-  margin-top: var(--spacer-12);
-  color: var(--success, #2e7d32);
-  font-size: 0.85rem; font-weight: 600;
-}
 .tool-btn {
   width: 36px; height: 36px;
   background: var(--surface); border: 1px solid var(--border);
@@ -485,14 +476,6 @@ watch(
   font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
 }
 .tool-btn.active { color: var(--warning); border-color: var(--warning); }
-.done-btn {
-  margin-top: var(--spacer-12);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 6px 16px;
-}
-.done-btn.done { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
 
 .fade-enter-active, .fade-leave-active { transition: opacity var(--dur-3) var(--ease-standard); }
 
@@ -544,11 +527,10 @@ watch(
 .topbar-enter-active, .topbar-leave-active { transition: transform 0.25s ease, opacity 0.25s ease; }
 .topbar-enter-from, .topbar-leave-to { transform: translateY(-100%); opacity: 0; }
 
-/* 移动端：底部操作栏为内容预留空间；头部去重（工具/完成按钮收入底部栏与更多面板） */
+/* 移动端：底部操作栏为内容预留空间；头部去重（工具收入底部栏与更多面板） */
 @media (max-width: 1150px) {
   .unit-view { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
   .page-tools { display: none; }
-  .done-btn { display: none; }
 
   /* 迷你顶栏：返回首页 + 页面标题 + 阅读进度百分比 */
   .mobile-topbar {
@@ -604,7 +586,6 @@ watch(
 @media (max-width: 600px) {
   .page-header h1 { font-size: 1.35rem; }
   .tool-btn { width: 40px; height: 40px; }
-  .done-btn { width: 100%; }
   .nav-btn { flex: 1; }
 
   /* 触控目标 ≥44px */

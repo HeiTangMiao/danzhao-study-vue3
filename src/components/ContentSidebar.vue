@@ -14,6 +14,9 @@
    - isMath      是否数学学科（侧边栏据此追加 math 主题类）
    - doneFiles   单元内各页面完成状态（布尔数组，移动端答题卡）
   移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
+  ⚠️ 与 AppTabBar 互斥契约（system_design §4.1 / §9.3）：本组件只在详情页（UnitView）使用，
+     而 AppTabBar 的底部 pill 在详情页（无 route.meta.tab）不渲染 —— 两个底栏永不同屏。
+     若将来把 ContentSidebar 复用到一级 Tab 页，须同步收敛两处底栏的显示条件。
   emits:
    - scroll-to   跳转到区块 ({index})
    - 完成状态由访问/交卷自动驱动（组件仅展示 isDone / doneFiles，无手动标记）
@@ -38,13 +41,14 @@
         <div class="sb-title">⚡ 快捷操作</div>
         <div class="sb-actions">
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')">⬆ <span>顶部</span></button>
-          <button class="sb-act" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成">
-            {{ isDone ? '✅' : '○' }} <span>{{ isDone ? '已完成' : '学习中' }}</span>
-          </button>
           <button class="sb-act" title="本页目录" @click="emit('toggle-toc')">☰ <span>目录</span></button>
           <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')">★ <span>收藏</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')">📝 <span>笔记</span></button>
         </div>
+        <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处 -->
+        <span class="sb-status" :class="{ on: isDone }" :title="isDone ? '已完成' : '学习中'">
+          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
+        </span>
       </div>
 
       <!-- ===== 快捷导航区：本页章节 ===== -->
@@ -87,10 +91,9 @@
       </nav>
     </div>
 
-    <!-- 收起态：迷你图标徽标 -->
+    <!-- 收起态：迷你图标徽标（完成状态不在此重复，展开后在快捷区查看） -->
     <div v-else class="sidebar-mini">
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')">⬆</button>
-      <button class="mini-item" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成" aria-label="完成状态">{{ isDone ? '✅' : '○' }}</button>
       <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')">☰</button>
       <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')">★</button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')">📝</button>
@@ -122,7 +125,11 @@
         <span class="sb-sheet__grab-bar"></span>
       </div>
       <div class="sb-sheet__head">
-        <span>📚 {{ unit?.title }}</span>
+        <span class="sb-sheet__title">📚 {{ unit?.title }}</span>
+        <!-- 完成状态：移动端唯一的只读状态徽章（与桌面端一致，非按钮） -->
+        <span class="sb-status" :class="{ on: isDone }">
+          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
+        </span>
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false">✕</button>
       </div>
       <div class="sb-sheet__body">
@@ -184,13 +191,10 @@
     <!-- 更多操作面板：收藏 / 笔记 / 完成 / 计算器 / 顶部 -->
     <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }" role="dialog" aria-modal="true" aria-label="更多操作" :aria-hidden="!moreOpen">
       <div class="sb-sheet__head">
-        <span>⋯ 更多操作</span>
+        <span class="sb-sheet__title">⋯ 更多操作</span>
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false">✕</button>
       </div>
       <div class="sb-more">
-        <button class="sb-more__item" :class="{ on: isDone }" disabled title="完成状态自动记录：内容页打开即学完，测验页提交后才算完成">
-          {{ isDone ? '✅' : '○' }}<span>{{ isDone ? '已完成' : '学习中' }}</span>
-        </button>
         <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false">★<span>收藏本页</span></button>
         <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false">📝<span>学习笔记</span></button>
         <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false">⬆<span>返回顶部</span></button>
@@ -394,6 +398,32 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 .sb-act:hover { border-color: var(--primary); color: var(--primary); }
 .sb-act.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
 
+/* 完成状态只读徽章（审计 §2-4 收敛：替代原先 3 处永远 disabled 的按钮；桌面/移动端共用） */
+.sb-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.sb-status.on {
+  background: rgba(var(--success-rgb), 0.12);
+  border-color: var(--success);
+  color: var(--success);
+}
+.sb-status__dot {
+  flex: 0 0 auto;
+  width: 6px; height: 6px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
 .sb-nav { border-top: 1px dashed var(--border); }
 .sb-nav ul { list-style: none; }
 .sb-item {
@@ -521,9 +551,13 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     font-weight: 700;
     font-size: 0.95rem;
   }
-  .sb-sheet__head span {
+  /* 仅标题参与省略；徽章/按钮不应被 nowrap 规则命中 */
+  .sb-sheet__title {
+    flex: 1;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
+  /* 抽屉头内的徽章：作为 flex 项不参与纵向堆叠间距 */
+  .sb-sheet__head .sb-status { margin-top: 0; flex: 0 0 auto; }
   .sb-sheet__close {
     flex: 0 0 auto;
     width: 36px; height: 36px;
