@@ -8,7 +8,7 @@
   说明：本组件为通用画板封装，具体图形由调用方通过 setup 回调定义。
 -->
 <template>
-  <div ref="container" class="jxg-board" :style="{ minHeight: height + 'px' }">
+  <div ref="container" class="jxg-board" data-no-swipe :style="{ minHeight: height + 'px' }">
     <!-- jsxgraph 专用宿主：仅由 jsxgraph 填充，Vue 不管理其子节点。
          init()/重试时只清空这里，绝不触碰下面 Vue 的 v-if 状态节点 ——
          否则 Vue 更新时会向已分离的父节点插入占位注释，产生 [AppError] insertBefore 噪声。 -->

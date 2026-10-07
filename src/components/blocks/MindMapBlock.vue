@@ -26,7 +26,7 @@
       <button class="mm-btn" type="button" title="复位" @click="resetView">⟳</button>
       <span class="mm-hint">按钮缩放 · 拖拽移动 · 点击节点跳转正文</span>
     </div>
-    <div ref="viewport" class="mindmap-viewport" @wheel.prevent="onWheel">
+    <div ref="viewport" class="mindmap-viewport" data-no-swipe @wheel.prevent="onWheel">
       <div ref="canvas" class="mindmap-canvas" :style="canvasStyle">
         <div ref="container" class="mindmap-content"></div>
       </div>
