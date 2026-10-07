@@ -14,6 +14,7 @@
 
   ⚠️ 玻璃三铁律：必写 -webkit- 前缀；blur ≤ 16px；玻璃层不可被带 transform/filter/will-change
      的祖先包住（否则新建 backdrop root，玻璃静默失效）。
+     本组件的玻璃取值全部来自 main.css 的 --glass-* token（唯一来源；main.css 的 .glass 工具类同源）。
 
   图标：内联 SVG 路径（源自 Lucide，ISC 许可），编译期内联、无 emoji、无运行时注入、CSP 零风险。
         P2-T1 引入 AppIcon 后统一替换此处路径。
@@ -119,9 +120,17 @@ const ICON_PATHS = {
   right: 0;
   z-index: 110;
   display: none; /* 默认隐藏，断点处再显示（移动优先） */
+  /* ⚠️ 顶栏真实占高必须 == calc(--tabbar-h + --sat)：
+   * 若不显式定高，顶栏高度由「子元素高 + 自身 border-bottom」决定，会多出 1px，
+   * 使进度条 top(= calc(--tabbar-h+--sat)) 落进顶栏底边（bottom 57 > top 56 → 重叠 1px）。
+   * 故显式给顶栏定高并用 border-box 把 border 计入高度，令 --tabbar-h 的语义
+   * == 「顶栏实际占高」——进度条、内容区让位等所有依赖它的 calc 随之同时正确（§4.1）。 */
+  height: calc(var(--tabbar-h) + var(--sat));
+  box-sizing: border-box;
+  /* 玻璃取值统一来自 main.css 的 --glass-* token（唯一来源，避免两套玻璃写法） */
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border-bottom: 1px solid var(--line);
   box-shadow: inset 0 1px 0 var(--glass-hl), var(--glass-shadow);
 }
@@ -131,7 +140,9 @@ const ICON_PATHS = {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-4);
-  height: calc(var(--tabbar-h) + var(--sat));
+  /* 跟随父级定高（父级已用 border-box 计入 border），不再各自算高度，避免两处高度漂移 */
+  height: 100%;
+  box-sizing: border-box;
   padding: var(--sat) var(--pad-page) 0;
 }
 .app-topbar__brand {
@@ -197,8 +208,8 @@ const ICON_PATHS = {
   z-index: -1; /* 置于内容之下；父级有 z-index 形成层叠上下文，仍显示在页面之上 */
   border-radius: 28px;
   background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow: inset 0 1px 0 var(--glass-hl);
 }
 .app-pill__tab {

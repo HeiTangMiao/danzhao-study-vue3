@@ -205,13 +205,16 @@
    * 底部 pill 与桌面顶栏共用同一高度，保证双形态同构；内容区据此让位。 */
   --tabbar-h: 56px;
 
-  /* ---------- 玻璃层 token（P1-T2 起用；P2-T3 将扩展为 .glass 工具类）----------
-   * 三要素必须 token 化：暗色主题与 @supports 降级各需一份取值。
-   * 不透明度取 42%（v2 参数，比 v1 的 55-72% 更轻盈）。 */
+  /* ---------- 玻璃层 token（P1-T2 建立；P2-T3 成为 .glass 工具类的单一取值来源）----------
+   * 三要素必须 token 化：暗色主题与 @supports 降级各需一份取值（system_design §5.1）。
+   * 不透明度取 42%（v2 参数，比 v1 的 55-72% 更轻盈）；blur 钳在 8-16px（此处 12px）。
+   * ⚠️ 这些是「玻璃的唯一定义」：AppTabBar 与本文件 .glass 都只引用它们，不各写一套字面量。 */
   --glass-bg: rgba(255, 255, 255, 0.42);
   --glass-hl: rgba(255, 255, 255, 0.9); /* 内侧高光：模拟折射边缘 */
   --glass-shadow: 0 8px 24px rgba(88, 46, 29, 0.1); /* 暖可可投影（禁纯黑） */
   --glass-active: rgba(201, 100, 66, 0.1); /* 激活项底色（陶土橙 10%） */
+  --glass-blur: 12px; /* backdrop-filter 模糊半径（§5.1 上限 8-16px） */
+  --glass-sat: 1.2; /* 饱和度补偿：玻璃下的内容透出时不至于发灰 */
 }
 
 /* ---------- 暗色主题 ---------- */
@@ -246,8 +249,12 @@
   --danger: var(--error-500);
   --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-pop: 0 8px 30px rgba(0, 0, 0, 0.55);
-  /* 玻璃底：暗色下改为近黑半透明（与亮色的纸白 .42 对应） */
+  /* 玻璃：暗色下三要素各给一份取值（§5.1「暗色主题与降级各需一份取值」）——
+   * 底色改近黑半透明（与亮色的纸白 .42 对应）；高光调弱（暗底上白线过亮会显脏）；
+   * 投影改深（暖可可投影在暗底几乎不可见，失去浮起感）。 */
   --glass-bg: rgba(28, 28, 26, 0.42);
+  --glass-hl: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 /* ---------- 基础样式复位 ---------- */
@@ -303,6 +310,44 @@ body {
     --pad-page: var(--space-4); /* 24 → 16 */
     --gap-block: var(--space-5); /* 32 → 24 */
     --gap-block-tight: var(--space-3); /* 16 → 12 */
+  }
+}
+
+/* ============================================================
+ * P2-T3 玻璃拟态工具类（system_design §5.1）
+ * ============================================================
+ * .glass       玻璃三要素齐全：背景 + backdrop-filter + 内侧高光 + 外投影
+ * .glass-pill  28px 胶囊同圆角（与 .glass 搭配，见 §4.1 液态 TabBar）
+ * .glass--flat 去掉外投影、只留内侧高光的「扁平玻璃」变体（页面级功能条用它，
+ *              见 §5.7.0：贴系统状态栏/手势区时加投影会与系统视觉打架）
+ *
+ * ⚠️ 头号陷阱（§5.1）：玻璃层不可被带 transform / filter / opacity<1 / will-change /
+ *    contain:paint 的祖先包住 —— 任一都会创建新的 backdrop root，
+ *    令 backdrop-filter **静默失效**（页面上看不出「模糊」，只是玻璃变闷）。
+ *    推论：玻璃层必须与「做位移/透明度动画的容器」是**兄弟**，不能是其后代（§5.7.4）。
+ * ⚠️ WebKit 圆角玻璃：圆角处可能模糊溢出/锯齿 → backdrop-filter 挂在**与容器同圆角的
+ *    伪元素**上（父级 border-radius + overflow:hidden），见 AppTabBar 的 .app-pill::before。
+ * ⚠️ 首帧性能：避免「大面积玻璃 + 大量内联 SVG」同帧首绘（WebKit bug #322045）。
+ */
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); /* 必写 -webkit- 前缀（Tauri WKWebView / 旧 Android WebView） */
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow: inset 0 1px 0 var(--glass-hl), var(--glass-shadow);
+}
+.glass-pill {
+  border-radius: 28px;
+}
+.glass--flat {
+  box-shadow: inset 0 1px 0 var(--glass-hl);
+}
+
+/* 降级：宿主不支持 backdrop-filter 时玻璃退化为不透明底。
+ * 只换取值、写法不变（§5.5「只换 token 不换写法」）；保留内侧高光边以维持层次。
+ * 判据用 `not (A or B)`：只要前缀版或标准版任一可用就不降级。 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--surface);
   }
 }
 

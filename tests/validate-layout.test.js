@@ -14,7 +14,9 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
-import contentSchema from '@/utils/contentSchema'
+// 直接读 schema JSON：原先的 @/utils/contentSchema 只是浏览器侧加载入口，
+// 已随低代码编辑器一并删除（它的唯一消费者就是编辑器）。测试本就跑在 Node 下，直读即可。
+import schemaJson from '../schema/content-schema.json'
 import { createBlockValidator, MAX_LAYOUT_DEPTH } from '@/utils/validateBlock'
 import { componentOf } from '@/components/blocks/registry'
 import { warmKatex } from '@/composables/useKatex'
@@ -22,7 +24,7 @@ import BlockRenderer from '@/components/BlockRenderer.vue'
 
 await warmKatex()
 
-const validateBlock = createBlockValidator(contentSchema)
+const validateBlock = createBlockValidator(schemaJson)
 
 /**
  * 造一条指定层数的 layout 链，末端放一个合法 knowledge。
@@ -143,7 +145,7 @@ describe('layout 渲染分发：schema 原语清单 ↔ 组件白名单', () => 
   // 真相源是 schema：新增第 7 个原语时本用例自动覆盖，不需要手改测试。
   // 存在的理由：若有人往 schema 加了原语却忘了在 LayoutRenderer.LAYOUT_COMPONENTS 注册组件，
   //          运行时会静默降级成「未知布局原语」，其它测试全绿 —— 这条在 CI 就把它拦下。
-  const layoutKinds = contentSchema.definitions.layoutKind.enum
+  const layoutKinds = schemaJson.definitions.layoutKind.enum
 
   it('原语清单非空（防止 schema 被改空导致下面的循环空跑）', () => {
     expect(layoutKinds.length).toBeGreaterThan(0)
