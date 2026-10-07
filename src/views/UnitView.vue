@@ -133,7 +133,6 @@
       @toggle-bookmark="bookmark.toggleBookmark()"
       @toggle-notes="showNotes = !showNotes"
       @toggle-toc="showToc = !showToc"
-      @open-geogebra="showDesmos = true"
       @go-file="goFile"
       @go-unit="goUnit"
       @go-prev="goPrev"
@@ -171,19 +170,6 @@
       >🍅</button>
     </div>
 
-    <!-- Desmos 演练场浮层 -->
-    <transition name="fade">
-      <div v-if="showDesmos" class="desmos-overlay" @click.self="showDesmos = false">
-        <div class="desmos-overlay__panel">
-          <div class="desmos-overlay__head">
-            <span>🧮 GeoGebra 图形计算器演练场</span>
-            <button class="desmos-overlay__close" title="关闭" aria-label="关闭" @click="showDesmos = false">✕</button>
-          </div>
-          <GeoGebraPlayground />
-        </div>
-      </div>
-    </transition>
-
     <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
     <transition name="fade">
       <div v-if="confirmLeave" class="leave-confirm-overlay" @click.self="handleLeaveConfirm(false)">
@@ -201,7 +187,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
+import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 // 别名导入：本组件已有名为 loadPage 的本地函数（负责访问记录/进度刷新等副作用）
@@ -214,9 +200,6 @@ import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import ContentSidebar from '@/components/ContentSidebar.vue'
-
-// GeoGebra 演练场只在浮层打开时才挂载（见模板 v-if）：组件本体与自托管脚本都推迟到那时
-const GeoGebraPlayground = defineAsyncComponent(() => import('@/components/GeoGebraPlayground.vue'))
 
 const route = useRoute()
 const router = useRouter()
@@ -247,9 +230,6 @@ const fileMeta = computed(() => unit.value?.files[fileIndex.value])
 
 // 笔记面板显隐
 const showNotes = ref(false)
-
-// Desmos 演练场浮层显隐
-const showDesmos = ref(false)
 
 // 加载状态
 const loading = ref(false)
@@ -620,46 +600,6 @@ watch(
 .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .nav-index { color: var(--text-muted); font-size: 0.85rem; }
 
-/* Desmos 演练场浮层 */
-.desmos-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex; align-items: center; justify-content: center;
-  padding: var(--spacer-24);
-}
-.desmos-overlay__panel {
-  width: min(920px, 100%);
-  max-height: 92vh;
-  display: flex; flex-direction: column;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-pop);
-  overflow: hidden;
-  overflow-y: auto; /* 内容超高（短屏/横屏）时可滚动，避免画布被裁切 */
-}
-.desmos-overlay__head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-muted);
-  font-weight: 700;
-  position: sticky; top: 0; z-index: 1; /* 滚动时保证关闭按钮始终可见 */
-}
-.desmos-overlay__close {
-  width: 30px; height: 30px;
-  border-radius: var(--radius-full);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  font-size: 0.9rem;
-  display: flex; align-items: center; justify-content: center;
-}
-.desmos-overlay__close:hover { color: var(--danger); border-color: var(--danger); }
-
-/* 浮层内 GeoGebra 演练场样式透传 */
-.desmos-overlay__panel :deep(.ggb-playground) { margin-bottom: 0; border: none; border-radius: 0; }
-.desmos-overlay__panel :deep(.ggb-body) { min-height: min(62vh, 640px); }
-.desmos-overlay__panel :deep(.ggb-container) { min-height: min(62vh, 640px); }
-
 /* 移动端适配 */
 @media (max-width: 600px) {
   .page-header h1 { font-size: 1.35rem; }
@@ -673,18 +613,6 @@ watch(
   .notes-save { min-height: 44px; padding: 0 16px; }
   /* 锚点跳转偏移补上迷你顶栏高度 + 安全区 */
   .block-anchor { scroll-margin-top: calc(56px + var(--sat)); }
-  .desmos-overlay {
-    padding: var(--spacer-8);
-    align-items: flex-end;
-  }
-  .desmos-overlay__panel {
-    width: 100%;
-    max-height: 96vh;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  .desmos-overlay__panel :deep(.ggb-body) { min-height: min(70vh, 560px); }
-  .desmos-overlay__panel :deep(.ggb-container) { min-height: min(70vh, 560px); }
 }
 
 /* 离开确认弹层 */

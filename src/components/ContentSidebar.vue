@@ -1,7 +1,7 @@
 <!--
   ContentSidebar —— 内容页固定侧边栏（快捷导航 + 快捷操作）
   职责：
-   - 快捷操作区（吸顶）：返回顶部 / 标记完成 / 书签 / 笔记 / 目录 / Desmos/展开收起
+   - 快捷操作区（吸顶）：返回顶部 / 标记完成 / 书签 / 笔记 / 目录 / 展开收起
    - 快捷导航区（可滚动）：本页区块章节 / 同单元其他页面 / 前后单元切换
   props:
    - unit        当前单元配置（含 files 列表）
@@ -11,7 +11,7 @@
    - unitNum     当前单元号
    - site        学科配置（用于单元间导航）
    - isDone      是否已完成
-   - isMath      是否数学学科（控制 GeoGebra 入口显隐）
+   - isMath      是否数学学科（侧边栏据此追加 math 主题类）
    - doneFiles   单元内各页面完成状态（布尔数组，移动端答题卡）
   移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
   emits:
@@ -20,7 +20,6 @@
    - toggle-bookmark 书签
    - toggle-notes 笔记
    - toggle-toc  目录面板
-   - open-geogebra 打开 GeoGebra 演练场
    - go-file     跳转同单元指定页
    - go-unit     跳转指定单元
    - go-prev     上一页（移动端底部栏）
@@ -45,9 +44,6 @@
           <button class="sb-act" title="本页目录" @click="emit('toggle-toc')">☰ <span>目录</span></button>
           <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')">★ <span>收藏</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')">📝 <span>笔记</span></button>
-          <button v-if="isMath" class="sb-act sb-desmos" title="GeoGebra 图形计算器演练场" @click="emit('open-geogebra')">
-            🧮 <span>GeoGebra</span>
-          </button>
         </div>
       </div>
 
@@ -98,7 +94,6 @@
       <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')">☰</button>
       <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')">★</button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')">📝</button>
-      <button v-if="isMath" class="mini-item" title="GeoGebra 演练场" aria-label="GeoGebra 图形计算器" @click="emit('open-geogebra')">🧮</button>
     </div>
   </aside>
 
@@ -198,7 +193,6 @@
         </button>
         <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false">★<span>收藏本页</span></button>
         <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false">📝<span>学习笔记</span></button>
-        <button v-if="isMath" class="sb-more__item sb-more__calc" @click="emit('open-geogebra'); moreOpen = false">🧮<span>计算器</span></button>
         <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false">⬆<span>返回顶部</span></button>
       </div>
     </div>
@@ -233,7 +227,7 @@ const props = defineProps({
 const emit = defineEmits([
   'scroll-to', 'scroll-top',
   'toggle-bookmark', 'toggle-notes', 'toggle-toc',
-  'open-geogebra', 'go-file', 'go-unit',
+  'go-file', 'go-unit',
   'go-prev', 'go-next'
 ])
 
@@ -399,7 +393,6 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 .sb-act:hover { border-color: var(--primary); color: var(--primary); }
 .sb-act.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
-.sb-desmos { background: rgba(var(--accent-rgb), 0.14); border-color: var(--accent); color: var(--accent); }
 
 .sb-nav { border-top: 1px dashed var(--border); }
 .sb-nav ul { list-style: none; }
@@ -624,8 +617,6 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   .sb-more__item span { font-size: 0.75rem; color: var(--text-muted); }
   .sb-more__item.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); }
   .sb-more__item.on span { color: var(--success); }
-  .sb-more__calc { background: rgba(var(--accent-rgb), 0.12); border-color: var(--accent); }
-  .sb-more__calc span { color: var(--accent); }
 
   /* ===== 底部常驻操作栏：目录 / 上页 / 下页（主操作）/ 更多 ===== */
   .sb-bar {

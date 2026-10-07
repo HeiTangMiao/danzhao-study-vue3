@@ -7,7 +7,7 @@
 
 /* ---------- 统一区块标题 ----------
  * 阶段 3 第二步：改造前 .block-title 有 3 处互不相同的定义（MindMap 是
- * 1.05rem/0 0 12px、Desmos 逐字复制全局 h3、Objectives 只覆盖下边距），
+ * 1.05rem/0 0 12px、例题块逐字复制全局 h3、Objectives 只覆盖下边距），
  * 其余 7 个区块靠全局 h3 兜底 —— 等于没有统一标题。
  * 这里成为 .block-title 的唯一真相源，各组件不再各自定义。
  */
@@ -24,7 +24,7 @@
  *  - shell--plain    ：默认，纯留白（knowledge / objectives 等）
  *  - shell--note     ：左 2px 语义色细线（tip / warning 共用，色值由调用方设 --tone）
  *  - shell--formula  ：全站唯一保留浅底色的类型（formula）
- *  - shell--viewport ：保留边框的视口（diagram / desmos 等）
+ *  - shell--viewport ：保留边框的视口（diagram 等图形类区块）
  * 约束：外壳不带下边距 —— 块间距由 UnitView 的 .block-anchor 间距统一负责。
  */
 .block-shell { /* 本身无规则，外观全部由变体决定 */ }

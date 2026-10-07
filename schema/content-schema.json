@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "desmos", "columns", "group", "steps", "summary", "compare", "vocab", "code", "cloze"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "columns", "group", "steps", "summary", "compare", "vocab", "code", "cloze"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -45,7 +45,6 @@
         { "if": { "properties": { "type": { "const": "errorfocus" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/errorFocusItem" } } } } },
         { "if": { "properties": { "type": { "const": "strategy" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/strategyItem" } } } } },
         { "if": { "properties": { "type": { "const": "exam" } } }, "then": { "required": ["items"], "properties": { "duration": { "type": "number", "description": "考试时长（分钟）" }, "totalScore": { "type": "number", "description": "满分" }, "passingScore": { "type": "number", "description": "及格分" }, "items": { "type": "array", "items": { "$ref": "#/definitions/examItem" } } } } },
-        { "if": { "properties": { "type": { "const": "desmos" } } }, "then": { "properties": { "initialExpressions": { "type": "array", "items": { "type": "string" }, "description": "初始表达式列表（LaTeX）" } } } },
         { "if": { "properties": { "type": { "const": "columns" } } }, "then": { "required": ["items"], "properties": { "cols": { "type": "number", "enum": [2, 3], "description": "桌面端列数；窄屏自动降单列" }, "gap": { "type": "string", "enum": ["normal", "tight"], "description": "列间距：normal 正常 / tight 紧凑" }, "items": { "type": "array", "items": { "type": "array", "items": { "$ref": "#/definitions/block" } }, "description": "每列是一个区块数组，长度必须与 cols 一致" } } } },
         { "if": { "properties": { "type": { "const": "group" } } }, "then": { "properties": { "variant": { "type": "string", "enum": ["band", "collapse"], "description": "band=分组带（发丝线分隔）；collapse=可折叠分组" }, "collapsed": { "type": "boolean", "description": "collapse 变体初始是否折叠" }, "items": { "type": "array", "items": { "$ref": "#/definitions/block" } } } } },
         { "if": { "properties": { "type": { "const": "steps" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/stepItem" }, "description": "编号步骤：渲染时按顺序自动编号，序号由渲染层生成不要写进标题" } } } },

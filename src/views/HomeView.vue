@@ -3,7 +3,6 @@
   职责：
    - 展示学科选择卡片（数学 / 语文 / 计算机）+ 对各学科的单元进度
    - 顶部提供工具快捷入口（仪表盘 / 错题本 / 模拟冲刺 / 编辑器）
-   - 提供 GeoGebra 图形计算器入口（懒加载，点击展开后才加载脚本）
    - 记忆用户选择的学科（localStorage）
    - 页脚：版权信息 + 工具链接导航
 -->
@@ -103,24 +102,6 @@
       </router-link>
     </section>
 
-    <!-- GeoGebra 图形计算器（懒加载折叠卡片） -->
-    <section class="desmos-card card">
-      <button class="desmos-card__head" :aria-expanded="desmosOpen" @click="desmosOpen = !desmosOpen">
-        <div class="desmos-card__title">
-          <span class="desmos-icon">🧮</span>
-          <div class="desmos-card__text">
-            <span class="desmos-name">GeoGebra 图形计算器</span>
-            <span class="desmos-desc">函数图像即绘即览 · 点击展开</span>
-          </div>
-        </div>
-        <span class="desmos-toggle" :class="{ open: desmosOpen }">▾</span>
-      </button>
-      <!-- 展开时才挂载组件，实现懒加载 -->
-      <div v-if="desmosOpen" class="desmos-card__body">
-        <GeoGebraPlayground />
-      </div>
-    </section>
-
     <!-- 按阶段分组展示单元 -->
     <section
       v-for="phase in groupedUnits"
@@ -175,14 +156,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProgressStore } from '@/stores/progress'
 import { SUBJECT_LIST, getSubjectConfig } from '@/content/index'
 import SearchPanel from '@/components/SearchPanel.vue'
-
-// GeoGebra 演练场只在卡片展开时才挂载（见模板 v-if="desmosOpen"）：组件本体推迟到那时
-const GeoGebraPlayground = defineAsyncComponent(() => import('@/components/GeoGebraPlayground.vue'))
 
 const router = useRouter()
 const progress = useProgressStore()
@@ -230,9 +208,6 @@ function continueStudy() {
 
 // 当前学科配置
 const currentConfig = computed(() => getSubjectConfig(currentSubject.value))
-
-// GeoGebra 折叠卡片是否展开（默认收起，展开后才加载脚本）
-const desmosOpen = ref(false)
 
 // 按阶段分组单元
 const groupedUnits = computed(() => {
@@ -394,29 +369,6 @@ const mockRoute = computed(() => sprintUnit.value
 .tool-text { display: flex; flex-direction: column; line-height: 1.4; }
 .tool-name { font-weight: 700; font-size: 0.95rem; }
 .tool-desc { font-size: 0.75rem; color: var(--text-muted); }
-
-/* Desmos 折叠卡片 */
-.desmos-card { padding: 0; overflow: hidden; margin-bottom: var(--spacer-20); }
-.desmos-card__head {
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: var(--spacer-12) var(--spacer-16);
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.desmos-card__head:hover { background: var(--surface-muted); }
-.desmos-card__title { display: flex; align-items: center; gap: var(--spacer-12); }
-.desmos-icon { font-size: 1.5rem; }
-.desmos-card__text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.4; }
-.desmos-name { font-weight: 700; font-size: 1rem; }
-.desmos-desc { font-size: 0.75rem; color: var(--text-muted); }
-.desmos-toggle {
-  font-size: 1.1rem; color: var(--text-muted);
-  transition: transform 0.2s ease;
-  line-height: 1;
-}
-.desmos-toggle.open { transform: rotate(180deg); }
-.desmos-card__body { border-top: 1px solid var(--border); }
 
 /* 阶段分组 */
 .phase-group { margin-bottom: var(--spacer-24); }

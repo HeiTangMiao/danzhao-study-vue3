@@ -69,12 +69,6 @@ export default {
     },
 
     {
-      type: "desmos",
-      title: "🖊 动手演练：二次函数（Desmos）",
-      initialExpressions: ["y = x^2 - 2x - 3", "y = -(x+1)^2 + 4"]
-    },
-
-    {
       type: "knowledge",
       title: "三、最值问题",
       paragraphs: [

@@ -28,8 +28,6 @@ export const BLOCK_TYPES_META = {
   errorfocus: { label: '易错专项', icon: '🚨' },
   strategy: { label: '考试技巧', icon: '🎯' },
   exam: { label: '模拟卷', icon: '📝' },
-  // 演练场：图标留空 —— 与改造前一致，该类型不进入本页目录
-  desmos: { label: '演练场', icon: '' },
   // 容器型区块：不进入本页目录（目录只收有具体内容的区块）
   columns: { label: '多栏', icon: '' },
   group: { label: '分组', icon: '' },

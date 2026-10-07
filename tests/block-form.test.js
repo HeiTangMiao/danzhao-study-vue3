@@ -74,11 +74,11 @@ describe('BlockForm 写回', () => {
   })
 
   it('可选的数组字段在首次添加时才被建出来', async () => {
-    // desmos 的 initialExpressions 非必填，骨架里没有这个键
-    const { wrapper, obj } = mountBlock('desmos')
-    expect(obj.initialExpressions).toBeUndefined()
-    await addBtnOf(wrapper, 'initialExpressions').trigger('click')
-    expect(obj.initialExpressions).toEqual([''])
+    // summary 的 points 非必填，骨架里没有这个键
+    const { wrapper, obj } = mountBlock('summary')
+    expect(obj.points).toBeUndefined()
+    await addBtnOf(wrapper, 'points').trigger('click')
+    expect(obj.points).toEqual([''])
   })
 })
 

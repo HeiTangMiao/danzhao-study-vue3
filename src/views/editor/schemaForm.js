@@ -57,7 +57,6 @@ const FIELD_LABEL = {
   duration: '考试时长（分钟）',
   totalScore: '满分',
   passingScore: '及格分',
-  initialExpressions: '初始表达式',
   variant: '变体',
   kind: '知识点子类型',
   cols: '列数',

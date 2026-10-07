@@ -49,11 +49,9 @@ const BLOCK_COMPONENTS = {
   strategy: StrategyBlock,
   // 低频大块（各自独立 chunk，页面用到才加载）：
   //  - exam：597 行，内置计时/评分状态，只被 11 页用到
-  //  - desmos：内含 GeoGebra 演练场
   // 反例（刻意保持同步，见交接文档阶段 7.3）：knowledge/quiz/example 等覆盖 100+ 页，
   // 且 quiz/example 带交互状态，异步重挂载会丢状态
   exam: asyncBlock(() => import('./ExamBlock.vue')),
-  desmos: asyncBlock(() => import('./DesmosBlock.vue')),
   // 容器型区块：由 BlockRenderer 内部自引用递归（registry 绑定仅为完整性，
   // BlockRenderer 在模板里用 v-if 分支处理，不会走到这里的 component）
   columns: ColumnsBlock,

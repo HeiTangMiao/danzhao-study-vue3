@@ -6,7 +6,7 @@
  *      在首屏加一次往返与占位闪烁，带交互状态的（quiz / example）还会丢状态。
  *
  * 职责（两个方向都要守，否则「不要贪」这条纪律会慢慢被磨掉）：
- *  - 异步组（exam / desmos / diagram）确实是异步组件，源码里不得再静态 import 它们
+ *  - 异步组（exam / diagram）确实是异步组件，源码里不得再静态 import 它们
  *  - 同步组（knowledge / quiz / example …）挂载瞬间就能渲染出内容，不得被顺手异步化
  */
 import { describe, it, expect, vi } from 'vitest'
@@ -25,7 +25,7 @@ const ROOT = process.cwd()
 const REGISTRY_SRC = readFileSync(join(ROOT, 'src', 'components', 'blocks', 'registry.js'), 'utf-8')
 
 /** 异步组：低频大块，各自独立 chunk */
-const ASYNC_TYPES = ['exam', 'desmos', 'diagram']
+const ASYNC_TYPES = ['exam', 'diagram']
 /** 同步白名单：覆盖页数多，或带交互状态（异步重挂载会丢状态） */
 const SYNC_TYPES = ['knowledge', 'objectives', 'formula', 'table', 'tip', 'warning', 'quiz', 'example', 'mindmap']
 
@@ -36,7 +36,7 @@ describe('registry 的异步取舍', () => {
         new RegExp(`${type}: asyncBlock\\(\\(\\) => import\\('\\./`)
       )
     }
-    for (const name of ['ExamBlock', 'DesmosBlock', 'GeometryBlock']) {
+    for (const name of ['ExamBlock', 'GeometryBlock']) {
       expect(REGISTRY_SRC, `${name} 不得再静态 import`).not.toMatch(new RegExp(`^import ${name} from`, 'm'))
     }
   })

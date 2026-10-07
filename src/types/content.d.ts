@@ -19,7 +19,6 @@ export type BlockType =
   | 'errorfocus' // 易错专项
   | 'strategy'   // 考试技巧
   | 'exam'       // 模拟卷
-  | 'desmos'     // 演练场（GeoGebra 图形计算器）
   | 'columns'    // 多栏容器
   | 'group'      // 分组容器
   | 'steps'      // 编号步骤条
@@ -116,12 +115,6 @@ export interface DiagramBlock extends BaseBlock {
   type: 'diagram'
   boardId: string       // JSXGraph 画板 ID（对应 src/geometry/boards/<boardId>.js 模块）
   caption?: string      // 图注
-}
-
-/** 演练场区块（GeoGebra 图形计算器） */
-export interface DesmosBlock extends BaseBlock {
-  type: 'desmos'
-  initialExpressions?: string[] // 初始表达式列表（LaTeX）
 }
 
 /** 易错专项条目 */
@@ -268,7 +261,6 @@ export type Block =
   | ErrorFocusBlock
   | StrategyBlock
   | ExamBlock
-  | DesmosBlock
   | ColumnsBlock
   | GroupBlock
   | StepsBlock

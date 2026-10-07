@@ -1,7 +1,7 @@
 /**
  * 异步区块包装工厂
  * 职责：
- *  - 低频 / 体积大的区块（图形画板、模拟卷、演练场）按需加载，避免挤进内容页主 chunk
+ *  - 低频 / 体积大的区块（图形画板、模拟卷）按需加载，避免挤进内容页主 chunk
  *  - 统一 loading / error 占位，避免每个异步区块各写一遍 defineAsyncComponent 配置
  * 说明：占位样式类 .block-async-loading / .block-async-error 定义在 BlockRenderer.vue
  *      的全局 style 中（非 scoped），此处只负责渲染结构

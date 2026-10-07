@@ -141,15 +141,6 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
           errors.push(`图形区块 boardId "${block.boardId}" 未找到对应画板模块`)
         }
         break
-      case 'desmos':
-        if (block.initialExpressions !== undefined) {
-          if (!Array.isArray(block.initialExpressions) || block.initialExpressions.length === 0) {
-            errors.push('Desmos 区块 initialExpressions 需为非空字符串数组')
-          } else if (block.initialExpressions.some((e) => isEmpty(e))) {
-            errors.push('Desmos 区块 initialExpressions 存在空元素')
-          }
-        }
-        break
       // 容器型区块（阶段 4）：递归校验子区块 —— 子区块的错误带上路径前缀
       case 'columns': {
         const cols = Array.isArray(block.items) ? block.items : []
