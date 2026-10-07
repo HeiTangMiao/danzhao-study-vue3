@@ -14,7 +14,7 @@
    - isMath      是否数学学科（侧边栏据此追加 math 主题类）
    - doneFiles   单元内各页面完成状态（布尔数组，移动端答题卡）
   移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
-  ⚠️ 与 AppTabBar 互斥契约（system_design §4.1 / §9.3）：本组件只在详情页（UnitView）使用，
+  注意：与 AppTabBar 互斥契约（system_design §4.1 / §9.3）：本组件只在详情页（UnitView）使用，
      而 AppTabBar 的底部 pill 在详情页（无 route.meta.tab）不渲染 —— 两个底栏永不同屏。
      若将来把 ContentSidebar 复用到一级 Tab 页，须同步收敛两处底栏的显示条件。
   emits:
@@ -38,12 +38,12 @@
     <div v-if="!collapsed" class="sidebar-inner">
       <!-- ===== 快捷操作区（吸顶） ===== -->
       <div class="sb-quick">
-        <div class="sb-title">⚡ 快捷操作</div>
+        <div class="sb-title">快捷操作</div>
         <div class="sb-actions">
-          <button class="sb-act" title="返回顶部" @click="emit('scroll-top')">⬆ <span>顶部</span></button>
-          <button class="sb-act" title="本页目录" @click="emit('toggle-toc')">☰ <span>目录</span></button>
-          <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')">★ <span>收藏</span></button>
-          <button class="sb-act" title="笔记" @click="emit('toggle-notes')">📝 <span>笔记</span></button>
+          <button class="sb-act" title="返回顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /><span>顶部</span></button>
+          <button class="sb-act" title="本页目录" @click="emit('toggle-toc')"><AppIcon name="menu" :size="16" /><span>目录</span></button>
+          <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏</span></button>
+          <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
         </div>
         <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处 -->
         <span class="sb-status" :class="{ on: isDone }" :title="isDone ? '已完成' : '学习中'">
@@ -53,11 +53,11 @@
 
       <!-- ===== 快捷导航区：本页章节 ===== -->
       <nav v-if="toc.length" class="sb-nav">
-        <div class="sb-title">📑 本页章节</div>
+        <div class="sb-title">本页章节</div>
         <ul>
           <li v-for="(item, i) in toc" :key="i">
             <button class="sb-item" @click="emit('scroll-to', item.index)">
-              <span class="sb-icon">{{ item.icon }}</span>
+              <span class="sb-icon"><AppIcon :name="item.icon" :size="15" /></span>
               <span class="sb-text">{{ item.title }}</span>
             </button>
           </li>
@@ -66,7 +66,7 @@
 
       <!-- ===== 快捷导航区：同单元页面 ===== -->
       <nav v-if="unit" class="sb-nav">
-        <div class="sb-title">📚 本单元内容</div>
+        <div class="sb-title">本单元内容</div>
         <ul>
           <li v-for="(f, i) in unit.files" :key="i">
             <button class="sb-item" :class="{ active: i === fileIndex }" @click="emit('go-file', i)">
@@ -79,7 +79,7 @@
 
       <!-- ===== 快捷导航区：单元切换 ===== -->
       <nav v-if="site" class="sb-nav">
-        <div class="sb-title">🔄 单元导航</div>
+        <div class="sb-title">单元导航</div>
         <div class="sb-unit-goto">
           <button class="sb-unit-btn" :disabled="!prevUnit" :title="prevUnit ? '上一单元：' + prevUnit.title : '已是第一单元'" @click="emit('go-unit', prevUnit)">
             ← {{ prevUnit ? prevUnit.title.slice(0, 4) : '—' }}
@@ -93,10 +93,10 @@
 
     <!-- 收起态：迷你图标徽标（完成状态不在此重复，展开后在快捷区查看） -->
     <div v-else class="sidebar-mini">
-      <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')">⬆</button>
-      <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')">☰</button>
-      <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')">★</button>
-      <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')">📝</button>
+      <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /></button>
+      <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')"><AppIcon name="menu" :size="16" /></button>
+      <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /></button>
+      <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /></button>
     </div>
   </aside>
 
@@ -125,12 +125,12 @@
         <span class="sb-sheet__grab-bar"></span>
       </div>
       <div class="sb-sheet__head">
-        <span class="sb-sheet__title">📚 {{ unit?.title }}</span>
+        <span class="sb-sheet__title">{{ unit?.title }}</span>
         <!-- 完成状态：移动端唯一的只读状态徽章（与桌面端一致，非按钮） -->
         <span class="sb-status" :class="{ on: isDone }">
           <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
         </span>
-        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false">✕</button>
+        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false"><AppIcon name="x" :size="18" /></button>
       </div>
       <div class="sb-sheet__body">
         <!-- 单元完成进度 -->
@@ -141,9 +141,9 @@
           <span class="sb-progress__text">{{ doneCount }}/{{ unit.files.length }} 已完成</span>
         </div>
 
-        <!-- 答题卡网格：本单元页面一览（✓ 已完成 / 高亮 当前页 / 考 测验页） -->
+        <!-- 答题卡网格：本单元页面一览（对勾 = 已完成 / 高亮 = 当前页 / 考 = 测验页） -->
         <nav v-if="unit" class="sb-nav">
-          <div class="sb-title">🗂 答题卡 · 点击跳页</div>
+          <div class="sb-title">答题卡 · 点击跳页</div>
           <div class="sb-grid">
             <button
               v-for="(f, i) in unit.files"
@@ -153,7 +153,7 @@
               :title="f.title"
               @click="emit('go-file', i); sheetOpen = false"
             >
-              <span v-if="doneFiles[i]" class="sb-grid__check">✓</span>
+              <span v-if="doneFiles[i]" class="sb-grid__check"><AppIcon name="check" :size="12" :stroke-width="2.5" /></span>
               <template v-else>{{ i + 1 }}</template>
               <span v-if="f.isTest" class="sb-grid__test">考</span>
             </button>
@@ -162,11 +162,11 @@
 
         <!-- 本页章节 -->
         <nav v-if="toc.length" class="sb-nav">
-          <div class="sb-title">📑 本页章节</div>
+          <div class="sb-title">本页章节</div>
           <ul>
             <li v-for="(item, i) in toc" :key="i">
               <button class="sb-item" @click="emit('scroll-to', item.index); sheetOpen = false">
-                <span class="sb-icon">{{ item.icon }}</span>
+                <span class="sb-icon"><AppIcon :name="item.icon" :size="15" /></span>
                 <span class="sb-text">{{ item.title }}</span>
               </button>
             </li>
@@ -175,7 +175,7 @@
 
         <!-- 单元切换 -->
         <nav v-if="site" class="sb-nav">
-          <div class="sb-title">🔄 单元导航</div>
+          <div class="sb-title">单元导航</div>
           <div class="sb-unit-goto">
             <button class="sb-unit-btn" :disabled="!prevUnit" :title="prevUnit ? '上一单元：' + prevUnit.title : '已是第一单元'" @click="emit('go-unit', prevUnit); sheetOpen = false">
               ← {{ prevUnit ? prevUnit.title.slice(0, 4) : '—' }}
@@ -192,18 +192,18 @@
     <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }" role="dialog" aria-modal="true" aria-label="更多操作" :aria-hidden="!moreOpen">
       <div class="sb-sheet__head">
         <span class="sb-sheet__title">⋯ 更多操作</span>
-        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false">✕</button>
+        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false"><AppIcon name="x" :size="18" /></button>
       </div>
       <div class="sb-more">
-        <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false">★<span>收藏本页</span></button>
-        <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false">📝<span>学习笔记</span></button>
-        <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false">⬆<span>返回顶部</span></button>
+        <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏本页</span></button>
+        <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false"><AppIcon name="square-pen" :size="16" /><span>学习笔记</span></button>
+        <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false"><AppIcon name="arrow-up" :size="16" /><span>返回顶部</span></button>
       </div>
     </div>
 
     <!-- 底部常驻操作栏：目录 / 上一页 / 下一页（主操作）/ 更多 -->
     <div class="sb-bar">
-      <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet('nav')">☰<span>目录</span></button>
+      <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet('nav')"><AppIcon name="menu" :size="16" /><span>目录</span></button>
       <button class="sb-bar__btn" :disabled="!hasPrev" title="上一页" @click="emit('go-prev')">←<span>上页</span></button>
       <button class="sb-bar__next" :title="nextBtnTitle" @click="onNextClick">
         {{ nextBtnLabel }}
@@ -215,6 +215,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 const props = defineProps({
   unit: { type: Object, default: null },

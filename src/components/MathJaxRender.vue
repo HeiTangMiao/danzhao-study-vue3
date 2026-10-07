@@ -27,7 +27,7 @@ const props = defineProps({
 })
 
 // 同步渲染：将文本中的 LaTeX 公式转为 HTML
-// ⚠️ engineVersion 是**必须显式引用**的依赖：renderMath 读的是模块级 katex 变量，
+// 注意：engineVersion 是**必须显式引用**的依赖：renderMath 读的是模块级 katex 变量，
 //    Vue 追踪不到它。少了这个分支，引擎就绪后公式不会重渲染（表现为「点了半天不更新」）。
 const html = computed(() => {
   if (!props.text) return ''

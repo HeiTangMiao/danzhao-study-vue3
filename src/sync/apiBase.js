@@ -12,7 +12,7 @@
  *   - dev / Web：不设 VITE_API_BASE，仍用 '/api'，保持原有代理逻辑不变
  *   - Tauri 桌面端：构建时通过 .env.tauri 注入绝对地址（见 package.json 的 build:tauri）
  *
- * ⚠️ 改动此地址时必须同步修改 src-tauri/tauri.conf.json 的 CSP `connect-src`，
+ * 注意：改动此地址时必须同步修改 src-tauri/tauri.conf.json 的 CSP `connect-src`，
  *    否则 WebView 会直接拦截请求（表现为控制台 CSP violation，而非网络错误）。
  */
 const RAW = import.meta.env.VITE_API_BASE || '/api'

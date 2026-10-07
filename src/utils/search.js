@@ -5,7 +5,7 @@
  *  - meta 条目：{ subject, unitNum, fileIndex, unitTitle, title, subtitle, isTest? } —— 标题级，常驻
  *  - bodies：{ [bodyKeyOf(meta)]: 正文 } —— 按学科分片，按需加载；未加载时该学科只按标题匹配
  *
- * ⚠️ 契约：`prepareSearchIndex` 的第二个参数必须与调用 `matchSearch` 时传入的 bodies 为同一份，
+ * 注意：契约：`prepareSearchIndex` 的第二个参数必须与调用 `matchSearch` 时传入的 bodies 为同一份，
  *    否则 _hay 里不含正文，正文命中会被静默漏掉（SearchPanel 在分片到位后重新 prepare 一次）。
  */
 import { bodyKeyOf } from '@/content/searchIndex'

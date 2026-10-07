@@ -11,7 +11,7 @@
   <div class="error-book">
     <!-- 面包屑 -->
     <nav class="breadcrumb">
-      <router-link to="/">📚 首页</router-link>
+      <router-link to="/">首页</router-link>
       <span class="crumb-sep">/</span>
       <span>错题本</span>
     </nav>
@@ -62,12 +62,11 @@
             @click="statusFilter = f.key"
           >{{ f.label }}</button>
         </div>
-        <button v-if="filtered.length > 0" class="clear-btn" @click="clearAll">🗑 清空全部</button>
+        <button v-if="filtered.length > 0" class="clear-btn" @click="clearAll"><AppIcon name="trash-2" :size="15" /> 清空全部</button>
       </section>
 
       <!-- 空状态 -->
       <section v-if="filtered.length === 0" class="card empty-card">
-        <div class="empty-icon">📭</div>
         <p class="empty-title">{{ errors.length === 0 ? '还没有错题记录' : '当前筛选下没有错题' }}</p>
         <p class="empty-desc">
           {{ errors.length === 0 ? '做题答错后会自动收录到错题本，方便集中复习巩固。' : '试试切换筛选条件。' }}
@@ -86,7 +85,8 @@
           <div class="error-head">
             <span class="error-index">{{ i + 1 }}</span>
             <span class="subject-tag" :class="'tag-' + err.subject">
-              {{ (SUBJECT_META[err.subject] && SUBJECT_META[err.subject].icon) || '' }} {{ (SUBJECT_META[err.subject] && SUBJECT_META[err.subject].name) || err.subject }}
+              <AppIcon :name="subjectIconName(err.subject)" :size="13" />
+              {{ (SUBJECT_META[err.subject] && SUBJECT_META[err.subject].name) || err.subject }}
             </span>
             <span v-if="err.difficulty" class="difficulty-tag" :class="diffClass(err.difficulty)">
               {{ diffLabel(err.difficulty) }}
@@ -122,18 +122,18 @@
               v-if="!err.reviewed"
               class="act-btn act-master"
               @click="markMastered(err)"
-            >✅ 已掌握</button>
+            ><AppIcon name="check" :size="14" /> 已掌握</button>
             <button
               v-else
               class="act-btn act-relearn"
               @click="markRelearn(err)"
-            >🔄 仍需复习</button>
+            ><AppIcon name="rotate-ccw" :size="14" /> 仍需复习</button>
             <router-link
               v-if="err.fileKey"
               :to="sourceRoute(err)"
               class="act-btn act-source"
-            >📖 查看原题</router-link>
-            <button class="act-btn act-del" @click="removeError(err)">🗑 删除</button>
+            ><AppIcon name="book-open" :size="14" /> 查看原题</router-link>
+            <button class="act-btn act-del" @click="removeError(err)"><AppIcon name="trash-2" :size="14" /> 删除</button>
           </div>
         </article>
       </section>
@@ -148,8 +148,14 @@ import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
 import { calculateSM2 } from '@/composables/useSpacedReview'
+import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
+
+// 学科图标名（数据层唯一取值来源 = SUBJECT_META；未学科目兜底空串渲染为空 svg）
+function subjectIconName(subject) {
+  return SUBJECT_META[subject]?.icon || ''
+}
 
 // 全部错题
 const errors = ref([])
@@ -305,7 +311,6 @@ onMounted(async () => {
 
 /* 空状态 */
 .empty-card { text-align: center; padding: var(--spacer-40); }
-.empty-icon { font-size: 3rem; margin-bottom: var(--spacer-12); }
 .empty-title { font-size: 1.1rem; font-weight: 600; margin-bottom: var(--spacer-8); }
 .empty-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: var(--spacer-16); }
 .empty-link { color: var(--primary); }
@@ -321,7 +326,7 @@ onMounted(async () => {
   display: inline-flex; align-items: center; justify-content: center;
   font-size: 0.75rem; font-weight: 700;
 }
-.subject-tag { font-size: 0.75rem; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 600; }
+.subject-tag { font-size: 0.75rem; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 .tag-math { background: rgba(79, 70, 229, 0.12); color: #4f46e5; }
 .tag-chinese { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
 .tag-computer { background: rgba(14, 165, 233, 0.12); color: #0ea5e9; }
@@ -348,7 +353,7 @@ onMounted(async () => {
   padding: 5px 14px; border-radius: var(--radius-full);
   border: 1px solid var(--border); background: var(--surface);
   font-size: 0.82rem; cursor: pointer; text-decoration: none; color: var(--text);
-  display: inline-flex; align-items: center;
+  display: inline-flex; align-items: center; gap: 5px;
 }
 .act-btn:hover { transform: translateY(-1px); }
 .act-master { border-color: var(--success); color: var(--success); }

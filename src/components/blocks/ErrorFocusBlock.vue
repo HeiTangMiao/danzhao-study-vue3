@@ -4,7 +4,7 @@
 -->
 <template>
   <section class="block errorfocus">
-    <h2 class="block-title">🚨 {{ block.title || '易错专项' }}</h2>
+    <h2 class="block-title"><AppIcon name="siren" :size="18" /> {{ block.title || '易错专项' }}</h2>
     <div v-for="(item, i) in block.items" :key="i" class="block-card ef-card">
       <div class="ef-scenario">
         <span class="ef-badge">场景 {{ i + 1 }}</span>
@@ -12,17 +12,17 @@
       </div>
       <div class="ef-compare">
         <div class="ef-side ef-wrong">
-          <div class="ef-side-title">✗ 常见错误</div>
+          <div class="ef-side-title"><AppIcon name="x" :size="14" /> 常见错误</div>
           <MathJaxRender :text="item.commonMistake" />
         </div>
         <div class="ef-arrow">→</div>
         <div class="ef-side ef-right">
-          <div class="ef-side-title">✓ 正确思路</div>
+          <div class="ef-side-title"><AppIcon name="check" :size="14" /> 正确思路</div>
           <MathJaxRender :text="item.correctApproach" />
         </div>
       </div>
       <div v-if="item.tip" class="ef-tip">
-        <span class="ef-tip-icon">💡</span>
+        <span class="ef-tip-icon"><AppIcon name="lightbulb" :size="16" /></span>
         <MathJaxRender :text="item.tip" />
       </div>
     </div>
@@ -31,6 +31,7 @@
 
 <script setup>
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 defineProps({
   // 区块数据：{ type:'errorfocus', title, items:[{scenario,commonMistake,correctApproach,tip}] }

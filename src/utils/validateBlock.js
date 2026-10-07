@@ -9,7 +9,7 @@
  * 从 schema 派生的部分（类型白名单 / 难度枚举 / 题型枚举）不再手写，
  * 避免「schema 加了类型但校验器不认识」。
  *
- * ⚠️ schema 用参数注入而非 import：Node 侧用 fs 读 JSON、浏览器侧走 Vite 的 JSON 导入，
+ * 注意：schema 用参数注入而非 import：Node 侧用 fs 读 JSON、浏览器侧走 Vite 的 JSON 导入，
  *    两端加载方式天生不同。把「怎么拿到 schema」留在调用方，本模块保持零 import。
  */
 

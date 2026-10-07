@@ -10,6 +10,8 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { BLOCK_TYPES, BLOCK_TYPES_META, labelOf, iconOf } from '@/components/blocks/blockTypes'
+import { ICON_SHAPES } from '@/components/icons/lucide-paths'
+import { SUBJECT_META } from '@/content/index'
 
 const ROOT = process.cwd()
 const schema = JSON.parse(readFileSync(join(ROOT, 'schema', 'content-schema.json'), 'utf-8'))
@@ -53,6 +55,34 @@ describe('区块类型清单一致性', () => {
 
   it('iconOf 对未知类型返回空字符串（不会误进目录）', () => {
     expect(iconOf('__不存在__')).toBe('')
+  })
+})
+
+describe('图标数据契约（P2-T1：icon 字段 = Lucide 名，AppIcon 渲染）', () => {
+  // 引 AppIcon 的数据表做存在性校验：icon 写错名字时渲染层会静默出空 svg，
+  // 在这里拦住比到页面上肉眼发现便宜得多
+  it('每个区块类型的 icon 都是路径表里存在的 Lucide 名（或空串 = 不进目录）', () => {
+    const bad = Object.entries(BLOCK_TYPES_META)
+      .filter(([, meta]) => meta.icon && !ICON_SHAPES[meta.icon])
+      .map(([type, meta]) => `${type}: ${meta.icon}`)
+    expect(bad).toEqual([])
+  })
+
+  it('每个学科的 icon 都是路径表里存在的 Lucide 名', () => {
+    const bad = Object.entries(SUBJECT_META)
+      .filter(([, meta]) => !ICON_SHAPES[meta.icon])
+      .map(([key, meta]) => `${key}: ${meta.icon}`)
+    expect(bad).toEqual([])
+  })
+
+  it('icon 取值不含 emoji（UI 侧 emoji 清零，验收按文件扫描 src/ 除 content/）', () => {
+    // icon 契约 = Lucide 官方名（纯 ASCII），任何非 ASCII 字符（emoji/全角）都算违约
+    const emojiRe = /\P{ASCII}/u
+    const all = [
+      ...Object.values(BLOCK_TYPES_META).map((m) => m.icon),
+      ...Object.values(SUBJECT_META).map((m) => m.icon)
+    ]
+    expect(all.filter((v) => emojiRe.test(v))).toEqual([])
   })
 })
 

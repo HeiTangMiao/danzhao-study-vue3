@@ -7,7 +7,7 @@
    - name        Lucide 官方图标名（未知名渲染为空 <svg> 并在开发环境告警，不抛错）
    - size        边长（px），数字或字符串，默认 20
    - strokeWidth 线宽，默认 2（与 Lucide 默认一致；UI 里常用 1.8 更轻盈）
-  ⚠️ 为什么不用 v-html / innerHTML 注入 SVG 字符串：
+  注意：为什么不用 v-html / innerHTML 注入 SVG 字符串：
      本项目 CSP 为 script-src 'self'，且全站离线；「字符串 → DOM」是不洁模式，
      将来启用 Trusted Types 会直接失效。此处所有形状均由模板静态声明，
      编译期即确定标签树，无任何运行时字符串注入 —— CSP 与 Trusted Types 双安全。

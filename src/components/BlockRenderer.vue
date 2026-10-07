@@ -5,7 +5,7 @@
    - 这是"Schema 驱动渲染"的枢纽：内容只描述数据，渲染由组件决定
    - 类型 → 组件的映射集中在 blocks/registry.js，此处不再维护类型清单
    - 容器型区块（columns / group）在这里内部自引用递归：子区块也走本组件渲染。
-     ⚠️ 不要改成让 ColumnsBlock/GroupBlock 去 import 本组件 —— 那会形成循环依赖，
+     注意：不要改成让 ColumnsBlock/GroupBlock 去 import 本组件 —— 那会形成循环依赖，
      模块求值顺序会让 registry 的 resolver 拿到 undefined（见交接文档阶段 4 约束）。
 -->
 <template>

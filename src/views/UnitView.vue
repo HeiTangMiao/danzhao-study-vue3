@@ -33,7 +33,7 @@
 
     <!-- 面包屑导航 -->
     <nav class="breadcrumb">
-      <router-link to="/">🏠 首页</router-link>
+      <router-link to="/">首页</router-link>
       <span class="crumb-sep">/</span>
       <span>{{ site.breadcrumbHome }}</span>
       <span class="crumb-sep">/</span>
@@ -49,22 +49,22 @@
         </div>
         <!-- 工具按钮：目录 + 书签 + 笔记 -->
         <div class="page-tools">
-          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" aria-label="目录" @click="showToc = !showToc">☰</button>
+          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" aria-label="目录" @click="showToc = !showToc"><AppIcon name="menu" :size="18" /></button>
           <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" aria-label="收藏" @click="bookmark.toggleBookmark()">
-            {{ bookmark.isBookmarked.value ? '★' : '☆' }}
+            <AppIcon name="star" :size="18" :stroke-width="1.8" />
           </button>
-          <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes">📝</button>
+          <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes"><AppIcon name="square-pen" :size="18" /></button>
         </div>
       </div>
     </header>
 
     <!-- 目录导航（折叠式） -->
     <section v-if="showToc && page && toc.length > 0" class="toc-panel card">
-      <div class="toc-head">📑 本页目录</div>
+      <div class="toc-head">本页目录</div>
       <ul class="toc-list">
         <li v-for="(item, i) in toc" :key="i">
           <button class="toc-item" @click="scrollToBlock(item.index)">
-            <span class="toc-icon">{{ item.icon }}</span>
+            <span class="toc-icon"><AppIcon :name="item.icon" :size="16" /></span>
             <span class="toc-text">{{ item.title }}</span>
           </button>
         </li>
@@ -78,7 +78,7 @@
 
     <!-- 内容加载失败提示 -->
     <div v-if="!page && !loading" class="error-hint card">
-      <p>⚠️ 内容加载失败</p>
+      <p>内容加载失败</p>
       <p class="error-detail">学科: {{ subject }} | 单元: {{ route.params.unitNum }} | 文件: {{ route.params.fileIndex || 0 }}</p>
       <router-link to="/" class="back-link">← 返回首页</router-link>
     </div>
@@ -86,7 +86,7 @@
     <!-- 笔记面板（折叠式） -->
     <section v-if="showNotes && page" class="notes-section card">
       <div class="notes-head">
-        <span>📝 我的笔记</span>
+        <span><AppIcon name="square-pen" :size="16" /> 我的笔记</span>
         <span class="notes-status" :class="'notes-' + notes.statusType.value">{{ notes.status.value }}</span>
       </div>
       <textarea
@@ -97,7 +97,7 @@
       ></textarea>
       <div class="notes-foot">
         <span>{{ notes.wordCount.value }} 字</span>
-        <button class="notes-save" @click="notes.manualSave()">💾 保存</button>
+        <button class="notes-save" @click="notes.manualSave()">保存</button>
       </div>
     </section>
 
@@ -150,7 +150,7 @@
       <transition name="fade">
         <div v-if="pomodoroOpen" class="pomodoro-card card" @click.stop>
           <div class="pomodoro-card__head">
-            <span class="pomodoro-mode" :class="'mode-' + pomodoro.mode.value">🍅 {{ pomodoro.modeLabel.value }}</span>
+            <span class="pomodoro-mode" :class="'mode-' + pomodoro.mode.value"><AppIcon name="timer" :size="14" /> {{ pomodoro.modeLabel.value }}</span>
             <span v-if="pomodoro.running.value" class="pomodoro-running">进行中</span>
           </div>
           <div class="pomodoro-time">{{ pomodoro.display.value }}</div>
@@ -173,14 +173,14 @@
         :aria-label="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
         :title="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
         @click="pomodoroOpen = !pomodoroOpen"
-      >🍅</button>
+      ><AppIcon name="timer" :size="20" /></button>
     </div>
 
     <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
     <transition name="fade">
       <div v-if="confirmLeave" class="leave-confirm-overlay" @click.self="handleLeaveConfirm(false)">
         <div class="leave-confirm card">
-          <div class="leave-confirm__title">⚠️ 确定离开？</div>
+          <div class="leave-confirm__title">确定离开？</div>
           <p class="leave-confirm__msg">{{ confirmMsg }}</p>
           <div class="leave-confirm__actions">
             <button class="leave-confirm__btn leave-confirm__cancel" @click="handleLeaveConfirm(false)">继续作答</button>
@@ -206,6 +206,7 @@ import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import ContentSidebar from '@/components/ContentSidebar.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -460,7 +461,7 @@ watch(
   font-size: 0.82rem; transition: all 0.15s ease;
 }
 .toc-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-.toc-icon { font-size: 0.85rem; }
+.toc-icon { display: inline-flex; color: var(--text-muted); }
 
 .breadcrumb { margin-bottom: var(--spacer-16); color: var(--text-muted); font-size: 0.85rem; }
 .crumb-sep { margin: 0 var(--spacer-8); }
@@ -639,7 +640,7 @@ watch(
   box-shadow: var(--shadow-pop);
 }
 .pomodoro-card__head { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-.pomodoro-mode { font-weight: 700; }
+.pomodoro-mode { font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
 .pomodoro-mode.mode-focus { color: var(--danger); }
 .pomodoro-mode.mode-break, .pomodoro-mode.mode-long_break { color: var(--success); }
 .pomodoro-running { color: var(--warning); font-size: 0.75rem; }

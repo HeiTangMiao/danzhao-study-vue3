@@ -5,7 +5,7 @@
 <template>
   <div class="profile">
     <nav class="breadcrumb">
-      <router-link to="/">📚 首页</router-link>
+      <router-link to="/">首页</router-link>
       <span class="crumb-sep">/</span>
       <span>个人主页</span>
     </nav>
@@ -14,14 +14,14 @@
 
     <!-- 加载失败 -->
     <div v-else-if="error" class="error-hint card">
-      <p>⚠️ {{ error }}</p>
-      <button class="retry-btn" @click="load">🔄 重试</button>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="load"><AppIcon name="refresh-cw" :size="16" /> 重试</button>
     </div>
 
     <template v-else>
-      <!-- 账号卡片 -->
+      <!-- 账号卡片：头像取用户名首字符（原 emoji 头像随 P2 emoji 清零移除） -->
       <section class="card account-card">
-        <div class="avatar">{{ avatarEmoji }}</div>
+        <div class="avatar">{{ avatarChar }}</div>
         <div class="account-info">
           <h1 class="username">{{ auth.user?.username }}
             <span v-if="auth.isAdmin" class="role-badge">管理员</span>
@@ -33,15 +33,15 @@
 
       <!-- 数据总览 -->
       <section v-if="overview" class="stat-grid">
-        <div class="card stat-card"><div class="stat-icon">📖</div><div class="stat-val">{{ overview.totalVisited }}</div><div class="stat-label">已学页面</div></div>
-        <div class="card stat-card"><div class="stat-icon">✏️</div><div class="stat-val">{{ overview.totalQuestions }}</div><div class="stat-label">答题总数</div></div>
-        <div class="card stat-card"><div class="stat-icon">⭐</div><div class="stat-val">{{ overview.errorsCount }}</div><div class="stat-label">错题</div></div>
-        <div class="card stat-card"><div class="stat-icon">📝</div><div class="stat-val">{{ noteCount }}</div><div class="stat-label">笔记</div></div>
+        <div class="card stat-card"><div class="stat-icon"><AppIcon name="book-open" :size="20" /></div><div class="stat-val">{{ overview.totalVisited }}</div><div class="stat-label">已学页面</div></div>
+        <div class="card stat-card"><div class="stat-icon"><AppIcon name="pencil" :size="20" /></div><div class="stat-val">{{ overview.totalQuestions }}</div><div class="stat-label">答题总数</div></div>
+        <div class="card stat-card"><div class="stat-icon"><AppIcon name="siren" :size="20" /></div><div class="stat-val">{{ overview.errorsCount }}</div><div class="stat-label">错题</div></div>
+        <div class="card stat-card"><div class="stat-icon"><AppIcon name="square-pen" :size="20" /></div><div class="stat-val">{{ noteCount }}</div><div class="stat-label">笔记</div></div>
       </section>
 
       <!-- 学科进度 -->
       <section v-if="overview" class="card subjects-card">
-        <h2>📊 学科进度</h2>
+        <h2>学科进度</h2>
         <div v-for="(_, key) in SUBJECT_NAMES" :key="key" class="subject-row">
           <span class="subject-name">{{ subjectName(key) }}</span>
           <span class="subject-bar">
@@ -53,11 +53,14 @@
 
       <!-- 快捷操作 -->
       <section class="profile-actions">
-        <router-link to="/dashboard" class="btn">📈 仪表盘</router-link>
-        <router-link to="/error-book" class="btn">⭐ 错题本</router-link>
-        <router-link v-if="auth.isAdmin" to="/admin" class="btn admin">🛠 管理后台</router-link>
+        <router-link to="/dashboard" class="btn">仪表盘</router-link>
+        <router-link to="/error-book" class="btn">错题本</router-link>
+        <router-link v-if="auth.isAdmin" to="/admin" class="btn admin">管理后台</router-link>
         <button class="btn danger" @click="logout">退出登录</button>
       </section>
+
+      <!-- 作者署名（D13 拍板：全站仅保留此处；墨色小字、去渐变文字、去装饰符号） -->
+      <p class="credit">黑糖＆菜菜</p>
     </template>
   </div>
 </template>
@@ -73,6 +76,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig } from '@/content/index'
 import { api } from '@/sync/api'
+import AppIcon from '@/components/AppIcon.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -85,9 +89,10 @@ const registerDate = ref('')
 // 加载失败提示
 const error = ref('')
 
-const avatarEmoji = computed(() => {
-  const n = (auth.user?.username || '?').charCodeAt(0) || 0
-  return ['🦊', '🐱', '🐶', '🐼', '🐯', '🦁', '🐸', '🐰'][n % 8]
+// 头像字符：取用户名首字符大写（原为 emoji 池，P2 emoji 清零后改为纯文字头像）
+const avatarChar = computed(() => {
+  const name = auth.user?.username || '?'
+  return name.charAt(0).toUpperCase()
 })
 
 const SUBJECT_NAMES = { math: '数学', chinese: '语文', computer: '计算机' }
@@ -155,7 +160,8 @@ function logout() {
 .avatar {
   width: 56px; height: 56px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.8rem; background: var(--surface-muted); border: 1px solid var(--border);
+  font-size: 1.3rem; font-weight: 700; color: var(--text-secondary, #666);
+  background: var(--surface-muted); border: 1px solid var(--border);
 }
 .username { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
 .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: #f0c040; color: #5a4300; font-weight: 600; }
@@ -163,7 +169,7 @@ function logout() {
 
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacer-10); }
 .stat-card { text-align: center; padding: var(--spacer-14) var(--spacer-8); }
-.stat-icon { font-size: 1.3rem; }
+.stat-icon { display: flex; justify-content: center; color: var(--primary); margin-bottom: var(--spacer-4); }
 .stat-val { font-size: 1.3rem; font-weight: 700; }
 .stat-label { font-size: 0.75rem; color: var(--text-secondary, #888); }
 
@@ -183,4 +189,12 @@ function logout() {
 }
 .btn.admin { background: #f0c040; color: #5a4300; border-color: transparent; }
 .btn.danger { color: #d33; border-color: #d33; }
+
+/* 作者署名（D13）：墨色小字，不用渐变文字与装饰符号 */
+.credit {
+  margin-top: var(--spacer-8);
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #888);
+}
 </style>

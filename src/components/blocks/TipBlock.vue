@@ -7,7 +7,7 @@
 <template>
   <BlockShell variant="note" tone="primary">
     <div class="tip-box">
-      <span class="tip-icon">💡</span>
+      <span class="tip-icon"><AppIcon name="lightbulb" :size="18" /></span>
       <MathJaxRender :text="block.text" />
     </div>
   </BlockShell>
@@ -16,6 +16,7 @@
 <script setup>
 import BlockShell from './BlockShell.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 defineProps({
   // 区块数据：{ type:'tip', text:string }

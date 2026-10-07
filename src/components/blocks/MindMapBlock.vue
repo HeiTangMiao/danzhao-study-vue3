@@ -8,7 +8,7 @@
 -->
 <template>
   <section class="block mindmap">
-    <h3 class="block-title">🧠 {{ block.title || '知识结构导图' }}</h3>
+    <h3 class="block-title"><AppIcon name="network" :size="18" /> {{ block.title || '知识结构导图' }}</h3>
     <!-- 图例与工具栏在渲染完成前也保留在 DOM 里（仅 visibility 隐藏）：
          它们是**插在固定高度视口上方**的，若用 v-if 到 ready 才插入，
          下方所有内容会被顶下去 —— 这就是 mermaid 唯一的 CLS 来源（阶段 7.3 实测结论）。 -->
@@ -35,8 +35,8 @@
         <span class="block-spinner"></span> 正在加载思维导图…
       </div>
       <div v-else-if="state === 'error'" class="mm-status">
-        <p class="mm-error-msg">⚠️ 思维导图加载失败</p>
-        <button class="mm-retry" type="button" @click="renderMindmap">🔄 重试</button>
+        <p class="mm-error-msg">思维导图加载失败</p>
+        <button class="mm-retry" type="button" @click="renderMindmap"><AppIcon name="refresh-cw" :size="14" /> 重试</button>
       </div>
     </div>
   </section>
@@ -44,6 +44,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 import { loadMermaid, renderMermaidTo } from '@/composables/useMermaid'
 
 const props = defineProps({

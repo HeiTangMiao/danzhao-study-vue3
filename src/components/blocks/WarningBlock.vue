@@ -7,7 +7,7 @@
 <template>
   <BlockShell variant="note" tone="tone-warn">
     <div class="warning-box">
-      <span class="warning-icon">⚠️</span>
+      <span class="warning-icon"><AppIcon name="triangle-alert" :size="18" /></span>
       <MathJaxRender :text="block.text" />
     </div>
   </BlockShell>
@@ -16,6 +16,7 @@
 <script setup>
 import BlockShell from './BlockShell.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 defineProps({
   // 区块数据：{ type:'warning', text:string }

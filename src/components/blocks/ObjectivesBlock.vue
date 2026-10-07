@@ -4,7 +4,7 @@
 -->
 <template>
   <section class="block objectives">
-    <h3 class="block-title">🎯 {{ block.title || '学习目标' }}</h3>
+    <h3 class="block-title"><AppIcon name="target" :size="18" /> {{ block.title || '学习目标' }}</h3>
     <div class="block-card objectives-box">
       <p v-for="(item, i) in block.items" :key="i" class="objective-item">
         <span class="objective-dot">•</span>
@@ -16,6 +16,7 @@
 
 <script setup>
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 defineProps({
   // 区块数据：{ type:'objectives', title, items:[string] }

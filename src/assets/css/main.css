@@ -27,7 +27,7 @@
    *   主色 terra-cotta #c96442 作为全站唯一的情感强调色；中性色为纸质暖灰；
    *   圆角 8/12/16/20/24；阴影克制。
    *
-   * ⚠️ 刻意不做的事（否则会破坏主应用已有的能力）：
+   * 注意：刻意不做的事（否则会破坏主应用已有的能力）：
    *   1. 不引入 Tailwind —— 静态稿靠 Tailwind CDN，主应用需离线可用且是原生 CSS
    *   2. 不把 KaTeX 换成 MathJax —— 保留本地 KaTeX（v0.3.0 刚做完异步优化）
    *   3. 不 @import Google Fonts —— 会阻塞渲染且离线必然失败；
@@ -191,7 +191,7 @@
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
 
   /* ---------- 断点阶梯（P1-T1，收敛原有 6 个碎片值 → 4 级）----------
-   * ⚠️ 这是「口径的单一来源」，不是可被 @media 直接引用的值：
+   * 注意：这是「口径的单一来源」，不是可被 @media 直接引用的值：
    *   CSS 媒体查询不解析 var()（@media (min-width: var(--bp-lg)) 无效），
    *   因此下列 token 供 JS（matchMedia / 断点判断）与文档引用；
    *   样式里的媒体查询仍必须写字面量，并在注释中标注对应 token（见各组件）。
@@ -208,7 +208,7 @@
   /* ---------- 玻璃层 token（P1-T2 建立；P2-T3 成为 .glass 工具类的单一取值来源）----------
    * 三要素必须 token 化：暗色主题与 @supports 降级各需一份取值（system_design §5.1）。
    * 不透明度取 42%（v2 参数，比 v1 的 55-72% 更轻盈）；blur 钳在 8-16px（此处 12px）。
-   * ⚠️ 这些是「玻璃的唯一定义」：AppTabBar 与本文件 .glass 都只引用它们，不各写一套字面量。 */
+   * 注意：这些是「玻璃的唯一定义」：AppTabBar 与本文件 .glass 都只引用它们，不各写一套字面量。 */
   --glass-bg: rgba(255, 255, 255, 0.42);
   --glass-hl: rgba(255, 255, 255, 0.9); /* 内侧高光：模拟折射边缘 */
   --glass-shadow: 0 8px 24px rgba(88, 46, 29, 0.1); /* 暖可可投影（禁纯黑） */
@@ -221,7 +221,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   /* Claude 暗色色阶
-   * ⚠️ 注意：Claude 在暗色下**反转了色阶方向**（50 最暗、900 最亮），
+   * 注意：Claude 在暗色下**反转了色阶方向**（50 最暗、900 最亮），
    *    因此这里必须重定义整批 primitive，不能沿用亮色那批值。 */
   --brand-100: #4d3528; --brand-500: #d97757; --brand-600: #e08d6f;
   --text-500: #b7b5a9; --text-600: #c3c0b6; --text-800: #f1f1ef; --text-900: #faf9f5;
@@ -321,13 +321,13 @@ body {
  * .glass--flat 去掉外投影、只留内侧高光的「扁平玻璃」变体（页面级功能条用它，
  *              见 §5.7.0：贴系统状态栏/手势区时加投影会与系统视觉打架）
  *
- * ⚠️ 头号陷阱（§5.1）：玻璃层不可被带 transform / filter / opacity<1 / will-change /
+ * 注意：头号陷阱（§5.1）：玻璃层不可被带 transform / filter / opacity<1 / will-change /
  *    contain:paint 的祖先包住 —— 任一都会创建新的 backdrop root，
  *    令 backdrop-filter **静默失效**（页面上看不出「模糊」，只是玻璃变闷）。
  *    推论：玻璃层必须与「做位移/透明度动画的容器」是**兄弟**，不能是其后代（§5.7.4）。
- * ⚠️ WebKit 圆角玻璃：圆角处可能模糊溢出/锯齿 → backdrop-filter 挂在**与容器同圆角的
+ * 注意：WebKit 圆角玻璃：圆角处可能模糊溢出/锯齿 → backdrop-filter 挂在**与容器同圆角的
  *    伪元素**上（父级 border-radius + overflow:hidden），见 AppTabBar 的 .app-pill::before。
- * ⚠️ 首帧性能：避免「大面积玻璃 + 大量内联 SVG」同帧首绘（WebKit bug #322045）。
+ * 注意：首帧性能：避免「大面积玻璃 + 大量内联 SVG」同帧首绘（WebKit bug #322045）。
  */
 .glass {
   background: var(--glass-bg);
@@ -338,6 +338,16 @@ body {
 .glass-pill {
   border-radius: 28px;
 }
+/* .glass--soft 柔光变体（hero 等大面积首屏区块）：
+   ① 背景更透（0.42 → 0.30，让柔光渐变从背后透出，"soft"即指此）；
+   ② 去外投影——大面积玻璃 + 外投影会显重，且首屏大片模糊的绘制成本已高；
+   ③ 内侧高光保留。
+   注意：本类覆盖 --glass-bg，暗色主题需在暗色块同步覆盖（当前 hero 仅亮色场景，P4 暗色落地时补）。 */
+.glass--soft {
+  --glass-bg: rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 0 var(--glass-hl);
+}
+
 .glass--flat {
   box-shadow: inset 0 1px 0 var(--glass-hl);
 }

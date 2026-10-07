@@ -9,25 +9,25 @@
   <section class="block exam">
     <!-- 考试介绍页（极简：无卡片，居中排版） -->
     <div v-if="phase === 'intro'" class="exam-intro">
-      <div class="exam-intro-icon">📝</div>
+      <div class="exam-intro-icon"><AppIcon name="clipboard-list" :size="28" /></div>
       <h2 class="exam-title">{{ block.title || '模拟卷' }}</h2>
       <div class="exam-meta">
-        <span class="exam-meta-item">⏱ 时长 {{ block.duration || 90 }} 分钟</span>
-        <span class="exam-meta-item">🏆 满分 {{ block.totalScore || 100 }} 分</span>
-        <span class="exam-meta-item">✅ 及格 {{ block.passingScore || 60 }} 分</span>
-        <span class="exam-meta-item">📋 共 {{ block.items.length }} 题</span>
+        <span class="exam-meta-item"><AppIcon name="timer" :size="14" /> 时长 {{ block.duration || 90 }} 分钟</span>
+        <span class="exam-meta-item">满分 {{ block.totalScore || 100 }} 分</span>
+        <span class="exam-meta-item">及格 {{ block.passingScore || 60 }} 分</span>
+        <span class="exam-meta-item">共 {{ block.items.length }} 题</span>
       </div>
       <p class="exam-intro-tip">建议独立限时完成，交卷后自动评分并生成错题回顾。</p>
-      <button class="exam-start-btn" @click="startExam">🚀 开始考试</button>
+      <button class="exam-start-btn" @click="startExam">开始考试</button>
     </div>
 
     <!-- 考试进行页 -->
     <div v-else-if="phase === 'running'" class="exam-running">
       <div class="block-card block-card--md block-card--shadow-xs exam-toolbar">
-        <span class="exam-timer" :class="{ 'timer-warn': timeLeft <= 300 }">⏱ {{ fmtTime(timeLeft) }}</span>
+        <span class="exam-timer" :class="{ 'timer-warn': timeLeft <= 300 }"><AppIcon name="timer" :size="14" /> {{ fmtTime(timeLeft) }}</span>
         <span class="exam-progress">已答 {{ answeredCount }}/{{ block.items.length }}</span>
         <span class="exam-toolbar__actions">
-          <button class="exam-jump-btn" :disabled="!hasUnanswered" title="跳转到下一道未答题" @click="jumpToNextUnanswered">⬇ 下一未答</button>
+          <button class="exam-jump-btn" :disabled="!hasUnanswered" title="跳转到下一道未答题" @click="jumpToNextUnanswered">下一未答</button>
           <button class="exam-submit-btn" :disabled="submitting" @click="handleSubmitClick">
             {{ submitting ? '提交中…' : '交卷' }}
           </button>
@@ -35,7 +35,7 @@
       </div>
 
       <!-- 交卷失败提示 -->
-      <div v-if="submitError" class="exam-error" role="alert">⚠️ {{ submitError }}</div>
+      <div v-if="submitError" class="exam-error" role="alert">{{ submitError }}</div>
 
       <div
         v-for="(item, i) in block.items"
@@ -71,8 +71,8 @@
         <!-- 非选择题：自评 -->
         <div v-else class="self-assess">
           <span class="self-label">作答情况：</span>
-          <button class="self-btn self-ok" :class="{ active: answers[i]?.correct === true }" @click="selfAssess(i, true)">✓ 答对了</button>
-          <button class="self-btn self-no" :class="{ active: answers[i]?.correct === false }" @click="selfAssess(i, false)">✗ 答错了</button>
+          <button class="self-btn self-ok" :class="{ active: answers[i]?.correct === true }" @click="selfAssess(i, true)"><AppIcon name="check" :size="14" /> 答对了</button>
+          <button class="self-btn self-no" :class="{ active: answers[i]?.correct === false }" @click="selfAssess(i, false)"><AppIcon name="x" :size="14" /> 答错了</button>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@
     <!-- 结果页（极简：无卡片） -->
     <div v-else class="exam-result">
       <div class="result-hero" :class="passed ? 'result-pass' : 'result-fail'">
-        <div class="result-icon">{{ passed ? '🎉' : '📚' }}</div>
+        <div class="result-icon"><AppIcon :name="passed ? 'check' : 'book-open'" :size="36" :stroke-width="1.8" /></div>
         <div class="result-score">{{ score }}<span class="result-total"> / {{ block.totalScore || 100 }}</span></div>
         <div class="result-percent">{{ percent }}%</div>
         <div class="result-verdict">{{ passed ? '恭喜通过！' : '未达及格线，继续加油' }}</div>
@@ -92,12 +92,12 @@
         <div class="result-stat"><span class="rs-num">{{ fmtTime(usedTime) }}</span><span class="rs-label">用时</span></div>
       </div>
 
-      <button class="exam-restart-btn" @click="restartExam">🔄 重新作答</button>
+      <button class="exam-restart-btn" @click="restartExam"><AppIcon name="refresh-cw" :size="16" /> 重新作答</button>
 
-      <h3 class="result-review-title">📖 逐题回顾</h3>
+      <h3 class="result-review-title">逐题回顾</h3>
       <div v-for="(item, i) in block.items" :key="i" class="review-item" :class="answers[i]?.correct ? 'review-ok' : 'review-no'">
         <div class="review-head">
-          <span class="review-mark">{{ answers[i]?.correct ? '✓' : '✗' }}</span>
+          <span class="review-mark"><AppIcon :name="answers[i]?.correct ? 'check' : 'x'" :size="14" :stroke-width="2.5" /></span>
           <span class="review-q"><MathJaxRender :text="item.question" /></span>
         </div>
         <div class="review-answer">
@@ -115,7 +115,7 @@
     <transition name="fade">
       <div v-if="confirmSubmit" class="submit-confirm-overlay" @click.self="confirmSubmit = false">
         <div class="submit-confirm card">
-          <div class="submit-confirm__title">⚠️ 还有 {{ unansweredCount }} 题未作答</div>
+          <div class="submit-confirm__title">还有 {{ unansweredCount }} 题未作答</div>
           <p class="submit-confirm__msg">确定现在交卷吗？未作答的题目将按答错计分。</p>
           <div class="submit-confirm__actions">
             <button class="submit-confirm__btn submit-confirm__cancel" @click="confirmSubmit = false">继续作答</button>
@@ -129,6 +129,7 @@
 
 <script setup>
 import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'

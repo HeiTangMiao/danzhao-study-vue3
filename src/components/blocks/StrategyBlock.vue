@@ -4,7 +4,7 @@
 -->
 <template>
   <section class="block strategy">
-    <h2 class="block-title">🎯 {{ block.title || '考试技巧' }}</h2>
+    <h2 class="block-title"><AppIcon name="target" :size="18" /> {{ block.title || '考试技巧' }}</h2>
     <div v-for="(item, i) in block.items" :key="i" class="block-card block-card--md block-card--rail-accent strategy-card">
       <div class="strategy-head">
         <span class="strategy-num">{{ i + 1 }}</span>
@@ -19,6 +19,7 @@
 
 <script setup>
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
 defineProps({
   // 区块数据：{ type:'strategy', title, items:[{title,content}] }

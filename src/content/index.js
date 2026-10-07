@@ -24,11 +24,13 @@ export const SUBJECT_LIST = [
 /**
  * 学科展示元信息（名称/图标）
  * 供仪表盘、错题本等跨学科界面统一使用，避免各处二元判断把 computer 误显示为语文
+ * icon 为 Lucide 官方图标名（P2-T1 契约变更：数据层不再存 emoji，
+ * 消费方经 AppIcon 以声明式 <svg> 渲染；名称必须存在于 icons/lucide-paths.js）
  */
 export const SUBJECT_META = {
-  math: { name: '数学', icon: '📐' },
-  chinese: { name: '语文', icon: '✍️' },
-  computer: { name: '计算机', icon: '💻' }
+  math: { name: '数学', icon: 'sigma' },
+  chinese: { name: '语文', icon: 'pen-line' },
+  computer: { name: '计算机', icon: 'monitor' }
 }
 
 /**

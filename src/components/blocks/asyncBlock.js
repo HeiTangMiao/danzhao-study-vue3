@@ -24,7 +24,7 @@ export function asyncBlock(loader) {
         ])
     },
     errorComponent: {
-      render: () => h('div', { class: 'block-async-error' }, '⚠️ 区块加载失败，请刷新重试')
+      render: () => h('div', { class: 'block-async-error' }, '区块加载失败，请刷新重试')
     },
     // 150ms 内加载完成则不显示占位，避免快速切换时闪烁
     delay: 150,

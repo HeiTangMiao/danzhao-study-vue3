@@ -5,7 +5,7 @@
 <template>
   <div class="login">
     <div class="login__card card">
-      <h1 class="login__title">📚 账号同步</h1>
+      <h1 class="login__title">账号同步</h1>
       <p class="login__sub">登录后学习进度、错题、笔记可在多设备间同步</p>
 
       <!-- 登录 / 注册 切换 -->
@@ -52,7 +52,7 @@
         </button>
       </form>
 
-      <p class="login__hint">🔒 登录后即可开始学习，进度、错题、笔记自动跨设备同步</p>
+      <p class="login__hint">登录后即可开始学习，进度、错题、笔记自动跨设备同步</p>
     </div>
   </div>
 </template>

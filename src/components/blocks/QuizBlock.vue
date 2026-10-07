@@ -62,7 +62,7 @@
         <transition name="fade">
           <div v-if="opened[i]" class="answer-panel">
             <div class="answer-text">
-              <div class="answer-label">📖 答案 / 解析</div>
+              <div class="answer-label"><AppIcon name="book-open" :size="15" /> 答案 / 解析</div>
               <MathJaxRender :text="item.answer" />
             </div>
           </div>
@@ -75,6 +75,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 
 const props = defineProps({

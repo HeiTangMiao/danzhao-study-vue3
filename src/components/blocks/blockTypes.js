@@ -13,33 +13,36 @@
 /**
  * 类型 → { label 中文名, icon 目录图标 }
  * icon 为空字符串表示「该类型不进入本页目录」
+ * icon 取值为 Lucide 官方图标名（P2-T1 起数据层去 emoji 化）：
+ * 消费方（UnitView 本页目录等）经 AppIcon 以声明式 <svg> 渲染，
+ * 名称必须存在于 icons/lucide-paths.js 的 ICON_SHAPES（由 tests/block-registry.test.js 守护）
  */
 export const BLOCK_TYPES_META = {
-  mindmap: { label: '思维导图', icon: '🧠' },
-  objectives: { label: '学习目标', icon: '🎯' },
-  knowledge: { label: '知识点', icon: '📖' },
-  formula: { label: '公式', icon: '🧮' },
-  table: { label: '表格', icon: '📊' },
-  warning: { label: '警告', icon: '⚠️' },
-  tip: { label: '提示', icon: '💡' },
-  example: { label: '例题', icon: '📝' },
-  quiz: { label: '题目', icon: '✏️' },
-  diagram: { label: '几何演示', icon: '📐' },
-  errorfocus: { label: '易错专项', icon: '🚨' },
-  strategy: { label: '考试技巧', icon: '🎯' },
-  exam: { label: '模拟卷', icon: '📝' },
+  mindmap: { label: '思维导图', icon: 'network' },
+  objectives: { label: '学习目标', icon: 'target' },
+  knowledge: { label: '知识点', icon: 'book-open' },
+  formula: { label: '公式', icon: 'calculator' },
+  table: { label: '表格', icon: 'table' },
+  warning: { label: '警告', icon: 'triangle-alert' },
+  tip: { label: '提示', icon: 'lightbulb' },
+  example: { label: '例题', icon: 'file-text' },
+  quiz: { label: '题目', icon: 'circle-help' },
+  diagram: { label: '几何演示', icon: 'compass' },
+  errorfocus: { label: '易错专项', icon: 'siren' },
+  strategy: { label: '考试技巧', icon: 'target' },
+  exam: { label: '模拟卷', icon: 'clipboard-list' },
   // 容器型区块：不进入本页目录（目录只收有具体内容的区块）
   columns: { label: '多栏', icon: '' },
   group: { label: '分组', icon: '' },
   // 布局原语（P0）：与容器同属「排布」而非「内容」，同样不进本页目录
   layout: { label: '布局', icon: '' },
   // 结构型区块（阶段 5）：步骤条 / 速记卡 / 对比 / 术语卡 / 代码 / 挖空都是正文型内容，进本页目录
-  steps: { label: '步骤条', icon: '🔢' },
-  summary: { label: '一页速记', icon: '📌' },
-  compare: { label: '对比', icon: '⚖' },
-  vocab: { label: '术语卡', icon: '📕' },
-  code: { label: '代码', icon: '💻' },
-  cloze: { label: '挖空默写', icon: '🖊' }
+  steps: { label: '步骤条', icon: 'list-ordered' },
+  summary: { label: '一页速记', icon: 'pin' },
+  compare: { label: '对比', icon: 'scale' },
+  vocab: { label: '术语卡', icon: 'book-marked' },
+  code: { label: '代码', icon: 'code' },
+  cloze: { label: '挖空默写', icon: 'square-pen' }
 }
 
 /** 全部区块类型（顺序与 BLOCK_TYPES_META 一致） */

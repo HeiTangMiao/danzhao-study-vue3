@@ -19,8 +19,8 @@
         <span class="block-spinner"></span> 正在加载图形…
       </div>
       <div v-else class="jxg-status__inner">
-        <p class="jxg-error-msg">⚠️ 图形组件加载失败</p>
-        <button class="jxg-retry" type="button" @click="init">🔄 重试</button>
+        <p class="jxg-error-msg">图形组件加载失败</p>
+        <button class="jxg-retry" type="button" @click="init"><AppIcon name="refresh-cw" :size="14" /> 重试</button>
       </div>
     </div>
   </div>
@@ -28,6 +28,7 @@
 
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue'
+import AppIcon from '@/components/AppIcon.vue'
 // JSXGraph 样式（复制自 jsxgraph 包，避免包 exports 映射限制深路径导入）
 import '@/assets/css/jsxgraph.css'
 

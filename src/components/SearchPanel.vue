@@ -10,7 +10,7 @@
 <template>
   <div ref="searchEl" :class="{ open: open }" class="search">
     <div class="search-bar">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><AppIcon name="search" :size="16" /></span>
       <input
         v-model="q"
         class="search-input"
@@ -19,13 +19,13 @@
         @focus="onFocus"
         @input="debounced"
       />
-      <button v-if="q" class="search-clear" title="清空" aria-label="清空" @click="clearSearch">✕</button>
+      <button v-if="q" class="search-clear" title="清空" aria-label="清空" @click="clearSearch"><AppIcon name="x" :size="16" /></button>
     </div>
 
     <!-- meta 索引加载失败 -->
     <div v-if="open && focused && metaState === 'error'" class="search-empty">
       <span>搜索索引加载失败，请重试</span>
-      <button class="search-retry" @click="loadMeta">🔄 重试</button>
+      <button class="search-retry" @click="loadMeta"><AppIcon name="refresh-cw" :size="14" /> 重试</button>
     </div>
 
     <!-- 结果列表 -->
@@ -36,7 +36,7 @@
         class="search-result"
         @click="go(r)"
       >
-        <span class="res-icon">{{ r.isTest ? '📝' : subjectIcon(r.subject) }}</span>
+        <span class="res-icon"><AppIcon :name="r.isTest ? 'clipboard-list' : subjectIconName(r.subject)" :size="16" /></span>
         <span class="res-body">
           <span class="res-title">{{ r.title }}</span>
           <span class="res-unit">{{ r.name }} · {{ r.unitTitle }}</span>
@@ -51,7 +51,7 @@
       <span v-if="bodyState === 'loading'">正在检索正文…</span>
       <template v-else-if="bodyState === 'error'">
         <span>正文索引加载失败，当前仅按标题匹配</span>
-        <button class="search-retry" @click="ensureBody">🔄 重试</button>
+        <button class="search-retry" @click="ensureBody"><AppIcon name="refresh-cw" :size="14" /> 重试</button>
       </template>
       <span v-else>没有匹配的内容，换个关键词试试</span>
     </div>
@@ -63,6 +63,8 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { matchSearch, prepareSearchIndex } from '@/utils/search'
 import { META_FILE, bodyShardPath } from '@/content/searchIndex'
+import { SUBJECT_META } from '@/content/index'
+import AppIcon from '@/components/AppIcon.vue'
 
 const router = useRouter()
 
@@ -93,9 +95,10 @@ const searchEl = ref(null)
 let timer = null
 let idleHandle = null
 
-const SUBJECT_ICON = { math: '📐', chinese: '✍️', computer: '💻' }
+// 学科图标名：数据层唯一取值来源 = SUBJECT_META（Lucide 名）；
+// 原本地 SUBJECT_ICON emoji 映射副本已删（重复真相源 + emoji 清零）
 const SUBJECT_NAME = { math: '数学', chinese: '语文', computer: '计算机' }
-function subjectIcon(s) { return SUBJECT_ICON[s] || '📖' }
+function subjectIconName(s) { return SUBJECT_META[s]?.icon || '' }
 /** 当前学科（首页记住的选择，UnitView / HomeView 均写这个键） */
 function currentSubject() { return localStorage.getItem('current_subject') || 'math' }
 

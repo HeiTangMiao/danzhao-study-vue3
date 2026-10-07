@@ -12,7 +12,7 @@
      由 UnitView 把进度条降到顶栏下方解决（见 UnitView `.reading-progress`）。
    - 一级 Tab 页：<1150px 渲染底部 pill；≥1150px 渲染桌面顶栏（同一 activeId 高亮，双形态同构）。
 
-  ⚠️ 玻璃三铁律：必写 -webkit- 前缀；blur ≤ 16px；玻璃层不可被带 transform/filter/will-change
+  注意：玻璃三铁律：必写 -webkit- 前缀；blur ≤ 16px；玻璃层不可被带 transform/filter/will-change
      的祖先包住（否则新建 backdrop root，玻璃静默失效）。
      本组件的玻璃取值全部来自 main.css 的 --glass-* token（唯一来源；main.css 的 .glass 工具类同源）。
 
@@ -120,7 +120,7 @@ const ICON_PATHS = {
   right: 0;
   z-index: 110;
   display: none; /* 默认隐藏，断点处再显示（移动优先） */
-  /* ⚠️ 顶栏真实占高必须 == calc(--tabbar-h + --sat)：
+  /* 注意：顶栏真实占高必须 == calc(--tabbar-h + --sat)：
    * 若不显式定高，顶栏高度由「子元素高 + 自身 border-bottom」决定，会多出 1px，
    * 使进度条 top(= calc(--tabbar-h+--sat)) 落进顶栏底边（bottom 57 > top 56 → 重叠 1px）。
    * 故显式给顶栏定高并用 border-box 把 border 计入高度，令 --tabbar-h 的语义

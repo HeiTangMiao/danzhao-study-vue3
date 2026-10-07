@@ -12,7 +12,7 @@
   <div class="dashboard">
     <!-- 面包屑 -->
     <nav class="breadcrumb">
-      <router-link to="/">📚 首页</router-link>
+      <router-link to="/">首页</router-link>
       <span class="crumb-sep">/</span>
       <span>学习仪表盘</span>
     </nav>
@@ -22,30 +22,30 @@
 
     <!-- 加载失败 -->
     <div v-else-if="error" class="error-hint card">
-      <p>⚠️ {{ error }}</p>
-      <button class="retry-btn" @click="load">🔄 重试</button>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="load"><AppIcon name="refresh-cw" :size="16" /> 重试</button>
     </div>
 
     <template v-else-if="overview">
       <!-- 核心数据卡片 -->
       <section class="stat-grid">
         <div class="card stat-card">
-          <div class="stat-icon">📖</div>
+          <div class="stat-icon"><AppIcon name="book-open" :size="22" /></div>
           <div class="stat-val">{{ overview.totalVisited }}</div>
           <div class="stat-label">已学页面</div>
         </div>
         <div class="card stat-card">
-          <div class="stat-icon">✏️</div>
+          <div class="stat-icon"><AppIcon name="pencil" :size="22" /></div>
           <div class="stat-val">{{ overview.totalQuestions }}</div>
           <div class="stat-label">答题总数</div>
         </div>
         <div class="card stat-card">
-          <div class="stat-icon">⭐</div>
+          <div class="stat-icon"><AppIcon name="siren" :size="22" /></div>
           <div class="stat-val">{{ overview.errorsCount }}</div>
           <div class="stat-label">错题收录</div>
         </div>
         <div class="card stat-card">
-          <div class="stat-icon">🧠</div>
+          <div class="stat-icon"><AppIcon name="rotate-ccw" :size="22" /></div>
           <div class="stat-val">{{ todayDue }}</div>
           <div class="stat-label">今日待复习</div>
         </div>
@@ -53,7 +53,7 @@
 
       <!-- 今日学习 -->
       <section class="card today-card">
-        <h2>📅 今日学习</h2>
+        <h2>今日学习</h2>
         <div class="today-grid">
           <div class="today-item">
             <span class="today-val">{{ overview.todayStat.filesVisited || 0 }}</span>
@@ -72,11 +72,11 @@
 
       <!-- 学科进度概览 -->
       <section class="card subject-progress-card">
-        <h2>📚 学科进度</h2>
+        <h2>学科进度</h2>
         <div class="subject-progress-list">
           <div v-for="(meta, key) in SUBJECT_META" :key="key" class="subject-progress-item">
             <div class="subject-progress-head">
-              <span class="subject-progress-icon">{{ meta.icon }}</span>
+              <span class="subject-progress-icon"><AppIcon :name="meta.icon" :size="18" /></span>
               <span class="subject-progress-name">{{ meta.name }}</span>
               <span class="subject-progress-pct">{{ subjPct(key) }}%</span>
             </div>
@@ -93,31 +93,27 @@
 
       <!-- 学情分析与复习建议（基于错题本聚合的薄弱点洞察） -->
       <section v-if="weakAreas.length > 0" class="card insight-card">
-        <h2>📋 学情分析与复习建议</h2>
+        <h2>学情分析与复习建议</h2>
         <div v-if="todayDue > 0" class="insight-due">
-          🔔 今日有 <strong>{{ todayDue }}</strong> 道错题到期待复习
+          <AppIcon name="bell" :size="16" />
+          今日有 <strong>{{ todayDue }}</strong> 道错题到期待复习
           <router-link to="/error-book" class="insight-link">去复习 →</router-link>
         </div>
-        <div v-else class="insight-due insight-clear">✅ 今日没有到期错题，可以学习新内容</div>
+        <div v-else class="insight-due insight-clear"><AppIcon name="check" :size="16" /> 今日没有到期错题，可以学习新内容</div>
         <p v-if="weakest" class="insight-tip">
           薄弱点集中在
-          <strong>{{ weakest.icon }} {{ weakest.name }} · {{ weakest.unitTitle }}</strong
+          <strong>{{ weakest.name }} · {{ weakest.unitTitle }}</strong
           >（{{ weakest.count }} 道错题），建议优先回看该单元并重做错题。
         </p>
         <div class="insight-list">
           <div v-for="(w, i) in weakAreas" :key="i" class="insight-item">
             <span class="insight-rank">{{ i + 1 }}</span>
-            <span class="insight-icon">{{ w.icon }}</span>
+            <span class="insight-icon"><AppIcon :name="w.icon" :size="16" /></span>
             <span class="insight-name">{{ w.name }} · {{ w.unitTitle }}</span>
             <span class="insight-count" :class="{ 'count-warn': i === 0 }">{{ w.count }} 题</span>
           </div>
         </div>
       </section>
-
-      <!-- 作者署名 -->
-      <div class="dashboard-credit">
-        Crafted with ❤️ by <strong>黑糖＆菜菜</strong>
-      </div>
     </template>
   </div>
 </template>
@@ -126,6 +122,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
+import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
 
@@ -190,7 +187,7 @@ const weakAreas = computed(() => {
       ...w,
       unitTitle: getUnitTitle(w.subject, w.unitNum),
       name: SUBJECT_META[w.subject]?.name || w.subject,
-      icon: SUBJECT_META[w.subject]?.icon || '📘'
+      icon: SUBJECT_META[w.subject]?.icon || 'book-open'
     }))
 })
 
@@ -233,7 +230,8 @@ onMounted(load)
 /* 统计卡片网格 */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacer-12); }
 .stat-card { text-align: center; }
-.stat-icon { font-size: 1.5rem; }
+/* AppIcon 通过 currentColor 继承文字色，这里只负责竖排与间距 */
+.stat-icon { display: flex; justify-content: center; color: var(--primary); margin-bottom: var(--spacer-4); }
 .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
 .stat-label { font-size: 0.8rem; color: var(--text-muted); }
 
@@ -247,7 +245,7 @@ onMounted(load)
 .subject-progress-list { display: flex; flex-direction: column; gap: var(--spacer-16); margin-top: var(--spacer-12); }
 .subject-progress-item { display: flex; flex-direction: column; gap: var(--spacer-4); }
 .subject-progress-head { display: flex; align-items: center; gap: var(--spacer-8); }
-.subject-progress-icon { font-size: 1.2rem; }
+.subject-progress-icon { display: inline-flex; color: var(--text-muted); }
 .subject-progress-name { font-weight: 600; flex: 1; }
 .subject-progress-pct { font-weight: 700; color: var(--primary); }
 .subject-progress-bar { height: 8px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
@@ -288,7 +286,7 @@ onMounted(load)
   background: var(--primary-soft); color: var(--primary);
   font-size: 0.78rem; font-weight: 700;
 }
-.insight-icon { font-size: 1.05rem; }
+.insight-icon { display: inline-flex; color: var(--text-muted); }
 .insight-name { flex: 1; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .insight-count {
   flex: 0 0 auto; font-size: 0.78rem; color: var(--text-muted);
@@ -299,17 +297,5 @@ onMounted(load)
 @media (max-width: 600px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .today-grid { grid-template-columns: repeat(3, 1fr); }
-}
-.dashboard-credit {
-  margin-top: var(--spacer-24);
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.dashboard-credit strong {
-  background: linear-gradient(135deg, #f43f5e, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 </style>

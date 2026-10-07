@@ -199,7 +199,7 @@ export function usePomodoro() {
         await recordStudyMinutes(FOCUS_DURATION / 60)
         // 以 daily_stats 为单一数据源刷新今日番茄数
         await loadTodaySessions()
-        notify('番茄钟完成！', '专注了25分钟，休息一下吧 🎉')
+        notify('番茄钟完成！', '专注了25分钟，休息一下吧')
       }
 
       // 切换到休息模式
@@ -213,7 +213,7 @@ export function usePomodoro() {
       }
     } else {
       // 休息完成
-      notify('休息结束', '继续学习吧！💪')
+      notify('休息结束', '继续学习吧！')
       mode.value = 'focus'
       timeLeft.value = FOCUS_DURATION
     }

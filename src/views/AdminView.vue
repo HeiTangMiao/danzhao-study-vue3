@@ -5,14 +5,14 @@
 <template>
   <div class="admin">
     <nav class="breadcrumb">
-      <router-link to="/">📚 首页</router-link>
+      <router-link to="/">首页</router-link>
       <span class="crumb-sep">/</span>
       <span>管理后台</span>
     </nav>
 
     <div class="admin__tabs">
-      <button class="admin__tab" :class="{ active: tab === 'users' }" @click="switchTab('users')">👥 用户管理</button>
-      <button class="admin__tab" :class="{ active: tab === 'stats' }" @click="switchTab('stats')">📊 页面统计</button>
+      <button class="admin__tab" :class="{ active: tab === 'users' }" @click="switchTab('users')">用户管理</button>
+      <button class="admin__tab" :class="{ active: tab === 'stats' }" @click="switchTab('stats')">页面统计</button>
     </div>
 
     <div v-if="loading" class="loading">加载中…</div>
@@ -58,7 +58,7 @@
       </div>
 
       <div class="card block">
-        <h3>📚 分学科</h3>
+        <h3>分学科</h3>
         <div v-for="(s, k) in stats.pages?.bySubject || {}" :key="k" class="subj-line">
           <span class="subj-name">{{ subjectName(k) }}</span>
           <span class="subj-stat">访问 {{ s.visits }} · 答题 {{ s.answers }} · 测验 {{ s.tests }}</span>
@@ -67,7 +67,7 @@
       </div>
 
       <div class="card block">
-        <h3>🔥 热门页面 TOP20</h3>
+        <h3>热门页面 TOP20</h3>
         <ol class="top-list">
           <li v-for="(p, i) in stats.pages?.topPages || []" :key="p.key">
             <span class="top-rank">{{ i + 1 }}</span>
@@ -79,7 +79,7 @@
       </div>
 
       <div class="card block">
-        <h3>📅 近 14 日访问趋势</h3>
+        <h3>近 14 日访问趋势</h3>
         <div class="trend">
           <div v-for="d in stats.pages?.dailyTrend || []" :key="d.date" class="trend-col">
             <span class="trend-bar" :style="{ height: trendHeight(d.visits) + 'px' }"></span>

@@ -7,7 +7,7 @@
 -->
 <template>
   <section class="block example">
-    <h2 class="block-title">📝 {{ block.title || '典型例题' }}</h2>
+    <h2 class="block-title"><AppIcon name="file-text" :size="18" /> {{ block.title || '典型例题' }}</h2>
     <div v-for="(item, i) in block.items" :key="i" class="example-card">
       <div class="ex-head">
         <span class="ex-title">{{ item.title || `例题 ${i + 1}` }}</span>
@@ -22,7 +22,7 @@
       <!-- 解答（默认折叠） -->
       <div v-if="item.solution" class="ex-solution-wrap">
         <button class="ex-toggle" @click="toggle('sol', i)">
-          {{ opened.sol[i] ? '收起解答' : '💭 先思考，再看解答' }}
+          {{ opened.sol[i] ? '收起解答' : '先思考，再看解答' }}
         </button>
         <transition name="fade">
           <div v-show="opened.sol[i]" class="ex-solution">
@@ -48,6 +48,7 @@
 <script setup>
 import { reactive } from 'vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 
 defineProps({

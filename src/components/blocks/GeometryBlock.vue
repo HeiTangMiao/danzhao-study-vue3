@@ -15,7 +15,7 @@
      - 语法错误从此是构建错误，不再是运行时炸
      - 单页只拉取用到的那一个画板模块
 
-  ⚠️ setup 由「同步 computed」变成了「异步取模块」：必须等模块到位后再渲染 JsxGraphBoard，
+  注意：setup 由「同步 computed」变成了「异步取模块」：必须等模块到位后再渲染 JsxGraphBoard，
      否则 JsxGraphBoard 的 `if (props.setup)` 守卫会在模块到位前跑完，表现为
      「加载中 → ready 但空画板」。因此这里用 v-if="setupFn" 拦截渲染时机。
 -->
@@ -34,7 +34,7 @@
       <div v-else-if="loadState === 'loading'" class="diagram-loading">
         <span class="block-spinner"></span> 正在加载画板…
       </div>
-      <p v-else class="diagram-error">⚠️ {{ loadError || '画板加载失败，无法渲染。' }}</p>
+      <p v-else class="diagram-error">{{ loadError || '画板加载失败，无法渲染。' }}</p>
       <p v-if="block.caption" class="diagram-caption">{{ block.caption }}</p>
     </div>
   </section>
