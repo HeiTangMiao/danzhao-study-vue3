@@ -40,12 +40,6 @@ const routes = [
     redirect: (to) => ({ name: 'unit', params: { subject: 'math', unitNum: to.params.unitNum, fileIndex: to.params.fileIndex } })
   },
   {
-    // 低代码编辑器
-    path: '/editor',
-    name: 'editor',
-    component: () => import('@/views/editor/EditorView.vue')
-  },
-  {
     // 学习仪表盘
     path: '/dashboard',
     name: 'dashboard',

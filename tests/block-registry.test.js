@@ -108,6 +108,11 @@ describe('布局原语（P0）', () => {
     const branch = schema.definitions.block.allOf.find(
       (b) => b.if?.properties?.type?.const === 'layout'
     )
-    expect(sorted(branch?.then?.required || [])).toEqual(['as', 'children'])
+    // 编辑器下线后 then 改成了 $ref（此前为让编辑器从 allOf 分支推导表单字段，只能内联），
+    // 所以这里要解析一次引用再断言。
+    const then = branch?.then?.$ref
+      ? schema.definitions[branch.then.$ref.replace('#/definitions/', '')]
+      : branch?.then
+    expect(sorted(then?.required || [])).toEqual(['as', 'children'])
   })
 })

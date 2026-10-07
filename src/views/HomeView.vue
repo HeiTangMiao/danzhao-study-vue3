@@ -94,13 +94,6 @@
           <span class="tool-desc">全真模拟限时实战</span>
         </div>
       </router-link>
-      <router-link to="/editor" class="tool-card" style="border-top-color: var(--accent)">
-        <span class="tool-icon">✏️</span>
-        <div class="tool-text">
-          <span class="tool-name">内容编辑器</span>
-          <span class="tool-desc">低代码内容管理</span>
-        </div>
-      </router-link>
     </section>
 
     <!-- 按阶段分组展示单元 -->

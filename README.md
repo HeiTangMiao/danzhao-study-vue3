@@ -36,7 +36,6 @@
 - **本地存储**：IndexedDB 数据层（学习日志、进度、错题、笔记、书签），离线可读写
 - **账号与跨设备同步**：注册/登录后，学习数据通过 Fastify 后端在多设备间同步（见「运行与登录」）
 - **数据导出/导入**：一键备份与迁移全部学习数据
-- **低代码内容编辑器**：内置 `/editor` 页面，可视化编辑内容区块，公式模板快捷插入，一键导出数据文件
 - **番茄钟**：内置专注计时器，辅助高效学习
 
 ---
@@ -132,7 +131,6 @@ danzhao-study-vue3/
 │   │   ├── site.js             # 数学站点配置（元信息唯一真相源）
 │   │   ├── pageMeta.js         # 元信息推导（浏览器 / Node 共用）
 │   │   ├── loadPage.js         # 浏览器侧加载链路
-│   │   ├── serializePage.js    # 内容文件序列化风格（唯一定义）
 │   │   ├── searchIndex.js      # 搜索索引形状定义（两端共用）
 │   │   ├── math/               # 数学内容
 │   │   ├── chinese/            # 语文内容（含自己的 site.js）
@@ -141,14 +139,13 @@ danzhao-study-vue3/
 │   │   ├── BlockRenderer.vue   # 区块分发器
 │   │   ├── MathJaxRender.vue   # 公式渲染（KaTeX 引擎）
 │   │   ├── JsxGraphBoard.vue   # 几何画板
-│   │   ├── GeoGebraPlayground.vue
 │   │   └── blocks/             # 区块渲染组件 + registry.js 映射表
 │   ├── composables/            # 组合式函数（KaTeX/Mermaid/笔记/书签/主题/番茄钟/间隔复习）
 │   ├── stores/                 # Pinia 状态管理（auth / progress / studyDb）
 │   ├── sync/                   # 同步层（api.js 请求封装 + engine.js push/pull + LWW）
 │   ├── router/index.js         # 路由配置（hash 模式 + 强制登录守卫）
-│   ├── utils/                  # 工具（validateBlock / contentSchema / search 等）
-│   ├── views/                  # 页面视图（首页/登录/内容页/仪表盘/错题本/编辑器/管理）
+│   ├── utils/                  # 工具（validateBlock / search 等）
+│   ├── views/                  # 页面视图（首页/登录/内容页/仪表盘/错题本/管理）
 │   └── types/                  # TypeScript 类型声明（.d.ts，仅文档用途）
 ├── scripts/
 │   ├── validate-content.mjs    # Schema 校验脚本（npm run validate:content）
@@ -176,8 +173,6 @@ danzhao-study-vue3/
 2. 按 Schema 编写区块（知识点、公式、例题、练习题、易错专项、模拟卷等）
 3. 在站点配置（`src/content/site.js` / `chinese/site.js` / `computer/site.js`）的 `files` 数组中注册——**页面元信息（id/unitNum/subject/title/subtitle/icon）只写在这里**，写进内容文件是校验硬错误
 4. 运行 `npm run validate:content` 校验数据合法性
-
-也可以使用内置低代码编辑器（`/editor` 路由）可视化创作并导出数据文件。
 
 > 历史文档 `MIGRATION-README.md` 里「内容文件需 `export default { subject, unitNum, blocks }`」的写法**已废弃**，以 `CLAUDE.md` 的内容铁律为准。
 
@@ -247,8 +242,6 @@ npm run tauri:android:build  # Android APK（需配置 Android SDK/NDK）
 - 桌面端**依赖网络**：当前方案下桌面端指向远程后端，断网时登录与同步不可用。
   若要完全离线，需改为 Tauri sidecar 内嵌本地后端（后端已支持 PGlite 嵌入式数据库，
   具备该方案的可行性前提；主要障碍是 `@node-rs/argon2` 为 Rust native 模块，单文件打包需先替换为纯 JS 实现）。
-- GeoGebra 离线资源（约 48 MB）已移出仓库，改为按需拉取：`npm run geogebra`。
-  未拉取时几何演练场会自动回退官方在线 CDN，功能不丢失（仅失去离线可用性）。
 
 ---
 

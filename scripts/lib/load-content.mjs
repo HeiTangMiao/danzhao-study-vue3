@@ -39,7 +39,6 @@ export const NON_PAGE_FILES = new Set([
   'index.js', // 多学科索引
   'pageMeta.js', // 页面元信息推导（纯 ESM，两端共用）
   'loadPage.js', // 页面加载入口（浏览器侧）
-  'serializePage.js', // 内容序列化风格定义（纯 ESM，两端共用，见阶段 6）
   'searchIndex.js' // 搜索索引形状定义（纯 ESM，两端共用，见阶段 7.4）
 ])
 

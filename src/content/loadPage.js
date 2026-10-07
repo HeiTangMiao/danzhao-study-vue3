@@ -1,7 +1,7 @@
 /**
  * 内容页唯一加载入口（浏览器侧）
  * 职责：把「按 site.js 解析元信息 → 动态导入页面文件 → 注入元信息」收敛成一个函数，
- *      供 UnitView 与 EditorView 共用，避免两处各写一遍导入逻辑而慢慢漂移。
+ *      供 UnitView 使用，避免各处各写一遍导入逻辑而慢慢漂移。
  * 说明：Node 侧的对应实现见 scripts/lib/load-content.mjs —— 两侧共用
  *      src/content/pageMeta.js 里的同一条推导规则。
  */
