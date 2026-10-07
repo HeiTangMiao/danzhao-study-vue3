@@ -1,0 +1,296 @@
+/**
+ * reader.css —— 学习页 v4 功能条与内容换页动效（P4-T4 / P4-T5）
+ *
+ * 职责边界：
+ *  - 本文件只承载「学习页功能条（ReaderTopbar/ReaderFooter）+ 翻页三态机动效」的样式；
+ *    token 一律引用 main.css（--glass-* / --dur-* / --space-*），本文件只新增 reader 私有 token。
+ *  - 为什么 --sys-gesture-bottom 定义在这里而不是 main.css：本批次约束不碰 main.css；
+ *    P5-T3 真机读到 WindowInsets 实值后再迁入 main.css 与 --sab 并列（§5.7.5）。
+ *
+ * 玻璃三铁律（§5.1 / §5.7.4）在结构上的落实：
+ *  - 两条功能条与 .reader-content 是**兄弟节点**（见 UnitView 模板），翻页动画只 transform
+ *    内容层 —— 功能条全程不动、不做 opacity 过渡，backdrop root 永不被自断。
+ *  - 内容层动效期间挂 [data-paging]，其内部若将来出现 .glass 区块会临时切不透明背景
+ *    （opacity < 1 期间 backdrop 必然失效，与其闪变不如主动降级）。
+ */
+
+:root {
+  /* 翻页时长三 token（§5.7.6 定档）：总时长 = --swipe-overlap + --swipe-in = 380ms。
+   * 调试口径：整档缩放 out/in，不动 overlap 的「入场延迟」语义。 */
+  --swipe-out: 260ms;
+  --swipe-in: 280ms;
+  --swipe-overlap: 100ms;
+  --swipe-spring: 160ms;
+  --swipe-shift: 22px; /* 跟手位移上限（用户定值） */
+  --ease-page: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --reader-topbar-h: 44px;
+  --reader-footer-h: 52px;
+  /* Android 底部系统手势区（应用不可申索）：真机定值前用保守 24px（§5.7.5） */
+  --sys-gesture-bottom: 24px;
+}
+
+/* ============================================================
+ * ReaderTopbar —— 44px 玻璃页眉（常驻，§5.6.1 v4 触发方式改为常驻）
+ * ============================================================ */
+.reader-topbar {
+  position: fixed;
+  top: var(--sat);
+  left: 0;
+  right: 0;
+  height: var(--reader-topbar-h);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  /* 玻璃：只引 token，不另写一套（§5.1 单一取值来源） */
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow: inset 0 1px 0 var(--glass-hl); /* .glass--flat 语义：页眉不加投影 */
+  border-bottom: 1px solid var(--line);
+}
+/* 桌面端（≥1150）AppTabBar 顶部导航条常驻在上方 → 页眉挪到其正下方 */
+@media (min-width: 1150px) {
+  .reader-topbar { top: calc(var(--tabbar-h) + var(--sat)); }
+}
+
+.rt-back {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+.rt-back:active { transform: scale(0.94); }
+
+.rt-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow: hidden;
+}
+.rt-unit {
+  font-weight: 700;
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 页码：陶土橙 + 等宽数字，翻页时不跳动 */
+.rt-page {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+/* 标题/页码文本 120ms 淡入淡出（§5.7.4 规则 2：玻璃层上唯一允许的过渡，纯文本） */
+.rt-fade-enter-active,
+.rt-fade-leave-active { transition: opacity 120ms linear; }
+.rt-fade-enter-from,
+.rt-fade-leave-to { opacity: 0; }
+
+.rt-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.rt-act {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+.rt-act.on { color: var(--primary); background: var(--glass-active); }
+.rt-act:active { transform: scale(0.94); }
+/* 桌面端有 ContentSidebar 全量快捷区，顶栏入口只服务移动端 */
+@media (min-width: 1151px) {
+  .rt-actions { display: none; }
+}
+
+/* 2px 分段进度：放页眉内底边（不另起 fixed 元素，少一个层叠上下文，§5.7.0 第 2 条） */
+.rt-segs {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  display: flex;
+}
+.rt-segs i {
+  flex: 1;
+  background: var(--line);
+}
+.rt-segs i + i { margin-left: 2px; }
+.rt-segs i.done { background: color-mix(in srgb, var(--primary) 40%, transparent); }
+.rt-segs i.cur { background: var(--primary); }
+
+/* ============================================================
+ * ReaderFooter —— 52px 玻璃页脚（常驻）
+ * ============================================================ */
+.reader-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: calc(var(--reader-footer-h) + max(var(--sab), var(--sys-gesture-bottom)));
+  /* 底部系统手势区不可申索（§5.7.5）：主行动按钮整体让开最底部 24px */
+  padding: 0 12px max(var(--sab), var(--sys-gesture-bottom));
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow: inset 0 1px 0 var(--glass-hl);
+  border-top: 1px solid var(--line);
+}
+/* 页脚玻璃是否加投影：技术侧建议不加（底部有系统导航/手势区，投影打架，§5.7.0 第 1 条） */
+
+.rf-nav {
+  flex: 0 0 auto;
+  min-width: 52px;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.rf-nav:active:not(:disabled) { transform: scale(0.94); color: var(--text); }
+.rf-nav:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* 主行动：全学习页唯一实心橙（橙色门禁）；已掌握态切描边（§5.7.7） */
+.rf-master {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.rf-master:active { transform: scale(0.97); }
+.rf-master.on {
+  background: transparent;
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ============================================================
+ * 内容层翻页三态机动效（§5.7.3 / §5.7.4）
+ * 结构硬规则：.reader-content 是唯一被 transform/opacity 的元素；
+ * 它与两条功能条是兄弟——功能条绝不参与动画。
+ * ============================================================ */
+.reader-content {
+  touch-action: pan-y; /* 纵向滚动交还浏览器原生处理，水平位移归手势层（§5.7.1） */
+  overflow-x: clip; /* 裁 22px 位移溢出；不用 hidden（退化滚动容器）不用 contain:paint（backdrop root） */
+}
+/* 跟手拖拽：只挂 is-dragging 类时才有 transform（常态零 transform，不给玻璃层添 backdrop root） */
+.reader-content.is-dragging {
+  transform: translateX(var(--swipe-dx, 0px));
+  will-change: transform, opacity; /* 生命周期：拖拽起、动画止（JS 摘除） */
+}
+
+@keyframes reader-page-out {
+  from { transform: translateX(var(--swipe-dx, 0px)); opacity: 1; }
+  to { transform: translateX(calc(var(--swipe-dir, -1) * var(--swipe-shift))); opacity: 0; }
+}
+@keyframes reader-page-in {
+  from { transform: translateX(calc(var(--swipe-dir, -1) * var(--swipe-shift))); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes reader-page-spring {
+  from { transform: translateX(var(--swipe-dx, 0px)); opacity: 1; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.reader-content.is-leaving {
+  animation: reader-page-out var(--swipe-out) var(--ease-page) forwards;
+}
+.reader-content.is-entering {
+  animation: reader-page-in var(--swipe-in) var(--ease-page) backwards;
+}
+.reader-content.is-spring {
+  animation: reader-page-spring var(--swipe-spring) var(--ease-page);
+}
+
+/* 内容层动效期间（opacity<1）内部玻璃必然 backdrop 失效 → 主动降级为不透明（§5.7.4 规则 3） */
+.reader-content[data-paging] .glass {
+  background: var(--surface);
+}
+
+/* 能力分级降级（§5.7.5）：档位由 useMotionPrefs 写 <html data-motion-tier> */
+/* 中档：去位移只留溶解（出 160 / 入 200） */
+html[data-motion-tier='reduced'] .reader-content.is-leaving {
+  animation-duration: 160ms;
+  animation-name: reader-fade-out;
+}
+html[data-motion-tier='reduced'] .reader-content.is-entering {
+  animation-duration: 200ms;
+  animation-name: reader-fade-in;
+}
+html[data-motion-tier='reduced'] .reader-content.is-dragging { transform: none; }
+@keyframes reader-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes reader-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* 低档（含 prefers-reduced-motion 硬约束）：不播动画直接换页——
+ * 页面翻页是功能不是装饰，手势照常工作，只是没有过渡 */
+html[data-motion-tier='off'] .reader-content.is-leaving,
+html[data-motion-tier='off'] .reader-content.is-entering,
+html[data-motion-tier='off'] .reader-content.is-spring {
+  animation: none;
+}
+html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
+
+/* ============================================================
+ * UnitView 布局适配：让位两条功能条
+ * ============================================================ */
+/* 顶部：页眉高 + 安全区（桌面再加 AppTabBar 高） */
+.unit-view { padding-top: calc(var(--sat) + var(--reader-topbar-h) + var(--spacer-16)); }
+@media (min-width: 1150px) {
+  .unit-view { padding-top: calc(var(--tabbar-h) + var(--sat) + var(--reader-topbar-h) + var(--spacer-16)); }
+}
+/* 底部：页脚总高 + 呼吸间距（v4 空间账：页脚 130 → 52+手势区） */
+@media (max-width: 1150px) {
+  .unit-view {
+    padding-bottom: calc(
+      var(--reader-footer-h) + max(var(--sab), var(--sys-gesture-bottom)) + var(--spacer-8)
+    );
+  }
+}

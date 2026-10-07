@@ -202,7 +202,8 @@
     </div>
 
     <!-- 底部常驻操作栏：目录 / 上一页 / 下一页（主操作）/ 更多 -->
-    <div class="sb-bar">
+    <!-- v4：翻页/入口职责移交 ReaderFooter 与 ReaderTopbar，hideBar 时不渲染（§5.7.0） -->
+    <div v-if="!hideBar" class="sb-bar">
       <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet('nav')"><AppIcon name="menu" :size="16" /><span>目录</span></button>
       <button class="sb-bar__btn" :disabled="!hasPrev" title="上一页" @click="emit('go-prev')">←<span>上页</span></button>
       <button class="sb-bar__next" :title="nextBtnTitle" @click="onNextClick">
@@ -226,7 +227,10 @@ const props = defineProps({
   isDone: { type: Boolean, default: false },
   isMath: { type: Boolean, default: false },
   // 单元内各页面完成状态（布尔数组，供移动端答题卡网格）
-  doneFiles: { type: Array, default: () => [] }
+  doneFiles: { type: Array, default: () => [] },
+  // v4 学习页（§5.7.0 空间账：页脚 130→52）：翻页职责移交 ReaderFooter，
+  // 本组件的移动端底部操作栏不再渲染；抽屉/更多面板保留，由父组件经 expose 打开
+  hideBar: { type: Boolean, default: false }
 })
 
 const emit = defineEmits([
@@ -254,6 +258,9 @@ function closeSheets() {
   sheetOpen.value = false
   moreOpen.value = false
 }
+
+// v4：底部操作栏隐藏后，父组件（UnitView）经模板 ref 打开答题卡抽屉/更多面板
+defineExpose({ openSheet, closeSheets })
 
 // Esc 关闭抽屉 / 更多面板
 function onKeyDown(e) {

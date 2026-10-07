@@ -35,4 +35,31 @@ export async function loadPage(subject, unitNum, fileIndex) {
   return hydratePage(mod.default, meta)
 }
 
+/**
+ * 预取页面模块（P4-T5 §5.7.5）：只预热 import() 缓存，不做 hydrate。
+ *  - 命中模块缓存天然幂等；Set 去重避免同一页反复触发 import
+ *  - 只预取 1 页（139 个 chunk 全拉对移动端流量与内存无意义）；跨单元由调用方 clearPrefetch()
+ */
+const prefetched = new Set()
+
+export async function prefetchPage(subject, unitNum, fileIndex) {
+  const meta = resolvePageMeta(getSubjectConfig(subject), unitNum, fileIndex)
+  if (!meta) return false
+  const dedupeKey = `${subject}/${meta.folder}/${meta.name}`
+  if (prefetched.has(dedupeKey)) return false
+  prefetched.add(dedupeKey)
+  try {
+    await importPageModule(subject, meta.folder, meta.name)
+    return true
+  } catch {
+    prefetched.delete(dedupeKey) // 失败允许下次重试
+    return false
+  }
+}
+
+/** 清空预取去重集（跨单元导航时调用，§5.7.5 建议③） */
+export function clearPrefetch() {
+  prefetched.clear()
+}
+
 export { resolvePageMeta, hydratePage }

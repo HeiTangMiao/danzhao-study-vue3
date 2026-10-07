@@ -3,62 +3,41 @@
   职责：
    - 根据路由参数 subject + unitNum + fileIndex 加载对应内容数据
    - 将内容区块数组交给 BlockRenderer 逐块渲染
-   - 提供上一页/下一页导航与完成标记
    - 学习追踪：记录页面访问、答题与测验成绩（无游戏化奖励）
-   - 笔记功能：每页可记录学习笔记
-   - 书签功能：收藏当前页面
-  导航互斥（system_design §4.1 / §9.3）：
-   - 本视图为详情页（路由不携带 meta.tab），故 AppTabBar 的底部 pill 自动隐藏，
-     由 ContentSidebar 的底部操作栏接管 —— 两个底栏不同屏。
-   - 桌面端顶栏仍常驻（承载用户区入口）；其与阅读进度条的层叠由本文件 `.reading-progress`
-     的桌面端 top 下移解决（进度条降至顶栏下方）。
-   - 完成状态不再在页眉重复渲染（原 `.done-chip` 为第 4 份拷贝）；
-     统一由 ContentSidebar 的只读状态徽章承担（每端 1 处，见架构审计 §2-3）。
+   - 笔记 / 书签 / 番茄钟 / 离开保护
+  学习页 v4（system_design §5.6 / §5.7，P4-T4/T5）：
+   - 页眉页脚为常驻玻璃功能条（ReaderTopbar 44px / ReaderFooter 52px），取代旧
+     page-header + page-nav + 迷你顶栏（空间账：页眉 76→44、页脚 130→52）
+   - 进度双端策略（§5.6.3，用户拍板）：移动端（<900px）**不挂载** .reading-progress，
+     位置感由页眉 2px 分段刻度承担；桌面端保留（渐变已改纯色 --primary，宽度过渡改 scaleX）
+   - 左右滑动翻页（useSwipePaging）：手势层只判意图，翻页仍走路由（goPrev/goNext），
+     自动继承作答保护 / markPageVisited / 续学位置整条链路
+   - backdrop root 解耦（§5.7.4 硬规则）：两条功能条与 .reader-content 是**兄弟节点**，
+     翻页动画只 transform 内容层，玻璃条全程不动 —— 绝不给 fixed 玻璃层加 transform 祖先
+  导航互斥（system_design §4.1 / §9.3）：本视图为详情页，AppTabBar 底部 pill 不渲染；
+  桌面端 AppTabBar 顶部导航条常驻，ReaderTopbar 挪到其正下方（见 reader.css）。
 -->
 <template>
   <div class="unit-view">
-    <!-- 阅读进度条 -->
-    <div class="reading-progress">
-      <div class="reading-progress__bar" :style="{ width: readProgress + '%' }"></div>
+    <!-- 桌面阅读进度条：移动端不挂载（§5.6.3 双端策略），宽度过渡改 scaleX（只动 transform） -->
+    <div v-if="!isNarrowViewport" class="reading-progress" aria-hidden="true">
+      <div class="reading-progress__bar" :style="{ transform: `scaleX(${readProgress / 100})` }"></div>
     </div>
 
-    <!-- 移动端迷你顶栏：滚动离开页面头部后出现（返回首页 + 标题 + 阅读进度） -->
-    <transition name="topbar">
-      <div v-if="showTopbar && page" class="mobile-topbar">
-        <button class="topbar-back" title="返回首页" aria-label="返回首页" @click="router.push('/')">←</button>
-        <span class="topbar-title">{{ fileMeta?.title }}</span>
-        <span class="topbar-progress">{{ readProgress }}%</span>
-      </div>
-    </transition>
+    <!-- v4 玻璃页眉：返回（唯一可靠返回通道）/ 单元标题 + 页码 / 收藏·笔记·答题卡入口 / 2px 分段刻度 -->
+    <ReaderTopbar
+      :unit-title="unit?.title || ''"
+      :file-index="fileIndex"
+      :total="unit?.files.length || 0"
+      :bookmarked="bookmark.isBookmarked.value"
+      :notes-open="showNotes"
+      @back="goHome"
+      @toc="onTopbarToc"
+      @bookmark="bookmark.toggleBookmark()"
+      @notes="showNotes = !showNotes"
+    />
 
-    <!-- 面包屑导航 -->
-    <nav class="breadcrumb">
-      <router-link to="/">首页</router-link>
-      <span class="crumb-sep">/</span>
-      <span>{{ site.breadcrumbHome }}</span>
-      <span class="crumb-sep">/</span>
-      <span>{{ unit?.title }}</span>
-    </nav>
-
-    <!-- 页面头部 -->
-    <header v-if="page" class="page-header">
-      <div class="page-header__row">
-        <div>
-          <h1>{{ page.title }}</h1>
-          <p class="page-subtitle">{{ page.subtitle }}</p>
-        </div>
-        <!-- 工具按钮：目录 + 书签 + 笔记 -->
-        <div class="page-tools">
-          <button v-if="toc.length > 0" class="tool-btn" :class="{ active: showToc }" title="目录" aria-label="目录" @click="showToc = !showToc"><AppIcon name="menu" :size="18" /></button>
-          <button class="tool-btn" :class="{ active: bookmark.isBookmarked.value }" title="收藏" aria-label="收藏" @click="bookmark.toggleBookmark()">
-            <AppIcon name="star" :size="18" :stroke-width="1.8" />
-          </button>
-          <button class="tool-btn" title="笔记" aria-label="笔记" @click="showNotes = !showNotes"><AppIcon name="square-pen" :size="18" /></button>
-        </div>
-      </div>
-    </header>
-
-    <!-- 目录导航（折叠式） -->
+    <!-- 目录导航（折叠式；桌面端入口，移动端用答题卡抽屉） -->
     <section v-if="showToc && page && toc.length > 0" class="toc-panel card">
       <div class="toc-head">本页目录</div>
       <ul class="toc-list">
@@ -101,8 +80,17 @@
       </div>
     </section>
 
-    <!-- 内容主体：逐块渲染 -->
-    <main v-if="page" class="page-content">
+    <!-- 内容主体：逐块渲染。
+         ⚠️ 本元素是全页唯一被 transform/opacity 动画的元素（§5.7.4）：
+         翻页三态机类 is-leaving/is-entering/is-spring 与跟手 --swipe-dx 都落在这里；
+         功能条/番茄钟/弹层都是它的兄弟节点，绝不能挪进它的子树。 -->
+    <main
+      v-if="page"
+      ref="readerContentEl"
+      class="page-content reader-content"
+      :class="pagingPhase !== 'idle' ? 'is-' + pagingPhase : null"
+      :data-paging="pagingPhase !== 'idle' ? '' : null"
+    >
       <!-- data-kind = 内容角色（P4-T3），取值来自 blockTypes.js 的 kind 字段；
            无角色（布局原语与功能区块）传 null 让 Vue 省略该属性，CSS 不会误命中 -->
       <div
@@ -119,16 +107,20 @@
       </div>
     </main>
 
-    <!-- 页面切换导航 -->
-    <nav v-if="unit" class="page-nav">
-      <button class="nav-btn" :disabled="!hasPrev" @click="goPrev">← 上一页</button>
-      <span class="nav-index">{{ fileIndex + 1 }} / {{ unit.files.length }}</span>
-      <button class="nav-btn" :disabled="!hasNext" @click="goNext">下一页 →</button>
-    </nav>
+    <!-- v4 玻璃页脚：上一页 / 标记已掌握（主行动，数据落点 §5.7.7）/ 下一页 -->
+    <ReaderFooter
+      :has-prev="hasPrev"
+      :has-next="hasNext"
+      :mastered="isPageMastered"
+      @prev="pagingGo('prev')"
+      @next="pagingGo('next')"
+      @toggle-master="togglePageMastered"
+    />
 
-    <!-- 固定侧边栏：快捷导航 + 快捷操作（移动端为底部栏 + 答题卡抽屉） -->
+    <!-- 固定侧边栏：快捷导航 + 快捷操作（移动端为答题卡抽屉 + 更多面板，底栏已由页脚取代） -->
     <ContentSidebar
       v-if="page"
+      ref="sidebarRef"
       :unit="unit"
       :toc="toc"
       :file-index="fileIndex"
@@ -137,6 +129,7 @@
       :is-done="isDone"
       :is-math="subject === 'math'"
       :done-files="doneFiles"
+      :hide-bar="true"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
       @toggle-bookmark="bookmark.toggleBookmark()"
@@ -144,8 +137,8 @@
       @toggle-toc="showToc = !showToc"
       @go-file="goFile"
       @go-unit="goUnit"
-      @go-prev="goPrev"
-      @go-next="goNext"
+      @go-prev="pagingGo('prev')"
+      @go-next="pagingGo('next')"
     />
 
     <!-- 番茄钟悬浮计时器（学习时随时开启，状态自动持久化） -->
@@ -200,18 +193,23 @@ import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount, ne
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 // 别名导入：本组件已有名为 loadPage 的本地函数（负责访问记录/进度刷新等副作用）
-import { loadPage as loadContentPage } from '@/content/loadPage'
+import { loadPage as loadContentPage, prefetchPage, clearPrefetch } from '@/content/loadPage'
 import { useProgressStore } from '@/stores/progress'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useNotes } from '@/composables/useNotes'
 import { useBookmarks } from '@/composables/useBookmarks'
 import { usePomodoro } from '@/composables/usePomodoro'
+import { useSwipePaging } from '@/composables/useSwipePaging'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import { kindOf } from '@/components/blocks/blockTypes'
 import ContentSidebar from '@/components/ContentSidebar.vue'
+import ReaderTopbar from '@/components/reader/ReaderTopbar.vue'
+import ReaderFooter from '@/components/reader/ReaderFooter.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import { useMotionPrefs } from '@/composables/useMotionPrefs'
+// v4 功能条与翻页动效样式（token 引 main.css；本文件全局生效一次）
+import '@/assets/css/reader.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -272,7 +270,7 @@ const toc = computed(() => {
     .filter((b) => b.title && b.icon)
 })
 
-// 目录面板显隐
+// 目录面板显隐（桌面端入口；移动端用答题卡抽屉）
 const showToc = ref(false)
 
 // 滚动到指定区块
@@ -284,17 +282,22 @@ function scrollToBlock(index) {
 // 阅读进度（0-100）
 const readProgress = ref(0)
 
-// 移动端迷你顶栏：滚动超过一屏后出现（返回 + 标题 + 进度百分比）
-const showTopbar = ref(false)
+// 进度双端策略（§5.6.3）：移动端 <900px 不挂载 .reading-progress，进度计算一并跳过（白算也是算）
+const isNarrowViewport = ref(false)
+let narrowMq = null
+function onNarrowChange(e) {
+  isNarrowViewport.value = e.matches
+  updateReadProgress()
+}
 
 // 计算滚动阅读进度
 function updateReadProgress() {
+  if (isNarrowViewport.value) { readProgress.value = 0; return }
   const doc = document.documentElement
   const total = doc.scrollHeight - window.innerHeight
-  if (total <= 0) { readProgress.value = 0; showTopbar.value = false; return }
+  if (total <= 0) { readProgress.value = 0; return }
   const scrolled = window.scrollY
   readProgress.value = Math.min(100, Math.round((scrolled / total) * 100))
-  showTopbar.value = scrolled > 200
 }
 
 // 监听滚动更新进度条（rAF 合并，避免每帧触发 Vue 渲染）
@@ -308,16 +311,23 @@ function onScroll() {
 }
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  if (typeof window.matchMedia === 'function') {
+    narrowMq = window.matchMedia('(max-width: 899px)')
+    isNarrowViewport.value = narrowMq.matches
+    narrowMq.addEventListener('change', onNarrowChange)
+  }
   updateReadProgress()
 })
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   if (scrollRaf) cancelAnimationFrame(scrollRaf)
+  narrowMq?.removeEventListener('change', onNarrowChange)
   // 进入动效的观察器随组件销毁，防止持有已卸载 DOM 的引用
   if (revealObserver) {
     revealObserver.disconnect()
     revealObserver = null
   }
+  cancelIdlePrefetch()
 })
 
 // 笔记 composable（按页面 key 隔离，key 随导航响应式变化）
@@ -380,31 +390,35 @@ function setupBlockReveal() {
   els.forEach((el) => revealObserver.observe(el))
 }
 
-// 首载与翻页共用一条路径：内容就绪且 DOM 渲染后再观察（nextTick 保证 .block-anchor 已存在）
-watch(page, () => nextTick(setupBlockReveal))
+/** 记录页面访问 + 刷新完成快照（提交新页内容后调用） */
+async function recordVisit() {
+  await db.markPageVisited({
+    subject: subject.value,
+    unitNum: unit.value?.num || '',
+    unitTitle: unit.value?.title || '',
+    fileKey: pageKey.value,
+    fileTitle: fileMeta.value?.title || '',
+    isTest: fileMeta.value?.isTest || false
+  })
+  // 「最近学习」位置不另存 localStorage —— progress 由 page_progress 推导（架构审计 §2-2）
+  progress.refresh().catch((e) => console.error('[UnitView] 刷新进度失败:', e))
+}
 
-/** 加载页面内容并记录访问 */
+/** 只取数据不落副作用（翻页转场闸门用：数据就绪时机由三态机决定） */
+async function fetchPageData() {
+  if (!unit.value || !fileMeta.value) return null
+  // 元信息由 site.js 推导并注入（见 src/content/loadPage.js）；越界返回 null 交由模板降级
+  return loadContentPage(subject.value, unit.value.num, fileIndex.value)
+}
+
+/** 首载/跨单元：直接加载并记录访问（无翻页转场） */
 async function loadPage() {
   if (!unit.value || !fileMeta.value) return
   loading.value = true
-  // 注意：不在此清空 page —— 翻页时保留旧内容直到新内容就绪，避免整块闪空
+  // 注意：不在此清空 page —— 保留旧内容直到新内容就绪，避免整块闪空
   try {
-    // 加载内容页：元信息由 site.js 推导并注入（见 src/content/loadPage.js）
-    // 注意：此处不做空值合并 —— 越界时 loadContentPage 返回 null，交由下方 catch/模板降级
-    page.value = await loadContentPage(subject.value, unit.value.num, fileIndex.value)
-    // 记录页面访问（学习日志 / 每日统计）
-    await db.markPageVisited({
-      subject: subject.value,
-      unitNum: unit.value.num,
-      unitTitle: unit.value.title,
-      fileKey: pageKey.value,
-      fileTitle: fileMeta.value.title,
-      isTest: fileMeta.value.isTest || false
-    })
-    // 刷新完成快照（内容页打开即完成，测验页等交卷后再由 ExamBlock 刷新）
-    // 「最近学习」位置不再另存 localStorage —— progress 由 page_progress 推导
-    // （含 lastStudied 坐标），首页「继续学习」直接读 store（见架构审计 §2-2）。
-    progress.refresh().catch((e) => console.error('[UnitView] 刷新进度失败:', e))
+    page.value = await fetchPageData()
+    if (page.value) await recordVisit()
   } catch (e) {
     console.error('[UnitView] 内容加载失败:', e)
     page.value = null
@@ -423,6 +437,21 @@ const doneFiles = computed(() => {
   if (!unit.value) return []
   return unit.value.files.map((_, i) => progress.isCompleted(subject.value, unit.value.num, i))
 })
+
+// ===== v4 页脚主行动「标记已掌握」（§5.7.7 语义③）=====
+const isPageMastered = computed(() =>
+  progress.isPageMastered(subject.value, unit.value?.num, fileIndex.value)
+)
+
+async function togglePageMastered() {
+  if (!unit.value || !pageKey.value) return
+  const payload = { subject: subject.value, unitNum: unit.value.num, fileKey: pageKey.value }
+  // 已掌握 → 取消（masteredAt 置 null + unmaster_page 日志）；反之标记（时间戳 + master_page 日志）
+  const r = isPageMastered.value
+    ? await db.unmarkPageMastered(payload)
+    : await db.markPageMastered(payload)
+  if (r && r.ok) progress.refresh().catch((e) => console.error('[UnitView] 刷新掌握态失败:', e))
+}
 
 // ===== 考试作答保护 =====
 // ExamBlock 注入此状态；作答中导航离开前统一确认，防误触丢失作答
@@ -443,24 +472,143 @@ function handleLeaveConfirm(ok) {
   if (resolveLeave) { resolveLeave(ok); resolveLeave = null }
 }
 
-// 统一离开保护：页内翻页（onBeforeRouteUpdate）+ 跨路由离开（onBeforeRouteLeave）都走同一确认，
-// 覆盖底部翻页、迷你顶栏返回、面包屑、答题卡抽屉、浏览器返回等所有出口
+// 统一离开保护：页内翻页（onBeforeRouteUpdate）+ 跨路由离开（onBeforeRouteLeave）都走同一确认。
+// leaveConfirmed：手势/按钮翻页路径已当面确认过一次，路由守卫放行本次——
+// 否则 confirm 弹层会弹两次（调用方一次 + 守卫一次）
+let leaveConfirmed = false
 async function guardLeave() {
   if (!examState.active) return true
+  if (leaveConfirmed) { leaveConfirmed = false; return true }
   return requestLeaveConfirm()
 }
 onBeforeRouteLeave(guardLeave)
 onBeforeRouteUpdate(guardLeave)
 
-// 翻页导航
+// ===== 翻页（v4：滑动/按钮共用一条转场路径；D17 页内 replace 不入历史栈，§5.7.2）=====
 const hasPrev = computed(() => fileIndex.value > 0)
 const hasNext = computed(() => unit.value && fileIndex.value < unit.value.files.length - 1)
 
-function goPrev() {
-  router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value - 1 } })
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+// 内容层元素（全页唯一被 transform/opacity 的元素）
+const readerContentEl = ref(null)
+// ContentSidebar 模板引用（底栏隐藏后经 expose 打开答题卡抽屉）
+const sidebarRef = ref(null)
+
+/** 一次进行中的页内翻页导航（watch 路由后消费；非空 = 本次导航走转场闸门） */
+let pendingPageNav = null
+
+/**
+ * 翻页统一入口：滑动 / 页脚按钮 / 侧栏按钮都走这里。
+ * 顺序刻意为「先确认、后起动画」——确认弹层出现时页面还没有任何视觉变化，
+ * 用户取消则页面保持原状（§5.7.3：被作答保护拦截 = 不进入 leaving）。
+ * @param {'prev'|'next'} dir 翻页方向
+ * @param {number} [offset] 页偏移（默认 ±1；答题卡跳页传目标差值）
+ */
+async function pagingGo(dir, offset = dir === 'next' ? 1 : -1) {
+  if (!unit.value) return
+  const target = fileIndex.value + offset
+  if (target < 0 || target >= unit.value.files.length || target === fileIndex.value) return
+  const ok = await guardLeave()
+  if (!ok) return
+  swipe.beginLeaving(dir)
+  leaveConfirmed = true
+  pendingPageNav = { dir, target }
+  // D17：页内翻页 replace 不入历史栈——返回 = 离开单元；跨单元进入仍 push（goUnit）
+  router.replace({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: target } })
+  // 看门狗：路由未被消费（参数异常等）→ 回弹，绝不卡死在 leaving 白屏态
+  window.setTimeout(() => {
+    if (pendingPageNav && swipe.phase.value === 'leaving') {
+      pendingPageNav = null
+      swipe.springBack(0)
+    }
+  }, 450)
 }
-function goNext() {
-  router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: fileIndex.value + 1 } })
+
+/**
+ * 转场闸门（§5.7.3 并行档）：出场启动后 100ms（--swipe-overlap）且数据就绪（上限 400ms）
+ * 才提交新内容并入场；数据超时则先入场、内容落地后再换（预取正常时不可见）。
+ */
+async function transitionedLoad() {
+  loading.value = true
+  const dataPromise = fetchPageData()
+  let data = null
+  let dataDone = false
+  dataPromise.then((d) => { data = d; dataDone = true }).catch(() => { dataDone = true })
+  await Promise.all([
+    swipe.overlapDone(),
+    Promise.race([dataPromise.catch(() => null), sleep(400)])
+  ])
+  if (dataDone) {
+    page.value = data
+    if (data) await recordVisit()
+    loading.value = false
+    swipe.beginEntering()
+  } else {
+    // 数据超 400ms：先入场（旧内容暂留，随后被替换），不长时间白屏（R9 前置）
+    swipe.beginEntering()
+    dataPromise.then((d) => {
+      page.value = d
+      if (d) recordVisit().catch(() => {})
+      loading.value = false
+    }).catch(() => { loading.value = false })
+  }
+}
+
+// ===== 滑动翻页手势（手势层只判意图；换数据/换路由在上方 pagingGo）=====
+const swipe = useSwipePaging({
+  target: readerContentEl,
+  isBlocked: () => examState.active, // 作答中不启用手势（§5.7.1 排除名单）
+  canGo: (dir) => (dir === 'prev' ? hasPrev.value : !!hasNext.value),
+  onIntent: (dir) => pagingGo(dir),
+  // 方向锁判定为水平的瞬间预取目标页（§5.7.5 建议②）
+  onPrefetch: (dir) => {
+    const t = fileIndex.value + (dir === 'next' ? 1 : -1)
+    if (unit.value && t >= 0 && t < unit.value.files.length) {
+      prefetchPage(subject.value, unit.value.num, t)
+    }
+  }
+})
+const pagingPhase = swipe.phase
+
+// ===== 空闲预取下一页（§5.7.5 建议①：只预取 1 页，requestIdleCallback 降级 setTimeout）=====
+let idleHandle = 0
+let idleIsRic = false
+function cancelIdlePrefetch() {
+  if (!idleHandle) return
+  if (idleIsRic && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
+  else clearTimeout(idleHandle)
+  idleHandle = 0
+}
+function scheduleIdlePrefetch() {
+  cancelIdlePrefetch()
+  const next = fileIndex.value + 1
+  if (!unit.value || next >= unit.value.files.length) return
+  const run = () => prefetchPage(subject.value, unit.value.num, next)
+  if (typeof window.requestIdleCallback === 'function') {
+    idleIsRic = true
+    idleHandle = window.requestIdleCallback(run, { timeout: 2000 })
+  } else {
+    idleIsRic = false
+    idleHandle = window.setTimeout(run, 1200)
+  }
+}
+
+// 首载与翻页共用一条路径：内容就绪且 DOM 渲染后再观察（nextTick 保证 .block-anchor 已存在）
+watch(page, () => {
+  nextTick(setupBlockReveal)
+  scheduleIdlePrefetch()
+})
+
+/** 页眉返回：唯一可靠返回通道（R2）。作答保护由 onBeforeRouteLeave 统一拦截 */
+function goHome() {
+  router.push('/')
+}
+
+/** 页眉「目录」：桌面端展开页内目录面板；移动端打开答题卡抽屉（页面入口收敛，§5.7.0） */
+function onTopbarToc() {
+  if (window.matchMedia('(min-width: 1151px)').matches) showToc.value = !showToc.value
+  else sidebarRef.value?.openSheet('nav')
 }
 
 // 滚动到顶部
@@ -468,43 +616,58 @@ function scrollTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// 跳转到同单元指定页
+// 跳转到同单元指定页（答题卡网格）：同样走转场路径
 function goFile(i) {
-  if (i === fileIndex.value) return
-  router.push({ name: 'unit', params: { subject: subject.value, unitNum: unit.value.num, fileIndex: i } })
+  if (!unit.value || i === fileIndex.value) return
+  pagingGo(i > fileIndex.value ? 'next' : 'prev', i - fileIndex.value)
 }
 
-// 跳转到指定单元（默认第一页）
+// 跳转到指定单元（默认第一页）：跨单元仍 push（D17：返回要能回 Tab），不做内容换页转场
 function goUnit(u) {
   if (!u) return
   router.push({ name: 'unit', params: { subject: subject.value, unitNum: u.num, fileIndex: 0 } })
 }
 
-// 监听路由变化重新加载内容（切换页面或学科时触发）
+// 监听路由变化重新加载内容：
+// - pendingPageNav 非空 = 手势/按钮发起的页内翻页 → 走并行档转场闸门
+// - 其余（首载参数修正 / 跨单元 / 跨学科）→ 普通加载；跨单元清预取集（§5.7.5 建议③）
+let lastUnitKey = `${route.params.subject}|${route.params.unitNum}`
 watch(
   () => [route.params.subject, route.params.unitNum, route.params.fileIndex],
   () => {
+    const unitKey = `${route.params.subject}|${route.params.unitNum}`
+    const nav = pendingPageNav
+    pendingPageNav = null
+    if (nav) {
+      transitionedLoad()
+      return
+    }
+    if (unitKey !== lastUnitKey) clearPrefetch()
+    lastUnitKey = unitKey
     loadPage()
   }
 )
 </script>
 
 <style scoped>
-/* 阅读进度条 */
+/* 阅读进度条（仅桌面端挂载，§5.6.3）：渐变改纯色 --primary（7.7 禁橙色渐变）；
+ * 宽度过渡改 scaleX（只动 transform，origin left） */
 .reading-progress {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  position: fixed;
+  top: calc(var(--sat) + var(--reader-topbar-h));
+  left: 0; right: 0; z-index: 119;
   height: 3px; background: transparent;
 }
-/* 桌面端顶栏常驻所有页面（z-index 110、高 calc(--tabbar-h + --sat)），会盖住 top:0 的进度条 →
- * 桌面端把进度条挪到顶栏正下方，避免遮挡冲突；移动端详情页无顶栏，保持 top:0 不变。
- * 注：「进度条并入顶栏」是 system_design §4.4 列的 P4 工作，本轮不做，先降至顶栏下方。 */
 @media (min-width: 1150px) {
-  .reading-progress { top: calc(var(--tabbar-h) + var(--sat)); }
+  /* AppTabBar 顶部导航条（≥1150 常驻）在页眉上方 → 进度条整体再下移一条页眉高 */
+  .reading-progress { top: calc(var(--tabbar-h) + var(--sat) + var(--reader-topbar-h)); }
 }
 .reading-progress__bar {
-  height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+  height: 100%;
+  background: var(--primary);
   border-radius: 0 3px 3px 0;
-  transition: width 0.1s linear;
+  transform-origin: left;
+  transition: transform 0.1s linear;
 }
 
 /* 目录导航 */
@@ -519,21 +682,6 @@ watch(
 }
 .toc-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 .toc-icon { display: inline-flex; color: var(--text-muted); }
-
-.breadcrumb { margin-bottom: var(--spacer-16); color: var(--text-muted); font-size: 0.85rem; }
-.crumb-sep { margin: 0 var(--spacer-8); }
-.page-header { margin-bottom: var(--spacer-24); position: relative; }
-.page-header__row { display: flex; justify-content: space-between; align-items: flex-start; }
-.page-header h1 { font-size: 1.6rem; }
-.page-subtitle { color: var(--text-muted); margin-top: var(--spacer-8); }
-.page-tools { display: flex; gap: var(--spacer-8); }
-.tool-btn {
-  width: 36px; height: 36px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-full); cursor: pointer;
-  font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
-}
-.tool-btn.active { color: var(--warning); border-color: var(--warning); }
 
 .fade-enter-active, .fade-leave-active { transition: opacity var(--dur-3) var(--ease-standard); }
 
@@ -580,78 +728,10 @@ watch(
 @media (min-width: 1151px) and (max-width: 1456px) {
   .unit-view { padding-right: 250px; }
 }
-/* 移动端迷你顶栏（桌面端隐藏） */
-.mobile-topbar { display: none; }
-.topbar-enter-active, .topbar-leave-active { transition: transform 0.25s ease, opacity 0.25s ease; }
-.topbar-enter-from, .topbar-leave-to { transform: translateY(-100%); opacity: 0; }
 
-/* 移动端：底部操作栏为内容预留空间；头部去重（工具收入底部栏与更多面板） */
-@media (max-width: 1150px) {
-  .unit-view { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
-  .page-tools { display: none; }
-
-  /* 迷你顶栏：返回首页 + 页面标题 + 阅读进度百分比 */
-  .mobile-topbar {
-    display: flex; align-items: center; gap: 10px;
-    position: fixed; top: 0; left: 0; right: 0; z-index: 99;
-    padding: calc(6px + var(--sat)) 12px 6px;
-    background: var(--surface);
-    background: color-mix(in srgb, var(--surface) 92%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow-xs);
-  }
-  .topbar-back {
-    flex: 0 0 auto;
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--surface-muted);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-full);
-    font-size: 1.05rem;
-    color: var(--text);
-  }
-  .topbar-title {
-    flex: 1; min-width: 0;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    font-weight: 700; font-size: 0.95rem;
-  }
-  .topbar-progress {
-    flex: 0 0 auto;
-    min-width: 44px; text-align: right;
-    font-size: 0.8rem; color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-}
-.page-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: var(--spacer-24);
-}
-.nav-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 8px 20px;
-}
-.nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
-.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.nav-index { color: var(--text-muted); font-size: 0.85rem; }
-
-/* 移动端适配 */
+/* 移动端：页脚让位（reader.css 已按 v4 功能条计算），锚点偏移对齐页眉高度 */
 @media (max-width: 600px) {
-  .page-header h1 { font-size: 1.35rem; }
-  .tool-btn { width: 40px; height: 40px; }
-  .nav-btn { flex: 1; }
-
-  /* 触控目标 ≥44px */
-  .toc-item { min-height: 44px; }
-  .nav-btn { min-height: 44px; }
-  .notes-save { min-height: 44px; padding: 0 16px; }
-  /* 锚点跳转偏移补上迷你顶栏高度 + 安全区 */
-  .block-anchor { scroll-margin-top: calc(56px + var(--sat)); }
+  .block-anchor { scroll-margin-top: calc(var(--reader-topbar-h) + var(--sat) + 8px); }
 }
 
 /* 离开确认弹层 */
@@ -707,7 +787,7 @@ watch(
 }
 .pomodoro-progress { height: 6px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
 .pomodoro-progress__bar {
-  height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+  height: 100%; background: var(--primary);
   border-radius: var(--radius-full); transition: width 1s linear;
 }
 .pomodoro-today { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; }
@@ -721,9 +801,9 @@ watch(
 }
 .pomodoro-btn--primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
 
-/* 移动端：悬浮在底部操作栏上方，触控目标 ≥44px */
+/* 移动端：悬浮在页脚（52px + 手势区）上方，触控目标 ≥44px */
 @media (max-width: 1150px) {
-  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + 76px); }
+  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + var(--reader-footer-h) + 12px); }
   .pomodoro-btn { min-height: 44px; }
 }
 </style>

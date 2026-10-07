@@ -21,6 +21,8 @@ export interface LastStudied {
 export interface ProgressState {
   /** 进度记录：按学科 → 单元号 → 文件索引 */
   completed: Record<string, Record<string, Record<number, boolean>>>
+  /** 已掌握快照（v4，§5.7.7）：同结构；判定 = page_progress.masteredAt != null */
+  mastered: Record<string, Record<string, Record<number, boolean>>>
   /** 最近学习时间戳 */
   lastStudiedAt: number | null
   /** 最近学习位置坐标（唯一事实源，替代原 localStorage.last_study） */
@@ -30,10 +32,13 @@ export interface ProgressState {
 /** 进度 Store 实例类型 */
 export interface ProgressStore {
   completed: ProgressState['completed']
+  mastered: ProgressState['mastered']
   lastStudiedAt: ProgressState['lastStudiedAt']
   lastStudied: ProgressState['lastStudied']
   completedCount: (subject: Subject, unitNum: string) => number
   isCompleted: (subject: Subject, unitNum: string, fileIndex: number) => boolean
+  /** 页面手动已掌握（v4 页脚主行动派生，§5.7.7 语义③） */
+  isPageMastered: (subject: Subject, unitNum: string, fileIndex: number) => boolean
   subjectTotalCompleted: (subject: Subject) => number
   init: () => Promise<void>
   /** 由 page_progress 重建完成快照（访问/交卷后调用） */
@@ -63,6 +68,8 @@ export interface PageProgress {
   questionsTotal: number
   testScore: number | null
   testPoints?: string
+  /** v4 页脚主行动「标记已掌握」（§5.7.7）：毫秒时间戳；null=未掌握；旧行 undefined 天然兼容 */
+  masteredAt?: number | null
 }
 
 /** 学习日志 */

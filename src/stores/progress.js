@@ -14,7 +14,7 @@ import { SUBJECTS } from '@/content/index'
 /**
  * 从 page_progress 记录推导完成快照
  * @param {Array<object>} rows - 全部 page_progress 记录
- * @returns {{ completed: object, lastStudiedAt: number|null, lastStudied: object|null }}
+ * @returns {{ completed: object, mastered: object, lastStudiedAt: number|null, lastStudied: object|null }}
  */
 function buildSnapshot(rows) {
   const byKey = new Map()
@@ -22,6 +22,9 @@ function buildSnapshot(rows) {
     if (r && r.key) byKey.set(r.key, r)
   }
   const completed = {}
+  // 「已掌握」快照（v4 页脚主行动，system_design §5.7.7）：
+  // 判定 = row.masteredAt != null；与 completed 互不派生（①自动完成 ≠ ③手动掌握）
+  const mastered = {}
   let lastStudiedAt = 0
   // 最近学习位置：取 page_progress 中 visitTime 最大的页面坐标。
   // 与 lastStudiedAt 同源推导，作为首页「继续学习」的唯一事实源
@@ -42,6 +45,11 @@ function buildSnapshot(rows) {
           if (!completed[subject][unit.num]) completed[subject][unit.num] = {}
           completed[subject][unit.num][i] = true
         }
+        if (row && row.masteredAt != null) {
+          if (!mastered[subject]) mastered[subject] = {}
+          if (!mastered[subject][unit.num]) mastered[subject][unit.num] = {}
+          mastered[subject][unit.num][i] = true
+        }
         if (row && row.visitTime && row.visitTime > lastStudiedAt) {
           lastStudiedAt = row.visitTime
           lastStudied = {
@@ -56,13 +64,15 @@ function buildSnapshot(rows) {
       }
     }
   }
-  return { completed, lastStudiedAt: lastStudiedAt || null, lastStudied }
+  return { completed, mastered, lastStudiedAt: lastStudiedAt || null, lastStudied }
 }
 
 export const useProgressStore = defineStore('progress', {
   state: () => ({
     // 完成快照：按学科 → 单元号 → 文件索引
     completed: {},
+    // 已掌握快照（v4 页脚主行动，§5.7.7）：同结构，判定 = page_progress.masteredAt != null
+    mastered: {},
     // 最近学习时间戳（取 page_progress 最新 visitTime）
     lastStudiedAt: null,
     // 最近学习位置坐标（与 lastStudiedAt 同源；供首页「继续学习」直达，具备跨设备能力）
@@ -96,6 +106,19 @@ export const useProgressStore = defineStore('progress', {
       return !!(subj[unitNum] && subj[unitNum][fileIndex])
     },
     /**
+     * 判断某学科某页面是否「已掌握」（v4 页脚主行动，§5.7.7 语义③：
+     * 用户手动标记，存储 masteredAt 时间戳；与 isCompleted ①互不派生）
+     * @param {string} subject - 学科 key
+     * @param {string} unitNum - 单元编号
+     * @param {number} fileIndex - 文件索引
+     * @returns {boolean}
+     */
+    isPageMastered: (state) => (subject, unitNum, fileIndex) => {
+      const subj = state.mastered[subject]
+      if (!subj) return false
+      return !!(subj[unitNum] && subj[unitNum][fileIndex])
+    },
+    /**
      * 获取某学科所有已完成页面总数
      * @param {string} subject - 学科 key
      * @returns {number}
@@ -124,6 +147,7 @@ export const useProgressStore = defineStore('progress', {
       const rows = await db.getAllPageProgress()
       const s = buildSnapshot(rows)
       this.completed = s.completed
+      this.mastered = s.mastered
       this.lastStudiedAt = s.lastStudiedAt
       this.lastStudied = s.lastStudied
       this._loaded = true

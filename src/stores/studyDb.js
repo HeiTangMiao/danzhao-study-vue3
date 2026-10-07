@@ -545,6 +545,43 @@ export const useStudyDbStore = defineStore('studyDb', {
     },
 
     /**
+     * 标记页面「已掌握」（v4 页脚主行动，system_design §5.7.7）
+     * 数据落点：page_progress.masteredAt 毫秒时间戳（行内加字段零迁移）；
+     * 与「已完成」(visited/testScore)、「复习掌握」(错题 SM-2) 三语义互不派生。
+     * 时间线只写 study_log（master_page），不进 daily_stats（统计口径不扩）。
+     * 同步行：engine.js 按整行采集 + updatedAt LWW，新字段自动随行（engine 零改动）。
+     */
+    async markPageMastered({ subject, unitNum, fileKey }) {
+      await this.init()
+      const existing = await this.getPageProgress(fileKey)
+      if (!existing) return { ok: false, already: false }
+      if (existing.masteredAt != null) return { ok: true, already: true }
+      await this.savePageProgress({ ...existing, masteredAt: Date.now() })
+      await this.addStudyLog({
+        date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+        action: 'master_page'
+      })
+      return { ok: true, already: false }
+    },
+
+    /**
+     * 取消页面「已掌握」：masteredAt 置回 null（不删历史行）；
+     * 时间线写 study_log（unmaster_page）
+     */
+    async unmarkPageMastered({ subject, unitNum, fileKey }) {
+      await this.init()
+      const existing = await this.getPageProgress(fileKey)
+      if (!existing) return { ok: false, already: false }
+      if (existing.masteredAt == null) return { ok: true, already: true }
+      await this.savePageProgress({ ...existing, masteredAt: null })
+      await this.addStudyLog({
+        date: getDateStr(), timestamp: Date.now(), subject, unitNum, fileKey,
+        action: 'unmaster_page'
+      })
+      return { ok: true, already: false }
+    },
+
+    /**
      * 记录测验成绩 —— 写入真实页面的 fileKey 行（不再生成 `${subject}_unit_${unitNum}_test`
      * 合成行，避免一页测验被记账两次、仪表盘“已学页面”虚高）。
      * @param {object} opt
