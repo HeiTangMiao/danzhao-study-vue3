@@ -100,3 +100,111 @@
 .difficulty-sprint { background: rgba(156, 135, 245, 0.18); color: #7c6bc9; }
 /* 暗色模式下提高冲刺难度标签对比度 */
 :root[data-theme="dark"] .difficulty-sprint { color: #d8a1ff; }
+
+/* ============================================================
+ * 内容角色差异化（P4-T3：data-kind）
+ * ------------------------------------------------------------
+ * 背景：22 个 type 在视觉上几乎无差别，长页里「概念 / 要点 / 例题 / 练习 /
+ *      提示」混成一片 —— 读者既抓不到节奏，也谈不上「视觉层次」。
+ *
+ * 路线：§5.6.2 的 **L1 纯 CSS**。不新增原语、不改 schema、不动存量内容，
+ *      也不碰 UnitView → BlockRenderer → registry 这条渲染链路：
+ *      只把 22 个 type 在 blockTypes.js 里归并为 5 个内容角色，UnitView
+ *      把角色写到 .block-anchor 的 data-kind 上，差异全部由本段的属性选择器承担。
+ *
+ * 差异化只落在容器层的两个理由（改这里前先读）：
+ *   ① 容器自身的背景 / 边界 / 内边距 —— 各区块组件的 scoped 样式管不到这一层；
+ *   ② 可继承属性（line-height）在容器上声明、由后代继承 —— 组件声明过的照旧
+ *      生效，没声明的才继承。这样既做出节奏，又不必写比 scoped 规则
+ *      (.class[data-v-x] = 0,2,0) 更长的选择器去硬压 —— 一旦硬压，
+ *      样式真相源就裂成两处（blocks.css 与组件各说各话）。
+ *
+ * 未提供 data-kind 的类型（布局原语与功能区块，见 blockTypes.js 的 KIND_EXEMPT）
+ * 不会命中任何一条规则：漏配 kind 的后果是"没样式"而不是"错样式"，失败方向安全。
+ *
+ * ⚠️ 色彩纪律（PM 定）：**只有 example 与 note 允许色彩表达**，其余三档靠墨色
+ *    层级与留白建立节奏 —— 阅读页以长时间可读性优先，不用色块抢注意力。
+ * ⚠️ 圆角一律取现有 token（--radius-sm/md/lg），不新增档位。
+ * ⚠️ 玻璃铁律（§5.1）：本段只改背景 / 边界 / 行高，不引入 transform、
+ *    filter、opacity<1 —— 因此不会新建 backdrop root，玻璃元素照常生效。
+ * ============================================================ */
+
+/* 各角色共用的节奏变量：集中在容器上声明，后代继承。
+ * 缺省值 = 通用正文节奏；var() 一律带回落，这样「容器没声明变量」的场景
+ * （如 columns / group 内部的子区块不套 .block-anchor）也不会拿到无效值。 */
+.block-anchor {
+  --kind-title-size: var(--fs-xl);
+  --kind-leading: 1.75;
+  --kind-pad-block: var(--space-4);
+}
+
+/* 标题字号按角色取值。.block-title 的唯一真相源就在本文件（见开头「统一区块标题」），
+ * 所以这里用同名选择器改写即可，不需要提高特异度。 */
+.block-title {
+  font-size: var(--kind-title-size, var(--fs-xl));
+}
+
+/* ---------- concept 概念：正文主干，刻意"什么都不加" ----------
+ * 概念段是停留最久的地方：底色与描边只会抬高视觉噪声、压低可读性。
+ * 它需要的不是"看起来像一张卡"，而是更宽的行距让长段落喘得过气。 */
+.block-anchor[data-kind='concept'] {
+  --kind-title-size: var(--fs-xl);
+  --kind-leading: 1.8;
+  line-height: var(--kind-leading);
+}
+
+/* ---------- point 要点：上下发丝线切出的"可摘录带" ----------
+ * 要点是要被回头翻、被单独摘出来的，所以它需要一个**独立于段落流的边界**。
+ * 用发丝线而不是整块底色：底色会和 formula 这类本就有浅底的区块叠成"盒中盒"。
+ * 相邻两个要点块之间会出现两条线（间距 32px），那是「两条各自独立的带」，
+ * 不是重复边框 —— 改成单边会让带的下沿失去收口。 */
+.block-anchor[data-kind='point'] {
+  --kind-title-size: var(--fs-lg);
+  --kind-leading: 1.7;
+  --kind-pad-block: var(--space-4);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-top: var(--kind-pad-block);
+  padding-bottom: var(--kind-pad-block);
+  line-height: var(--kind-leading);
+}
+
+/* ---------- example 例题：左侧 3px 主色竖条 ----------
+ * 例题要"在流里被一眼认出"，但它仍是**正文的一部分**而非卡片，
+ * 所以只给一条竖条标记身份，不给底、不给描边。主色是本档唯一的色彩。 */
+.block-anchor[data-kind='example'] {
+  --kind-title-size: var(--fs-lg);
+  --kind-leading: 1.75;
+  border-left: 3px solid var(--primary);
+  padding-left: var(--space-5);
+  line-height: var(--kind-leading);
+}
+
+/* ---------- practice 练习：独立卡，且揭示前不带任何对错色彩 ----------
+ * 两件事：
+ *  ① 给独立卡，是为了把"要动手"的内容从"读"的内容里拎出来（surface 底 + 描边）；
+ *  ② 揭示前**不得**用绿/红暗示对错 —— 那等于替用户先把答案读了。对错只在揭示
+ *     后由 QuizBlock 自己着色，本层**不提供任何提前着色的钩子**（连 hover 都不着色）。
+ * ⚠️ 卡片一律中性色，不在此处引入语义色。 */
+.block-anchor[data-kind='practice'] {
+  --kind-title-size: var(--fs-lg);
+  --kind-leading: 1.7;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--pad-shell, var(--space-5));
+  line-height: var(--kind-leading);
+}
+
+/* ---------- note 小结 / 警示：缩进 + 更紧的节奏 ----------
+ * 这类内容是**旁注**：不进主叙述流，所以整体缩进一档，行距与标题都收紧
+ * ——读者一眼能感到"这条不是正文主干"。
+ * 色相由区块自己带（tip 主色 / warning 警示色 / errorfocus 卡片内的对比色），
+ * 本层不再画第二条线：tip / warning 的内层 .shell--note 已有一条 2px 同名细线，
+ * 两层都画会出现相隔 16px 的平行线，像表格边框。 */
+.block-anchor[data-kind='note'] {
+  --kind-title-size: var(--fs-md);
+  --kind-leading: 1.65;
+  padding-left: var(--space-4);
+  line-height: var(--kind-leading);
+}

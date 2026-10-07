@@ -64,6 +64,10 @@
 下表逐字对应 `schema/content-schema.json` 的 `definitions.layoutProps`。
 **未知的键会被校验器直接拒绝**（不是忽略），所以只填下表列出的键。
 
+> 关于示例来源：标了 **「来源」** 的示例是仓库里的**真实页面节选**，可以直接打开对应文件对照
+> （作者照抄真实用例的出错率明显低于照抄抽象示例）；未标来源的是最小形态示例，只用于说明参数形状。
+> 改动真实页面前请先读一遍该页，节选里用 `…` 省略的部分不代表可以删。
+
 ### grid
 
 | 键 | 取值域 | 默认 | 含义 |
@@ -71,16 +75,20 @@
 | `cols` | `2` `3` `4` | `2` | 容器足够宽时的列数 |
 | `gap` | `'normal'` `'tight'` `'loose'` | `'normal'` | 间距档 |
 
+**来源**：`src/content/chinese/01-语言文字运用/03-标点符号.js`
+
 ```js
+// 该页原有 4 条并列的「高频错误警示」，纵向堆叠时连成一堵墙、看不出是四件并列的事；
+// 它们彼此无主次，正是 grid 的适用场景 → 容器 ≥640px 时排成 2×2。
 {
   type: 'layout',
   as: 'grid',
-  title: '三组对照练习',
-  props: { cols: 3, gap: 'tight' },
+  props: { cols: 2, gap: 'tight' },
   children: [
-    { type: 'tip', text: '第一组要点' },
-    { type: 'tip', text: '第二组要点' },
-    { type: 'tip', text: '第三组要点' }
+    { type: 'warning', text: '顿号使用的常见错误：…' },
+    { type: 'warning', text: '冒号使用注意事项：…' },
+    { type: 'warning', text: '引号与点号的配合：…' },
+    { type: 'warning', text: '省略号使用注意：…' }
   ]
 }
 ```
@@ -177,14 +185,23 @@
 | `sticky` | `true` `false` | `false` | 侧轨是否吸顶 |
 | `gap` | `'normal'` `'tight'` `'loose'` | `'normal'` | 侧轨与主内容的间隙档 |
 
+**来源**：`src/content/math/09-概率/10-复习测验.js`
+
 ```js
+// 该页原是「考试说明 + 选择/填空/解答三块题目」的一条纵向流，说明与题目抢同一条流。
+// 把说明提到侧轨后，主内容保持 选择→填空→解答 的原顺序；
+// 窄容器降为单列时侧轨自然落到最前 —— 恰好是开考前该先看的内容。
+// 注意：这里**没有**开 sticky —— 吸顶会让它滑到固定玻璃顶栏之下，
+// 需要先把 --layout-sticky-top 对齐顶栏高度（属 P4-T4 范围）。
 {
   type: 'layout',
   as: 'rail',
-  props: { side: 'start', width: 'sm', sticky: true },
+  props: { side: 'start', width: 'sm', sticky: false, gap: 'loose' },
   children: [
-    { type: 'summary', points: ['要点一', '要点二'] },   // 第一个 child 是侧轨
-    { type: 'knowledge', paragraphs: ['主内容正文……'] }  // 其余是主内容
+    { type: 'warning', text: '建议用时 45 分钟，满分 100 分。…' },  // ← 第一个 child 即侧轨
+    { type: 'quiz', title: '一、选择题（每题 5 分，共 40 分）', items: [ /* … */ ] },
+    { type: 'quiz', title: '二、填空题（每题 5 分，共 20 分）', items: [ /* … */ ] },
+    { type: 'example', title: '三、解答题（共 40 分）', items: [ /* … */ ] }
   ]
 }
 ```

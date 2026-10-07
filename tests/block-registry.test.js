@@ -9,7 +9,9 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { BLOCK_TYPES, BLOCK_TYPES_META, labelOf, iconOf } from '@/components/blocks/blockTypes'
+import {
+  BLOCK_TYPES, BLOCK_TYPES_META, BLOCK_KINDS, KIND_EXEMPT, labelOf, iconOf, kindOf
+} from '@/components/blocks/blockTypes'
 import { ICON_SHAPES } from '@/components/icons/lucide-paths'
 import { SUBJECT_META } from '@/content/index'
 
@@ -144,5 +146,81 @@ describe('布局原语（P0）', () => {
       ? schema.definitions[branch.then.$ref.replace('#/definitions/', '')]
       : branch?.then
     expect(sorted(then?.required || [])).toEqual(['as', 'children'])
+  })
+})
+
+describe('内容角色（P4-T3：data-kind 五值域）', () => {
+  // 为什么钉死这张表：data-kind 是「内容角色 → 差异化样式」的唯一入口，
+  // 值写错不会报错，只会导致 CSS 永远命中不到 —— 典型的静默失败。
+  const kindSet = new Set(BLOCK_KINDS)
+
+  it('每个类型都有 kind，或出现在显式豁免清单里（防新增类型漏配）', () => {
+    const missing = BLOCK_TYPES.filter((t) => !BLOCK_TYPES_META[t]?.kind && !KIND_EXEMPT[t])
+    expect(missing).toEqual([])
+  })
+
+  it('kind 取值不超出五值域（防手写错值）', () => {
+    const bad = BLOCK_TYPES.filter((t) => {
+      const k = BLOCK_TYPES_META[t]?.kind
+      return k && !kindSet.has(k)
+    }).map((t) => `${t}: ${BLOCK_TYPES_META[t].kind}`)
+    expect(bad).toEqual([])
+  })
+
+  it('豁免清单不含未知类型（防拼写错误 / 类型删除后残留）', () => {
+    const stale = Object.keys(KIND_EXEMPT).filter((t) => !BLOCK_TYPES.includes(t))
+    expect(stale).toEqual([])
+  })
+
+  it('同一类型不得同时有 kind 与豁免（口径必须唯一）', () => {
+    const both = Object.keys(KIND_EXEMPT).filter((t) => Boolean(BLOCK_TYPES_META[t]?.kind))
+    expect(both).toEqual([])
+  })
+
+  it('每个豁免项都写了理由（失败时能直接点名，不用再翻代码）', () => {
+    const noReason = Object.entries(KIND_EXEMPT)
+      .filter(([, reason]) => !reason)
+      .map(([t]) => t)
+    expect(noReason).toEqual([])
+  })
+
+  it('kindOf 对 6 类无角色类型返回空串（模板据此省略 data-kind 属性）', () => {
+    for (const t of Object.keys(KIND_EXEMPT)) {
+      expect(kindOf(t)).toBe('')
+    }
+    // 未知类型同样无角色：宁可没有样式，也不能套错样式
+    expect(kindOf('__不存在__')).toBe('')
+  })
+
+  it('五个角色都被真实类型用到（防值域里躺着永不生效的角色）', () => {
+    const used = new Set(BLOCK_TYPES.map((t) => BLOCK_TYPES_META[t]?.kind).filter(Boolean))
+    const unused = BLOCK_KINDS.filter((k) => !used.has(k))
+    expect(unused).toEqual([])
+  })
+})
+
+describe('内容角色的样式落点（源码级契约）', () => {
+  // 只做「可被文本确定性判定」的断言：jsdom 不算布局、也不支持容器查询，
+  // 硬写 DOM 断言只会得到一串假绿。这里钉的是两条结构性约定。
+  const css = readFileSync(join(ROOT, 'src', 'assets', 'css', 'blocks.css'), 'utf-8')
+  const unitView = readFileSync(join(ROOT, 'src', 'views', 'UnitView.vue'), 'utf-8')
+
+  it('blocks.css 为五个角色各写了 [data-kind=...] 规则', () => {
+    const missing = BLOCK_KINDS.filter((k) => !css.includes(`[data-kind='${k}']`))
+    expect(missing).toEqual([])
+  })
+
+  it('blocks.css 不给豁免类型写任何 data-kind 规则（防误样式化）', () => {
+    const offending = Object.keys(KIND_EXEMPT).filter((t) => css.includes(`[data-kind='${t}']`))
+    expect(offending).toEqual([])
+  })
+
+  it('UnitView 在 .block-anchor 上绑定 data-kind，且无角色时传 null（而非空串）', () => {
+    // 为什么强调 null：Vue 只在值为 null/undefined 时**省略**属性。
+    // 若写成 kindOf(...) 返回 '' ，DOM 上会出现 data-kind=""，
+    // 值选择器虽不会误命中，但会污染 DOM 语义（"这个块有角色，只是值是空的"）。
+    expect(unitView).toMatch(/:data-kind="kindOf\(block\.type\) \|\| null"/)
+    // 属性必须落在 .block-anchor 容器上，而不是内层区块元素
+    expect(unitView).toMatch(/class="block-anchor"[\s\S]{0,80}:data-kind=/)
   })
 })

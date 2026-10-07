@@ -103,11 +103,14 @@
 
     <!-- 内容主体：逐块渲染 -->
     <main v-if="page" class="page-content">
+      <!-- data-kind = 内容角色（P4-T3），取值来自 blockTypes.js 的 kind 字段；
+           无角色（布局原语与功能区块）传 null 让 Vue 省略该属性，CSS 不会误命中 -->
       <div
         v-for="(block, i) in page.blocks"
         :id="'block-' + i"
         :key="i"
         class="block-anchor"
+        :data-kind="kindOf(block.type) || null"
       >
         <BlockRenderer
           :block="block"
@@ -205,6 +208,7 @@ import { useBookmarks } from '@/composables/useBookmarks'
 import { usePomodoro } from '@/composables/usePomodoro'
 import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
+import { kindOf } from '@/components/blocks/blockTypes'
 import ContentSidebar from '@/components/ContentSidebar.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import { useMotionPrefs } from '@/composables/useMotionPrefs'
