@@ -1,7 +1,8 @@
 # 移动端体验大改造 · 系统设计 v1
 
-> 状态：**v1.5（翻页口径定档 380ms + 「已掌握」数据落点定论 + `data-kind` 映射定稿，2026-10-07）**。
-> **v1.5 本轮变更**：①翻页时长**定档**：`--swipe-overlap: 100ms`，总时长 **380ms**（此前 120/400 口径差统一，全文档唯一口径；调试口径改为"整档缩放 `--swipe-out/in`，不动 overlap 语义"，§5.7.6）；②新增 **§5.7.7「标记已掌握」数据落点定论**：`page_progress` 行内加 `masteredAt`（毫秒时间戳）、`engine.js` 零改动（ENTITIES 已含 page_progress）、三个「掌握」语义命名表（completed / mastered / masteredAt+isPageMastered），落地清单并入 P4-T4，页脚主行动定为「标记已掌握」；③**`data-kind` 映射定稿**（§5.6.2：concept/point/example/practice/note 五值域 + 覆盖 16/22 类型，其余缺省不输出；与 `iconOf` Lucide 契约同批，P4-T3 已更新依赖）；④§5.6.3 补「桌面端 `.reading-progress` 渐变改纯色 `--primary`」（橙色渐变违规，PM 发现）；⑤§11-15/16/20 关闭，删除头部重复的 v1.3 残段。
+> 状态：**v1.6（并入用户拍板 D17-D20：翻页 replace / 不设第 5 Tab / 组卷排除真题 / 桌面顶栏，2026-10-07）**。
+> **v1.6 本轮变更**：①**D17 翻页路由 = `replace`**——页内翻页不入历史栈、跨单元仍 `push`，系统返回 = 直接离开单元回 Tab，页眉 `[返回]` 与边缘手势成为唯一返回通道（§5.7.2 更新、P4-T5 落地、§11-18 关闭）；②**D18 第 5 Tab「数据」不设**（§11-10 关闭；将来加约 0.5 天，架构零阻碍）；③**D19 自动组卷默认排除真题卷**（`source === 'exam'` 的 104 题，口径以 P6-T1 实测为准）+「含真题卷题目」开关默认关闭 + 禁自称"真题"（P6-T3 更新）；④**D20 桌面 ≥1150px TabBar 退化为顶部玻璃导航条**（与移动 pill 完全同构；否决侧栏三条理由写死防翻案；§2/§4.1/§4.4 更新）；⑤**P1-T2 交付扩为「AppTabBar 双形态」**（移动 pill / 桌面顶栏）。
+> v1.5 记录：翻页时长**定档** `--swipe-overlap: 100ms`、总 **380ms**（唯一口径，调试改整档缩放，§5.7.6）；新增 **§5.7.7「标记已掌握」数据落点定论**（`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表，P4-T4 落地）；**`data-kind` 映射定稿**（§5.6.2 五值域，P4-T3 同批依赖）；§5.6.3 桌面端进度条渐变改纯色；§11-15/16/20 关闭。
 > v1.4 记录：**翻页并行档 + 进度条双端策略**——出场 100ms 入场（总 380ms）落 `reader.css` 三 token；§5.3 新增「两档转场时长」对照表（R2 ≤300ms 只约束路由级转场、不放宽）；移动端只留页眉 2px 分段刻度、删除 `.reading-progress`（不挂载），桌面端保留（§5.6.1 / §5.6.3 / §5.7.0-3，P4-T4 按断点拆渲染分支）。
 > v1.3 记录：**新增 §5.7 学习页 v4**（页眉/页脚可插拔功能条 + 滑动翻页转场），回答六个技术问题：手势实现选型（自写 Pointer Events，**不引库**）、边缘右滑返回与内容右滑翻页的判定规则（起手 x 阈值 24px）、View Transitions **不适用于**本场景（改手动三态机）、backdrop root 解耦写法（并列 + 玻璃条恒常）、性能/降级/`prefetchPage` 时机；并入 D15/D16；更新 §5.2 分层与 §5.3 两条硬规则；§10 更新 P4-T4、新增 P4-T5；§11 新增 16-20。
 > v1.2 记录：①并入 **D11-D14**（练习自评强制 / 自动组卷 / 署名块 / 克制+关键处加强）与 **v2 风格细则**（玻璃 30-42% + 内侧高光、TabBar 液态悬浮 pill、陶土橙加至 ~6 处）；②新增 §5.6 学习页视觉改进（玻璃迷你顶栏可行性、区块差异化最小改动路径、进度条统一）；③**正确性体检**（§12）：修正「147 页」→ **139 页**（147 = 139 数据页 + 3 site.js + 5 基建文件）等多处数字/表述；④§13 给出 `docs/csp-guard-plan.md` 处置结论。
@@ -28,7 +29,11 @@
 | **D13** | 署名块 | **仅保留一处**（「我的」页，墨色小字，去紫红渐变文字与 ❤️ emoji）；其余页脚署名卡全删 | 用户拍板 |
 | **D14** | 视觉方向 | **克制为主 + 关键处加强**：整体 Claude 纸质克制高级感，首页/入口等少数位置加强视觉冲击 | 用户拍板；导航页渐变**保持克制**（用户明确选此项） |
 | **D15** | 学习页结构（v4） | **页眉/页脚压缩为可插拔功能条**（页眉 ~44px、页脚 ~52px，阅读区 330→376px）+ **左右滑动翻页带转场**（`translateX(±22px)` + fade，出 260ms / 入 280ms，`cubic-bezier(.22,.61,.36,1)`，只动 transform/opacity，reduced-motion 降级） | 用户拍板 v4；PM 正在写入 `docs/prd-mobile.md` §7；技术侧可行性与落地写法见 **§5.7** |
-| **D16** | 手势归属 | **层级分开**：屏幕边缘 0-24px 的右滑**交系统返回**（应用不注册）；内容区右滑 = 上一页、左滑 = 下一页。手势**自写（Pointer Events），不引第三方手势库** | ①Android 10+ 手势导航的返回手势即"从左右边缘向内滑"（官方文档已核实），系统优先消费，应用申索需 `View.setSystemGestureExclusionRects()`（Tauri 侧能力 **待确认**）②项目 runtime deps 仅 6 个、无 @vueuse，且第三方库在 `script-src 'self'` 下的 eval 安全性未核实（§5.7.1） |
+| **D16** | 手势归属 | **层级分开**：屏幕边缘 0-24px 的右滑**交系统返回**（应用不注册）；内容区右滑 = 上一页、左滑 = 下一页。手势**自写（Pointer Events），不引第三方手势库** | ①Android 10+ 手势导航的返回手势即"从左右边缘向内滑"（官方文档已核实），系统优先消费，应用申索需 `View.setSystemGestureExclusionRects()`（Tauri 侧能力 **待确认**）②项目 runtime deps 仅 7 个、无 @vueuse，且第三方库在 `script-src 'self'` 下的 eval 安全性未核实（§5.7.1） |
+| **D17** | 翻页路由 | **页内翻页用 `router.replace`（不入历史栈）**；跨单元进入（从 Tab 点进）仍 `push`（保证返回能回 Tab）。系统返回 = **直接离开单元回 Tab**；回看上一页由翻页手势承担（右滑 = 上一页，v4 已定）。**页眉 `[返回]` 按钮与边缘手势成为唯一返回通道**（R2 语义强化） | 用户拍板。①单元内连翻 12 页按 push 需 11 次返回才能离开——碎片场景的致命痛点；②回看需求已被翻页手势完整覆盖，返回键逐页回看是冗余；③业界阅读类 App（微信读书/小说）章节翻页普遍不入栈。落地：`goPrev/goNext` 内部改 `replace`（P4-T5） |
+| **D18** | 第 5 Tab「数据」 | **不设**，4 Tab 定案不变；Dashboard 洞察已并入「我的」 | 用户拍板（架构师此前已建议不设）。将来要加成本约 **0.5 天**（路由 meta + Tab 数组各加一项），架构零阻碍（§11-10 关闭） |
+| **D19** | 自动组卷 | **默认排除真题卷 + 留开关**：组卷池默认排除 `source === 'exam'` 的 **104 题**（口径以 P6-T1 建索引后实测为准），避免组出真题卷原题；组卷配置（PRD L2）留「**含真题卷题目**」开关，**默认关闭**；文案硬约束不变：自动组卷**禁止自称"真题"**，须作"自定义组卷" | 用户拍板；与 D12（支持自动组卷）叠加，收紧题源边界 |
+| **D20** | 桌面宽屏导航 | **≥1150px（`--bp-lg`）TabBar 退化为顶部玻璃导航条**（品牌左 / 4 Tab 水平居中 / 用户区右），与移动端**完全同构**（同图标、同激活色、同文案），底部液态 pill 不渲染；**<1150px** 底部液态 pill（已定）。**否决侧栏方案**：①与移动端同构心智零迁移（D2 自适应优先的本意）②导航侧栏会与内容页 `ContentSidebar` 形成**双竖栏并存冲突**（顶栏无此问题）③第 5 Tab 已决定不设（D18），侧栏的扩展性优势是伪需求。桌面激活态：`rgba(201,100,66,.10)` 底 + 橙字（与移动端 pill 内激活一致） | 用户拍板；落地并入 **P1-T2**（AppTabBar 双形态） |
 
 **CSP 硬约束**（贯穿所有选型）：`script-src 'self'`（禁 eval/内联脚本）；`style-src 'self' 'unsafe-inline'`（内联样式允许）；`font-src 'self' data:`（字体必须自托管）；`connect-src` 不含第三方域。
 
@@ -66,7 +71,9 @@
 - `App.vue` 常驻站点式顶部 header；`.app-main { max-width: 960px }` 桌面居中列
 - Dashboard/ErrorBook/Profile 均带面包屑（纯 Web 惯用法）
 
-### 目标 IA：底部 Tab Bar（移动）+ 侧栏（桌面）
+### 目标 IA：底部 Tab Bar（移动，<1150px）+ 顶部导航条（桌面，≥1150px，D20）
+
+> **D20（2026-10-07 用户拍板）**：桌面宽屏**不设侧栏**——4 Tab 上移进**顶部玻璃导航条**（品牌左 / 4 Tab 水平居中 / 用户区右），与移动端 pill **完全同构**（同图标同激活色同文案）；否决侧栏的三条理由见 D20 行（双竖栏冲突 / 心智迁移 / 扩展性伪需求）。
 
 | Tab    | 收录现有页面                                                      | 归并理由                                       |
 | ------ | ----------------------------------------------------------- | ------------------------------------------ |
@@ -125,9 +132,9 @@
 
 ## 4. 移动端架构
 
-### 4.1 TabBar —— 纯手写 `AppTabBar.vue`（v2：**圆角液态悬浮 pill**）
+### 4.1 TabBar —— 纯手写 `AppTabBar.vue`（**双形态**：移动液态 pill / 桌面顶部导航条，D20）
 
-**v2 形态（用户已定，取代 v1 的「贴底栏 + 中间凸起 fab」）**：
+**移动端 v2 形态（用户已定，取代 v1 的「贴底栏 + 中间凸起 fab」）**：
 
 | 项 | v2 参数 |
 |---|---|
@@ -135,7 +142,9 @@
 | 玻璃底 | `rgba(255,255,255,.42)` + `backdrop-filter: blur(12px) saturate(1.2)` |
 | 投影 | 暖可可 `0 8px 24px rgba(88,46,29,.10)` |
 | 激活项 | 底色 `rgba(201,100,66,.10)`（陶土橙）+ 内圆角 `22px` |
-| 显示条件 | 仅 `< var(--bp-lg)`（1150px）；桌面端为侧栏 |
+| 显示条件 | 仅 `< var(--bp-lg)`（1150px）；**≥1150px 切桌面顶栏形态（D20），pill 不渲染** |
+
+**桌面端顶栏形态（D20，≥1150px）**：同一 `AppTabBar.vue` 组件的第二形态——**顶部玻璃导航条**（`position: fixed; top: 0`），布局 = **品牌区左 / 4 Tab 水平居中 / 用户区右**；玻璃参数复用 §5.1 的 `--glass-*` token；激活态 = `rgba(201,100,66,.10)` 底 + 橙字（与移动 pill 内激活一致）。与移动端**完全同构**（同图标、同激活色、同文案）。**否决侧栏方案的理由（写死防翻案）**：①与移动端同构，心智零迁移（D2 自适应优先的本意）②导航侧栏会与内容页 `ContentSidebar` 形成**双竖栏并存冲突**（顶栏无此问题）③第 5 Tab 已决定不设（D18），侧栏的扩展性优势是伪需求。
 
 **悬浮 pill 的安全区公式（v2 新增，与 v1 贴底不同）**：
 
@@ -179,7 +188,7 @@
 
 | 类别                          | 组件                                                                            |
 | --------------------------- | ----------------------------------------------------------------------------- |
-| **结构性**（元素位置真的变，同一数据两个容器）   | `ContentSidebar.vue`（侧栏↔底栏+抽屉）、`UnitView.vue`（内容+侧栏↔迷你顶栏）、`AppTabBar.vue`（新增） |
+| **结构性**（元素位置真的变，同一数据两个容器）   | `ContentSidebar.vue`（侧栏↔底栏+抽屉）、`UnitView.vue`（内容+侧栏↔迷你顶栏）、`AppTabBar.vue`（新增，**双形态**：移动 pill ↔ 桌面顶部导航条，D20） |
 | **布局变体**（props 表达意图，CSS 降级） | `ColumnsBlock.vue`（多栏↔单列）、`CompareBlock.vue`（左右↔上下）                           |
 | **仅密度/排版**（不改结构，token 切换）   | 其余全部                                                                          |
 
@@ -415,9 +424,9 @@
 
 配套两条：
 
-- **`[返回]` 按钮必须是唯一可靠返回通道**，不能依赖边缘手势。它在 v4 页眉中已常驻，满足
-- **翻页仍走路由**（复用 `goPrev/goNext` → `router.push`）→ 自动继承现有的 `onBeforeRouteLeave` / `onBeforeRouteUpdate` 作答保护、`markPageVisited` 访问记录、`saveLastStudy` 续学位置、`watch` → `loadPage` 链路。**手势层只负责"判定意图并调用 goPrev/goNext"，不自己换数据**（§1.5 低耦合）
-- ⚠️ 保持 `push` 的代价是历史条目累积（单元内连翻 20 页要按 20 次返回才能离开），好处是**返回键 = 上一页**符合 Android 心智。取舍列 §11-18
+- **`[返回]` 按钮必须是唯一可靠返回通道**，不能依赖边缘手势。它在 v4 页眉中已常驻，满足。**D17 落地后进一步强化**：页内翻页 `router.replace` 不入栈 → 返回键/返回手势 = 直接离开单元回 Tab，页眉 `[返回]` 与边缘手势是**仅有的两个返回通道**
+- **翻页仍走路由**（复用 `goPrev/goNext`，**D17：内部改 `router.replace`，不入历史栈**；跨单元进入仍 `push`）→ 自动继承现有的 `onBeforeRouteLeave` / `onBeforeRouteUpdate` 作答保护、`markPageVisited` 访问记录、`saveLastStudy` 续学位置、`watch` → `loadPage` 链路。**手势层只负责"判定意图并调用 goPrev/goNext"，不自己换数据**（§1.5 低耦合）
+- ~~保持 `push` 的取舍~~ → **已定：D17 采用 `replace`**（理由：连翻 12 页需 11 次返回才能离开是碎片场景致命痛点；回看由翻页手势承担；业界阅读类 App 章节翻页普遍不入栈），§11-18 关闭
 
 #### 5.7.3 与 View Transitions API 的关系（Q3 结论）：**不适用，改手动三态机**
 
@@ -846,7 +855,7 @@ sequenceDiagram
 | 任务 | 内容与文件 | 依赖 | 可并行 |
 |---|---|---|---|
 | P1-T1 token 与断点收敛 | `src/assets/css/main.css`（`--bp-sm/md/lg/xl`、容器查询基础设施 + `@supports` 兜底、密度 token 移动端覆盖） | 无 | ✅ 与 P0 并行 |
-| P1-T2 TabBar + 路由 | 新增 `src/components/AppTabBar.vue`（玻璃底 + 中间凸起直达 + meta.tab 高亮）；改 `src/router/index.js`（meta.tab/tabOrder、`/practice` 占位路由）；改 `src/App.vue`（挂载 TabBar、顶部 header 收敛） | P1-T1；入口清单已定（D3） | — |
+| P1-T2 TabBar + 路由（**双形态**，D20） | 新增 `src/components/AppTabBar.vue`（**双形态**：移动端液态悬浮 pill（`<1150px`，玻璃底 + pill 内强调直达项 + meta.tab 高亮）；**桌面端顶部玻璃导航条（`≥1150px`，品牌左 / 4 Tab 居中 / 用户区右，同构同激活色**，底部 pill 不渲染））；改 `src/router/index.js`（meta.tab/tabOrder、`/practice` 占位路由）；改 `src/App.vue`（挂载 TabBar、顶部 header 收敛并与桌面顶栏合并） | P1-T1；入口清单已定（D3） | — |
 | P1-T3 结构性重排 | `src/components/ContentSidebar.vue`（与 TabBar 互斥协调）；`src/views/UnitView.vue`（详情页隐藏 TabBar）；`src/views/HomeView.vue`（学习 Tab 改造：去 960px 居中 / 面包屑 / 页脚 nav） | P1-T2 | — |
 | P1-T4 容器查询迁移 | `src/components/blocks/ColumnsBlock.vue`、`src/components/blocks/CompareBlock.vue`（媒体查询 → 容器查询） | P1-T1 | ✅ 与 T2/T3 |
 | P1-T5 CSP 护栏（防复发，见 §13） | 新增 `tests/csp-guard.test.js`（L1-L4）+ `tests/helpers/csp-lock.js`（L5 `withCspLocked`）；零新依赖（`node:fs` + vitest + 自写 CSP 解析器） | 无 | ✅ 全程可并行 |
@@ -877,7 +886,7 @@ sequenceDiagram
 | P4-T2 三轴差异化 + 骨架屏（R9） | 新增 `src/components/SkeletonBlock.vue`；改 `src/views/UnitView.vue`（加载骨架）；区块 tone/variant 扩展（schema + 对应 block 组件） | P0、P2 | — |
 | P4-T3 区块差异化（data-kind，映射已定稿见 §5.6.2） | 改 `src/views/UnitView.vue`（`.block-anchor` 加 `data-kind`，值取 `blockTypes.js` 的 `kind`）；改 `src/components/blocks/blockTypes.js`（新增 `kind` 字段，**值域已定**：concept/point/example/practice/note，22 项逐一归入或显式豁免）；改 `src/assets/css/blocks.css`（`[data-kind=...]` 差异化）；扩展 `tests/block-registry.test.js` 守卫（每项必有 `kind` 或显式豁免 + `kind` 值域校验）。**必须与 `iconOf` → Lucide 契约变更同批**（同一张表） | P0-T1、P2-T1（`iconOf` 契约变更先行或同批） | ✅ 与 T4/T5 |
 | **P4-T4 学习页 v4 功能条（取代原「迷你顶栏 v2」，见 §5.7.0 / §5.7.7）** | 新增 `src/components/reader/ReaderTopbar.vue`（~44px 玻璃 `.glass--flat` 不加投影；`[返回][标题][页码] + 右侧插槽`；2px 分段进度 `segs = min(n,12)`）；新增 `src/components/reader/ReaderFooter.vue`（~52px；**`[标记已掌握]` 主行动 + 次级图标插槽 ×N**；底部 `max(--sab, --sys-gesture-bottom, 24px)` 留白）；新增 `src/assets/css/reader.css`；改 `src/views/UnitView.vue`（拆出两条功能条、移动端去掉旧 `page-header`/`page-nav` 呈现、桌面端保留）；改 `src/assets/css/main.css`（新增 `.glass--flat` 变体 + `--sys-gesture-bottom`）。**「已掌握」数据落点（定论见 §5.7.7）**：改 `src/stores/studyDb.js`（`markPageMastered / unmarkPageMastered` + 写 `study_log`）、`src/stores/progress.js`（`isPageMastered` getter）、`src/types/store.d.ts`（`masteredAt?`）；`engine.js` 不动。**⚠️ 进度条按断点拆两条渲染分支**（已定，§5.6.3）：移动端（<900px）**不挂载** `.reading-progress` 并跳过 `updateReadProgress()` 的进度计算，只渲染页眉 2px 分段条 + 页码数字；桌面端（≥900px）保留 `.reading-progress`（渐变改纯色 `--primary`）并改为 `scaleX`。⚠️ §5.6.1 的「滚动 >200px 才出现」改为**常驻**，须按 §5.1 处理首帧「玻璃 + 内联 SVG」 | P2-T3（玻璃 token 先落地） | ✅ 与 T3 |
-| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext` + 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 100ms` 三 token，**并行档：入场延迟 = `--swipe-overlap`，总时长 = 100+280 = 380ms**；调试时整档缩放 out/in，不动 overlap 语义；中/低档与 `prefers-reduced-motion` 降级）。⚠️ 这三个 token **只管内容换页**，路由级转场仍受 R2 ≤300ms 约束（§5.3 两档口径表）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
+| **P4-T5 滑动翻页 + 转场（见 §5.7.1-5.7.5）** | 新增 `src/composables/useSwipePaging.js`（Pointer Events + 方向锁 + 阈值 + 三态机 `idle/leaving/entering/springBack`，阈值导出为常量便于测试）；改 `src/views/UnitView.vue`（内容层 `.reader-content` + `--swipe-dx` CSS 变量 + 接 `goPrev/goNext`（**D17：内部改 `router.replace`**，跨单元仍 `push`）+ 空闲预取）；新增 `src/assets/css/reader.css` 追加（`@keyframes page-out/page-in`；`--swipe-out: 260ms` / `--swipe-in: 280ms` / `--swipe-overlap: 100ms` 三 token，**并行档：入场延迟 = `--swipe-overlap`，总时长 = 100+280 = 380ms**；调试时整档缩放 out/in，不动 overlap 语义；中/低档与 `prefers-reduced-motion` 降级）。⚠️ 这三个 token **只管内容换页**，路由级转场仍受 R2 ≤300ms 约束（§5.3 两档口径表）；改 `src/content/loadPage.js`（新增 `prefetchPage`，用 Set 去重，不碰字面量前缀）；新增 `tests/use-swipe-paging.test.js`（方向锁 / 距离 / 速度 / 排除名单的纯函数用例，jsdom 可测）。⚠️ 遵守 §5.7.4 的并列结构与 §5.3 两条硬规则 | P4-T4（内容层结构先定）、P3-T1（动效 token） | ✅ 与 P4-T1/T2/T3 |
 
 ### P5 Android 打包（依赖 P1-P3 + 工具链）
 
@@ -893,7 +902,7 @@ sequenceDiagram
 |---|---|---|
 | P6-T1 题源提取与索引 | 新增 `scripts/build-practice-index.mjs`（复用 `scripts/build-search-index.mjs` 的 blocks 遍历模式：聚合 quiz/exam 的 `items`，按 学科/单元/难度 建索引）。⚠️ 仅 **286/1393（20.5%）** 有 `options`+`correctIndex` 可机器判分，其余只有自由文本答案 → **索引必须区分「可判分 / 需自评」两类** | P0（blocks 结构稳定后） |
 | P6-T2 做题会话 store | 新增 `src/stores/practice.js`（Pinia：会话队列、当前题、作答/自评状态）；自评结果写入既有 `studyDb` 的 `error_book`（**D11：自评是错题入库唯一触发器**） | P6-T1 |
-| P6-T3 自动组卷（D12） | 新增组卷器（按 难度/单元 从 P6-T1 索引抽题，支持「真题卷」与「自动组卷」两种来源）；复用 `ExamBlock` 的计时/计分语义 | P6-T1、P6-T2 |
+| P6-T3 自动组卷（D12 + **D19**） | 新增组卷器（按 难度/单元 从 P6-T1 索引抽题；**默认排除 `source === 'exam'` 的真题卷题目（104 题，实测口径以 P6-T1 为准）**；组卷配置留「**含真题卷题目**」开关，**默认关闭**）；文案硬约束：**禁止自称"真题"，须作"自定义组卷"**；复用 `ExamBlock` 的计时/计分语义 | P6-T1、P6-T2 |
 | P6-T4 会话页 + 结算页 UI | 新增 `src/views/practice/`（会话页全屏、结算页）；`src/router/index.js`（`/practice` 由占位转正）。**强制自评**：看答案后必须选「我会了/我还不会」才允许下一题（不可跳过） | P6-T2、P6-T3；**PM 交互稿** |
 
 ---
@@ -909,7 +918,7 @@ sequenceDiagram
 7. ~~架构师复核本文档~~ ✅ **v1.1 已完成（2026-10-07）**：复核结论「无失真」；更正第 8 条 geogebra 事实错误；精化 §5.1 引用；补 §2 `/practice` 路由；补全 §9 / §10
 8. ✅ **GeoGebra 演练场已拍板下线（D10，2026-10-07）**：移除 desmos 区块实例（`03-二次函数.js` 全站唯一）、`DesmosBlock.vue` + `GeoGebraPlayground.vue` 组件、registry/schema/blockTypes 注册、HomeView/UnitView 入口；随后 `git rm -r public/vendor/geogebra`（48MB，**保留 `scripts/fetch-geogebra.mjs` 与 `npm run geogebra` 脚本**供将来重拉）；`stash@{0}` 重写方案保留（P4 用 layout 原语重做）；`lib.rs` 两条 warning
 9. ✅ **PM 的 PRD 已落盘**：`docs/prd-mobile.md`（992 行，含题库盘点三表 / 练习 Tab 交互稿 / 视觉规范 B1-B6 / 验收标准 / 附录 B 复核命令），2026-10-07 提交 `7cc77de`
-10. ⬜ 可选第 5 Tab「数据」：**架构师建议不设**（D3 已定 4 Tab；Dashboard 数据洞察已并入「我的」）。若后续要加，架构零阻碍——路由 meta 加一项 + `AppTabBar` 数组加一项（约 0.5 天），无需改容器
+10. ✅ **第 5 Tab「数据」已定：不设（D18，2026-10-07 用户拍板）**。4 Tab 定案不变；Dashboard 洞察已并入「我的」。将来要加成本约 0.5 天（路由 meta + `AppTabBar` Tab 数组各加一项，含桌面顶栏形态），架构零阻碍 —— 本条**关闭**
 11. ⬜ 「练习」聚合层：**已升级为 P6 阶段**（见 §10），**估 1-2 周**，含 P6-T1~T4（题源索引 / 会话 store / 自动组卷 / 会话页+结算页）。⚠️ 关键约束：**索引必须区分「可判分（286 题）」与「需自评（1107 题）」两类**，因为 79.5% 无 `options`+`correctIndex`。**前置**：PM 交互稿。风险：题目去重、exam 计分语义复用
 12. ⬜ `tests/jsxgraph-eval-guard.test.js`（QA 已独立复核 PASS 并入库 `6427673`）：与 P0-P6 **无耦合**，不影响本设计实施
 13. ✅ **`docs/csp-guard-plan.md` 已更新对齐**（419 行，2026-10-07 提交 `3055bbc`）：失效段落清理（演练场回退相关）、L4 首轮预期改写（落实 D10 后 0 违规）、新增 §2.1 与 QA 守卫测试的分工边界。归档结论维持"保留"
@@ -917,7 +926,7 @@ sequenceDiagram
 15. ✅ **`data-kind` 语义映射表已定稿（2026-10-07）**：22 个 `type` → 5 个内容角色（英文值域）写死在 **§5.6.2**，PM 侧（PRD）跟随此命名；落点 = `blockTypes.js`，与 `iconOf` 的 Lucide 契约变更**同批修改**（任务依赖已写入 P4-T3）
 16. ✅ **v4 翻页时长已定档（2026-10-07）**：**并行档，`--swipe-overlap: 100ms`，总时长 = 100 + 280 = 380ms**（原串行 540ms 作废；此前 120/400 口径差已统一为 100/380，全文档唯一口径）。调试口径：真机实测若仍感钝，**整体下调 `--swipe-out/in`（如 220/240），不改变并行结构与 overlap 语义**（§5.7.6）。**与 R2「≤300ms」不冲突**：R2 约束的是**路由级转场**（P3-T2，不放宽），内容换页是另一档（P4-T5，同路由 `fileIndex` 变化，路由级转场在此不触发），对照表见 §5.3 —— 本条**关闭**
 17. ⬜ **Tauri Android 的系统手势能力待确认**：能否申索边缘区域（`View.setSystemGestureExclusionRects()`，Android 10/API 29）、能否读到 `WindowInsets.getMandatorySystemGestureInsets()`。**当前设计不依赖这两项**（边缘完全交系统、页脚用保守 24px 留白），故不阻塞 P4；若将来要做"应用内边缘返回"则需写 Kotlin 插件
-18. ⬜ **翻页路由用 `push` 还是 `replace`**：暂定 `push`（返回键 = 上一页，符合 Android 心智），代价是历史条目累积（单元内连翻需多次返回才能离开）。是否改为 `replace` 或"跨单元时 replace"待定
+18. ✅ **翻页路由已定：`replace`（D17，2026-10-07 用户拍板）**。页内翻页 `router.replace` 不入历史栈（连翻 12 页按 push 需 11 次返回才能离开——碎片场景致命痛点；回看由翻页手势承担；业界阅读类 App 章节翻页普遍不入栈）；**跨单元进入仍 `push`**（保证返回能回 Tab）；系统返回 = 直接离开单元回 Tab，页眉 `[返回]` 与边缘手势成为唯一返回通道。落地：`goPrev/goNext` 内部改 `replace`（P4-T5）—— 本条**关闭**
 19. ⬜ **系统 WebView 版本与 View Transitions 可用性：待实测**（Tauri Android 用系统 WebView，VT 需 Chromium 111+）。**不阻塞**：§5.7.3 已定主方案不依赖 VT
 20. ✅ **两种进度条已定（2026-10-07 用户拍板，与 PM 产品侧结论一致）**：**移动端只留 v4 页眉的 2px 分段刻度**（"单元内第几页"），**删除** `.reading-progress` 滚动进度线（不挂载，非仅隐藏）；**桌面端保留** `.reading-progress`（须把橙色渐变改**纯色 `--primary`**，见 §5.6.3）。理由：同屏两个进度指示读数冲突。已写入 §5.6.1 / §5.6.3 / §5.7.0 第 3 条，实施分支要求见 **P4-T4** —— 本条**关闭**。
     ✅ **原遗留两项也已定（2026-10-07）**：①"段数自适应"口径 = **`segs = min(n, 12)`**（超过 12 页时每段代表 `ceil(n/12)` 页，§5.7.0 第 2 条），PM 侧跟随此口径不再另写；②页脚主行动 = **「标记已掌握」**，其数据落点已由架构师定论（**§5.7.7**：`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表）。**唯一待确认**：服务端对 `page_progress` 是否做字段白名单过滤（§5.7.7 Q3，实施前一次真实同步验证）
@@ -990,3 +999,4 @@ sequenceDiagram
 *v1.3 学习页 v4 与手势翻页：架构师（高见远），2026-10-07 —— 新增 §5.7（手势选型/边缘手势判定规则/View Transitions 不适用/backdrop root 并列解耦/性能与预取）、并入 D15-D16、更新 §5.2 分层与 §5.3 两条硬规则、§10 改 P4-T4 并新增 P4-T5、§11 新增 16-20。**只改本文档，未开工写代码。***
 *v1.4 两条决策落定：架构师（高见远），2026-10-07 —— 翻页改并行档（出 260ms、延迟 100ms 入场、入 280ms，总 380ms）+ §5.3 两档转场时长对照表（R2 ≤300ms 仅约束路由级转场，不放宽）；进度条双端策略（移动端只分段条、删滚动条，桌面端保留）写入 §5.6.1/§5.6.3/§5.7.0 与 P4-T4；关闭 §11-16 与 §11-20。**只改本文档，未开工写代码。***
 *v1.5 定档与定论：架构师（高见远），2026-10-07 —— 翻页口径定档 `overlap=100ms` / 总 380ms（唯一口径，调试改整档缩放）；新增 §5.7.7「标记已掌握」数据落点定论（`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表）；`data-kind` 映射定稿（§5.6.2 五值域，P4-T3 同批依赖）；§5.6.3 桌面端进度条渐变改纯色。**只改本文档，未开工写代码。***
+*v1.6 并入 D17-D20：架构师（高见远），2026-10-07 —— 翻页路由改 `replace`（D17，跨单元仍 push，§5.7.2/P4-T5）；第 5 Tab「数据」不设（D18，§11-10 关闭）；自动组卷默认排除真题卷 + 留开关（D19，P6-T3）；桌面 ≥1150px TabBar 退化顶部玻璃导航条、否决侧栏（D20，§2/§4.1/§4.4）；P1-T2 交付扩为 AppTabBar 双形态；§11-10/18 关闭。**只改本文档，未开工写代码。***
