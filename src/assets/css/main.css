@@ -180,10 +180,15 @@
   --shadow-pop: 0 8px 30px rgba(40, 38, 27, 0.10); /* 只给浮层（搜索下拉 / TOC / 遮罩面板） */
 
   /* ---------- 动效 token ----------
-   * 极简路线：动效克制。全站交互动效只留 5 处（折叠展开 / 悬停 / 浮层进出 /
-   * 阅读进度条 / 迷你顶栏），统一走这三个时长与两个缓动；配合
-   * prefers-reduced-motion 兜底（见文末）。不做路由切换过渡、不做列表 stagger、
-   * 不做滚动视差、不做 hover 位移放大。 */
+   * P3 反转（2026-10-07，用户新需求「动效丰富 + 分级降级」，取代早前的「动效克制」哲学）：
+   * 边界不再是「做不做动效」，而是「怎么做才不掉帧」——
+   *   1. 只动 transform / opacity（compositor-only），禁动 width/height/top/left/box-shadow/blur
+   *   2. 全站动效挂在这三个时长与两个缓动上，节奏统一（沿用原命名 --dur-1/2/3，不另起一套）
+   *   3. 分级降级：prefers-reduced-motion（硬约束，见文末）→ 设备能力三档
+   *      （<html data-motion-tier>，判定逻辑见 useMotionPrefs.js）→ 低档只 opacity 或全关
+   * 仍然不做：滚动视差（易掉帧）、一屏几十个元素同时动画（主线程长任务）——这是性能边界，不是审美
+   * ⚠️ 联动铁律（§5.1）：被 transform/opacity 动画的容器内不得放玻璃（backdrop-filter）元素，
+   *    玻璃必须是被动画元素的兄弟而非后代 —— 新增动效前先核对这一条。 */
   --dur-1: 100ms;
   --dur-2: 160ms;
   --dur-3: 240ms;
@@ -428,4 +433,59 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* View Transitions 的伪元素不匹配上面的 *::before/::after 通配（伪元素名不同），
+   * 必须显式点名，否则减弱动效下路由转场仍会播放 240ms 溶解 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ============================================================
+ * P3 动效层（system_design §5.2 / §5.3，2026-10-07 反转「动效克制」哲学）
+ * ============================================================ */
+
+/* ---------- 按压反馈（P3-T1）----------
+ * 只动 transform（compositor-only）。选择器只收「可按压」的元素：
+ * 普通卡片（.card，如笔记面板/确认弹窗）不给按压态 —— 按压反馈应暗示可点，
+ * 静态容器缩放只会制造噪音。刻意**不**配全局 transition：
+ * transition 声明会整体覆盖（而非合并）组件里既有的 transition，全局加会静默
+ * 吃掉比如 .tool-card 的 border-color 过渡；按下即时缩放在触控上反而更跟手。 */
+button:active,
+.tool-card:active,
+.unit-card:active {
+  transform: scale(0.97);
+}
+/* ⚠️ 上述元素若将来被塞入玻璃子元素，按压 transform 会新建 backdrop root 使玻璃静默失效
+ * （§5.1 铁律）。现状核对：玻璃只在 AppTabBar（fixed）/ 迷你顶栏（fixed）/ hero 上，
+ * 均不在 button/.tool-card/.unit-card 内部 —— 改布局时保持这个不变量。 */
+
+/* ---------- 路由级转场（P3-T2，View Transitions）----------
+ * R2 口径：路由级转场 ≤300ms —— 用 --dur-3（240ms），与内容换页的 380ms 并行档是两回事。
+ * 默认的 VT 动画就是交叉溶解（纯 opacity），天然满足「不对 router-view 包裹元素做
+ * transform」的硬规则 —— 本规则只调时长与缓动，不加任何位移。 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-3);
+  animation-timing-function: var(--ease-standard);
+}
+
+/* ---------- 区块进入动效（P3-T3，能力分级）----------
+ * 隐藏态只在 full / reduced 两档存在：off 档元素天然可见，JS 观察器也直接不启动。
+ * full = fade + rise；reduced = 只溶解（无位移）——位移是低端机最容易掉帧的部分。
+ * 元素进入视口时由 UnitView 的 IntersectionObserver 加 .is-revealed，**一次触发不回收**。
+ * ⚠️ 玻璃铁律：.block-anchor 内不得放入玻璃元素（transform 动画期间会新建 backdrop root）。 */
+[data-motion-tier='full'] .block-anchor {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out);
+}
+[data-motion-tier='reduced'] .block-anchor {
+  opacity: 0;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+[data-motion-tier='full'] .block-anchor.is-revealed,
+[data-motion-tier='reduced'] .block-anchor.is-revealed {
+  opacity: 1;
+  transform: none;
 }

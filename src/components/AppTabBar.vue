@@ -44,8 +44,9 @@
     </div>
   </header>
 
-  <!-- 移动端：底部液态悬浮 pill（<1150px） -->
-  <nav v-if="isTabRoute" class="app-pill" aria-label="主导航">
+  <!-- 移动端：底部液态悬浮 pill（<1150px）。
+       --tab-active：当前激活 Tab 的下标（0-3），驱动 ::after 指示器滑动（见样式） -->
+  <nav v-if="isTabRoute" class="app-pill" aria-label="主导航" :style="{ '--tab-active': activeIndex }">
     <router-link
       v-for="t in tabs"
       :key="t.id"
@@ -86,6 +87,10 @@ const activeId = computed(() => route.meta.tab || '')
 
 // 一级入口判定：详情页（UnitView）不携带 tab meta → 隐藏底部 pill
 const isTabRoute = computed(() => !!route.meta.tab)
+
+// 激活 Tab 下标：驱动底部 pill 的滑动指示器（CSS transform 按 100% × 下标平移）。
+// 未命中（详情页等）给 -1 → 指示器滑出左边界，视觉上等于无高亮，不需要额外的显隐逻辑。
+const activeIndex = computed(() => tabs.findIndex((t) => t.id === activeId.value))
 
 // 内联图标路径（Lucide 24×24 线性路径，stroke 由 CSS 控制）
 const ICON_PATHS = {
@@ -172,6 +177,11 @@ const ICON_PATHS = {
   background: var(--surface-muted);
   color: var(--text);
 }
+.app-topbar__tab:active {
+  /* P3-T1 按压反馈：只动 transform；顶栏是玻璃层本体，transform 只加在子 Tab 上
+   * （不能加在 .app-topbar 上，那会破坏它自己的 backdrop-filter） */
+  transform: scale(0.96);
+}
 .app-topbar__tab.is-active {
   background: var(--glass-active);
   color: var(--primary);
@@ -212,9 +222,30 @@ const ICON_PATHS = {
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   box-shadow: inset 0 1px 0 var(--glass-hl);
 }
+/* 滑动指示器（P3-T1）：激活底色从「各 Tab 自带背景」改为「一枚共享的滑块」——
+ * 切换 Tab 时滑块以 transform 平移过去（compositor-only），比背景瞬间跳变更有方向感。
+ * 与玻璃的关系：::after 是 ::before（玻璃）的**兄弟**而非后代，transform 动画不会
+ * 新建玻璃的 backdrop root（§5.1 铁律的「玻璃层必须是被动画元素的兄弟」）。
+ * 几何：pill 内宽减去左右 padding 后四等分；left 定位在内容区起点，translateX
+ * 按「自身宽度 × 下标」平移 —— 与 flex:1 的等宽 Tab 一一对齐。 */
+.app-pill::after {
+  content: '';
+  position: absolute;
+  top: var(--space-1);
+  bottom: var(--space-1);
+  left: var(--space-1);
+  width: calc((100% - var(--space-1) * 2) / 4);
+  border-radius: 22px; /* 与 Tab 内圆角一致 */
+  background: var(--glass-active);
+  transform: translateX(calc(var(--tab-active, 0) * 100%));
+  transition: transform var(--dur-2) var(--ease-out);
+}
 .app-pill__tab {
   flex: 1;
   min-width: 0;
+  /* 抬到指示器之上：指示器是绝对定位，不抬会被盖住（无点击问题但有视觉遮挡） */
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -223,10 +254,14 @@ const ICON_PATHS = {
   border-radius: 22px; /* 内圆角：与外胶囊同心 */
   color: var(--text-muted);
   font-size: var(--fs-2xs);
-  transition: background var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard);
+  /* 激活底色已由 ::after 滑块承担，这里只过渡文字/图标颜色 —— 避免「滑块未到、底色先到」的双高亮 */
+  transition: color var(--dur-2) var(--ease-standard);
+}
+.app-pill__tab:active {
+  /* P3-T1 按压反馈：transform 加在 Tab（玻璃的兄弟）上，不碰 ::before 玻璃层 */
+  transform: scale(0.96);
 }
 .app-pill__tab.is-active {
-  background: var(--glass-active);
   color: var(--primary);
   font-weight: 600;
 }

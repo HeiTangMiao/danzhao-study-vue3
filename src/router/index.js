@@ -5,6 +5,8 @@
  * 多学科支持：/study/:subject/:unitNum/:fileIndex?
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { nextTick } from 'vue'
+import { withRouteTransition } from '@/utils/viewTransition'
 
 const routes = [
   {
@@ -85,6 +87,32 @@ const router = createRouter({
  *  - meta.admin 路由要求 role=admin，否则回首页
  */
 import { useAuthStore } from '@/stores/auth'
+
+/**
+ * 路由级转场（P3-T2，View Transitions 渐进增强）
+ *
+ * 触发条件刻意收窄为「Tab ↔ Tab 的跨记录切换」（to/from 都带 meta.tab 且记录不同）：
+ *  - D17：内容翻页是**同一记录内的 replace**（fileIndex 变化），根本不会进这个分支 ——
+ *    这保证 380ms 并行档（P4-T5）与路由级转场（≤300ms）两档口径互不越界（§5.3）。
+ *  - 登录/登出、进/出详情页：瞬时切换。转场价值在「同级内容换位」，进出详情页
+ *    层级变化大，溶解反而模糊层级。
+ *
+ * 实现要点：next() 必须在 startViewTransition 的 update 回调**内部**调用并 await
+ * nextTick —— VT 在 update 回调的 Promise 结算时才拍「新快照」，不等 Vue 补丁落盘
+ * 就结算，新旧快照会是同一帧，转场等于没发生。守卫在 next() 被调用前保持 pending，
+ * 这是 vue-router 回调式守卫的标准用法。
+ */
+router.beforeResolve((to, from, next) => {
+  const crossTab = to.meta?.tab && from.meta?.tab && to.name !== from.name
+  if (!crossTab) {
+    next()
+    return
+  }
+  withRouteTransition(async () => {
+    next()
+    await nextTick()
+  })
+})
 
 router.beforeEach((to) => {
   const auth = useAuthStore()

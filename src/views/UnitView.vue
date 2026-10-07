@@ -193,7 +193,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, reactive, watch, provide, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { getSubjectConfig } from '@/content/index'
 // 别名导入：本组件已有名为 loadPage 的本地函数（负责访问记录/进度刷新等副作用）
@@ -207,6 +207,7 @@ import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import ContentSidebar from '@/components/ContentSidebar.vue'
 import AppIcon from '@/components/AppIcon.vue'
+import { useMotionPrefs } from '@/composables/useMotionPrefs'
 
 const route = useRoute()
 const router = useRouter()
@@ -308,6 +309,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   if (scrollRaf) cancelAnimationFrame(scrollRaf)
+  // 进入动效的观察器随组件销毁，防止持有已卸载 DOM 的引用
+  if (revealObserver) {
+    revealObserver.disconnect()
+    revealObserver = null
+  }
 })
 
 // 笔记 composable（按页面 key 隔离，key 随导航响应式变化）
@@ -325,6 +331,53 @@ const bookmark = useBookmarks(pageKey, subject, computed(() => ({
 
 // 动态加载内容数据（Vite 支持动态 import）
 const page = ref(null)
+
+// ===== 区块进入动效（P3-T3）=====
+// 动效档位（模块级单例，同时驱动 <html data-motion-tier>，CSS 据此分流降级）
+const motion = useMotionPrefs()
+
+let revealObserver = null
+
+/**
+ * 为当前页的区块建立进入视口观察。
+ * - 只在 full / reduced 两档启动；off 档元素天然可见（CSS 隐藏态只在两档存在），观察器直接不建。
+ * - IntersectionObserver **一次触发**：命中即加 .is-revealed 并停止观察该元素 ——
+ *   反复触发会让已读内容在回滚时反复淡入，干扰阅读。
+ * - 翻页（page 变化）时重建：旧页的观察随 disconnect 整体作废，新页重新观察。
+ */
+function setupBlockReveal() {
+  if (revealObserver) {
+    revealObserver.disconnect()
+    revealObserver = null
+  }
+  if (motion.tier.value === 'off') return
+  const els = document.querySelectorAll('.page-content .block-anchor')
+  if (!els.length) return
+  // 降级：极老 WebView 能跑 ES Module 却没有 IntersectionObserver。
+  // 此时 <html data-motion-tier> 已是 full/reduced，CSS 隐藏态**已经生效**——
+  // 单纯 return 会让区块永远停在 opacity:0（白屏）。所以这里必须就地放行全部区块：
+  // 宁可没有任何动效，也不能让用户看不见内容。
+  if (typeof IntersectionObserver !== 'function') {
+    els.forEach((el) => el.classList.add('is-revealed'))
+    return
+  }
+  revealObserver = new IntersectionObserver(
+    (entries, obs) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        entry.target.classList.add('is-revealed')
+        obs.unobserve(entry.target) // 一次触发
+      }
+    },
+    // rootMargin 底部收 10%：让「刚露出头的」区块先别 reveal，露出约一成才入场，
+    // 避免用户看到「半截区块在淡入」的割裂感
+    { rootMargin: '0px 0px -10% 0px' }
+  )
+  els.forEach((el) => revealObserver.observe(el))
+}
+
+// 首载与翻页共用一条路径：内容就绪且 DOM 渲染后再观察（nextTick 保证 .block-anchor 已存在）
+watch(page, () => nextTick(setupBlockReveal))
 
 /** 加载页面内容并记录访问 */
 async function loadPage() {
