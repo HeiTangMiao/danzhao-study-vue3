@@ -1,0 +1,105 @@
+/* ============================================================
+ * 布局原语样式（P0 布局层）
+ * 职责：只负责「排布」—— 不定义任何内容语义（内容外观归 blocks.css 与各区块组件）。
+ *
+ * 降级策略：一律用**容器查询**（container-type: inline-size + @container），按「布局容器
+ *   自身可用宽度」降级，而不是视口宽度。原因：同一原语既可能独占整页宽度，也可能被嵌进
+ *   Split/Rail 的窄栏里 —— 用视口媒体查询会在后一种场景误判（视口很宽、但该栏很窄）。
+ *   刻意只用 width 类容器查询，避开 cqw/cqh 单位与 style queries（旧 WebView 未支持）。
+ * ============================================================ */
+
+/* ---------- 所有原语共用：容器上下文 + 默认纵向节奏 ---------- */
+.layout { container-type: inline-size; }
+
+.layout__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-gap, var(--spacer-24));
+}
+
+/* gap 档位只改局部变量，具体排布由各原语消费 */
+.layout.gap-tight { --layout-gap: var(--spacer-16); }
+.layout.gap-loose { --layout-gap: var(--spacer-32); }
+
+/* ---------- grid：等宽网格 ---------- */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* 窄容器：单列 */
+  gap: var(--layout-gap, var(--spacer-24));
+}
+.layout-grid > * { min-width: 0; } /* 防止公式 / 表格把列撑破 */
+
+@container (min-width: 640px) {
+  .layout-grid {
+    grid-template-columns: repeat(var(--layout-grid-cols, 2), minmax(0, 1fr));
+  }
+}
+
+/* ---------- split：主次分栏 ---------- */
+.layout-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-gap, var(--spacer-24));
+}
+.layout-split > * { min-width: 0; }
+
+@container (min-width: 720px) {
+  .layout-split { grid-template-columns: var(--layout-split-cols, 1fr 1fr); }
+}
+
+/* ---------- rail：侧轨 + 主内容（第一个 child 为侧轨） ---------- */
+.layout-rail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-gap, var(--spacer-24));
+}
+.layout-rail > * { min-width: 0; }
+.layout-rail.width-md { --layout-rail-aside: 260px; }
+
+@container (min-width: 720px) {
+  .layout-rail {
+    grid-template-columns: var(--layout-rail-aside, 200px) minmax(0, 1fr);
+  }
+  .layout-rail > * { grid-column: 2; }
+  /* 侧轨跨满所有行，主内容各行依次排列 */
+  .layout-rail > :first-child { grid-column: 1; grid-row: 1 / -1; }
+  /* 侧轨在右：交换两列 */
+  .layout-rail.side-end {
+    grid-template-columns: minmax(0, 1fr) var(--layout-rail-aside, 200px);
+  }
+  .layout-rail.side-end > * { grid-column: 1; }
+  .layout-rail.side-end > :first-child { grid-column: 2; }
+}
+
+/* 吸顶侧轨：仅桌面分栏形态下有意义；align-self 保证短侧轨不被拉伸 */
+.layout-rail.is-sticky > :first-child {
+  align-self: start;
+  position: sticky;
+  top: var(--layout-sticky-top, var(--spacer-16));
+}
+
+/* ---------- hero：章节强调区 ---------- */
+.layout--hero .layout__body { align-items: flex-start; text-align: left; }
+.layout--hero.align-center .layout__body { align-items: center; text-align: center; }
+/* tone=accent：极浅强调底色（不做大面积渐变，遵守阅读页克制原则） */
+.layout--hero.tone-accent .layout__body {
+  padding: var(--spacer-24);
+  border-radius: var(--radius-lg);
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+/* ---------- bleed：出血（突破版心留白） ---------- */
+.layout--bleed .layout__body {
+  --layout-bleed: 24px;
+  margin-inline: calc(-1 * var(--layout-bleed));
+}
+.layout--bleed.width-full .layout__body { --layout-bleed: 40px; }
+.layout--bleed.side-start .layout__body { margin-inline: calc(-1 * var(--layout-bleed)) 0; }
+.layout--bleed.side-end .layout__body { margin-inline: 0 calc(-1 * var(--layout-bleed)); }
+/* 容器本身不够宽时取消出血，避免把内容推出可视区 */
+@container (max-width: 560px) {
+  .layout--bleed .layout__body { margin-inline: 0; }
+}
+
+/* ---------- stack：即默认纵向节奏，显式声明以对齐原语语义 ---------- */
+.layout-stack .layout__body { /* 继承 .layout__body 默认节奏 */ }

@@ -18,6 +18,10 @@
   <GroupBlock v-else-if="block.type === 'group'" :block="block">
     <BlockRenderer v-for="(child, bi) in block.items || []" :key="bi" :block="child" :context="context" />
   </GroupBlock>
+  <!-- 布局原语（P0）：与容器同构 —— 子区块由本组件自引用递归后经默认插槽注入 -->
+  <LayoutRenderer v-else-if="block.type === 'layout'" :block="block">
+    <BlockRenderer v-for="(child, bi) in block.children || []" :key="bi" :block="child" :context="context" />
+  </LayoutRenderer>
   <template v-else>
     <component :is="resolver" v-if="resolver" :block="block" :context="context" />
     <!-- 未知类型：显式提示，避免内容写错 type 时静默渲染成一片空白 -->
@@ -32,6 +36,7 @@ import { computed } from 'vue'
 import { componentOf } from './blocks/registry'
 import ColumnsBlock from './blocks/ColumnsBlock.vue'
 import GroupBlock from './blocks/GroupBlock.vue'
+import LayoutRenderer from './LayoutRenderer.vue'
 
 const props = defineProps({
   // 单个区块数据（content-schema 的 block）

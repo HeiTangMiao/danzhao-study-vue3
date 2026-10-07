@@ -21,6 +21,7 @@ export type BlockType =
   | 'exam'       // 模拟卷
   | 'columns'    // 多栏容器
   | 'group'      // 分组容器
+  | 'layout'     // 布局原语（排布容器：grid/stack/split/hero/bleed/rail）
   | 'steps'      // 编号步骤条
   | 'summary'    // 一页速记
   | 'compare'    // 双栏中性对照
@@ -115,6 +116,38 @@ export interface DiagramBlock extends BaseBlock {
   type: 'diagram'
   boardId: string       // JSXGraph 画板 ID（对应 src/geometry/boards/<boardId>.js 模块）
   caption?: string      // 图注
+}
+
+/** 布局原语种类（与 schema 的 definitions.layoutKind 保持一致，由守卫测试钉死） */
+export type LayoutKind = 'grid' | 'stack' | 'split' | 'hero' | 'bleed' | 'rail'
+
+/**
+ * 布局参数：各原语允许的键与取值域。
+ * 唯一真相源是 schema 的 definitions.layoutProps —— 此处仅为 IDE 提示，
+ * 越界取值由 validateBlock 依据 schema 拒绝。
+ */
+export interface GridLayoutProps { cols?: 2 | 3 | 4; gap?: 'normal' | 'tight' | 'loose' }
+export interface StackLayoutProps { gap?: 'normal' | 'tight' | 'loose' }
+export interface SplitLayoutProps { ratio?: '1:1' | '1:2' | '2:1' | '1:3' | '3:1'; gap?: 'normal' | 'tight' | 'loose' }
+export interface HeroLayoutProps { align?: 'start' | 'center'; tone?: 'plain' | 'accent' }
+export interface BleedLayoutProps { side?: 'start' | 'end' | 'both'; width?: 'wide' | 'full' }
+export interface RailLayoutProps { side?: 'start' | 'end'; width?: 'sm' | 'md'; sticky?: boolean; gap?: 'normal' | 'tight' | 'loose' }
+
+/** 布局参数联合类型（按 as 取对应分支） */
+export type LayoutProps =
+  | GridLayoutProps
+  | StackLayoutProps
+  | SplitLayoutProps
+  | HeroLayoutProps
+  | BleedLayoutProps
+  | RailLayoutProps
+
+/** 布局原语区块：children 可递归嵌套普通区块或嵌套 layout */
+export interface LayoutBlock extends BaseBlock {
+  type: 'layout'
+  as: LayoutKind
+  props?: LayoutProps
+  children: Block[]
 }
 
 /** 易错专项条目 */
@@ -263,6 +296,7 @@ export type Block =
   | ExamBlock
   | ColumnsBlock
   | GroupBlock
+  | LayoutBlock
   | StepsBlock
   | SummaryBlock
   | CompareBlock

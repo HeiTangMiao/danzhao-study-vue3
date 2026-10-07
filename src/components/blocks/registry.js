@@ -28,6 +28,9 @@ import CompareBlock from './CompareBlock.vue'
 import VocabBlock from './VocabBlock.vue'
 import CodeBlock from './CodeBlock.vue'
 import ClozeBlock from './ClozeBlock.vue'
+// 布局原语分发器（P0）。放在 components/ 根下而非 blocks/：它不含任何「内容语义」，
+// 与区块组件解耦，故不做成区块组件的一员。
+import LayoutRenderer from '../LayoutRenderer.vue'
 
 /**
  * 类型 → 渲染组件
@@ -56,6 +59,8 @@ const BLOCK_COMPONENTS = {
   // BlockRenderer 在模板里用 v-if 分支处理，不会走到这里的 component）
   columns: ColumnsBlock,
   group: GroupBlock,
+  // 布局原语（P0）：同样由 BlockRenderer 自引用递归注入 children，此处绑定仅为完整性
+  layout: LayoutRenderer,
   // 结构型区块（阶段 5）
   steps: StepsBlock,
   summary: SummaryBlock,

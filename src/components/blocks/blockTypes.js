@@ -31,6 +31,8 @@ export const BLOCK_TYPES_META = {
   // 容器型区块：不进入本页目录（目录只收有具体内容的区块）
   columns: { label: '多栏', icon: '' },
   group: { label: '分组', icon: '' },
+  // 布局原语（P0）：与容器同属「排布」而非「内容」，同样不进本页目录
+  layout: { label: '布局', icon: '' },
   // 结构型区块（阶段 5）：步骤条 / 速记卡 / 对比 / 术语卡 / 代码 / 挖空都是正文型内容，进本页目录
   steps: { label: '步骤条', icon: '🔢' },
   summary: { label: '一页速记', icon: '📌' },

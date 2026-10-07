@@ -14,6 +14,13 @@
  */
 
 /**
+ * 布局原语的最大嵌套深度。
+ * 深度语义：顶层 layout 为 0，其子 layout 为 1，依此类推；达到该值即拒绝再嵌套。
+ * 导出常量便于测试与文档引用，避免「上限」在两处各写一个数字。
+ */
+export const MAX_LAYOUT_DEPTH = 8
+
+/**
  * 创建校验器
  * @param {object} schema content-schema 对象
  * @param {object} [options] 可选注入项
@@ -37,6 +44,9 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
 
   /** 判空：undefined / null / 纯空白 均视为空 */
   const isEmpty = (v) => v === undefined || v === null || String(v).trim() === ''
+
+  /** 是否普通对象（排除 null 与数组）—— 用于 props 这类「应为对象」的字段 */
+  const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 
   /** 题目类区块（quiz / exam）共用的字段校验 */
   function checkQuestionItems(items, prefix, errors) {
@@ -62,8 +72,15 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
     })
   }
 
+  /**
+   * 布局原语白名单（P0）：原语种类与「各原语允许的参数及其取值域」都从 schema 派生 ——
+   * schema 新增原语或参数时校验器自动认识，避免「schema 加了、校验器不认」的老问题。
+   */
+  const LAYOUT_KINDS = schema?.definitions?.layoutKind?.enum || []
+  const LAYOUT_PROPS = schema?.definitions?.layoutProps?.properties || {}
+
   /** 校验单个区块，返回相对该区块的错误描述列表 */
-  return function validateBlock(block) {
+  return function validateBlock(block, depth = 0) {
     const errors = []
     if (!block || typeof block !== 'object') return ['不是对象']
     if (!block.type) errors.push('缺少 type')
@@ -141,6 +158,42 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
           errors.push(`图形区块 boardId "${block.boardId}" 未找到对应画板模块`)
         }
         break
+      // 布局原语（P0）：as 白名单 + props 白名单（含取值域）+ children 递归（带深度上限）
+      case 'layout': {
+        const kind = block.as
+        if (isEmpty(kind)) errors.push('布局区块缺少 as（布局原语种类）')
+        else if (!LAYOUT_KINDS.includes(kind)) errors.push(`未知布局原语 as: ${kind}`)
+        else if (block.props !== undefined) {
+          if (!isPlainObject(block.props)) errors.push('布局区块 props 应为对象')
+          else {
+            const allowed = LAYOUT_PROPS[kind] || {}
+            for (const [key, value] of Object.entries(block.props)) {
+              const spec = allowed[key]
+              if (!spec) {
+                errors.push(`布局原语 ${kind} 不支持参数 ${key}`)
+                continue
+              }
+              // 取值域在 schema 中以 enum 表达；未给 enum 的参数不限制取值
+              if (Array.isArray(spec.enum) && !spec.enum.includes(value)) {
+                errors.push(`布局原语 ${kind} 参数 ${key} 取值非法: ${value}`)
+              }
+            }
+          }
+        }
+        if (!Array.isArray(block.children)) {
+          errors.push('布局区块缺少 children')
+        } else if (depth >= MAX_LAYOUT_DEPTH) {
+          // 到顶即停：不再向下递归，避免异常内容把校验/渲染开销拖爆
+          errors.push(`布局嵌套超过上限 ${MAX_LAYOUT_DEPTH} 层`)
+        } else {
+          block.children.forEach((child, ci) => {
+            for (const e of validateBlock(child, depth + 1)) {
+              errors.push(`子区块[${ci}] ${e}`)
+            }
+          })
+        }
+        break
+      }
       // 容器型区块（阶段 4）：递归校验子区块 —— 子区块的错误带上路径前缀
       case 'columns': {
         const cols = Array.isArray(block.items) ? block.items : []

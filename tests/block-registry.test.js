@@ -75,3 +75,39 @@ describe('区块类型与渲染组件的绑定', () => {
     expect(componentOf(undefined)).toBeNull()
   })
 })
+
+describe('布局原语（P0）', () => {
+  /** schema 里的 as 取值域（布局原语种类） */
+  const layoutKindEnum = schema.definitions.layoutKind.enum
+  /** schema 里的参数白名单表：kind → { propKey: { enum? } } */
+  const layoutProps = schema.definitions.layoutProps.properties
+  /** 从 content.d.ts 的 LayoutKind 联合类型中提取字面量 */
+  const dtsLayoutKind = [...readFileSync(join(ROOT, 'src', 'types', 'content.d.ts'), 'utf-8')
+    .split('export type LayoutKind =')[1]
+    .split('\n')[0]
+    .matchAll(/'([a-z]+)'/g)].map((m) => m[1])
+
+  it('as 的取值域是六个布局原语', () => {
+    expect(sorted(layoutKindEnum)).toEqual(sorted(['grid', 'stack', 'split', 'hero', 'bleed', 'rail']))
+  })
+
+  it('每个原语都有参数白名单，且不多不少（无漂移、无遗漏）', () => {
+    // 三者必须同时改：schema 的 layoutKind / layoutProps、校验器（从 schema 派生）以及 d.ts
+    expect(sorted(Object.keys(layoutProps))).toEqual(sorted(layoutKindEnum))
+  })
+
+  it('content.d.ts 的 LayoutKind 与 schema 一致', () => {
+    expect(sorted(new Set(dtsLayoutKind))).toEqual(sorted(layoutKindEnum))
+  })
+
+  it('layout 在 schema 中有字段定义分支（供编辑器推导表单）', () => {
+    expect(branchTypes).toContain('layout')
+  })
+
+  it('layout 分支声明 as 与 children 必填', () => {
+    const branch = schema.definitions.block.allOf.find(
+      (b) => b.if?.properties?.type?.const === 'layout'
+    )
+    expect(sorted(branch?.then?.required || [])).toEqual(['as', 'children'])
+  })
+})
