@@ -326,7 +326,7 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
 
 /* ---------- 页脚全端退场（桌面 UX 方案二批 2A，用户拍板解读 A） ----------
  * 桌面 ≥1150：桌面 UX 方案 commit 1 已隐藏；移动 ≤1150：本轮整合进顶栏/侧栏（掌握→rt-actions、
- * 翻页→手势/答题卡/sb-more）。display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动），
+ * 翻页→手势/答题卡/抽屉快捷操作区）。display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动），
  * 将来要恢复删两行即可。≥1150 与 ≤1150 两条规则在 1150 断点无缝衔接。 */
 @media (max-width: 1150px) {
   .reader-footer { display: none; }

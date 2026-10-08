@@ -57,7 +57,7 @@
         </div>
         <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处。
              桌面 UX 方案批 2：内容页不渲染（「学习中」对内容页是零信息量噪音）；
-             仅测验页显示 已交卷/待作答。移动端抽屉头徽章不受影响（保持已完成/学习中） -->
+             仅测验页显示 已交卷/待作答——桌面侧栏与移动抽屉头共用此条件与文案（移动端三调整对齐） -->
         <span v-if="isTestPage" class="sb-status" :class="{ on: isDone }" :title="isDone ? '本页测验已交卷' : '本页测验待作答'">
           <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已交卷' : '待作答' }}
         </span>
@@ -570,7 +570,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 /* 移动端组件（桌面端隐藏） */
 .sb-mobile { display: none; }
 
-/* 响应式：窄屏隐藏桌面侧边栏，改用底部操作栏 + 答题卡抽屉 + 更多面板 */
+/* 响应式：窄屏隐藏桌面侧边栏，改用底部操作栏 + 答题卡抽屉（快捷操作已并入抽屉首区块） */
 @media (max-width: 1150px) {
   .content-sidebar { display: none; }
 

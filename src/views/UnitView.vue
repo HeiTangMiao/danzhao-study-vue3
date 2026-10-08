@@ -93,7 +93,7 @@
       @toggle-master="togglePageMastered"
     />
 
-    <!-- 固定侧边栏：快捷导航 + 快捷操作（移动端为答题卡抽屉 + 更多面板，底栏已由页脚取代） -->
+    <!-- 固定侧边栏：快捷导航 + 快捷操作（移动端为答题卡抽屉，快捷操作并入抽屉首区块；底栏已由页脚取代） -->
     <ContentSidebar
       v-if="page"
       ref="sidebarRef"
@@ -176,7 +176,7 @@ const progress = useProgressStore()
 const db = useStudyDbStore()
 
 // 番茄钟：常驻悬浮球 + 锚定面板（交互模型见 PomodoroPanel 头注）。
-// pomodoroOpen 由本组件持有，侧栏/更多面板入口与点球共用同一状态源；
+// pomodoroOpen 由本组件持有，侧栏入口与点球共用同一状态源；
 // 球位置与「固定位置」锁均在 PomodoroPanel 内部持久化，本组件不再关心 pinned
 const pomodoro = usePomodoro()
 const pomodoroOpen = ref(false)
@@ -492,7 +492,7 @@ async function pagingGo(dir, offset = dir === 'next' ? 1 : -1) {
  * ① 测验作答中（与滑动翻页 isBlocked 同源的 examState）
  * ② 表单元素聚焦（←/→ 在输入框内是移动光标，不能被翻页劫持）
  * ③ 离开确认弹层开着（confirmLeave 就在本组件内，可直接读）
- * ④ 答题卡抽屉/更多面板开着——面板状态在 ContentSidebar 内部未 expose，
+ * ④ 答题卡抽屉开着——面板状态在 ContentSidebar 内部未 expose，
  *    但其 watch 在面板打开时会锁 body 滚动（overflow:hidden），以该副作用作守卫
  * ⑤ 翻页转场进行中（三态机单飞，避免连按堆积导航）
  * 带修饰键的 ←/→ 是浏览器/系统快捷键（如 ⌘+← 回历史），一并不劫持。

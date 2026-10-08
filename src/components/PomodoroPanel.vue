@@ -15,7 +15,7 @@
   props:
    - pomodoro  usePomodoro() 返回对象整体透传（refs 嵌在对象内，模板按 .value 取）；
                计时 interval 在 composable 内，与面板开合解耦——面板关闭计时照跑
-   - open      面板显隐（由 UnitView 持有，侧栏/更多面板入口与点球共用同一状态源）
+   - open      面板显隐（由 UnitView 持有，侧栏入口与点球共用同一状态源）
   emits:
    - close     关闭面板（× 按钮）
    - toggle    点球时请求开合面板（UnitView 翻转 open）
