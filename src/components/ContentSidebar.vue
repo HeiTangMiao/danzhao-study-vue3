@@ -207,16 +207,21 @@
       </div>
     </div>
 
-    <!-- 更多操作面板：收藏 / 笔记 / 完成 / 计算器 / 顶部 -->
+    <!-- 更多操作面板：收藏 / 笔记 / 顶部 + 上一页 / 下一页 / 番茄钟（6 项整格，桌面 UX 方案二批 2A） -->
     <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }" role="dialog" aria-modal="true" aria-label="更多操作" :aria-hidden="!moreOpen">
       <div class="sb-sheet__head">
         <span class="sb-sheet__title">⋯ 更多操作</span>
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false"><AppIcon name="x" :size="18" /></button>
       </div>
       <div class="sb-more">
+        <!-- 6 项整格（3 列 × 2 行）：页脚退场后翻页兜底进更多面板（桌面 UX 方案二批 2A）；
+             番茄钟项为方案三共用入口，emit toggle-pomodoro 由 UnitView 接面板开关 -->
         <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏本页</span></button>
         <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false"><AppIcon name="square-pen" :size="16" /><span>学习笔记</span></button>
         <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false"><AppIcon name="arrow-up" :size="16" /><span>返回顶部</span></button>
+        <button class="sb-more__item" :disabled="!hasPrev" @click="emit('go-prev'); moreOpen = false"><AppIcon name="chevron-left" :size="16" /><span>上一页</span></button>
+        <button class="sb-more__item" :disabled="!hasNext" @click="emit('go-next'); moreOpen = false"><AppIcon name="chevron-right" :size="16" /><span>下一页</span></button>
+        <button class="sb-more__item" @click="emit('toggle-pomodoro'); moreOpen = false"><AppIcon name="timer" :size="16" /><span>番茄钟</span></button>
       </div>
     </div>
 
@@ -258,7 +263,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'scroll-to', 'scroll-top',
-  'toggle-master', 'toggle-bookmark', 'toggle-notes',
+  'toggle-master', 'toggle-bookmark', 'toggle-notes', 'toggle-pomodoro',
   'go-file', 'go-unit',
   'go-prev', 'go-next'
 ])

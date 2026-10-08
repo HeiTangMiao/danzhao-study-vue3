@@ -25,6 +25,18 @@
     </div>
 
     <div class="rt-actions">
+      <!-- 首位「掌握」：页脚全端退场后（桌面 UX 方案二批 2A）移动端主行动承接于此；
+           与桌面侧栏「掌握居首」对齐。icon target ↔ check 与页脚 rf-master 现行为一致，
+           on 态复用 rt-act.on（primary 高亮 + glass-active 底） -->
+      <button
+        class="rt-act"
+        :class="{ on: mastered }"
+        :title="mastered ? '已掌握本页，点击取消' : '标记本页已掌握'"
+        :aria-label="mastered ? '取消掌握' : '标记掌握'"
+        @click="emit('toggle-master')"
+      >
+        <AppIcon v-if="iconsReady" :name="mastered ? 'check' : 'target'" :size="18" />
+      </button>
       <!-- 收藏 / 笔记 / 目录（答题卡抽屉）：移动端唯一入口（v4 收敛，桌面由 ContentSidebar 承担） -->
       <button class="rt-act" :class="{ on: bookmarked }" title="收藏本页" aria-label="收藏本页" @click="emit('bookmark')">
         <AppIcon v-if="iconsReady" name="star" :size="18" :stroke-width="1.8" />
@@ -69,10 +81,12 @@ const props = defineProps({
   total: { type: Number, default: 0 },
   // 页脚/顶栏入口的联动态（高亮当前开启的面板）
   bookmarked: { type: Boolean, default: false },
-  notesOpen: { type: Boolean, default: false }
+  notesOpen: { type: Boolean, default: false },
+  // 本页是否已手动掌握（页脚主行动同源数据 §5.7.7；页脚退场后移动端由顶栏承接）
+  mastered: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['back', 'bookmark', 'notes', 'toc', 'go-index'])
+const emit = defineEmits(['back', 'bookmark', 'notes', 'toc', 'go-index', 'toggle-master'])
 
 // 首帧规避：玻璃容器先绘，下一帧再挂内联 SVG（WebKit bug #322045，§5.6.1 v4 失效项的补救）
 const iconsReady = ref(false)

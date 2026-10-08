@@ -308,20 +308,16 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
 @media (min-width: 1150px) {
   .unit-view { padding-top: calc(var(--tabbar-h) + var(--sat) + var(--reader-topbar-h) + var(--spacer-16)); }
 }
-/* 底部：页脚总高 + 呼吸间距（v4 空间账：页脚 130 → 52+手势区） */
-@media (max-width: 1150px) {
-  .unit-view {
-    padding-bottom: calc(
-      var(--reader-footer-h) + max(var(--sab), var(--sys-gesture-bottom)) + var(--spacer-8)
-    );
-  }
-}
+/* 底部让位规则已随页脚全端退场一并删除（桌面 UX 方案二批 2A）：
+ * 页脚 display:none 后移动端不再需要 padding-bottom 让位 */
 
-/* ---------- 桌面端（≥1150）隐藏页脚 ----------
- * 页脚的三个职责在桌面端已有更好的承接（桌面 UX 方案 commit 1，用户拍板）：
- * 翻页 → 键盘 ←/→ + 分段条点击 + 侧栏翻页兜底；掌握 → 侧栏「掌握」按钮。
- * display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动）；
- * ≤1150 移动端页脚完全不受影响。 */
+/* ---------- 页脚全端退场（桌面 UX 方案二批 2A，用户拍板解读 A） ----------
+ * 桌面 ≥1150：桌面 UX 方案 commit 1 已隐藏；移动 ≤1150：本轮整合进顶栏/侧栏（掌握→rt-actions、
+ * 翻页→手势/答题卡/sb-more）。display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动），
+ * 将来要恢复删两行即可。≥1150 与 ≤1150 两条规则在 1150 断点无缝衔接。 */
+@media (max-width: 1150px) {
+  .reader-footer { display: none; }
+}
 @media (min-width: 1150px) {
   .reader-footer { display: none; }
 }

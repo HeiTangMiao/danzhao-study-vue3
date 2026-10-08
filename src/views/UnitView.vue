@@ -24,17 +24,19 @@
       <div class="reading-progress__bar" :style="{ transform: `scaleX(${readProgress / 100})` }"></div>
     </div>
 
-    <!-- v4 玻璃页眉：返回（唯一可靠返回通道）/ 单元标题 + 页码 / 收藏·笔记·答题卡入口 / 2px 分段刻度 -->
+    <!-- v4 玻璃页眉：返回（唯一可靠返回通道）/ 单元标题 + 页码 / 掌握·收藏·笔记·答题卡入口 / 2px 分段刻度 -->
     <ReaderTopbar
       :unit-title="unit?.title || ''"
       :file-index="fileIndex"
       :total="unit?.files.length || 0"
       :bookmarked="bookmark.isBookmarked.value"
       :notes-open="showNotes"
+      :mastered="isPageMastered"
       @back="goHome"
       @toc="onTopbarToc"
       @bookmark="bookmark.toggleBookmark()"
       @notes="showNotes = !showNotes"
+      @toggle-master="togglePageMastered"
       @go-index="goFile"
     />
 
@@ -129,6 +131,7 @@
       @go-unit="goUnit"
       @go-prev="pagingGo('prev')"
       @go-next="pagingGo('next')"
+      @toggle-pomodoro="pomodoroOpen = !pomodoroOpen"
     />
 
     <!-- 番茄钟悬浮计时器（学习时随时开启，状态自动持久化） -->
@@ -804,9 +807,10 @@ watch(
 }
 .pomodoro-btn--primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
 
-/* 移动端：悬浮在页脚（52px + 手势区）上方，触控目标 ≥44px */
+/* 移动端：悬浮在系统手势区上方（页脚已全端退场，桌面 UX 方案二批 2A——不再避让 --reader-footer-h），
+ * 触控目标 ≥44px */
 @media (max-width: 1150px) {
-  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + var(--reader-footer-h) + 12px); }
+  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + 12px); }
   .pomodoro-btn { min-height: 44px; }
 }
 </style>
