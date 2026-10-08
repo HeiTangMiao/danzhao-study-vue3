@@ -99,6 +99,14 @@
         </div>
       </div>
     </transition>
+
+    <!-- 二级归因层（P0-4）：自评「我还不会」后弹出，一点即完成 / 可跳过 -->
+    <ReasonChips
+      :open="!!store.pendingAttribution"
+      :question="attributionQuestion"
+      @done="store.setAttribution"
+      @skip="store.dismissAttribution"
+    />
   </div>
 </template>
 
@@ -107,6 +115,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import ReasonChips from '@/components/ReasonChips.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { usePracticeStore } from '@/stores/practice'
 import { warmKatex } from '@/composables/useKatex'
@@ -118,6 +127,14 @@ const router = useRouter()
 const q = computed(() => store.current)
 const rec = computed(() => store.currentRecord)
 const total = computed(() => store.session?.questions.length || 0)
+
+// 待归因题的题干（供归因层展示上下文）
+const attributionQuestion = computed(() => {
+  const pa = store.pendingAttribution
+  if (!pa || !store.session) return ''
+  const target = store.session.questions[pa.index]
+  return target ? target.question : ''
+})
 
 // 阅读进度：已自评题数 / 总题数（自评是单题完成的唯一标志）
 const progressPct = computed(() => {

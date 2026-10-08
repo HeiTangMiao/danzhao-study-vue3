@@ -62,7 +62,38 @@
             @click="statusFilter = f.key"
           >{{ f.label }}</button>
         </div>
+        <div class="filter-group">
+          <span class="filter-label">归因：</span>
+          <button
+            class="filter-btn"
+            :class="{ active: reasonFilter === 'all' }"
+            @click="reasonFilter = 'all'"
+          >全部</button>
+          <button
+            v-for="r in REASONS"
+            :key="r"
+            class="filter-btn"
+            :class="{ active: reasonFilter === r }"
+            @click="reasonFilter = r"
+          >{{ r }}</button>
+          <button
+            class="filter-btn"
+            :class="{ active: reasonFilter === 'none' }"
+            @click="reasonFilter = 'none'"
+          >未归因</button>
+        </div>
         <button v-if="filtered.length > 0" class="clear-btn" @click="clearAll"><AppIcon name="trash-2" :size="15" /> 清空全部</button>
+      </section>
+
+      <!-- 归因分布（H3：归因是用户自评数据，与自动判分分别统计、不合并） -->
+      <section v-if="errors.length" class="card dist-card">
+        <span class="dist-title">归因分布</span>
+        <div class="dist-list">
+          <span v-for="d in distribution" :key="d.reason" class="dist-item" :class="{ 'dist-item--none': d.reason === 'none' }">
+            <span class="dist-label">{{ d.label }}</span>
+            <span class="dist-num">{{ d.count }}</span>
+          </span>
+        </div>
       </section>
 
       <!-- 空状态 -->
@@ -91,6 +122,8 @@
             <span v-if="err.difficulty" class="difficulty-tag" :class="diffClass(err.difficulty)">
               {{ diffLabel(err.difficulty) }}
             </span>
+            <span v-if="err.reason" class="reason-tag">{{ err.reason }}</span>
+            <span v-if="err.wrongCount > 1" class="wrongcount-tag">错 {{ err.wrongCount }} 次</span>
             <span v-if="err.unitTitle" class="source-tag">{{ err.unitTitle }}</span>
             <span class="error-date">{{ fmtDate(err.createdAt) }}</span>
           </div>
@@ -147,7 +180,8 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
-import { calculateSM2 } from '@/composables/useSpacedReview'
+import { calculateSM2, GRADES } from '@/composables/useSpacedReview'
+import { REASONS, reasonDistribution } from '@/utils/practiceMetrics'
 import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
@@ -164,6 +198,7 @@ const loading = ref(true)
 // 筛选状态
 const subjectFilter = ref('all')
 const statusFilter = ref('all')
+const reasonFilter = ref('all')
 
 const subjectFilters = [
   { key: 'all', label: '全部' },
@@ -183,6 +218,9 @@ const masteredRate = computed(() => {
   return Math.round((reviewedCount.value / errors.value.length) * 100)
 })
 
+// 归因分布（六选一 + 未归因；H3：与自动判分口径分开，纯函数单一真相源）
+const distribution = computed(() => reasonDistribution(errors.value))
+
 // 筛选后的错题（按时间倒序）
 const filtered = computed(() => {
   let list = errors.value
@@ -191,6 +229,8 @@ const filtered = computed(() => {
   }
   if (statusFilter.value === 'unreviewed') list = list.filter((e) => !e.reviewed)
   if (statusFilter.value === 'reviewed') list = list.filter((e) => e.reviewed)
+  if (reasonFilter.value === 'none') list = list.filter((e) => !e.reason)
+  else if (reasonFilter.value !== 'all') list = list.filter((e) => e.reason === reasonFilter.value)
   return [...list].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
 })
 
@@ -224,7 +264,9 @@ function sourceRoute(err) {
 async function markMastered(err) {
   const updated = {
     ...err,
-    ...calculateSM2(err, 4),
+    // 伪参数：此路「已掌握」未做四档自评，借用 GOOD 档（P0-6 复习器落地后改为真实评分入口，
+    // 见路线图 C-1）；本批只做常量命名留痕，行为不变（批 A 拍板 #3）
+    ...calculateSM2(err, GRADES.GOOD),
     reviewed: true,
     reviewCount: (err.reviewCount || 0) + 1,
     lastReviewedAt: Date.now()
@@ -309,6 +351,18 @@ onMounted(async () => {
 }
 .clear-btn:hover { background: var(--danger); color: #fff; }
 
+/* 归因分布（P0-4）：六选一 + 未归因 */
+.dist-card { display: flex; flex-direction: column; gap: var(--spacer-8); }
+.dist-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+.dist-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.dist-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 12px; border-radius: var(--radius-full);
+  background: var(--surface-muted); font-size: 0.8rem;
+}
+.dist-item--none { color: var(--text-muted); }
+.dist-num { font-weight: 700; color: var(--primary); }
+
 /* 空状态 */
 .empty-card { text-align: center; padding: var(--spacer-40); }
 .empty-title { font-size: 1.1rem; font-weight: 600; margin-bottom: var(--spacer-8); }
@@ -336,6 +390,8 @@ onMounted(async () => {
 :root[data-theme="dark"] .tag-chinese { color: #ff8a8a; }
 :root[data-theme="dark"] .tag-computer { color: #6fc7f5; }
 .source-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface-muted); color: var(--text-muted); }
+.reason-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--primary-soft); color: var(--primary); }
+.wrongcount-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--danger-rgb), 0.1); color: var(--danger); }
 .error-date { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); }
 
 .error-question { margin-bottom: var(--spacer-10); }
