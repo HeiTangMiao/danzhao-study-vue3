@@ -24,9 +24,9 @@
       <button class="mm-btn" type="button" title="缩小" @click="zoomOut">－</button>
       <button class="mm-btn" type="button" title="适应窗口" @click="fitToView">⤢</button>
       <button class="mm-btn" type="button" title="复位" @click="resetView">⟳</button>
-      <span class="mm-hint">按钮缩放 · 拖拽移动 · 点击节点跳转正文</span>
+      <span class="mm-hint">Ctrl+滚轮缩放 · 拖拽移动 · 点击节点跳转正文</span>
     </div>
-    <div ref="viewport" class="mindmap-viewport" data-no-swipe @wheel.prevent="onWheel">
+    <div ref="viewport" class="mindmap-viewport" data-no-swipe @wheel="onWheel">
       <div ref="canvas" class="mindmap-canvas" :style="canvasStyle">
         <div ref="container" class="mindmap-content"></div>
       </div>
@@ -98,6 +98,12 @@ function fitToView() {
 function resetView() { fitToView() }
 
 function onWheel(e) {
+  // 防误触（桌面 UX 方案批 3）：普通滚轮直接 return 放行页面滚动——
+  // 不 preventDefault、不改 scale，导图不再劫持阅读时最常见的「滚着往下看」。
+  // 仅 Ctrl/Cmd+滚轮才缩放：触控板捏合的 wheel 事件由浏览器合成时自带
+  // ctrlKey=true，捏合缩放天然保留；工具栏按钮缩放与拖拽 pan 均不受影响。
+  if (!(e.ctrlKey || e.metaKey)) return
+  e.preventDefault()
   const dir = e.deltaY < 0 ? 1 : -1
   const ns = Math.max(MIN, Math.min(MAX, +(transform.scale + dir * STEP).toFixed(2)))
   transform.scale = ns
