@@ -72,7 +72,7 @@
       <div
         v-for="(block, i) in page.blocks"
         :id="'block-' + i"
-        :key="i"
+        :key="`${blockListKey}-${i}`"
         class="block-anchor"
         :data-kind="kindOf(block.type) || null"
       >
@@ -306,6 +306,22 @@ const bookmark = useBookmarks(pageKey, subject, computed(() => ({
 
 // 动态加载内容数据（Vite 支持动态 import）
 const page = ref(null)
+
+/**
+ * 区块列表的数据驱动键前缀（BugFix F-2）
+ *
+ * ⚠️ 为什么 key 不能用索引：翻页时 page.blocks 整体替换，但同索引的区块会复用
+ *    同一组件实例。命令式渲染的区块（MindMapBlock 仅在 onMounted 调 mermaid 出图，
+ *    不监听 props 变化）复用实例后不再重渲 —— 表现为翻页后导图（及同类画板）残留
+ *    上一页内容，硬刷新才正确。
+ *
+ *    改用 page.id（由 site.js 经 hydratePage 推导、随 page 对象替换而变，如 "math-02-01"）
+ *    作键前缀：page 变了 → 所有 .block-anchor 重建 → 命令式组件（mermaid 导图、
+ *    jsxgraph 画板，以及未来新增的命令式块）全体重新初始化，一处修复覆盖全部同类问题。
+ *    取自 page 而非路由，确保「内容真正替换时」才换键（规避转场异步、路由先于数据的时序差）。
+ *    pageKey 仅作兜底（page.id 恒存在，兜底一般不触发）。
+ */
+const blockListKey = computed(() => page.value?.id || pageKey.value || '')
 
 // ===== 区块进入动效（P3-T3）=====
 // 动效档位（模块级单例，同时驱动 <html data-motion-tier>，CSS 据此分流降级）
