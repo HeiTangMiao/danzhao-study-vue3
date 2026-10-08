@@ -58,10 +58,10 @@ export default {
           type: "objectives",
           title: "学习目标",
           items: [
-            "理解 VLAN 的作用：划分广播域、隔离广播、提高安全性",
-            "掌握创建 VLAN、命名 VLAN 的命令",
-            "掌握将端口划入 VLAN（access 模式）的命令",
-            "掌握 Trunk 端口配置与端口聚合（channel-group）配置"
+            "能说出 VLAN 划分广播域、隔离广播、提高安全性的作用，并判断广播域数量",
+            "能写出创建与命名 VLAN 的命令，命令格式无误",
+            "能写出将端口划入 VLAN 的 access 模式命令，端口归属正确",
+            "能完成 Trunk 端口与端口聚合（channel-group）配置，跨交换机同 VLAN 互通"
           ]
         },
       ]

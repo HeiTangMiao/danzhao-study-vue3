@@ -58,10 +58,10 @@ export default {
           type: "objectives",
           title: "学习目标",
           items: [
-            "了解 Python 开发环境（IDLE），掌握交互模式与脚本文件的运行方法",
-            "掌握变量命名规则与常用数据类型（int、float、str、bool）",
-            "掌握 print 输出与 input 输入的基本用法，学会类型转换",
-            "养成添加注释、规范书写代码的良好习惯"
+            "能说出 Python 开发环境（IDLE）的组成，并在交互模式与脚本文件两种方式下运行程序",
+            "能按命名规则判断变量名是否合法，并说出 int、float、str、bool 四种数据类型的特点与区别",
+            "能用 print 与 input 完成输入输出，并正确完成 str 与 int、float 之间的类型转换",
+            "能为代码添加必要注释，并按缩进与命名规范书写程序"
           ]
         },
       ]
