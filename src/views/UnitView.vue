@@ -121,26 +121,14 @@
       @toggle-pomodoro="pomodoroOpen = !pomodoroOpen"
     />
 
-    <!-- 状态自动持久化；计时 interval 在 usePomodoro 内，面板关闭计时照跑 -->
+    <!-- 番茄钟 = 常驻悬浮球 + 锚定面板（交互模型见 PomodoroPanel 头注）。
+         状态自动持久化；计时 interval 在 usePomodoro 内，面板关闭计时照跑 -->
     <PomodoroPanel
       :pomodoro="pomodoro"
       :open="pomodoroOpen"
-      :pinned="pomodoroPinned"
       @close="pomodoroOpen = false"
-      @toggle-pin="pomodoroPinned = !pomodoroPinned"
+      @toggle="pomodoroOpen = !pomodoroOpen"
     />
-    <!-- 番茄钟 FAB：仅固定态渲染（桌面 UX 方案二批 3：取消默认固定，
-         非固定态走居中浮层 + 侧栏/更多面板入口；pinned 时点 FAB 开合面板，现有交互回归） -->
-    <transition name="fade">
-      <button
-        v-if="pomodoroPinned"
-        class="pomodoro-fab__btn"
-        :class="{ open: pomodoroOpen }"
-        :aria-label="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
-        :title="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
-        @click="pomodoroOpen = !pomodoroOpen"
-      ><AppIcon name="timer" :size="20" /></button>
-    </transition>
 
     <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
     <transition name="fade">
@@ -178,7 +166,6 @@ import PomodoroPanel from '@/components/PomodoroPanel.vue'
 import NotesPanel from '@/components/NotesPanel.vue'
 import ReaderTopbar from '@/components/reader/ReaderTopbar.vue'
 import ReaderFooter from '@/components/reader/ReaderFooter.vue'
-import AppIcon from '@/components/AppIcon.vue'
 import { useMotionPrefs } from '@/composables/useMotionPrefs'
 // v4 功能条与翻页动效样式（token 引 main.css；本文件全局生效一次）
 import '@/assets/css/reader.css'
@@ -188,13 +175,11 @@ const router = useRouter()
 const progress = useProgressStore()
 const db = useStudyDbStore()
 
-// 番茄钟（学习页悬浮计时器）
+// 番茄钟：常驻悬浮球 + 锚定面板（交互模型见 PomodoroPanel 头注）。
+// pomodoroOpen 由本组件持有，侧栏/更多面板入口与点球共用同一状态源；
+// 球位置与「固定位置」锁均在 PomodoroPanel 内部持久化，本组件不再关心 pinned
 const pomodoro = usePomodoro()
 const pomodoroOpen = ref(false)
-// 固定态（桌面 UX 方案二批 3）：默认不固定——FAB 不渲染，由侧栏/更多面板入口进入；
-// pinned 只管 UI 形态，持久化 key 命名与 pomodoro_state / sidebar_collapsed 风格一致
-const pomodoroPinned = ref(localStorage.getItem('pomodoro_pin') === '1')
-watch(pomodoroPinned, (v) => localStorage.setItem('pomodoro_pin', v ? '1' : '0'))
 
 // 当前学科（从路由参数获取，默认 math）
 const subject = computed(() => route.params.subject || 'math')
@@ -732,21 +717,6 @@ watch(
 .leave-confirm__cancel { background: var(--surface-muted); color: var(--text); border: 1px solid var(--border); }
 .leave-confirm__ok { background: var(--danger); color: #fff; }
 
-/* 番茄钟卡片样式已迁入 PomodoroPanel.vue（桌面 UX 方案二批 3 组件化）。
- * FAB 留守本组件：仅固定态渲染（v-if="pomodoroPinned"），右下角锚定 */
-.pomodoro-fab__btn {
-  position: fixed; right: 24px; bottom: 24px; z-index: 150;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--primary); color: #fff; border: none;
-  font-size: 1.5rem; cursor: pointer;
-  box-shadow: var(--shadow-pop);
-  display: flex; align-items: center; justify-content: center;
-  transition: transform var(--dur-1) var(--ease-standard);
-}
-.pomodoro-fab__btn:active { transform: scale(0.92); }
-
-/* 移动端：悬浮在系统手势区上方（页脚已全端退场，桌面 UX 方案二批 2A——不再避让 --reader-footer-h） */
-@media (max-width: 1150px) {
-  .pomodoro-fab__btn { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + 12px); }
-}
+/* 番茄钟样式（悬浮球 + 面板）已全部迁入 PomodoroPanel.vue（常驻悬浮球交互模型）。
+ * 本组件不再持有任何番茄钟相关样式或状态。 */
 </style>
