@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"正弦定理与余弦定理\"]\n  ROOT --> SINE[\"正弦定理<br/>a/sinA = 2R\"]\n  ROOT --> COS[\"余弦定理<br/>a² = b²+c²-2bc·cosA\"]\n  ROOT --> AREA[\"面积公式<br/>S = ½·ab·sinC\"]\n  ROOT --> CHOOSE[\"定理选择\"]\n\n  SINE --> SINE_FORM[\"变形形式<br/>a = 2R·sinA\"]\n  SINE --> SINE_USE[\"适用场景\"]\n  SINE_FORM --> SINE_RATIO[\"a:b:c = sinA:sinB:sinC\"]\n  SINE_USE --> SINE_AAS[\"两角一边 AAS/ASA\"]\n  SINE_USE --> SINE_SSA[\"两边对角 SSA<br/>可能两解\"]\n\n  COS --> COS_FORM[\"变形形式<br/>cosA = b²+c²-a² / 2bc\"]\n  COS --> COS_USE[\"适用场景\"]\n  COS_USE --> COS_SSS[\"已知三边 SSS\"]\n  COS_USE --> COS_SAS[\"两边夹角 SAS\"]\n  COS --> COS_SHAPE[\"判断形状<br/>cosA 与 0 比较\"]\n\n  AREA --> AREA_R[\"S = abc/4R\"]\n  AREA --> AREA_HERON[\"海伦公式<br/>S = √ p·(p-a)·(p-b)·(p-c)\"]\n\n  CHOOSE --> C_SINE[\"两角一边 → 正弦定理\"]\n  CHOOSE --> C_COS[\"三边/两边夹角 → 余弦定理\"]\n\n  SINE_SSA -.->|关联| C_SINE\n  COS_FORM -.->|关联| AREA_R\n  SINE -.->|互补| COS"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"正弦定理与余弦定理\"]\n  ROOT --> SINE[\"正弦定理<br/>a/sinA = 2R\"]\n  ROOT --> COS[\"余弦定理<br/>a² = b²+c²-2bc·cosA\"]\n  ROOT --> AREA[\"面积公式<br/>S = ½·ab·sinC\"]\n  ROOT --> CHOOSE[\"定理选择\"]\n\n  SINE --> SINE_FORM[\"变形形式<br/>a = 2R·sinA\"]\n  SINE --> SINE_USE[\"适用场景\"]\n  SINE_FORM --> SINE_RATIO[\"a:b:c = sinA:sinB:sinC\"]\n  SINE_USE --> SINE_AAS[\"两角一边 AAS/ASA\"]\n  SINE_USE --> SINE_SSA[\"两边对角 SSA<br/>可能两解\"]\n\n  COS --> COS_FORM[\"变形形式<br/>cosA = b²+c²-a² / 2bc\"]\n  COS --> COS_USE[\"适用场景\"]\n  COS_USE --> COS_SSS[\"已知三边 SSS\"]\n  COS_USE --> COS_SAS[\"两边夹角 SAS\"]\n  COS --> COS_SHAPE[\"判断形状<br/>cosA 与 0 比较\"]\n\n  AREA --> AREA_R[\"S = abc/4R\"]\n  AREA --> AREA_HERON[\"海伦公式<br/>S = √ p·(p-a)·(p-b)·(p-c)\"]\n\n  CHOOSE --> C_SINE[\"两角一边 → 正弦定理\"]\n  CHOOSE --> C_COS[\"三边/两边夹角 → 余弦定理\"]\n\n  SINE_SSA -.->|关联| C_SINE\n  COS_FORM -.->|关联| AREA_R\n  SINE -.->|互补| COS"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握正弦定理的内容及其变形形式，能运用正弦定理解三角形",
-        "掌握余弦定理的内容及其变形形式，能运用余弦定理解三角形",
-        "能根据已知条件选择合适的定理解三角形",
-        "能利用余弦定理判断三角形的形状"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握正弦定理的内容及其变形形式，能运用正弦定理解三角形",
+            "掌握余弦定理的内容及其变形形式，能运用余弦定理解三角形",
+            "能根据已知条件选择合适的定理解三角形",
+            "能利用余弦定理判断三角形的形状"
+          ]
+        },
       ]
     },
 

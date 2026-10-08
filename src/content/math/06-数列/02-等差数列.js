@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"等差数列\"]\n  N1[\"定义\"]\n  N0 --> N1\n  N2[\"an - an-1 = d\"]\n  N1 --> N2\n  N3[\"公差 d\"]\n  N1 --> N3\n  N4[\"通项公式\"]\n  N0 --> N4\n  N5[\"an = a1 + (n-1)d\"]\n  N4 --> N5\n  N6[\"前n项和\"]\n  N0 --> N6\n  N7[\"Sn = n(a1+an)/2\"]\n  N6 --> N7\n  N8[\"Sn = na1 + n(n-1)d/2\"]\n  N6 --> N8\n  N9[\"性质\"]\n  N0 --> N9\n  N10[\"下标和性质\"]\n  N9 --> N10\n  N11[\"等差中项\"]\n  N9 --> N11\n  N12[\"Sm S2m-Sm ...\"]\n  N9 --> N12"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"等差数列\"]\n  N1[\"定义\"]\n  N0 --> N1\n  N2[\"an - an-1 = d\"]\n  N1 --> N2\n  N3[\"公差 d\"]\n  N1 --> N3\n  N4[\"通项公式\"]\n  N0 --> N4\n  N5[\"an = a1 + (n-1)d\"]\n  N4 --> N5\n  N6[\"前n项和\"]\n  N0 --> N6\n  N7[\"Sn = n(a1+an)/2\"]\n  N6 --> N7\n  N8[\"Sn = na1 + n(n-1)d/2\"]\n  N6 --> N8\n  N9[\"性质\"]\n  N0 --> N9\n  N10[\"下标和性质\"]\n  N9 --> N10\n  N11[\"等差中项\"]\n  N9 --> N11\n  N12[\"Sm S2m-Sm ...\"]\n  N9 --> N12"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "理解等差数列的定义，掌握等差中项的概念",
-        "熟练运用等差数列的通项公式和前 \\(n\\) 项和公式",
-        "掌握等差数列的重要性质，能灵活运用解题",
-        "能解决等差数列的实际应用问题"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "理解等差数列的定义，掌握等差中项的概念",
+            "熟练运用等差数列的通项公式和前 \\(n\\) 项和公式",
+            "掌握等差数列的重要性质，能灵活运用解题",
+            "能解决等差数列的实际应用问题"
+          ]
+        },
       ]
     },
 

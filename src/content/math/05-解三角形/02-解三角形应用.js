@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"解三角形应用\"]\n  ROOT --> PRACT[\"实际问题\"]\n  ROOT --> STEP[\"解题步骤\"]\n  ROOT --> MODEL[\"常见模型\"]\n  ROOT --> AREA[\"面积公式<br/>S = ½·ab·sinC\"]\n\n  PRACT --> P_DIST[\"测量距离\"]\n  PRACT --> P_HIGH[\"测量高度\"]\n  PRACT --> P_ANG[\"测量角度\"]\n  P_DIST --> P_DIST_M[\"构造三角形<br/>正弦/余弦定理\"]\n  P_HIGH --> P_HIGH_M[\"仰角俯角<br/>构造直角三角形\"]\n  P_ANG --> P_ANG_M[\"方位角/方向角构造\"]\n\n  STEP --> S1[\"1. 建模抽象\"]\n  STEP --> S2[\"2. 画示意图\"]\n  STEP --> S3[\"3. 选择定理\"]\n  STEP --> S4[\"4. 求解计算\"]\n  S3 --> S3_SINE[\"两角一边 → 正弦定理\"]\n  S3 --> S3_COS[\"三边/两边夹角 → 余弦定理\"]\n\n  MODEL --> M_ELEV[\"仰角俯角<br/>以水平线为准\"]\n  MODEL --> M_AZI[\"方位角<br/>以正北为 0°\"]\n  MODEL --> M_DIR[\"方向角<br/>南偏东/西\"]\n\n  AREA -.->|关联| P_DIST_M\n  M_AZI -.->|关联| P_ANG_M\n  S3_SINE -.->|关联| P_HIGH_M"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"解三角形应用\"]\n  ROOT --> PRACT[\"实际问题\"]\n  ROOT --> STEP[\"解题步骤\"]\n  ROOT --> MODEL[\"常见模型\"]\n  ROOT --> AREA[\"面积公式<br/>S = ½·ab·sinC\"]\n\n  PRACT --> P_DIST[\"测量距离\"]\n  PRACT --> P_HIGH[\"测量高度\"]\n  PRACT --> P_ANG[\"测量角度\"]\n  P_DIST --> P_DIST_M[\"构造三角形<br/>正弦/余弦定理\"]\n  P_HIGH --> P_HIGH_M[\"仰角俯角<br/>构造直角三角形\"]\n  P_ANG --> P_ANG_M[\"方位角/方向角构造\"]\n\n  STEP --> S1[\"1. 建模抽象\"]\n  STEP --> S2[\"2. 画示意图\"]\n  STEP --> S3[\"3. 选择定理\"]\n  STEP --> S4[\"4. 求解计算\"]\n  S3 --> S3_SINE[\"两角一边 → 正弦定理\"]\n  S3 --> S3_COS[\"三边/两边夹角 → 余弦定理\"]\n\n  MODEL --> M_ELEV[\"仰角俯角<br/>以水平线为准\"]\n  MODEL --> M_AZI[\"方位角<br/>以正北为 0°\"]\n  MODEL --> M_DIR[\"方向角<br/>南偏东/西\"]\n\n  AREA -.->|关联| P_DIST_M\n  M_AZI -.->|关联| P_ANG_M\n  S3_SINE -.->|关联| P_HIGH_M"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握三角形面积公式，能求三角形的面积",
-        "理解解三角形的四类基本场景，能选择合适的方法求解",
-        "能运用正弦定理和余弦定理解决实际测量问题",
-        "能综合运用三角公式解决解三角形的综合问题"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握三角形面积公式，能求三角形的面积",
+            "理解解三角形的四类基本场景，能选择合适的方法求解",
+            "能运用正弦定理和余弦定理解决实际测量问题",
+            "能综合运用三角公式解决解三角形的综合问题"
+          ]
+        },
       ]
     },
 

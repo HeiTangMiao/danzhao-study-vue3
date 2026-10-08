@@ -6,15 +6,22 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"二项式定理\"]\n  N1[\"定理公式\"]\n  N0 --> N1\n  N2[\"(a+b)^n = Σ C(n,k)·a^(n-k)·b^k\"]\n  N1 --> N2\n  N3[\"通项公式\"]\n  N0 --> N3\n  N4[\"Tr+1 = C(n,r)·a^(n-r)·b^r\"]\n  N3 --> N4\n  N5[\"性质\"]\n  N0 --> N5\n  N6[\"二项式系数对称性\"]\n  N5 --> N6\n  N7[\"二项式系数和 = 2^n\"]\n  N5 --> N7\n  N8[\"奇数项系数和 = 偶数项系数和\"]\n  N5 --> N8\n  N9[\"应用\"]\n  N0 --> N9\n  N10[\"求特定项\"]\n  N9 --> N10\n  N11[\"求系数\"]\n  N9 --> N11\n  N12[\"整除问题\"]\n  N9 --> N12"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"二项式定理\"]\n  N1[\"定理公式\"]\n  N0 --> N1\n  N2[\"(a+b)^n = Σ C(n,k)·a^(n-k)·b^k\"]\n  N1 --> N2\n  N3[\"通项公式\"]\n  N0 --> N3\n  N4[\"Tr+1 = C(n,r)·a^(n-r)·b^r\"]\n  N3 --> N4\n  N5[\"性质\"]\n  N0 --> N5\n  N6[\"二项式系数对称性\"]\n  N5 --> N6\n  N7[\"二项式系数和 = 2^n\"]\n  N5 --> N7\n  N8[\"奇数项系数和 = 偶数项系数和\"]\n  N5 --> N8\n  N9[\"应用\"]\n  N0 --> N9\n  N10[\"求特定项\"]\n  N9 --> N10\n  N11[\"求系数\"]\n  N9 --> N11\n  N12[\"整除问题\"]\n  N9 --> N12"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: ["掌握二项式定理及其通项公式", "理解二项式系数的性质，能求指定项的系数", "掌握赋值法求系数和的方法"]
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: ["掌握二项式定理及其通项公式", "理解二项式系数的性质，能求指定项的系数", "掌握赋值法求系数和的方法"]
+        },
+      ]
     },
 
     {

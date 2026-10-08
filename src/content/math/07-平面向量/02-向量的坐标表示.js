@@ -6,20 +6,27 @@
 export default {
   blocks: [
     {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "理解平面向量基本定理，掌握向量的坐标表示",
-        "熟练掌握向量的坐标运算（加法、减法、数乘）",
-        "掌握向量模的坐标公式和中点坐标公式",
-        "掌握共线向量的坐标条件，能判断两向量是否共线"
-      ]
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "理解平面向量基本定理，掌握向量的坐标表示",
+            "熟练掌握向量的坐标运算（加法、减法、数乘）",
+            "掌握向量模的坐标公式和中点坐标公式",
+            "掌握共线向量的坐标条件，能判断两向量是否共线"
+          ]
+        },
 
-    {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"向量的坐标表示\"]\n  N1[\"平面向量基本定理\"]\n  N0 --> N1\n  N2[\"基底 e1 e2 不共线\"]\n  N1 --> N2\n  N3[\"a = lambda1 e1 + lambda2 e2\"]\n  N1 --> N3\n  N4[\"坐标表示\"]\n  N0 --> N4\n  N5[\"a = xi + yj\"]\n  N4 --> N5\n  N6[\"a = x y\"]\n  N4 --> N6\n  N7[\"AB = x2-x1 y2-y1\"]\n  N4 --> N7\n  N8[\"坐标运算\"]\n  N0 --> N8\n  N9[\"加法 x1+x2 y1+y2\"]\n  N8 --> N9\n  N10[\"减法 x1-x2 y1-y2\"]\n  N8 --> N10\n  N11[\"数乘 lambda x lambda y\"]\n  N8 --> N11\n  N12[\"模公式\"]\n  N0 --> N12\n  N13[\"a = sqrt x2+y2\"]\n  N12 --> N13\n  N14[\"AB 距离公式\"]\n  N12 --> N14\n  N15[\"中点坐标公式\"]\n  N0 --> N15\n  N16[\"x1+x2 2 y1+y2 2\"]\n  N15 --> N16\n  N17[\"共线条件\"]\n  N0 --> N17\n  N18[\"x1 y2 - x2 y1 = 0\"]\n  N17 --> N18"
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"向量的坐标表示\"]\n  N1[\"平面向量基本定理\"]\n  N0 --> N1\n  N2[\"基底 e1 e2 不共线\"]\n  N1 --> N2\n  N3[\"a = lambda1 e1 + lambda2 e2\"]\n  N1 --> N3\n  N4[\"坐标表示\"]\n  N0 --> N4\n  N5[\"a = xi + yj\"]\n  N4 --> N5\n  N6[\"a = x y\"]\n  N4 --> N6\n  N7[\"AB = x2-x1 y2-y1\"]\n  N4 --> N7\n  N8[\"坐标运算\"]\n  N0 --> N8\n  N9[\"加法 x1+x2 y1+y2\"]\n  N8 --> N9\n  N10[\"减法 x1-x2 y1-y2\"]\n  N8 --> N10\n  N11[\"数乘 lambda x lambda y\"]\n  N8 --> N11\n  N12[\"模公式\"]\n  N0 --> N12\n  N13[\"a = sqrt x2+y2\"]\n  N12 --> N13\n  N14[\"AB 距离公式\"]\n  N12 --> N14\n  N15[\"中点坐标公式\"]\n  N0 --> N15\n  N16[\"x1+x2 2 y1+y2 2\"]\n  N15 --> N16\n  N17[\"共线条件\"]\n  N0 --> N17\n  N18[\"x1 y2 - x2 y1 = 0\"]\n  N17 --> N18"
+        },
+      ]
     },
 
     {

@@ -6,15 +6,22 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"组合\"]\n  N1[\"组合定义\"]\n  N0 --> N1\n  N2[\"从n个不同元素\"]\n  N1 --> N2\n  N3[\"取m个不分顺序\"]\n  N1 --> N3\n  N4[\"组合数公式\"]\n  N0 --> N4\n  N5[\"C(n,m) = A(n,m)/A(m,m)\"]\n  N4 --> N5\n  N6[\"C(n,m) = n!/(m!(n-m)!)\"]\n  N4 --> N6\n  N7[\"性质\"]\n  N0 --> N7\n  N8[\"C(n,m) = C(n,n-m)\"]\n  N7 --> N8\n  N9[\"C(n,m) = C(n-1,m-1) + C(n-1,m)\"]\n  N7 --> N9\n  N10[\"常见模型\"]\n  N0 --> N10\n  N11[\"选人问题\"]\n  N10 --> N11\n  N12[\"分配问题\"]\n  N10 --> N12\n  N13[\"至少至多问题\"]\n  N10 --> N13"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"组合\"]\n  N1[\"组合定义\"]\n  N0 --> N1\n  N2[\"从n个不同元素\"]\n  N1 --> N2\n  N3[\"取m个不分顺序\"]\n  N1 --> N3\n  N4[\"组合数公式\"]\n  N0 --> N4\n  N5[\"C(n,m) = A(n,m)/A(m,m)\"]\n  N4 --> N5\n  N6[\"C(n,m) = n!/(m!(n-m)!)\"]\n  N4 --> N6\n  N7[\"性质\"]\n  N0 --> N7\n  N8[\"C(n,m) = C(n,n-m)\"]\n  N7 --> N8\n  N9[\"C(n,m) = C(n-1,m-1) + C(n-1,m)\"]\n  N7 --> N9\n  N10[\"常见模型\"]\n  N0 --> N10\n  N11[\"选人问题\"]\n  N10 --> N11\n  N12[\"分配问题\"]\n  N10 --> N12\n  N13[\"至少至多问题\"]\n  N10 --> N13"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: ["理解组合的概念，掌握组合数公式及性质", "能区分排列与组合，正确选择方法解题", "掌握分组分配等经典组合问题的解法"]
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: ["理解组合的概念，掌握组合数公式及性质", "能区分排列与组合，正确选择方法解题", "掌握分组分配等经典组合问题的解法"]
+        },
+      ]
     },
 
     {

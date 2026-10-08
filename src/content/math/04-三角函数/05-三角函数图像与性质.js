@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"三角函数图像与性质\"]\n  ROOT --> A[\"正弦函数\"]\n  ROOT --> B[\"余弦函数\"]\n  ROOT --> C[\"正切函数\"]\n  ROOT --> D[\"图像变换\"]\n  A --> A1[\"y=sin x<br/>定义域R\"]\n  A --> A2[\"周期T=2π<br/>值域[-1,1]\"]\n  A --> A3[\"奇函数<br/>关于原点对称\"]\n  A --> A4[\"单调性<br/>增减区间交替\"]\n  B --> B1[\"y=cos x<br/>定义域R\"]\n  B --> B2[\"周期T=2π<br/>值域[-1,1]\"]\n  B --> B3[\"偶函数<br/>关于y轴对称\"]\n  B --> B4[\"由sin左移π/2<br/>cosx=sin(x+π/2)\"]\n  C --> C1[\"y=tan x<br/>x≠π/2+kπ\"]\n  C --> C2[\"周期T=π<br/>值域R\"]\n  C --> C3[\"奇函数<br/>渐近线x=π/2+kπ\"]\n  C --> C4[\"单调递增<br/>每个周期内递增\"]\n  D --> D1[\"振幅变换<br/>y=sinx→y=Asinx\"]\n  D --> D2[\"周期变换<br/>y=sinx→y=sinωx\"]\n  D --> D3[\"相位变换<br/>y=sinx→y=sin(x+φ)\"]\n  D --> D4[\"一般形式<br/>y=Asin(ωx+φ)<br/>T=2π/ω\"]\n  A -.->|平移π/2| B\n  B4 -.->|本质平移| D3\n  D4 -.->|综合参数| A2\n  C3 -.->|渐近线| C1"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"三角函数图像与性质\"]\n  ROOT --> A[\"正弦函数\"]\n  ROOT --> B[\"余弦函数\"]\n  ROOT --> C[\"正切函数\"]\n  ROOT --> D[\"图像变换\"]\n  A --> A1[\"y=sin x<br/>定义域R\"]\n  A --> A2[\"周期T=2π<br/>值域[-1,1]\"]\n  A --> A3[\"奇函数<br/>关于原点对称\"]\n  A --> A4[\"单调性<br/>增减区间交替\"]\n  B --> B1[\"y=cos x<br/>定义域R\"]\n  B --> B2[\"周期T=2π<br/>值域[-1,1]\"]\n  B --> B3[\"偶函数<br/>关于y轴对称\"]\n  B --> B4[\"由sin左移π/2<br/>cosx=sin(x+π/2)\"]\n  C --> C1[\"y=tan x<br/>x≠π/2+kπ\"]\n  C --> C2[\"周期T=π<br/>值域R\"]\n  C --> C3[\"奇函数<br/>渐近线x=π/2+kπ\"]\n  C --> C4[\"单调递增<br/>每个周期内递增\"]\n  D --> D1[\"振幅变换<br/>y=sinx→y=Asinx\"]\n  D --> D2[\"周期变换<br/>y=sinx→y=sinωx\"]\n  D --> D3[\"相位变换<br/>y=sinx→y=sin(x+φ)\"]\n  D --> D4[\"一般形式<br/>y=Asin(ωx+φ)<br/>T=2π/ω\"]\n  A -.->|平移π/2| B\n  B4 -.->|本质平移| D3\n  D4 -.->|综合参数| A2\n  C3 -.->|渐近线| C1"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握 \\(y = \\sin x\\)、\\(y = \\cos x\\)、\\(y = \\tan x\\) 的定义域、值域、周期性和奇偶性",
-        "理解 \\(y = A\\sin(\\omega x + \\varphi)\\) 中各参数的含义，掌握周期公式",
-        "掌握图像的平移变换和伸缩变换规律",
-        "能用五点法画出 \\(y = A\\sin(\\omega x + \\varphi)\\) 的图像"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握 \\(y = \\sin x\\)、\\(y = \\cos x\\)、\\(y = \\tan x\\) 的定义域、值域、周期性和奇偶性",
+            "理解 \\(y = A\\sin(\\omega x + \\varphi)\\) 中各参数的含义，掌握周期公式",
+            "掌握图像的平移变换和伸缩变换规律",
+            "能用五点法画出 \\(y = A\\sin(\\omega x + \\varphi)\\) 的图像"
+          ]
+        },
       ]
     },
 

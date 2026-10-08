@@ -6,15 +6,22 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"三角恒等变换\"]\n  ROOT --> A[\"两角和差公式\"]\n  ROOT --> B[\"二倍角公式\"]\n  ROOT --> C[\"半角公式\"]\n  ROOT --> D[\"辅助角公式\"]\n  ROOT --> E[\"和差化积·积化和差\"]\n  A --> A1[\"cos(α±β)=cosαcosβ∓sinαsinβ\"]\n  A --> A2[\"sin(α±β)=sinαcosβ±cosαsinβ\"]\n  A --> A3[\"tan(α±β)=(tanα±tanβ)/(1∓tanαtanβ)\"]\n  B --> B1[\"sin2α=2sinαcosα\"]\n  B --> B2[\"cos2α=cos²α-sin²α<br/>=2cos²α-1=1-2sin²α\"]\n  B --> B3[\"tan2α=2tanα/(1-tan²α)\"]\n  C --> C1[\"sin(α/2)=±√((1-cosα)/2)\"]\n  C --> C2[\"cos(α/2)=±√((1+cosα)/2)\"]\n  C --> C3[\"tan(α/2)=±√((1-cosα)/(1+cosα))\"]\n  D --> D1[\"asinα+bcosα<br/>=√(a²+b²)sin(α+φ)\"]\n  D --> D2[\"tanφ=b/a\"]\n  E --> E1[\"和差化积<br/>sinα+sinβ<br/>=2sin((α+β)/2)cos((α-β)/2)\"]\n  E --> E2[\"积化和差<br/>sinαcosβ<br/>=½·(sin(α+β)+sin(α-β))\"]\n  A -.->|\"α=β 推导\"| B\n  B -.->|\"逆用降幂\"| C\n  A -.->|\"代换推导\"| E1\n  E1 -.->|\"互逆\"| E2"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"三角恒等变换\"]\n  ROOT --> A[\"两角和差公式\"]\n  ROOT --> B[\"二倍角公式\"]\n  ROOT --> C[\"半角公式\"]\n  ROOT --> D[\"辅助角公式\"]\n  ROOT --> E[\"和差化积·积化和差\"]\n  A --> A1[\"cos(α±β)=cosαcosβ∓sinαsinβ\"]\n  A --> A2[\"sin(α±β)=sinαcosβ±cosαsinβ\"]\n  A --> A3[\"tan(α±β)=(tanα±tanβ)/(1∓tanαtanβ)\"]\n  B --> B1[\"sin2α=2sinαcosα\"]\n  B --> B2[\"cos2α=cos²α-sin²α<br/>=2cos²α-1=1-2sin²α\"]\n  B --> B3[\"tan2α=2tanα/(1-tan²α)\"]\n  C --> C1[\"sin(α/2)=±√((1-cosα)/2)\"]\n  C --> C2[\"cos(α/2)=±√((1+cosα)/2)\"]\n  C --> C3[\"tan(α/2)=±√((1-cosα)/(1+cosα))\"]\n  D --> D1[\"asinα+bcosα<br/>=√(a²+b²)sin(α+φ)\"]\n  D --> D2[\"tanφ=b/a\"]\n  E --> E1[\"和差化积<br/>sinα+sinβ<br/>=2sin((α+β)/2)cos((α-β)/2)\"]\n  E --> E2[\"积化和差<br/>sinαcosβ<br/>=½·(sin(α+β)+sin(α-β))\"]\n  A -.->|\"α=β 推导\"| B\n  B -.->|\"逆用降幂\"| C\n  A -.->|\"代换推导\"| E1\n  E1 -.->|\"互逆\"| E2"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: ["掌握两角和与差的正弦、余弦、正切公式", "熟练运用二倍角公式进行化简求值", "了解降幂公式和辅助角公式的应用", "能综合运用公式解决三角恒等变换问题"]
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: ["掌握两角和与差的正弦、余弦、正切公式", "熟练运用二倍角公式进行化简求值", "了解降幂公式和辅助角公式的应用", "能综合运用公式解决三角恒等变换问题"]
+        },
+      ]
     },
 
     {

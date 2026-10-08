@@ -5,58 +5,65 @@
  */
 export default {
   blocks: [
-    // ---------- 知识结构导图 ----------
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: `graph LR
-  N0["Windows 网络配置与命令"]
-  N1["IP 地址配置"]
-  N0 --> N1
-  N2["静态 IP"]
-  N1 --> N2
-  N3["自动获取 DHCP"]
-  N1 --> N3
-  N4["网络命令"]
-  N0 --> N4
-  N5["ipconfig"]
-  N4 --> N5
-  N6["ping"]
-  N4 --> N6
-  N7["tracert"]
-  N4 --> N7
-  N8["netstat"]
-  N4 --> N8
-  N9["arp"]
-  N4 --> N9
-  N10["故障排查"]
-  N0 --> N10
-  N11["ipconfig 查看"]
-  N11 --> N12
-  N12["ping 定位"]
-  N10 --> N12
-  N13["常见故障"]
-  N0 --> N13
-  N14["IP 冲突"]
-  N13 --> N14
-  N15["网关错误"]
-  N13 --> N15
-  N16["DNS 故障"]
-  N13 --> N16
-  N17["网络共享"]
-  N0 --> N17
-  N18["文件共享"]
-  N17 --> N18`
-    },
-    // ---------- 学习目标 ----------
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握 Windows 中静态 IP 与自动获取 IP 的配置方法",
-        "掌握 ipconfig、ping、tracert 等常用网络命令的用法",
-        "能使用网络命令进行网络故障的分析、定位与排除",
-        "了解网络资源共享的配置方法"
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        // ---------- 知识结构导图 ----------
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: `graph LR
+      N0["Windows 网络配置与命令"]
+      N1["IP 地址配置"]
+      N0 --> N1
+      N2["静态 IP"]
+      N1 --> N2
+      N3["自动获取 DHCP"]
+      N1 --> N3
+      N4["网络命令"]
+      N0 --> N4
+      N5["ipconfig"]
+      N4 --> N5
+      N6["ping"]
+      N4 --> N6
+      N7["tracert"]
+      N4 --> N7
+      N8["netstat"]
+      N4 --> N8
+      N9["arp"]
+      N4 --> N9
+      N10["故障排查"]
+      N0 --> N10
+      N11["ipconfig 查看"]
+      N11 --> N12
+      N12["ping 定位"]
+      N10 --> N12
+      N13["常见故障"]
+      N0 --> N13
+      N14["IP 冲突"]
+      N13 --> N14
+      N15["网关错误"]
+      N13 --> N15
+      N16["DNS 故障"]
+      N13 --> N16
+      N17["网络共享"]
+      N0 --> N17
+      N18["文件共享"]
+      N17 --> N18`
+        },
+        // ---------- 学习目标 ----------
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握 Windows 中静态 IP 与自动获取 IP 的配置方法",
+            "掌握 ipconfig、ping、tracert 等常用网络命令的用法",
+            "能使用网络命令进行网络故障的分析、定位与排除",
+            "了解网络资源共享的配置方法"
+          ]
+        },
       ]
     },
     // ---------- 知识点 ----------

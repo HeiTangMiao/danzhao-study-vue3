@@ -5,58 +5,65 @@
  */
 export default {
   blocks: [
-    // ---------- 知识结构导图 ----------
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: `graph LR
-  N0["交换机配置与 VLAN"]
-  N1["交换机基本配置"]
-  N0 --> N1
-  N2["设备命名"]
-  N1 --> N2
-  N3["VLAN 概念"]
-  N0 --> N3
-  N4["划分广播域"]
-  N3 --> N4
-  N5["隔离广播"]
-  N3 --> N5
-  N6["创建 VLAN"]
-  N0 --> N6
-  N7["vlan 命令"]
-  N6 --> N7
-  N8["命名 vlan"]
-  N6 --> N8
-  N9["端口划分"]
-  N0 --> N9
-  N10["access 模式"]
-  N9 --> N10
-  N11["switchport access vlan"]
-  N9 --> N11
-  N12["Trunk 端口"]
-  N0 --> N12
-  N13["跨交换机传输"]
-  N12 --> N13
-  N14["switchport mode trunk"]
-  N12 --> N14
-  N15["端口聚合"]
-  N0 --> N15
-  N16["channel-group"]
-  N15 --> N16
-  N17["保存配置"]
-  N0 --> N17
-  N18["copy running-config"]
-  N17 --> N18`
-    },
-    // ---------- 学习目标 ----------
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "理解 VLAN 的作用：划分广播域、隔离广播、提高安全性",
-        "掌握创建 VLAN、命名 VLAN 的命令",
-        "掌握将端口划入 VLAN（access 模式）的命令",
-        "掌握 Trunk 端口配置与端口聚合（channel-group）配置"
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        // ---------- 知识结构导图 ----------
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: `graph LR
+      N0["交换机配置与 VLAN"]
+      N1["交换机基本配置"]
+      N0 --> N1
+      N2["设备命名"]
+      N1 --> N2
+      N3["VLAN 概念"]
+      N0 --> N3
+      N4["划分广播域"]
+      N3 --> N4
+      N5["隔离广播"]
+      N3 --> N5
+      N6["创建 VLAN"]
+      N0 --> N6
+      N7["vlan 命令"]
+      N6 --> N7
+      N8["命名 vlan"]
+      N6 --> N8
+      N9["端口划分"]
+      N0 --> N9
+      N10["access 模式"]
+      N9 --> N10
+      N11["switchport access vlan"]
+      N9 --> N11
+      N12["Trunk 端口"]
+      N0 --> N12
+      N13["跨交换机传输"]
+      N12 --> N13
+      N14["switchport mode trunk"]
+      N12 --> N14
+      N15["端口聚合"]
+      N0 --> N15
+      N16["channel-group"]
+      N15 --> N16
+      N17["保存配置"]
+      N0 --> N17
+      N18["copy running-config"]
+      N17 --> N18`
+        },
+        // ---------- 学习目标 ----------
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "理解 VLAN 的作用：划分广播域、隔离广播、提高安全性",
+            "掌握创建 VLAN、命名 VLAN 的命令",
+            "掌握将端口划入 VLAN（access 模式）的命令",
+            "掌握 Trunk 端口配置与端口聚合（channel-group）配置"
+          ]
+        },
       ]
     },
     // ---------- 知识点 ----------

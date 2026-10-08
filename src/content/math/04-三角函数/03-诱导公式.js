@@ -6,15 +6,22 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"诱导公式<br/>奇变偶不变·符号看象限\"]\n  ROOT --> A1[\"公式一 2kπ+α\"]\n  ROOT --> A2[\"公式二 π+α\"]\n  ROOT --> A3[\"公式三 -α\"]\n  ROOT --> A4[\"公式四 π-α\"]\n  ROOT --> A5[\"公式五六 π/2±α\"]\n  A1 --> A1a[\"sin(2kπ+α)=sinα<br/>cos(2kπ+α)=cosα<br/>tan(2kπ+α)=tanα\"]\n  A1 --> A1c[\"偶不变·函数名不变\"]\n  A2 --> A2a[\"sin(π+α)=-sinα<br/>cos(π+α)=-cosα<br/>tan(π+α)=tanα\"]\n  A3 --> A3a[\"sin(-α)=-sinα<br/>cos(-α)=cosα<br/>tan(-α)=-tanα\"]\n  A4 --> A4a[\"sin(π-α)=sinα<br/>cos(π-α)=-cosα<br/>tan(π-α)=-tanα\"]\n  A5 --> A5a[\"π/2-α<br/>sin(π/2-α)=cosα<br/>cos(π/2-α)=sinα<br/>tan(π/2-α)=cotα\"]\n  A5 --> A5b[\"π/2+α<br/>sin(π/2+α)=cosα<br/>cos(π/2+α)=-sinα<br/>tan(π/2+α)=-cotα\"]\n  A5 --> A5c[\"奇变·函数名改变\"]\n  A2 -.->|\"原点对称\"| A3\n  A4 -.->|\"y轴对称\"| A2\n  A5c -.->|\"奇变规律\"| A1c"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"诱导公式<br/>奇变偶不变·符号看象限\"]\n  ROOT --> A1[\"公式一 2kπ+α\"]\n  ROOT --> A2[\"公式二 π+α\"]\n  ROOT --> A3[\"公式三 -α\"]\n  ROOT --> A4[\"公式四 π-α\"]\n  ROOT --> A5[\"公式五六 π/2±α\"]\n  A1 --> A1a[\"sin(2kπ+α)=sinα<br/>cos(2kπ+α)=cosα<br/>tan(2kπ+α)=tanα\"]\n  A1 --> A1c[\"偶不变·函数名不变\"]\n  A2 --> A2a[\"sin(π+α)=-sinα<br/>cos(π+α)=-cosα<br/>tan(π+α)=tanα\"]\n  A3 --> A3a[\"sin(-α)=-sinα<br/>cos(-α)=cosα<br/>tan(-α)=-tanα\"]\n  A4 --> A4a[\"sin(π-α)=sinα<br/>cos(π-α)=-cosα<br/>tan(π-α)=-tanα\"]\n  A5 --> A5a[\"π/2-α<br/>sin(π/2-α)=cosα<br/>cos(π/2-α)=sinα<br/>tan(π/2-α)=cotα\"]\n  A5 --> A5b[\"π/2+α<br/>sin(π/2+α)=cosα<br/>cos(π/2+α)=-sinα<br/>tan(π/2+α)=-cotα\"]\n  A5 --> A5c[\"奇变·函数名改变\"]\n  A2 -.->|\"原点对称\"| A3\n  A4 -.->|\"y轴对称\"| A2\n  A5c -.->|\"奇变规律\"| A1c"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: ["理解诱导公式的推导过程，掌握口诀\"奇变偶不变，符号看象限\"", "熟练运用诱导公式进行三角函数式的化简和求值", "能利用诱导公式证明简单的三角恒等式"]
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: ["理解诱导公式的推导过程，掌握口诀\"奇变偶不变，符号看象限\"", "熟练运用诱导公式进行三角函数式的化简和求值", "能利用诱导公式证明简单的三角恒等式"]
+        },
+      ]
     },
 
     {

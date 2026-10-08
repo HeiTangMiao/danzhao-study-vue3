@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"等比数列\"]\n  N1[\"定义\"]\n  N0 --> N1\n  N2[\"an/an-1 = q\"]\n  N1 --> N2\n  N3[\"公比 q\"]\n  N1 --> N3\n  N4[\"通项公式\"]\n  N0 --> N4\n  N5[\"an = a1·q^(n-1)\"]\n  N4 --> N5\n  N6[\"前n项和\"]\n  N0 --> N6\n  N7[\"q ≠ 1: Sn = a1(1-q^n)/(1-q)\"]\n  N6 --> N7\n  N8[\"q = 1: Sn = na1\"]\n  N6 --> N8\n  N9[\"性质\"]\n  N0 --> N9\n  N10[\"下标和性质\"]\n  N9 --> N10\n  N11[\"等比中项\"]\n  N9 --> N11\n  N12[\"Sm S2m-Sm ...\"]\n  N9 --> N12"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"等比数列\"]\n  N1[\"定义\"]\n  N0 --> N1\n  N2[\"an/an-1 = q\"]\n  N1 --> N2\n  N3[\"公比 q\"]\n  N1 --> N3\n  N4[\"通项公式\"]\n  N0 --> N4\n  N5[\"an = a1·q^(n-1)\"]\n  N4 --> N5\n  N6[\"前n项和\"]\n  N0 --> N6\n  N7[\"q ≠ 1: Sn = a1(1-q^n)/(1-q)\"]\n  N6 --> N7\n  N8[\"q = 1: Sn = na1\"]\n  N6 --> N8\n  N9[\"性质\"]\n  N0 --> N9\n  N10[\"下标和性质\"]\n  N9 --> N10\n  N11[\"等比中项\"]\n  N9 --> N11\n  N12[\"Sm S2m-Sm ...\"]\n  N9 --> N12"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "理解等比数列的定义，掌握等比中项的概念",
-        "熟练运用等比数列的通项公式和前 \\(n\\) 项和公式",
-        "掌握等比数列的重要性质，能灵活运用解题",
-        "注意公式中 \\(q = 1\\) 和 \\(q \\neq 1\\) 的分类讨论"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "理解等比数列的定义，掌握等比中项的概念",
+            "熟练运用等比数列的通项公式和前 \\(n\\) 项和公式",
+            "掌握等比数列的重要性质，能灵活运用解题",
+            "注意公式中 \\(q = 1\\) 和 \\(q \\neq 1\\) 的分类讨论"
+          ]
+        },
       ]
     },
 

@@ -6,15 +6,22 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  N0[\"排列\"]\n  N1[\"排列定义\"]\n  N0 --> N1\n  N2[\"从n个不同元素\"]\n  N1 --> N2\n  N3[\"取m个按顺序排列\"]\n  N1 --> N3\n  N4[\"排列数公式\"]\n  N0 --> N4\n  N5[\"A(n,m) = n!/(n-m)!\"]\n  N4 --> N5\n  N6[\"A(n,n) = n!\"]\n  N4 --> N6\n  N7[\"性质\"]\n  N0 --> N7\n  N8[\"A(n,m) = n·A(n-1,m-1)\"]\n  N7 --> N8\n  N9[\"A(n,m) = A(n,m-1)·(n-m+1)\"]\n  N7 --> N9\n  N10[\"常见模型\"]\n  N0 --> N10\n  N11[\"排队问题\"]\n  N10 --> N11\n  N12[\"定位问题\"]\n  N10 --> N12\n  N13[\"相邻与不相邻\"]\n  N10 --> N13"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  N0[\"排列\"]\n  N1[\"排列定义\"]\n  N0 --> N1\n  N2[\"从n个不同元素\"]\n  N1 --> N2\n  N3[\"取m个按顺序排列\"]\n  N1 --> N3\n  N4[\"排列数公式\"]\n  N0 --> N4\n  N5[\"A(n,m) = n!/(n-m)!\"]\n  N4 --> N5\n  N6[\"A(n,n) = n!\"]\n  N4 --> N6\n  N7[\"性质\"]\n  N0 --> N7\n  N8[\"A(n,m) = n·A(n-1,m-1)\"]\n  N7 --> N8\n  N9[\"A(n,m) = A(n,m-1)·(n-m+1)\"]\n  N7 --> N9\n  N10[\"常见模型\"]\n  N0 --> N10\n  N11[\"排队问题\"]\n  N10 --> N11\n  N12[\"定位问题\"]\n  N10 --> N12\n  N13[\"相邻与不相邻\"]\n  N10 --> N13"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: ["理解排列的概念，掌握排列数公式及阶乘运算", "能用排列数公式解决简单的排列问题", "掌握捆绑法、插空法等经典排列解题方法"]
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: ["理解排列的概念，掌握排列数公式及阶乘运算", "能用排列数公式解决简单的排列问题", "掌握捆绑法、插空法等经典排列解题方法"]
+        },
+      ]
     },
 
     {

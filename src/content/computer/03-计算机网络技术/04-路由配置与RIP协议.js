@@ -5,58 +5,65 @@
  */
 export default {
   blocks: [
-    // ---------- 知识结构导图 ----------
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: `graph LR
-  N0["路由配置与 RIP 协议"]
-  N1["路由器基本配置"]
-  N0 --> N1
-  N2["接口 IP 配置"]
-  N1 --> N2
-  N3["no shutdown"]
-  N1 --> N3
-  N4["静态路由"]
-  N0 --> N4
-  N5["ip route 命令"]
-  N4 --> N5
-  N6["默认路由"]
-  N4 --> N6
-  N7["RIP 动态路由"]
-  N0 --> N7
-  N8["router rip"]
-  N7 --> N8
-  N9["version 2"]
-  N7 --> N9
-  N10["network 宣告"]
-  N7 --> N10
-  N11["取消自动汇总"]
-  N7 --> N11
-  N12["路由重发布"]
-  N0 --> N12
-  N13["redistribute static"]
-  N12 --> N13
-  N14["三层交换"]
-  N0 --> N14
-  N15["ip routing"]
-  N14 --> N15
-  N16["SVI 接口"]
-  N14 --> N16
-  N17["全网互通"]
-  N0 --> N17
-  N18["ping 测试"]
-  N17 --> N18`
-    },
-    // ---------- 学习目标 ----------
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握路由器接口 IP 地址的配置方法",
-        "掌握静态路由与默认路由的配置命令",
-        "掌握 RIP 动态路由协议（RIPv2）的配置方法",
-        "理解三层交换机的路由功能与 SVI 接口配置"
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        // ---------- 知识结构导图 ----------
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: `graph LR
+      N0["路由配置与 RIP 协议"]
+      N1["路由器基本配置"]
+      N0 --> N1
+      N2["接口 IP 配置"]
+      N1 --> N2
+      N3["no shutdown"]
+      N1 --> N3
+      N4["静态路由"]
+      N0 --> N4
+      N5["ip route 命令"]
+      N4 --> N5
+      N6["默认路由"]
+      N4 --> N6
+      N7["RIP 动态路由"]
+      N0 --> N7
+      N8["router rip"]
+      N7 --> N8
+      N9["version 2"]
+      N7 --> N9
+      N10["network 宣告"]
+      N7 --> N10
+      N11["取消自动汇总"]
+      N7 --> N11
+      N12["路由重发布"]
+      N0 --> N12
+      N13["redistribute static"]
+      N12 --> N13
+      N14["三层交换"]
+      N0 --> N14
+      N15["ip routing"]
+      N14 --> N15
+      N16["SVI 接口"]
+      N14 --> N16
+      N17["全网互通"]
+      N0 --> N17
+      N18["ping 测试"]
+      N17 --> N18`
+        },
+        // ---------- 学习目标 ----------
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握路由器接口 IP 地址的配置方法",
+            "掌握静态路由与默认路由的配置命令",
+            "掌握 RIP 动态路由协议（RIPv2）的配置方法",
+            "理解三层交换机的路由功能与 SVI 接口配置"
+          ]
+        },
       ]
     },
     // ---------- 知识点 ----------

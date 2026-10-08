@@ -6,19 +6,26 @@
 export default {
   blocks: [
     {
-      type: "mindmap",
-      title: "知识结构导图",
-      mermaid: "graph LR\n  ROOT[\"三角函数定义与同角关系\"]\n  ROOT --> A[\"坐标定义\"]\n  ROOT --> B[\"定义域与值域\"]\n  ROOT --> C[\"同角基本关系\"]\n  ROOT --> D[\"符号规律\"]\n  A --> A1[\"正弦<br/>sinα=y/r\"]\n  A --> A2[\"余弦<br/>cosα=x/r\"]\n  A --> A3[\"正切<br/>tanα=y/x\"]\n  A --> A4[\"单位圆特例<br/>r=1, sinα=y, cosα=x\"]\n  B --> B1[\"sin、cos<br/>定义域为R\"]\n  B --> B2[\"tan<br/>x≠π/2+kπ\"]\n  B --> B3[\"值域<br/>sin、cos∈[-1,1]<br/>tan∈R\"]\n  C --> C1[\"平方关系<br/>sin²α+cos²α=1\"]\n  C --> C2[\"商数关系<br/>tanα=sinα/cosα\"]\n  C --> C3[\"常用变形<br/>sin²α=1-cos²α\"]\n  D --> D1[\"一全正<br/>第一象限全正\"]\n  D --> D2[\"二正弦<br/>第二象限sin正\"]\n  D --> D3[\"三正切<br/>第三象限tan正\"]\n  D --> D4[\"四余弦<br/>第四象限cos正\"]\n  A3 -.->|定义限制| B2\n  A4 -.->|推导关系| C1\n  C1 -.->|开方定号| D"
-    },
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "mindmap",
+          title: "知识结构导图",
+          mermaid: "graph LR\n  ROOT[\"三角函数定义与同角关系\"]\n  ROOT --> A[\"坐标定义\"]\n  ROOT --> B[\"定义域与值域\"]\n  ROOT --> C[\"同角基本关系\"]\n  ROOT --> D[\"符号规律\"]\n  A --> A1[\"正弦<br/>sinα=y/r\"]\n  A --> A2[\"余弦<br/>cosα=x/r\"]\n  A --> A3[\"正切<br/>tanα=y/x\"]\n  A --> A4[\"单位圆特例<br/>r=1, sinα=y, cosα=x\"]\n  B --> B1[\"sin、cos<br/>定义域为R\"]\n  B --> B2[\"tan<br/>x≠π/2+kπ\"]\n  B --> B3[\"值域<br/>sin、cos∈[-1,1]<br/>tan∈R\"]\n  C --> C1[\"平方关系<br/>sin²α+cos²α=1\"]\n  C --> C2[\"商数关系<br/>tanα=sinα/cosα\"]\n  C --> C3[\"常用变形<br/>sin²α=1-cos²α\"]\n  D --> D1[\"一全正<br/>第一象限全正\"]\n  D --> D2[\"二正弦<br/>第二象限sin正\"]\n  D --> D3[\"三正切<br/>第三象限tan正\"]\n  D --> D4[\"四余弦<br/>第四象限cos正\"]\n  A3 -.->|定义限制| B2\n  A4 -.->|推导关系| C1\n  C1 -.->|开方定号| D"
+        },
 
-    {
-      type: "objectives",
-      title: "学习目标",
-      items: [
-        "掌握任意角的三角函数定义，能利用定义求三角函数值",
-        "熟记三角函数值在各象限的符号规律",
-        "掌握同角三角函数的基本关系式，能进行化简求值",
-        "熟记特殊角的三角函数值"
+        {
+          type: "objectives",
+          title: "学习目标",
+          items: [
+            "掌握任意角的三角函数定义，能利用定义求三角函数值",
+            "熟记三角函数值在各象限的符号规律",
+            "掌握同角三角函数的基本关系式，能进行化简求值",
+            "熟记特殊角的三角函数值"
+          ]
+        },
       ]
     },
 
