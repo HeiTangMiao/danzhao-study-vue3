@@ -92,7 +92,10 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "小说三要素中，居于中心地位的是（　）\nA. 情节　　B. 环境　　C. 人物　　D. 主题",
+          type: "single",
+          question: "小说三要素中，居于中心地位的是（　）",
+          options: ["A. 情节", "B. 环境", "C. 人物", "D. 主题"],
+          correctIndex: 2,
           answer: "答案：C。小说以塑造人物形象为中心，情节和环境都是为表现人物性格服务的。主题通过人物形象来体现。"
         },
         {

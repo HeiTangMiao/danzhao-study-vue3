@@ -196,7 +196,10 @@ export default {
         },
         {
           difficulty: "basic",
-          question: "下列函数中，既是奇函数又是增函数的是（　）\nA. \\(y = x^2\\)　　B. \\(y = -x\\)　　C. \\(y = x^3\\)　　D. \\(y = \\frac{1}{x}\\)",
+          type: "single",
+          question: "下列函数中，既是奇函数又是增函数的是（　）",
+          options: ["A. \\(y = x^2\\)", "B. \\(y = -x\\)", "C. \\(y = x^3\\)", "D. \\(y = \\frac{1}{x}\\)"],
+          correctIndex: 2,
           answer: "答案：C。\\(y=x^2\\) 是偶函数。\\(y=-x\\) 是奇函数但是减函数。\\(y=x^3\\) 是奇函数且在 \\(\\mathbb{R}\\) 上单调递增。\\(y=\\frac{1}{x}\\) 是奇函数但在 \\((0,+\\infty)\\) 上递减。"
         },
         {

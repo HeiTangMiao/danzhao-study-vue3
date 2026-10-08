@@ -20,42 +20,66 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "过两点 \\(A(1, 1)\\)、\\(B(3, 5)\\) 的直线的斜率为（　）\nA. \\(1\\)　　B. \\(2\\)　　C. \\(\\dfrac{1}{2}\\)　　D. \\(-2\\)",
+          type: "single",
+          question: "过两点 \\(A(1, 1)\\)、\\(B(3, 5)\\) 的直线的斜率为（　）",
+          options: ["A. \\(1\\)", "B. \\(2\\)", "C. \\(\\dfrac{1}{2}\\)", "D. \\(-2\\)"],
+          correctIndex: 1,
           answer: "**B**。\\(k = \\dfrac{5 - 1}{3 - 1} = \\dfrac{4}{2} = 2\\)。"
         },
         {
           difficulty: "basic",
-          question: "过点 \\((1, 1)\\) 且与直线 \\(y = 3x + 2\\) 平行的直线方程为（　）\nA. \\(3x - y - 2 = 0\\)　　B. \\(3x - y + 2 = 0\\)　　C. \\(x - 3y - 2 = 0\\)　　D. \\(y = 3x + 1\\)",
+          type: "single",
+          question: "过点 \\((1, 1)\\) 且与直线 \\(y = 3x + 2\\) 平行的直线方程为（　）",
+          options: ["A. \\(3x - y - 2 = 0\\)", "B. \\(3x - y + 2 = 0\\)", "C. \\(x - 3y - 2 = 0\\)", "D. \\(y = 3x + 1\\)"],
+          correctIndex: 0,
           answer: "**A**。平行则斜率相同 \\(k = 3\\)，点斜式 \\(y - 1 = 3(x - 1)\\)，即 \\(3x - y - 2 = 0\\)。"
         },
         {
           difficulty: "medium",
-          question: "直线 \\(y = x - 1\\) 被椭圆 \\(\\dfrac{x^2}{4} + \\dfrac{y^2}{2} = 1\\) 截得的弦长为（　）\nA. \\(\\dfrac{4\\sqrt{5}}{3}\\)　　B. \\(\\dfrac{2\\sqrt{5}}{3}\\)　　C. \\(\\dfrac{4}{3}\\)　　D. \\(\\sqrt{5}\\)",
+          type: "single",
+          question: "直线 \\(y = x - 1\\) 被椭圆 \\(\\dfrac{x^2}{4} + \\dfrac{y^2}{2} = 1\\) 截得的弦长为（　）",
+          options: ["A. \\(\\dfrac{4\\sqrt{5}}{3}\\)", "B. \\(\\dfrac{2\\sqrt{5}}{3}\\)", "C. \\(\\dfrac{4}{3}\\)", "D. \\(\\sqrt{5}\\)"],
+          correctIndex: 0,
           answer: "**A**。代入得 \\(3x^2 - 4x - 2 = 0\\)，韦达定理 \\(x_1 + x_2 = \\dfrac{4}{3}\\)，\\(x_1x_2 = -\\dfrac{2}{3}\\)。\n弦长 \\(= \\sqrt{1+k^2}\\sqrt{(x_1+x_2)^2 - 4x_1x_2} = \\sqrt{2} \\times \\dfrac{\\sqrt{40}}{3} = \\dfrac{4\\sqrt{5}}{3}\\)。"
         },
         {
           difficulty: "basic",
-          question: "圆 \\((x-1)^2 + (y+2)^2 = 9\\) 的圆心和半径分别是（　）\nA. \\((1, -2)\\)，\\(r = 3\\)　　B. \\((-1, 2)\\)，\\(r = 3\\)　　C. \\((1, -2)\\)，\\(r = 9\\)　　D. \\((-1, 2)\\)，\\(r = 9\\)",
+          type: "single",
+          question: "圆 \\((x-1)^2 + (y+2)^2 = 9\\) 的圆心和半径分别是（　）",
+          options: ["A. \\((1, -2)\\)，\\(r = 3\\)", "B. \\((-1, 2)\\)，\\(r = 3\\)", "C. \\((1, -2)\\)，\\(r = 9\\)", "D. \\((-1, 2)\\)，\\(r = 9\\)"],
+          correctIndex: 0,
           answer: "**A**。由标准方程 \\((x - a)^2 + (y - b)^2 = r^2\\) 直接读出圆心 \\((1, -2)\\)，半径 \\(r = 3\\)。"
         },
         {
           difficulty: "medium",
-          question: "直线 \\(x - y + 1 = 0\\) 与圆 \\(x^2 + y^2 = 2\\) 的位置关系是（　）\nA. 相离　　B. 相切　　C. 相交　　D. 无法判断",
+          type: "single",
+          question: "直线 \\(x - y + 1 = 0\\) 与圆 \\(x^2 + y^2 = 2\\) 的位置关系是（　）",
+          options: ["A. 相离", "B. 相切", "C. 相交", "D. 无法判断"],
+          correctIndex: 2,
           answer: "**C**。圆心 \\((0,0)\\)，半径 \\(r = \\sqrt{2}\\)。圆心到直线距离 \\(d = \\dfrac{|1|}{\\sqrt{2}} = \\dfrac{\\sqrt{2}}{2} < r\\)，所以直线与圆相交。"
         },
         {
           difficulty: "basic",
-          question: "椭圆 \\(\\dfrac{x^2}{25} + \\dfrac{y^2}{16} = 1\\) 的焦距为（　）\nA. \\(4\\)　　B. \\(6\\)　　C. \\(8\\)　　D. \\(9\\)",
+          type: "single",
+          question: "椭圆 \\(\\dfrac{x^2}{25} + \\dfrac{y^2}{16} = 1\\) 的焦距为（　）",
+          options: ["A. \\(4\\)", "B. \\(6\\)", "C. \\(8\\)", "D. \\(9\\)"],
+          correctIndex: 1,
           answer: "**B**。\\(a = 5\\)，\\(b = 4\\)，\\(c = \\sqrt{a^2 - b^2} = \\sqrt{25 - 16} = 3\\)，焦距 \\(2c = 6\\)。"
         },
         {
           difficulty: "medium",
-          question: "双曲线 \\(\\dfrac{x^2}{16} - \\dfrac{y^2}{9} = 1\\) 的渐近线方程为（　）\nA. \\(y = \\pm \\dfrac{3}{4} x\\)　　B. \\(y = \\pm \\dfrac{4}{3} x\\)　　C. \\(y = \\pm x\\)　　D. \\(y = \\pm \\dfrac{16}{9} x\\)",
+          type: "single",
+          question: "双曲线 \\(\\dfrac{x^2}{16} - \\dfrac{y^2}{9} = 1\\) 的渐近线方程为（　）",
+          options: ["A. \\(y = \\pm \\dfrac{3}{4} x\\)", "B. \\(y = \\pm \\dfrac{4}{3} x\\)", "C. \\(y = \\pm x\\)", "D. \\(y = \\pm \\dfrac{16}{9} x\\)"],
+          correctIndex: 0,
           answer: "**A**。\\(a = 4\\)，\\(b = 3\\)，渐近线 \\(y = \\pm \\dfrac{b}{a} x = \\pm \\dfrac{3}{4} x\\)。"
         },
         {
           difficulty: "basic",
-          question: "抛物线 \\(y^2 = 12x\\) 的焦点坐标为（　）\nA. \\((3, 0)\\)　　B. \\((6, 0)\\)　　C. \\((-3, 0)\\)　　D. \\((0, 3)\\)",
+          type: "single",
+          question: "抛物线 \\(y^2 = 12x\\) 的焦点坐标为（　）",
+          options: ["A. \\((3, 0)\\)", "B. \\((6, 0)\\)", "C. \\((-3, 0)\\)", "D. \\((0, 3)\\)"],
+          correctIndex: 0,
           answer: "**A**。\\(2p = 12\\)，\\(p = 6\\)。开口向右，焦点 \\(\\left(\\dfrac{p}{2}, 0\\right) = (3, 0)\\)。"
         }
       ]

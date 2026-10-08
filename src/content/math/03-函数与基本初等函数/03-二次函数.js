@@ -170,7 +170,10 @@ export default {
         },
         {
           difficulty: "basic",
-          question: "已知二次函数 \\(y = ax^2 + bx + c\\) 的图像如图所示（开口向下，对称轴 \\(x=1\\)，过原点），则下列正确的是（　）\nA. \\(a > 0, b > 0, c = 0\\)\nB. \\(a < 0, b > 0, c = 0\\)\nC. \\(a < 0, b < 0, c = 0\\)\nD. \\(a < 0, b = 0, c = 0\\)",
+          type: "single",
+          question: "已知二次函数 \\(y = ax^2 + bx + c\\) 的图像如图所示（开口向下，对称轴 \\(x=1\\)，过原点），则下列正确的是（　）",
+          options: ["A. \\(a > 0, b > 0, c = 0\\)", "B. \\(a < 0, b > 0, c = 0\\)", "C. \\(a < 0, b < 0, c = 0\\)", "D. \\(a < 0, b = 0, c = 0\\)"],
+          correctIndex: 1,
           answer: "答案：B。开口向下 \\(\\Rightarrow a < 0\\)，对称轴 \\(x = -\\frac{b}{2a} = 1 \\Rightarrow b > 0\\)，过原点 \\(\\Rightarrow c = 0\\)。"
         },
         {

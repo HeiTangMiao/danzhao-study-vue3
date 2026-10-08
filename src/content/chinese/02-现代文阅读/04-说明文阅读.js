@@ -100,7 +100,10 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "下列不属于说明方法的是（　）\nA. 举例子　　B. 打比方　　C. 借代　　D. 列数字",
+          type: "single",
+          question: "下列不属于说明方法的是（　）",
+          options: ["A. 举例子", "B. 打比方", "C. 借代", "D. 列数字"],
+          correctIndex: 2,
           answer: "答案：C。借代属于修辞手法，不是说明方法。举例子、打比方、列数字都是常见说明方法。"
         },
         {

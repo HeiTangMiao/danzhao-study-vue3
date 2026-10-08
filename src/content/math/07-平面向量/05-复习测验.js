@@ -19,42 +19,66 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "已知向量 \\(\\boldsymbol{a} = (2, 3)\\)，\\(\\boldsymbol{b} = (-1, 4)\\)，则 \\(\\boldsymbol{a} + \\boldsymbol{b} =\\)（　）\nA. \\((-1, 7)\\)　　B. \\((1, 7)\\)　　C. \\((3, -1)\\)　　D. \\((3, 1)\\)",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (2, 3)\\)，\\(\\boldsymbol{b} = (-1, 4)\\)，则 \\(\\boldsymbol{a} + \\boldsymbol{b} =\\)（　）",
+          options: ["A. \\((-1, 7)\\)", "B. \\((1, 7)\\)", "C. \\((3, -1)\\)", "D. \\((3, 1)\\)"],
+          correctIndex: 1,
           answer: "**B**。\\(\\boldsymbol{a} + \\boldsymbol{b} = (2 + (-1), 3 + 4) = (1, 7)\\)。"
         },
         {
           difficulty: "basic",
-          question: "已知向量 \\(\\boldsymbol{a} = (3, 4)\\)，则 \\(|\\boldsymbol{a}| =\\)（　）\nA. 5　　B. 7　　C. 25　　D. 12",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (3, 4)\\)，则 \\(|\\boldsymbol{a}| =\\)（　）",
+          options: ["A. 5", "B. 7", "C. 25", "D. 12"],
+          correctIndex: 0,
           answer: "**A**。\\(|\\boldsymbol{a}| = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知向量 \\(\\boldsymbol{a} = (2, 1)\\)，\\(\\boldsymbol{b} = (m, 3)\\)，若 \\(\\boldsymbol{a} \\parallel \\boldsymbol{b}\\)，则 \\(m =\\)（　）\nA. 6　　B. 3　　C. 4　　D. -6",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (2, 1)\\)，\\(\\boldsymbol{b} = (m, 3)\\)，若 \\(\\boldsymbol{a} \\parallel \\boldsymbol{b}\\)，则 \\(m =\\)（　）",
+          options: ["A. 6", "B. 3", "C. 4", "D. -6"],
+          correctIndex: 0,
           answer: "**A**。由共线条件 \\(x_1 y_2 - x_2 y_1 = 0\\)，即 \\(2\\times 3 - m\\times 1 = 0\\)，解得 \\(m = 6\\)。"
         },
         {
           difficulty: "basic",
-          question: "已知向量 \\(\\boldsymbol{a} = (3, -2)\\)，\\(\\boldsymbol{b} = (1, 4)\\)，则 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} =\\)（　）\nA. 5　　B. -5　　C. 11　　D. -11",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (3, -2)\\)，\\(\\boldsymbol{b} = (1, 4)\\)，则 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} =\\)（　）",
+          options: ["A. 5", "B. -5", "C. 11", "D. -11"],
+          correctIndex: 1,
           answer: "**B**。\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 3\\times 1 + (-2)\\times 4 = 3 - 8 = -5\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知向量 \\(\\boldsymbol{a} = (1, 2)\\)，\\(\\boldsymbol{b} = (m, -1)\\)，若 \\(\\boldsymbol{a} \\perp \\boldsymbol{b}\\)，则 \\(m =\\)（　）\nA. -2　　B. 2　　C. 1　　D. -1",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (1, 2)\\)，\\(\\boldsymbol{b} = (m, -1)\\)，若 \\(\\boldsymbol{a} \\perp \\boldsymbol{b}\\)，则 \\(m =\\)（　）",
+          options: ["A. -2", "B. 2", "C. 1", "D. -1"],
+          correctIndex: 1,
           answer: "**B**。由垂直条件 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\)，即 \\(m - 2 = 0\\)，解得 \\(m = 2\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知向量 \\(\\boldsymbol{a} = (1, \\sqrt{3})\\)，\\(\\boldsymbol{b} = (\\sqrt{3}, 1)\\)，则 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 的夹角为（　）\nA. \\(\\frac{\\pi}{3}\\)　　B. \\(\\frac{\\pi}{4}\\)　　C. \\(\\frac{\\pi}{6}\\)　　D. \\(\\frac{\\pi}{2}\\)",
+          type: "single",
+          question: "已知向量 \\(\\boldsymbol{a} = (1, \\sqrt{3})\\)，\\(\\boldsymbol{b} = (\\sqrt{3}, 1)\\)，则 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 的夹角为（　）",
+          options: ["A. \\(\\frac{\\pi}{3}\\)", "B. \\(\\frac{\\pi}{4}\\)", "C. \\(\\frac{\\pi}{6}\\)", "D. \\(\\frac{\\pi}{2}\\)"],
+          correctIndex: 2,
           answer: "**C**。\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = \\sqrt{3} + \\sqrt{3} = 2\\sqrt{3}\\)，\\(|\\boldsymbol{a}| = 2\\)，\\(|\\boldsymbol{b}| = 2\\)，\\(\\cos\\theta = \\frac{2\\sqrt{3}}{4} = \\frac{\\sqrt{3}}{2}\\)，故 \\(\\theta = \\frac{\\pi}{6}\\)。"
         },
         {
           difficulty: "medium",
-          question: "化简 \\(2(\\boldsymbol{a} + \\boldsymbol{b}) - 3(\\boldsymbol{a} - \\boldsymbol{b}) =\\)（　）\nA. \\(-\\boldsymbol{a} + 5\\boldsymbol{b}\\)　　B. \\(5\\boldsymbol{a} - \\boldsymbol{b}\\)　　C. \\(-\\boldsymbol{a} - 5\\boldsymbol{b}\\)　　D. \\(5\\boldsymbol{a} + \\boldsymbol{b}\\)",
+          type: "single",
+          question: "化简 \\(2(\\boldsymbol{a} + \\boldsymbol{b}) - 3(\\boldsymbol{a} - \\boldsymbol{b}) =\\)（　）",
+          options: ["A. \\(-\\boldsymbol{a} + 5\\boldsymbol{b}\\)", "B. \\(5\\boldsymbol{a} - \\boldsymbol{b}\\)", "C. \\(-\\boldsymbol{a} - 5\\boldsymbol{b}\\)", "D. \\(5\\boldsymbol{a} + \\boldsymbol{b}\\)"],
+          correctIndex: 0,
           answer: "**A**。\\(2\\boldsymbol{a} + 2\\boldsymbol{b} - 3\\boldsymbol{a} + 3\\boldsymbol{b} = -\\boldsymbol{a} + 5\\boldsymbol{b}\\)。"
         },
         {
           difficulty: "advanced",
-          question: "已知 \\(|\\boldsymbol{a}| = 2\\)，\\(|\\boldsymbol{b}| = 3\\)，\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = -3\\)，则 \\(|\\boldsymbol{a} + \\boldsymbol{b}| =\\)（　）\nA. \\(\\sqrt{7}\\)　　B. 7　　C. \\(\\sqrt{13}\\)　　D. 1",
+          type: "single",
+          question: "已知 \\(|\\boldsymbol{a}| = 2\\)，\\(|\\boldsymbol{b}| = 3\\)，\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = -3\\)，则 \\(|\\boldsymbol{a} + \\boldsymbol{b}| =\\)（　）",
+          options: ["A. \\(\\sqrt{7}\\)", "B. 7", "C. \\(\\sqrt{13}\\)", "D. 1"],
+          correctIndex: 0,
           answer: "**A**。\\(|\\boldsymbol{a} + \\boldsymbol{b}|^2 = |\\boldsymbol{a}|^2 + |\\boldsymbol{b}|^2 + 2\\boldsymbol{a} \\cdot \\boldsymbol{b} = 4 + 9 + 2\\times (-3) = 7\\)，所以 \\(|\\boldsymbol{a} + \\boldsymbol{b}| = \\sqrt{7}\\)。"
         }
       ]

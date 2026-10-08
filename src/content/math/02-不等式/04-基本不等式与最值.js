@@ -147,12 +147,18 @@ export default {
         },
         {
           difficulty: "basic",
-          question: "已知 \\(a > 0, b > 0, ab = 9\\)，则 \\(a + b\\) 的最小值为（　）\nA. 3　　B. 6　　C. 9　　D. 18",
+          type: "single",
+          question: "已知 \\(a > 0, b > 0, ab = 9\\)，则 \\(a + b\\) 的最小值为（　）",
+          options: ["A. 3", "B. 6", "C. 9", "D. 18"],
+          correctIndex: 1,
           answer: "答案：B。\\(a+b \\ge 2\\sqrt{ab} = 2\\sqrt{9} = 6\\)，当 \\(a = b = 3\\) 时取等。"
         },
         {
           difficulty: "medium",
-          question: "下列函数中，最小值为2的是（　）\nA. \\(y = x + \\frac{1}{x}\\)（\\(x \\in \\mathbb{R}, x \\ne 0\\)）\nB. \\(y = \\sin x + \\frac{1}{\\sin x}\\)（\\(x \\in (0, \\pi)\\)）\nC. \\(y = x + \\frac{1}{x}\\)（\\(x > 0\\)）\nD. \\(y = x^2 + \\frac{2}{x^2 + 1}\\)",
+          type: "single",
+          question: "下列函数中，最小值为2的是（　）",
+          options: ["A. \\(y = x + \\frac{1}{x}\\)（\\(x \\in \\mathbb{R}, x \\ne 0\\)）", "B. \\(y = \\sin x + \\frac{1}{\\sin x}\\)（\\(x \\in (0, \\pi)\\)）", "C. \\(y = x + \\frac{1}{x}\\)（\\(x > 0\\)）", "D. \\(y = x^2 + \\frac{2}{x^2 + 1}\\)"],
+          correctIndex: 2,
           answer: "答案：C。A中 \\(x < 0\\) 时 \\(x + \\frac{1}{x} \\le -2\\)，不符题意；B中 \\(\\sin x \\in (0,1]\\)，当 \\(\\sin x = 1\\)（即 \\(x = \\frac{\\pi}{2}\\)）时取到2；C中 \\(x > 0\\)，\\(y \\ge 2\\sqrt{1} = 2\\)，当 \\(x=1\\) 时取等，正确。D中令 \\(t = x^2+1 \\ge 1\\)，\\(y = t-1+\\frac{2}{t}\\)，需进一步分析。"
         },
         {

@@ -154,7 +154,10 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "若 \\(a > b\\)，则下列不等式中一定成立的是（　）\nA. \\(a^2 > b^2\\)　　B. \\(\\frac{1}{a} < \\frac{1}{b}\\)\nC. \\(a - 3 > b - 3\\)　　D. \\(ac > bc\\)（\\(c \\ne 0\\)）",
+          type: "single",
+          question: "若 \\(a > b\\)，则下列不等式中一定成立的是（　）",
+          options: ["A. \\(a^2 > b^2\\)", "B. \\(\\frac{1}{a} < \\frac{1}{b}\\)", "C. \\(a - 3 > b - 3\\)", "D. \\(ac > bc\\)（\\(c \\ne 0\\)）"],
+          correctIndex: 2,
           answer: "答案：C。A错误，如 \\(a=1, b=-2\\) 时 \\(a>b\\) 但 \\(a^2=1 < b^2=4\\)；B错误，如 \\(a=1, b=-2\\) 时 \\(\\frac{1}{a}=1 > \\frac{1}{b}=-\\frac{1}{2}\\)，但 \\(a>b\\)；C正确，\\(a>b \\Rightarrow a-3>b-3\\)；D错误，\\(c<0\\) 时方向改变。"
         },
         {

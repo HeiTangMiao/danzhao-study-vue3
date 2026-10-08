@@ -160,7 +160,10 @@ export default {
         },
         {
           difficulty: "medium",
-          question: "不等式 \\(|3x + 1| \\ge 4\\) 的解集是（　）\nA. \\(\\{x \\mid -\\frac{5}{3} \\le x \\le 1\\}\\)\nB. \\(\\{x \\mid x \\le -\\frac{5}{3} \\text{ 或 } x \\ge 1\\}\\)\nC. \\(\\{x \\mid x \\le 1\\}\\)\nD. \\(\\{x \\mid x \\ge -\\frac{5}{3}\\}\\)",
+          type: "single",
+          question: "不等式 \\(|3x + 1| \\ge 4\\) 的解集是（　）",
+          options: ["A. \\(\\{x \\mid -\\frac{5}{3} \\le x \\le 1\\}\\)", "B. \\(\\{x \\mid x \\le -\\frac{5}{3} \\text{ 或 } x \\ge 1\\}\\)", "C. \\(\\{x \\mid x \\le 1\\}\\)", "D. \\(\\{x \\mid x \\ge -\\frac{5}{3}\\}\\)"],
+          correctIndex: 1,
           answer: "答案：B。\\(3x+1 \\ge 4\\) 或 \\(3x+1 \\le -4\\)，即 \\(x \\ge 1\\) 或 \\(x \\le -\\frac{5}{3}\\)。"
         },
         {

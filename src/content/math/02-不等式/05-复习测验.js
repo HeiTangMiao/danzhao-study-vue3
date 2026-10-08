@@ -19,42 +19,66 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "若 \\(a > b\\)，则下列不等式中一定成立的是（　）\nA. \\(a^2 > b^2\\)　　B. \\(\\frac{1}{a} < \\frac{1}{b}\\)\nC. \\(a - 3 > b - 3\\)　　D. \\(ac > bc\\)（\\(c \\ne 0\\)）",
+          type: "single",
+          question: "若 \\(a > b\\)，则下列不等式中一定成立的是（　）",
+          options: ["A. \\(a^2 > b^2\\)", "B. \\(\\frac{1}{a} < \\frac{1}{b}\\)", "C. \\(a - 3 > b - 3\\)", "D. \\(ac > bc\\)（\\(c \\ne 0\\)）"],
+          correctIndex: 2,
           answer: "**C**。由加法保号性，\\(a>b\\) 两边同减 3（同加 \\(-3\\)），不等号方向不变，得 \\(a-3>b-3\\)。A 错（如 \\(a=1, b=-2\\)）；B 错（如 \\(a=1, b=-2\\)）；D 错（\\(c<0\\) 时方向改变）。"
         },
         {
           difficulty: "basic",
-          question: "不等式 \\(-x^2 + 3x + 4 > 0\\) 的解集是（　）\nA. \\(\\{x \\mid x < -1 \\text{ 或 } x > 4\\}\\)　　B. \\(\\{x \\mid -1 < x < 4\\}\\)\nC. \\(\\{x \\mid x < -4 \\text{ 或 } x > 1\\}\\)　　D. \\(\\{x \\mid -4 < x < 1\\}\\)",
+          type: "single",
+          question: "不等式 \\(-x^2 + 3x + 4 > 0\\) 的解集是（　）",
+          options: ["A. \\(\\{x \\mid x < -1 \\text{ 或 } x > 4\\}\\)", "B. \\(\\{x \\mid -1 < x < 4\\}\\)", "C. \\(\\{x \\mid x < -4 \\text{ 或 } x > 1\\}\\)", "D. \\(\\{x \\mid -4 < x < 1\\}\\)"],
+          correctIndex: 1,
           answer: "**B**。两边同乘 \\(-1\\) 化正并变号，得 \\(x^2-3x-4<0\\)，即 \\((x-4)(x+1)<0\\)，解集为 \\(-1 < x < 4\\)。"
         },
         {
           difficulty: "basic",
-          question: "不等式 \\(|x - 3| < 2\\) 的解集是（　）\nA. \\((1, 5)\\)　　B. \\((-\\infty, 1) \\cup (5, +\\infty)\\)　　C. \\((3, 5)\\)　　D. \\((-5, -1)\\)",
+          type: "single",
+          question: "不等式 \\(|x - 3| < 2\\) 的解集是（　）",
+          options: ["A. \\((1, 5)\\)", "B. \\((-\\infty, 1) \\cup (5, +\\infty)\\)", "C. \\((3, 5)\\)", "D. \\((-5, -1)\\)"],
+          correctIndex: 0,
           answer: "**A**。\\(|x-3|<2\\) 等价于 \\(-2 < x-3 < 2\\)，解得 \\(1 < x < 5\\)，即 \\((1,5)\\)。"
         },
         {
           difficulty: "basic",
-          question: "已知 \\(x > 0\\)，则 \\(x + \\frac{4}{x}\\) 的最小值为（　）\nA. 2　　B. 3　　C. 4　　D. 8",
+          type: "single",
+          question: "已知 \\(x > 0\\)，则 \\(x + \\frac{4}{x}\\) 的最小值为（　）",
+          options: ["A. 2", "B. 3", "C. 4", "D. 8"],
+          correctIndex: 2,
           answer: "**C**。由均值不等式 \\(x+\\frac{4}{x} \\ge 2\\sqrt{x \\cdot \\frac{4}{x}} = 2\\times 2 = 4\\)，当 \\(x=2\\) 时取等。"
         },
         {
           difficulty: "medium",
-          question: "已知不等式 \\(x^2 + bx + c > 0\\) 的解集为 \\(\\{x \\mid x < 1 \\text{ 或 } x > 3\\}\\)，则 \\(b + c\\) 的值为（　）\nA. \\(-1\\)　　B. 7　　C. \\(-7\\)　　D. 1",
+          type: "single",
+          question: "已知不等式 \\(x^2 + bx + c > 0\\) 的解集为 \\(\\{x \\mid x < 1 \\text{ 或 } x > 3\\}\\)，则 \\(b + c\\) 的值为（　）",
+          options: ["A. \\(-1\\)", "B. 7", "C. \\(-7\\)", "D. 1"],
+          correctIndex: 0,
           answer: "**A**。方程 \\(x^2+bx+c=0\\) 的两根为 \\(1, 3\\)，由韦达定理 \\(1+3=-b\\)，\\(1\\times3=c\\)，得 \\(b=-4\\)，\\(c=3\\)，\\(b+c=-1\\)。"
         },
         {
           difficulty: "medium",
-          question: "若不等式 \\(x^2 + mx + 4 \\ge 0\\) 对一切实数 \\(x\\) 恒成立，则实数 \\(m\\) 的取值范围是（　）\nA. \\(m > 4\\)　　B. \\(-4 < m < 4\\)　　C. \\(m \\ge 4\\)　　D. \\(-4 \\le m \\le 4\\)",
+          type: "single",
+          question: "若不等式 \\(x^2 + mx + 4 \\ge 0\\) 对一切实数 \\(x\\) 恒成立，则实数 \\(m\\) 的取值范围是（　）",
+          options: ["A. \\(m > 4\\)", "B. \\(-4 < m < 4\\)", "C. \\(m \\ge 4\\)", "D. \\(-4 \\le m \\le 4\\)"],
+          correctIndex: 3,
           answer: "**D**。二次项系数为正，恒成立需判别式 \\(\\Delta = m^2 - 16 \\le 0\\)，即 \\(-4 \\le m \\le 4\\)。"
         },
         {
           difficulty: "medium",
-          question: "不等式 \\(\\frac{x - 1}{x + 2} \\le 0\\) 的解集是（　）\nA. \\((-2, 1]\\)　　B. \\([-2, 1]\\)　　C. \\([-2, 1)\\)　　D. \\((-\\infty, -2) \\cup [1, +\\infty)\\)",
+          type: "single",
+          question: "不等式 \\(\\frac{x - 1}{x + 2} \\le 0\\) 的解集是（　）",
+          options: ["A. \\((-2, 1]\\)", "B. \\([-2, 1]\\)", "C. \\([-2, 1)\\)", "D. \\((-\\infty, -2) \\cup [1, +\\infty)\\)"],
+          correctIndex: 0,
           answer: "**A**。转化为 \\((x-1)(x+2)\\le0\\) 且 \\(x\\ne-2\\)，得 \\(-2 < x \\le 1\\)，即 \\((-2, 1]\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知 \\(a > 0, b > 0\\) 且 \\(ab = 9\\)，则 \\(a + b\\) 的最小值为（　）\nA. 3　　B. 6　　C. 9　　D. 18",
+          type: "single",
+          question: "已知 \\(a > 0, b > 0\\) 且 \\(ab = 9\\)，则 \\(a + b\\) 的最小值为（　）",
+          options: ["A. 3", "B. 6", "C. 9", "D. 18"],
+          correctIndex: 1,
           answer: "**B**。由均值不等式 \\(a+b \\ge 2\\sqrt{ab} = 2\\sqrt{9} = 6\\)，当 \\(a=b=3\\) 时取等。"
         }
       ]

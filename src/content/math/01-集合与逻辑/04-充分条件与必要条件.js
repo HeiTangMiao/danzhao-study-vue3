@@ -172,7 +172,10 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "\"\\(x > 3\\)\" 是 \"\\(x > 2\\)\" 的（　）\nA. 充分不必要条件　　B. 必要不充分条件\nC. 充要条件　　D. 既不充分也不必要条件",
+          type: "single",
+          question: "\"\\(x > 3\\)\" 是 \"\\(x > 2\\)\" 的（　）",
+          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          correctIndex: 0,
           answer: "答案：A。\\(x>3 \\Rightarrow x>2\\)（充分性成立），但 \\(x>2\\) 时 \\(x\\) 不一定 \\(>3\\)。集合 \\((3,+\\infty) \\subsetneq (2,+\\infty)\\)，小充分。"
         },
         {

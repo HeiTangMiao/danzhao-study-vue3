@@ -177,12 +177,18 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "已知集合 \\(A = \\{a, b\\}\\)，则集合 \\(A\\) 的非空真子集个数为（　）\nA. 1　　B. 2　　C. 3　　D. 4",
+          type: "single",
+          question: "已知集合 \\(A = \\{a, b\\}\\)，则集合 \\(A\\) 的非空真子集个数为（　）",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correctIndex: 1,
           answer: "答案：B。\\(n=2\\)，非空真子集个数为 \\(2^2-2 = 2\\) 个，分别是 \\(\\{a\\}\\) 和 \\(\\{b\\}\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知集合 \\(M = \\{0, 1\\}\\)，\\(N = \\{x \\mid x^2 + x = 0\\}\\)，则（　）\nA. \\(M \\subsetneq N\\)　　B. \\(N \\subsetneq M\\)　　C. \\(M = N\\)　　D. 互不包含",
+          type: "single",
+          question: "已知集合 \\(M = \\{0, 1\\}\\)，\\(N = \\{x \\mid x^2 + x = 0\\}\\)，则（　）",
+          options: ["A. \\(M \\subsetneq N\\)", "B. \\(N \\subsetneq M\\)", "C. \\(M = N\\)", "D. 互不包含"],
+          correctIndex: 3,
           answer: "答案：D。\\(N = \\{x \\mid x(x+1)=0\\} = \\{0, -1\\}\\)，而 \\(M=\\{0,1\\}\\)，两集合不相等，互不包含。"
         },
         {

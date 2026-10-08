@@ -154,7 +154,10 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "一次函数 \\(y = -2x + 5\\) 的图像不经过（　）\nA. 第一象限　　B. 第二象限　　C. 第三象限　　D. 第四象限",
+          type: "single",
+          question: "一次函数 \\(y = -2x + 5\\) 的图像不经过（　）",
+          options: ["A. 第一象限", "B. 第二象限", "C. 第三象限", "D. 第四象限"],
+          correctIndex: 2,
           answer: "答案：C。\\(k=-2 < 0\\)，\\(b=1 > 0\\)（交 \\(y\\) 轴正半轴，过一象限）。所以过一、二、四象限，不过第三象限。"
         },
         {

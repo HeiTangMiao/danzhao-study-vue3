@@ -152,7 +152,10 @@ export default {
         },
         {
           difficulty: "basic",
-          question: "不等式 \\(-x^2 + 3x + 4 > 0\\) 的解集是（　）\nA. \\(\\{x \\mid x < -1 \\text{ 或 } x > 4\\}\\)　　B. \\(\\{x \\mid -1 < x < 4\\}\\)\nC. \\(\\{x \\mid -4 < x < 1\\}\\)",
+          type: "single",
+          question: "不等式 \\(-x^2 + 3x + 4 > 0\\) 的解集是（　）",
+          options: ["A. \\(\\{x \\mid x < -1 \\text{ 或 } x > 4\\}\\)", "B. \\(\\{x \\mid -1 < x < 4\\}\\)", "C. \\(\\{x \\mid -4 < x < 1\\}\\)"],
+          correctIndex: 1,
           answer: "答案：B。先化 \\(a>0\\)：两边乘 \\(-1\\) 得 \\(x^2-3x-4 < 0\\)，即 \\((x-4)(x+1)<0\\)，解集为 \\(-1 < x < 4\\)。"
         },
         {

@@ -19,42 +19,66 @@ export default {
       items: [
         {
           difficulty: "basic",
-          question: "书架上有 3 本不同的数学书和 5 本不同的物理书，从中任取一本，共有多少种不同的取法？（　）\nA. 8 种　　B. 15 种　　C. 3 种　　D. 5 种",
+          type: "single",
+          question: "书架上有 3 本不同的数学书和 5 本不同的物理书，从中任取一本，共有多少种不同的取法？（　）",
+          options: ["A. 8 种", "B. 15 种", "C. 3 种", "D. 5 种"],
+          correctIndex: 0,
           answer: "**A**。任取一本，可以是数学书（3 种）或物理书（5 种），用分类加法计数原理：\\(3 + 5 = 8\\) 种。"
         },
         {
           difficulty: "basic",
-          question: "计算 \\(A_5^3\\) 的值为（　）\nA. 20　　B. 10　　C. 60　　D. 120",
+          type: "single",
+          question: "计算 \\(A_5^3\\) 的值为（　）",
+          options: ["A. 20", "B. 10", "C. 60", "D. 120"],
+          correctIndex: 2,
           answer: "**C**。由排列数公式 \\(A_5^3 = 5 \\times 4 \\times 3 = 60\\)。"
         },
         {
           difficulty: "basic",
-          question: "计算 \\(C_7^3\\) 的值为（　）\nA. 27　　B. 35　　C. 21　　D. 210",
+          type: "single",
+          question: "计算 \\(C_7^3\\) 的值为（　）",
+          options: ["A. 27", "B. 35", "C. 21", "D. 210"],
+          correctIndex: 1,
           answer: "**B**。\\(C_7^3 = \\dfrac{7 \\times 6 \\times 5}{3 \\times 2 \\times 1} = 35\\)。"
         },
         {
           difficulty: "basic",
-          question: "用数字 1, 2, 3, 4 可以组成多少个没有重复数字的三位数？（　）\nA. 12　　B. 64　　C. 24　　D. 6",
+          type: "single",
+          question: "用数字 1, 2, 3, 4 可以组成多少个没有重复数字的三位数？（　）",
+          options: ["A. 12", "B. 64", "C. 24", "D. 6"],
+          correctIndex: 2,
           answer: "**C**。从 4 个数字中选 3 个排成一列，有序，用排列数 \\(A_4^3 = 4 \\times 3 \\times 2 = 24\\) 个。"
         },
         {
           difficulty: "medium",
-          question: "5 人排成一排照相，其中甲、乙两人必须相邻的排法共有（　）\nA. 96 种　　B. 24 种　　C. 120 种　　D. 48 种",
+          type: "single",
+          question: "5 人排成一排照相，其中甲、乙两人必须相邻的排法共有（　）",
+          options: ["A. 96 种", "B. 24 种", "C. 120 种", "D. 48 种"],
+          correctIndex: 3,
           answer: "**D**。捆绑法：将甲、乙看作一个整体，与另外 3 人共 4 个元素全排列 \\(A_4^4 = 24\\)，甲乙内部 \\(A_2^2 = 2\\)，共 \\(24 \\times 2 = 48\\) 种。"
         },
         {
           difficulty: "medium",
-          question: "5 人排成一排，甲、乙两人不相邻的排法共有（　）\nA. 48 种　　B. 72 种　　C. 96 种　　D. 120 种",
+          type: "single",
+          question: "5 人排成一排，甲、乙两人不相邻的排法共有（　）",
+          options: ["A. 48 种", "B. 72 种", "C. 96 种", "D. 120 种"],
+          correctIndex: 1,
           answer: "**B**。插空法：先排其余 3 人 \\(A_3^3 = 6\\)，形成 4 个空隙，将甲、乙插入 \\(A_4^2 = 12\\)，共 \\(6 \\times 12 = 72\\) 种。"
         },
         {
           difficulty: "medium",
-          question: "\\((2x - 1)^5\\) 的展开式中 \\(x^3\\) 的系数为（　）\nA. -80　　B. 40　　C. 80　　D. -40",
+          type: "single",
+          question: "\\((2x - 1)^5\\) 的展开式中 \\(x^3\\) 的系数为（　）",
+          options: ["A. -80", "B. 40", "C. 80", "D. -40"],
+          correctIndex: 2,
           answer: "**C**。通项 \\(T_{k+1} = C_5^k (2x)^{5-k}(-1)^k\\)，令 \\(5 - k = 3\\)，得 \\(k = 2\\)，系数为 \\(C_5^2 \\times 2^3 \\times (-1)^2 = 10 \\times 8 = 80\\)。"
         },
         {
           difficulty: "medium",
-          question: "已知 \\((1 - 2x)^7 = a_0 + a_1 x + a_2 x^2 + \\cdots + a_7 x^7\\)，则 \\(a_0 + a_1 + a_2 + \\cdots + a_7 =\\)（　）\nA. 1　　B. -1　　C. 128　　D. -128",
+          type: "single",
+          question: "已知 \\((1 - 2x)^7 = a_0 + a_1 x + a_2 x^2 + \\cdots + a_7 x^7\\)，则 \\(a_0 + a_1 + a_2 + \\cdots + a_7 =\\)（　）",
+          options: ["A. 1", "B. -1", "C. 128", "D. -128"],
+          correctIndex: 1,
           answer: "**B**。用赋值法，令 \\(x = 1\\)：\\((1 - 2)^7 = (-1)^7 = -1\\)，所以 \\(a_0 + a_1 + \\cdots + a_7 = -1\\)。"
         }
       ]
