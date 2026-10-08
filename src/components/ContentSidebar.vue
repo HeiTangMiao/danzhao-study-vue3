@@ -22,7 +22,6 @@
    - 完成状态由访问/交卷自动驱动（组件仅展示 isDone / doneFiles，无手动标记）
    - toggle-bookmark 书签
    - toggle-notes 笔记
-   - toggle-toc  目录面板
    - go-file     跳转同单元指定页
    - go-unit     跳转指定单元
    - go-prev     上一页（移动端底部栏）
@@ -30,20 +29,16 @@
 -->
 <template>
   <aside class="content-sidebar" :class="{ collapsed, 'math': isMath }">
-    <!-- 展开/收起开关（常驻右下/右上浮动） -->
-    <button class="sidebar-toggle" :class="{ active: !collapsed }" :title="collapsed ? '展开侧边栏' : '收起侧边栏'" :aria-label="collapsed ? '展开侧边栏' : '收起侧边栏'" @click="collapsed = !collapsed">
-      {{ collapsed ? '◀' : '▶' }}
-    </button>
-
     <div v-if="!collapsed" class="sidebar-inner">
       <!-- ===== 快捷操作区（吸顶） ===== -->
       <div class="sb-quick">
         <div class="sb-title">快捷操作</div>
         <div class="sb-actions">
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /><span>顶部</span></button>
-          <button class="sb-act" title="本页目录" @click="emit('toggle-toc')"><AppIcon name="menu" :size="16" /><span>目录</span></button>
           <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
+          <!-- 目录不设按钮：侧栏「本页章节」常驻即目录（用户裁定：toc-panel 浮层与目录按钮均为冗余） -->
+          <button class="sb-act" title="收起侧边栏" @click="collapsed = true"><AppIcon name="chevron-left" :size="16" /><span>收起</span></button>
         </div>
         <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处 -->
         <span class="sb-status" :class="{ on: isDone }" :title="isDone ? '已完成' : '学习中'">
@@ -91,10 +86,11 @@
       </nav>
     </div>
 
-    <!-- 收起态：迷你图标徽标（完成状态不在此重复，展开后在快捷区查看） -->
+    <!-- 收起态：迷你图标徽标（完成状态不在此重复，展开后在快捷区查看）；
+         展开入口集成在此按钮组首位（独立把手已按用户裁定移除） -->
     <div v-else class="sidebar-mini">
+      <button class="mini-item mini-item--expand" title="展开侧边栏" aria-label="展开侧边栏" @click="collapsed = false"><AppIcon name="chevron-right" :size="16" /></button>
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /></button>
-      <button class="mini-item" title="目录" aria-label="目录" @click="emit('toggle-toc')"><AppIcon name="menu" :size="16" /></button>
       <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /></button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /></button>
     </div>
@@ -235,7 +231,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'scroll-to', 'scroll-top',
-  'toggle-bookmark', 'toggle-notes', 'toggle-toc',
+  'toggle-bookmark', 'toggle-notes',
   'go-file', 'go-unit',
   'go-prev', 'go-next'
 ])
@@ -342,7 +338,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 <style scoped>
 .content-sidebar {
   position: fixed;
-  top: 64px;
+  /* 顶部对齐阅读区功能条之下（玻璃条 = tabbar 56 + reader-topbar 44），不与其抢占视觉层 */
+  top: calc(var(--tabbar-h) + var(--sat) + var(--reader-topbar-h) + 8px);
   right: 12px;
   bottom: 12px;
   z-index: 90;
@@ -354,32 +351,6 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 .content-sidebar.collapsed {
   width: 0;
-}
-.sidebar-toggle {
-  position: absolute;
-  top: 12px;
-  left: -34px;
-  width: 26px;
-  height: 34px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-right: none;
-  border-radius: 10px 0 0 10px;
-  box-shadow: var(--shadow-xs);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 95;
-}
-.sidebar-toggle:hover { color: var(--primary); }
-/* 收起态：把手与 mini 快捷列同宽对齐（各 34px 上下相接成一列），描边/着色加强提示
-   ——收起后仅剩这条窄入口，弱样式会让用户找不到展开方式（用户实测反馈） */
-.content-sidebar.collapsed .sidebar-toggle {
-  width: 34px;
-  height: 34px;
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: var(--shadow-pop);
 }
 .sidebar-inner {
   flex: 1;
@@ -497,9 +468,9 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 .sidebar-mini {
   /* 收起态侧栏盒宽为 0，flex:1 会把迷你列推出视口右缘（实测越界 27px）→ 固定到视口右缝 */
   position: fixed;
-  top: 114px;
+  top: 116px; /* 与展开态侧栏 top（功能条下方 +8）对齐，展开/收起切换无跳动 */
   right: 12px;
-  z-index: 95; /* 与把手同层：盖过内容区、低于功能条 */
+  z-index: 95; /* 盖过内容区、低于功能条 */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -521,6 +492,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 .mini-item:hover { border-color: var(--primary); }
 .mini-item.on { color: var(--success); }
+/* 展开入口：收起态唯一的展开方式，primary 描边着色保证可发现性（用户实测反馈） */
+.mini-item--expand { border-color: var(--primary); color: var(--primary); }
 
 /* 移动端组件（桌面端隐藏） */
 .sb-mobile { display: none; }

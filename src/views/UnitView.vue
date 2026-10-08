@@ -37,19 +37,6 @@
       @notes="showNotes = !showNotes"
     />
 
-    <!-- 目录导航（折叠式；桌面端入口，移动端用答题卡抽屉） -->
-    <section v-if="showToc && page && toc.length > 0" class="toc-panel card">
-      <div class="toc-head">本页目录</div>
-      <ul class="toc-list">
-        <li v-for="(item, i) in toc" :key="i">
-          <button class="toc-item" @click="scrollToBlock(item.index)">
-            <span class="toc-icon"><AppIcon :name="item.icon" :size="16" /></span>
-            <span class="toc-text">{{ item.title }}</span>
-          </button>
-        </li>
-      </ul>
-    </section>
-
     <!-- 加载中提示 -->
     <div v-if="!page && loading" class="loading-hint">
       <span class="loading-spinner"></span> 正在加载内容…
@@ -134,7 +121,6 @@
       @scroll-top="scrollTop"
       @toggle-bookmark="bookmark.toggleBookmark()"
       @toggle-notes="showNotes = !showNotes"
-      @toggle-toc="showToc = !showToc"
       @go-file="goFile"
       @go-unit="goUnit"
       @go-prev="pagingGo('prev')"
@@ -269,9 +255,6 @@ const toc = computed(() => {
     .map((b, i) => ({ index: i, type: b.type, title: b.title, icon: iconOf(b.type) }))
     .filter((b) => b.title && b.icon)
 })
-
-// 目录面板显隐（桌面端入口；移动端用答题卡抽屉）
-const showToc = ref(false)
 
 // 滚动到指定区块
 function scrollToBlock(index) {
@@ -605,10 +588,9 @@ function goHome() {
   router.push('/')
 }
 
-/** 页眉「目录」：桌面端展开页内目录面板；移动端打开答题卡抽屉（页面入口收敛，§5.7.0） */
+/** 页眉「答题卡与目录」：移动端打开答题卡抽屉。桌面端目录常驻侧栏（toc-panel 浮层已按用户裁定移除） */
 function onTopbarToc() {
-  if (window.matchMedia('(min-width: 1151px)').matches) showToc.value = !showToc.value
-  else sidebarRef.value?.openSheet('nav')
+  sidebarRef.value?.openSheet('nav')
 }
 
 // 滚动到顶部
@@ -669,19 +651,6 @@ watch(
   transform-origin: left;
   transition: transform 0.1s linear;
 }
-
-/* 目录导航 */
-.toc-panel { margin-bottom: var(--spacer-16); }
-.toc-head { font-weight: 700; margin-bottom: var(--spacer-8); }
-.toc-list { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
-.toc-item {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--surface-muted); border: 1px solid var(--border);
-  border-radius: var(--radius-full); padding: 4px 12px;
-  font-size: 0.82rem; transition: all 0.15s ease;
-}
-.toc-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-.toc-icon { display: inline-flex; color: var(--text-muted); }
 
 .fade-enter-active, .fade-leave-active { transition: opacity var(--dur-3) var(--ease-standard); }
 
