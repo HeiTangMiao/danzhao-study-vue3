@@ -69,13 +69,16 @@ onMounted(async () => {
   iconsReady.value = true
 })
 
-/** 分段数：segs = min(n, 12)；超过 12 页时每段代表 ceil(n/12) 页（§5.7.0 第 2 条） */
+/** 分段数：segs = min(n, 12)（§5.7.0 第 2 条） */
 const segCount = computed(() => Math.max(1, Math.min(props.total || 0, 12)))
-const pagesPerSeg = computed(() => Math.ceil((props.total || 0) / segCount.value))
-/** 当前页所在段（1 基）；之前的段=done（primary 40%），当前段=cur（primary），之后=line */
+/**
+ * 当前页所在段（1 基）：按比例映射 floor(i × segs / n) + 1。
+ * 不用 ceil(n/segs) 每段等页数的老写法 —— n=13~23 时余数页永远进不了最后几段，
+ * 进度条走不满（QA 备忘缺陷）；比例映射保证末页必落在最后一段。
+ */
 const curSeg = computed(() => {
   if (!props.total) return 0
-  return Math.min(segCount.value, Math.floor(props.fileIndex / pagesPerSeg.value) + 1)
+  return Math.min(segCount.value, Math.floor((props.fileIndex * segCount.value) / props.total) + 1)
 })
 
 const pageLabel = computed(() =>

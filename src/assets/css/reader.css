@@ -164,6 +164,17 @@
 }
 /* 页脚玻璃是否加投影：技术侧建议不加（底部有系统导航/手势区，投影打架，§5.7.0 第 1 条） */
 
+/* 降级（QA F3）：功能条的玻璃是本文件内联写的（只引 token，未挂 .glass 类），
+ * main.css 的 @supports 降级只覆盖 .glass，摸不到这里 —— 宿主不支持 backdrop-filter 时
+ * 两条功能条会停在 0.42 半透明底上没有模糊，文字对比度失守。补同款降级：
+ * reader.css 晚于 main.css 加载（UnitView 内 import），同特异性下本块必胜出。 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .reader-topbar,
+  .reader-footer {
+    background: var(--surface);
+  }
+}
+
 .rf-nav {
   flex: 0 0 auto;
   min-width: 52px;

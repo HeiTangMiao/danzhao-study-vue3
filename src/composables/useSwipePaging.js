@@ -136,6 +136,15 @@ export function useSwipePaging({ target, isBlocked, canGo, onIntent, onPrefetch 
     return Number.isFinite(n) && n > 0 ? n : fallback
   }
 
+  /* ---- 跟手位移类生产（QA F2）---- */
+  /* reader.css 的 .is-dragging 只有消费者没有生产者，--swipe-dx 写了也看不见。
+   * 这里是唯一生产点：方向锁定后挂上，动画态（leaving/spring/entering）接管前摘除 ——
+   * off/reduced 档 CSS 侧 transform:none 天然兼容，JS 无需感知动效档位。 */
+  function setDragging(on) {
+    if (!el) return
+    el.classList.toggle('is-dragging', on)
+  }
+
   function clearPhaseTimer() {
     if (phaseTimer) { clearTimeout(phaseTimer); phaseTimer = 0 }
   }
@@ -143,6 +152,7 @@ export function useSwipePaging({ target, isBlocked, canGo, onIntent, onPrefetch 
   /** 快速连划接管：立即终止当前动画回到 idle（排队会让连续翻页发涩，§5.7.3） */
   function forceIdle() {
     clearPhaseTimer()
+    setDragging(false)
     if (overlapResolve) { overlapResolve(); overlapResolve = null; overlapPromise = null }
     phase.value = 'idle'
   }
@@ -171,6 +181,7 @@ export function useSwipePaging({ target, isBlocked, canGo, onIntent, onPrefetch 
   /** 回弹：阈值不足 / pointercancel / 导航被拦截；时长读 --swipe-spring */
   function springBack(dx = 0) {
     clearPhaseTimer()
+    setDragging(false) // 回弹视觉交 .is-spring 动画（keyframe 同样读 --swipe-dx），拖拽类摘除
     if (el) {
       el.style.setProperty('--swipe-dx', `${dx}px`)
       const springMs = durationMs('--swipe-spring', 160)
@@ -226,6 +237,7 @@ export function useSwipePaging({ target, isBlocked, canGo, onIntent, onPrefetch 
       if (resolveAxis(dx, dy) !== 'h') { track = null; return } // 纵向：作废，交还滚动
       // 方向锁判定为水平 → 此时才捕获（顺序反了会吞内部按钮点按）
       track.locked = true
+      setDragging(true) // 跟手位移可见（QA F2：锁定即挂类，--swipe-dx 由 rAF 持续刷新）
       try { el?.setPointerCapture(e.pointerId) } catch { /* 捕获失败不阻断手势 */ }
       if (onPrefetch) onPrefetch(swipeDirOf(dx)) // 锁定瞬间预取（§5.7.5 建议②）
     }
@@ -282,6 +294,7 @@ export function useSwipePaging({ target, isBlocked, canGo, onIntent, onPrefetch 
   watch(target, (node) => { detach(); attach(node) })
   onBeforeUnmount(() => {
     detach()
+    setDragging(false) // 组件卸载兜底：不留挂着的拖拽类（如作答中途路由跳转）
     clearPhaseTimer()
     if (rafId) cancelAnimationFrame(rafId)
   })
