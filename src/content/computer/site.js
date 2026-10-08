@@ -43,7 +43,11 @@ export const COMPUTER_CONFIG = {
         { name: "04-路由配置与RIP协议", title: "路由配置与 RIP 协议", subtitle: "路由器配置、静态路由与 RIP 动态路由" },
         { name: "05-Windows网络配置与命令", title: "Windows 网络配置与命令", subtitle: "IP 配置、网络命令与故障排查" },
         { name: "06-网络服务配置", title: "网络服务配置", subtitle: "DHCP、WWW、FTP、DNS 服务搭建" },
-        { name: "07-复习测验", title: "计算机网络技术 · 复习测验", subtitle: "本单元知识综合检测", isTest: true }
+        { name: "07-复习测验", title: "计算机网络技术 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        // ↓↓↓ 理论考「网络及网页设计」模块补充页（末尾追加，未插入、未重排）
+        { name: "08-网页设计基础", title: "网页设计基础（HTML）", subtitle: "网页概念、开发流程与 HTML 常用标签" },
+        { name: "09-CSS样式与布局基础", title: "CSS 样式与布局基础", subtitle: "CSS 引入方式、选择器、盒子模型与 DIV+CSS 布局" },
+        { name: "10-OSI参考模型与TCPIP协议", title: "OSI 参考模型与 TCP/IP 协议", subtitle: "分层思想、七层模型、TCP/IP 与 TCP/UDP" }
       ]
     },
     {
