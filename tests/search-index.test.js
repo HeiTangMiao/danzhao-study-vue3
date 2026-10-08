@@ -63,7 +63,8 @@ describe('索引形状', () => {
 })
 
 describe('截断必报告（注入小上限验证整条链）', () => {
-  it('注入 500 字符上限时：每页都被截断，且逐页点名（不静默）', async () => {
+  // 全量重跑 collectIndex（156 页）远超默认 5s——内容持续增长，给足余量并保持显式（超时即失败可见）
+  it('注入 500 字符上限时：每页都被截断，且逐页点名（不静默）', { timeout: 20000 }, async () => {
     const small = await collectIndex({ limit: 500 })
     // 今天最短的页面也超过 500，故应「全部」被截断并逐个报告
     expect(small.truncated.length).toBe(small.meta.length)

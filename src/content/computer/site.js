@@ -78,6 +78,27 @@ export const COMPUTER_CONFIG = {
         { name: "07-新一代信息技术", title: "新一代信息技术", subtitle: "大数据、云计算、物联网、区块链、5G、人工智能" },
         { name: "08-复习测验", title: "理论基础 · 复习测验", subtitle: "本单元知识综合检测", isTest: true }
       ]
+    },
+    // ↓↓↓ 新增单元：组装与维护（理论考约 20 分 / 13.3%，此前零命中）
+    {
+      num: "07", title: "组装与维护", folder: "07-组装与维护", phase: 1, color: "#f59e0b", icon: "🔧",
+      files: [
+        { name: "01-计算机主要部件与外围设备", title: "计算机主要部件与外围设备", subtitle: "主机内部部件、外围设备与选购方法" },
+        { name: "02-硬件拆装与BIOS基础", title: "硬件拆装与 BIOS 基础", subtitle: "拆装流程、注意事项与 BIOS/CMOS" },
+        { name: "03-硬盘分区与软件安装", title: "硬盘分区与软件安装", subtitle: "分区格式、软件版权与备份还原" },
+        { name: "04-系统维护与故障处理", title: "系统维护与故障处理", subtitle: "驱动补丁、维护方法与常见故障" },
+        { name: "05-复习测验", title: "组装与维护 · 复习测验", subtitle: "本单元知识综合检测", isTest: true }
+      ]
+    },
+    // ↓↓↓ 新增单元：数据库基础（理论考约 15 分 / 10%，此前零命中）
+    {
+      num: "08", title: "数据库基础", folder: "08-数据库基础", phase: 1, color: "#10b981", icon: "🗄️",
+      files: [
+        { name: "01-数据库基本概念", title: "数据库基本概念", subtitle: "DB/DBMS/DBS、系统特征与数据模型" },
+        { name: "02-数据表与字段", title: "数据表与字段", subtitle: "记录与字段、主键外键与数据类型" },
+        { name: "03-SQL基础语句", title: "SQL 基础语句", subtitle: "CREATE/INSERT/SELECT/UPDATE/DELETE（单表）" },
+        { name: "04-复习测验", title: "数据库基础 · 复习测验", subtitle: "本单元知识综合检测", isTest: true }
+      ]
     }
   ],
   phases: {
