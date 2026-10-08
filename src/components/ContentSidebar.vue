@@ -243,6 +243,10 @@ const emit = defineEmits([
 // 收起/展开状态（持久化）
 const collapsed = ref(localStorage.getItem('sidebar_collapsed') === '1')
 watch(collapsed, (v) => localStorage.setItem('sidebar_collapsed', v ? '1' : '0'))
+// 收起态同步到 body：reader.css 据此收窄功能条的避让量（侧栏只剩 mini 快捷列），
+// 用 body 类而非 :has() —— 不依赖选择器兼容性，卸载时清理防止状态残留到非学习页
+watch(collapsed, (v) => document.body.classList.toggle('sb-collapsed', v), { immediate: true })
+onBeforeUnmount(() => document.body.classList.remove('sb-collapsed'))
 
 // ===== 移动端：抽屉与更多面板 =====
 // 导航抽屉开关
@@ -368,6 +372,15 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   z-index: 95;
 }
 .sidebar-toggle:hover { color: var(--primary); }
+/* 收起态：把手与 mini 快捷列同宽对齐（各 34px 上下相接成一列），描边/着色加强提示
+   ——收起后仅剩这条窄入口，弱样式会让用户找不到展开方式（用户实测反馈） */
+.content-sidebar.collapsed .sidebar-toggle {
+  width: 34px;
+  height: 34px;
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: var(--shadow-pop);
+}
 .sidebar-inner {
   flex: 1;
   overflow-y: auto;
@@ -482,7 +495,11 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 
 /* 收起态迷你图标 */
 .sidebar-mini {
-  flex: 1;
+  /* 收起态侧栏盒宽为 0，flex:1 会把迷你列推出视口右缘（实测越界 27px）→ 固定到视口右缝 */
+  position: fixed;
+  top: 114px;
+  right: 12px;
+  z-index: 95; /* 与把手同层：盖过内容区、低于功能条 */
   display: flex;
   flex-direction: column;
   gap: 6px;

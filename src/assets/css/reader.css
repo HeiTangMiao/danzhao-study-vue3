@@ -320,3 +320,13 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
     right: calc(var(--sb-rail-w, 236px) + 24px);
   }
 }
+
+/* 侧栏收起态：右侧只剩 mini 快捷列 + 把手（各 34px，右缝 12px）→ 避让量收窄，
+   否则功能条右端留 260px 空带（用户实测反馈的「顶栏缺口」）。
+   body.sb-collapsed 由 ContentSidebar watch 同步（卸载时移除）。 */
+@media (min-width: 1150px) {
+  body.sb-collapsed .reader-topbar,
+  body.sb-collapsed .reader-footer {
+    right: 58px; /* mini 列 34 + 右缝 12 + 间隙 12 */
+  }
+}
