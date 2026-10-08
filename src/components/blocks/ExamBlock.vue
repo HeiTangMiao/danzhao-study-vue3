@@ -4,6 +4,8 @@
    - 考试模式：倒计时、逐题作答、交卷评分
    - 选择题点击作答；判断/填空/解答题自评作答
    - 交卷后展示成绩、正确率、逐题回顾与错题入本
+   - 单题耗时（P0-3）：按作答顺序结算每题历时（时间戳差值，非 setInterval 累加）→ 交卷批写入库
+   - 错题归因（P0-4）：交卷后（结果页）逐题弹归因层，**不在作答中打断考试**
 -->
 <template>
   <section class="block exam">
@@ -111,6 +113,14 @@
       </div>
     </div>
 
+    <!-- 错题归因层（P0-4）：交卷后逐个弹出，一点即完成 / 可跳过 -->
+    <ReasonChips
+      :open="attrOpen"
+      :question="attrCurrent ? attrCurrent.question : ''"
+      @done="onAttrDone"
+      @skip="onAttrSkip"
+    />
+
     <!-- 提前交卷二次确认 -->
     <transition name="fade">
       <div v-if="confirmSubmit" class="submit-confirm-overlay" @click.self="confirmSubmit = false">
@@ -131,9 +141,12 @@
 import { ref, computed, watch, inject, onMounted, onBeforeUnmount } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
+import ReasonChips from '@/components/ReasonChips.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useProgressStore } from '@/stores/progress'
+import { paperKeyOf } from '@/content/practiceBank'
+import { TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 const props = defineProps({
   // 区块数据：{ type:'exam', title, duration, totalScore, passingScore, items:[...] }
@@ -164,6 +177,17 @@ const submitError = ref('')
 let timer = null
 // 交卷截止时间戳（毫秒），用于时间戳基准校准倒计时
 let deadline = 0
+// 考试开始时间戳（毫秒）：单题耗时结算的起点基准
+let examStartAt = 0
+// 作答顺序（首次作答的题号与时间戳）：单题耗时按「相邻作答间隔」近似结算（单页考试无逐题进入事件）
+let answerOrder = []
+let answerAt = new Set()
+
+// 错题归因队列（P0-4）：交卷后逐个弹出，可跳过
+const attrQueue = ref([])
+const attrIndex = ref(0)
+const attrOpen = computed(() => attrIndex.value < attrQueue.value.length)
+const attrCurrent = computed(() => attrQueue.value[attrIndex.value] || null)
 
 const usedTime = computed(() => {
   const total = (props.block.duration || 90) * 60
@@ -232,8 +256,13 @@ function fmtTime(sec) {
 function startExam() {
   phase.value = 'running'
   deadline = Date.now() + (props.block.duration || 90) * 60 * 1000
+  examStartAt = Date.now()
   timeLeft.value = (props.block.duration || 90) * 60
   answers.value = {}
+  answerOrder = []
+  answerAt = new Set()
+  attrQueue.value = []
+  attrIndex.value = 0
   timer = setInterval(() => {
     // 时间戳基准校准：后台/切标签回来后剩余时间自动修正，避免 setInterval 节流导致漂移
     timeLeft.value = Math.max(0, Math.ceil((deadline - Date.now()) / 1000))
@@ -249,11 +278,87 @@ function startExam() {
 function selectOption(i, oi) {
   const item = props.block.items[i]
   answers.value[i] = { answered: true, selected: oi, correct: oi === item.correctIndex }
+  markAnswered(i)
 }
 
 // 自评
 function selfAssess(i, correct) {
   answers.value[i] = { answered: true, selected: null, correct }
+  markAnswered(i)
+}
+
+/** 记录某题「首次作答」顺序（单题耗时的结算序列；重复改答不重复计时） */
+function markAnswered(i) {
+  if (answerAt.has(i)) return
+  answerAt.add(i)
+  answerOrder.push({ i, t: Date.now() })
+}
+
+/**
+ * 按作答顺序结算每题历时（毫秒）：以「上一次作答时间」为界，首题以考试开始为界。
+ * 单页考试没有逐题进入事件，用相邻作答间隔近似（一律时间戳差值，避免后台节流漂移）。
+ * @returns {Record<number, number>} 题号 → 历时
+ */
+function settleExamElapsed() {
+  const byIndex = {}
+  let prev = examStartAt || Date.now()
+  for (const { i, t } of answerOrder) {
+    byIndex[i] = Math.max(0, t - prev)
+    prev = t
+  }
+  return byIndex
+}
+
+/** 组卷单题作答行（question_attempt，source 固定 exam） */
+function buildExamAttempts() {
+  const c = props.context || {}
+  const fileKey = c.fileKey || ''
+  const elapsedByIndex = settleExamElapsed()
+  const out = []
+  props.block.items.forEach((item, i) => {
+    const a = answers.value[i]
+    if (!a || !a.answered) return
+    const choice = isChoice(item)
+    const elapsedMs = elapsedByIndex[i] != null ? elapsedByIndex[i] : 0
+    out.push({
+      subject: c.subject || 'math',
+      unitNum: c.unitNum || '',
+      fileKey,
+      questionKey: paperKeyOf({ fileKey, question: item.question }),
+      itemType: item.type || '',
+      source: 'exam',
+      picked: choice && a.selected !== null ? a.selected : null,
+      assess: choice ? null : a.correct ? 'known' : 'unknown',
+      correct: choice ? a.correct === true : null,
+      elapsedMs,
+      timedOut: elapsedMs >= TIMEOUT_MS,
+      reason: null,
+      createdAt: Date.now(),
+      createdAtDate: localDateStr()
+    })
+  })
+  return out
+}
+
+/** 本地日期串 YYYY-MM-DD（与 studyDb.getDateStr 同口径） */
+function localDateStr(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+// 归因层：一点即完成 → 回写该错题；跳过 → 不写字段，仅前进
+async function onAttrDone({ reason, kp }) {
+  const cur = attrCurrent.value
+  if (cur) {
+    try {
+      await db.attributeError(cur.id, { reason: reason || undefined, kp: kp || undefined })
+    } catch (e) {
+      console.error('[ExamBlock] 归因回写失败:', e)
+    }
+  }
+  attrIndex.value++
+}
+function onAttrSkip() {
+  attrIndex.value++
 }
 
 // 结果页：展示用户作答（选择题显示所选选项，自评题显示对错）
@@ -319,12 +424,20 @@ async function submitExam() {
       await db.recordAnswered(answeredCount.value, { fileKey: c.fileKey || '' })
     }
 
+    // 单题耗时批写（P0-3）：整卷一个事务；失败只记日志、不阻断交卷（与错题逐题容错同款）
+    try {
+      await db.addAttempts(buildExamAttempts())
+    } catch (e) {
+      console.error('[ExamBlock] 单题耗时落库失败:', e)
+    }
+
     // 错题入本（逐题容错：单题入库失败不阻断整卷交卷；recordError 内部会按 题干+页面 去重）
+    const queue = []
     for (const [i, item] of props.block.items.entries()) {
       if (answers.value[i]?.answered && !answers.value[i]?.correct) {
         const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
         try {
-          await db.recordError(
+          const r = await db.recordError(
             c.subject || 'math',
             c.unitNum || '',
             item.question,
@@ -333,11 +446,15 @@ async function submitExam() {
             `模拟卷解析：${item.answer}`,
             { fileKey: c.fileKey || '', fileTitle: c.fileTitle || '', unitTitle: c.unitTitle || '', difficulty: item.difficulty || '' }
           )
+          // 交卷后（结果页）逐题补标归因，避免作答中弹层打断考试（A-3 风险缓解）
+          queue.push({ id: r.id, question: item.question })
         } catch (e) {
           console.error('[ExamBlock] 错题入本失败:', e)
         }
       }
     }
+    attrQueue.value = queue
+    attrIndex.value = 0
 
     phase.value = 'result'
     // 测验页已交卷 → 刷新完成快照，答题卡/首页进度即时更新
@@ -357,6 +474,10 @@ function restartExam() {
   score.value = 0
   answers.value = {}
   submitError.value = ''
+  answerOrder = []
+  answerAt = new Set()
+  attrQueue.value = []
+  attrIndex.value = 0
   // 重置未答跳转状态
   lastJumpIndex = -1
   jumpTarget.value = -1

@@ -23,6 +23,27 @@
       <AppIcon name="chevron-right" :size="15" />
     </button>
 
+    <!-- 单题耗时（P0-3）：耗时最长 Top 3 + 平均；超时题数 > 0 时出「一键归因超时」 -->
+    <section v-if="attempts.length" class="card presult-time">
+      <h2 class="presult-time__title">单题耗时</h2>
+      <p class="presult-time__meta">
+        平均 {{ fmtSec(avgMs) }} · 超时 {{ timeouts }} 题（≥ {{ timeoutSec }} 秒）
+      </p>
+      <ol class="presult-time__list">
+        <li v-for="(a, i) in slowest" :key="a.id || i" class="presult-time__item">
+          <span class="pt-rank">{{ i + 1 }}</span>
+          <span class="pt-q">{{ summaryOf(a) }}</span>
+          <span class="pt-sec" :class="{ 'pt-sec--timeout': a.timedOut }">
+            <AppIcon v-if="a.timedOut" name="timer" :size="13" />{{ fmtSec(a.elapsedMs) }}
+          </span>
+        </li>
+      </ol>
+      <button v-if="timeouts > 0" class="presult-time__attr" :disabled="attributing" @click="attributeTimeouts">
+        <AppIcon name="timer" :size="15" /> 一键归因超时（{{ timeouts }} 题）
+      </button>
+      <p v-if="attributed > 0" class="presult-time__done">已标注 {{ attributed }} 题为「超时蒙猜」</p>
+    </section>
+
     <div class="presult-actions">
       <button class="pact" :disabled="!hasWrong" @click="store.redoErrors()">
         <AppIcon name="rotate-ccw" :size="16" /> 重做错题
@@ -69,6 +90,8 @@ import { useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import { usePracticeStore } from '@/stores/practice'
+import { paperKeyOf } from '@/content/practiceBank'
+import { topSlowest, timeoutCount, avgElapsedMs, TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 const store = usePracticeStore()
 const router = useRouter()
@@ -76,6 +99,45 @@ const router = useRouter()
 const st = computed(() => store.resultStats || { total: 0, autoCount: 0, autoCorrect: 0, selfCount: 0, selfKnown: 0, newErrors: 0, durationSec: 0 })
 
 const showReview = ref(false)
+
+// ===== 单题耗时（P0-3）=====
+const attempts = computed(() => store.session?.attempts || [])
+const slowest = computed(() => topSlowest(attempts.value, 3))
+const timeouts = computed(() => timeoutCount(attempts.value))
+const avgMs = computed(() => avgElapsedMs(attempts.value))
+const timeoutSec = Math.round(TIMEOUT_MS / 1000)
+
+const attributing = ref(false)
+const attributed = ref(0)
+/** 一键归因超时（A-3.4）：把本次超时题标为「超时蒙猜」并同步错题本 */
+async function attributeTimeouts() {
+  if (attributing.value) return
+  attributing.value = true
+  try {
+    attributed.value = await store.attributeTimeouts()
+  } catch (e) {
+    console.error('[practice] 一键归因超时失败:', e)
+  } finally {
+    attributing.value = false
+  }
+}
+
+/** 毫秒 → 「X分YY秒 / YY秒」 */
+function fmtSec(ms) {
+  const s = Math.round((Number(ms) || 0) / 1000)
+  const m = Math.floor(s / 60)
+  const r = s % 60
+  return m > 0 ? `${m}分${String(r).padStart(2, '0')}秒` : `${r}秒`
+}
+
+/** 由 questionKey（fileKey|question）反查题干摘要 */
+function summaryOf(a) {
+  const s = store.session
+  if (!s) return ''
+  const q = s.questions.find((x) => paperKeyOf(x) === a.questionKey)
+  const text = q ? q.question : ''
+  return text.length > 40 ? text.slice(0, 40) + '…' : text
+}
 
 /** 本次是否有错题（重做错题按钮禁用口径） */
 const hasWrong = computed(() => {
@@ -183,6 +245,33 @@ async function again() {
 .review-no .review-user { border-color: var(--danger); background: rgba(var(--danger-rgb), 0.06); }
 .review-answer { background: var(--surface-muted); }
 .review-label { font-weight: var(--fw-semibold); color: var(--text-muted); }
+
+/* 单题耗时（P0-3） */
+.presult-time { padding: var(--space-4); }
+.presult-time__title { font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+.presult-time__meta { color: var(--text-muted); font-size: var(--fs-md); margin-bottom: var(--space-3); }
+.presult-time__list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.presult-time__item { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-base); }
+.pt-rank {
+  flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--surface-muted); color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+}
+.pt-q { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-sec {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 3px;
+  color: var(--text-muted); font-variant-numeric: tabular-nums;
+}
+.pt-sec--timeout { color: var(--danger); font-weight: var(--fw-semibold); }
+.presult-time__attr {
+  margin-top: var(--space-3); width: 100%; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: var(--radius-full); border: 1px solid var(--danger);
+  background: rgba(var(--danger-rgb), 0.06); color: var(--danger); font-weight: var(--fw-semibold);
+}
+.presult-time__attr:disabled { opacity: 0.5; }
+.presult-time__done { margin-top: var(--space-2); color: var(--success); font-size: var(--fs-md); }
 
 @media (max-width: 600px) {
   .presult-actions { grid-template-columns: repeat(2, 1fr); }

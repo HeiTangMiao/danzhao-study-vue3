@@ -6,11 +6,13 @@
  *  - 组卷：composePaper 纯函数（难度分布 / 单元加权 / 三条去重），本 store 只喂参数
  *  - 会话状态机：home / config / session / result 四层页面共享的单一真相源
  *  - 落库：一律走既有 studyDb —— recordAnswered（答题数）+ recordError（错题本，
- *    写 SM-2 初始字段，复习 Tab 的 loadDueReviews 会自动捞到）；本 store 不写任何
- *    SM-2 逻辑、不建新仓库
+ *    写 SM-2 初始字段，复习 Tab 的 loadDueReviews 会自动捞到）+ addAttempts（单题耗时
+ *    question_attempt，P0-3 批写）；本 store 不写任何 SM-2 逻辑、不建新仓库
+ *  - 归因（P0-4）：自评「不会」后置 pendingAttribution，由视图弹二级归因层，
+ *    经 attributeError 回写 error_book.reason/kp（extra 透传，零迁移）
  *
  * 会话为内存态（未完成会话可在本页面续做，刷新后丢弃）——与 PRD §5.5 的决策一致：
- * 落库只剩两件事（答题数、错题本），其余状态不值得持久化。
+ * 落库只剩两件事（答题数、错题本），其余状态不值得持久化（单题耗时随会话结束批写入库）。
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -18,6 +20,7 @@ import { useStudyDbStore } from './studyDb'
 import { loadBankIndex, loadSubjectBank } from '@/utils/practiceBankClient'
 import { composePaper, weakAreasOf, weakWeightsFromErrors } from '@/utils/composePaper'
 import { paperKeyOf } from '@/content/practiceBank'
+import { TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 export const usePracticeStore = defineStore('practice', () => {
   const db = useStudyDbStore()
@@ -72,9 +75,12 @@ export const usePracticeStore = defineStore('practice', () => {
 
   // ===== L3 做题会话 =====
   // session: { mode, title, subject, unitNums, questions, index, records,
-  //            startedAt, finishedAt, newErrorIds, compose }
-  // record:  { picked: number|null, revealed: boolean, assess: null|'known'|'unknown' }
+  //            startedAt, finishedAt, newErrorIds, compose, attempts }
+  // record:  { picked, revealed, assess, enterAt, elapsedMs, errorId }
   const session = ref(null)
+
+  // 待归因（P0-4）：自评「我还不会」后置位，视图据此弹 ReasonChips；完成/跳过即清空
+  const pendingAttribution = ref(null) // { index: number } | null
 
   const current = computed(() =>
     session.value ? session.value.questions[session.value.index] : null
@@ -103,10 +109,18 @@ export const usePracticeStore = defineStore('practice', () => {
       unitNums: unitNums || [],
       questions,
       index: 0,
-      records: questions.map(() => ({ picked: null, revealed: false, assess: null })),
+      records: questions.map(() => ({
+        picked: null,
+        revealed: false,
+        assess: null,
+        enterAt: Date.now(), // 进入该题的时间戳（切题时重设），用于结算 elapsedMs
+        elapsedMs: null, // 结算后写入（毫秒）
+        errorId: null // 若入错题本，记录其 id 供归因回写
+      })),
       startedAt: Date.now(),
       finishedAt: null,
       newErrorIds: [],
+      attempts: null, // finishSession 批写后的 question_attempt 行
       compose: compose || null
     }
     phase.value = 'session'
@@ -205,7 +219,10 @@ export const usePracticeStore = defineStore('practice', () => {
           `练习解析：${q.answer}`,
           { fileKey: q.fileKey, fileTitle: q.fileTitle, unitTitle: q.unitTitle, difficulty: q.difficulty || '' }
         )
+        rec.errorId = r.id // 供归因回写（新入本与被去重命中都指向同一行）
         if (!r.duplicated) s.newErrorIds.push(r.id)
+        // 置待归因：视图弹二级归因层（可跳过，不阻塞继续答题）
+        pendingAttribution.value = { index: s.index }
       }
     } catch (e) {
       // 落库失败不阻断做题：回滚自评态让用户可重试，避免整题数据丢失
@@ -222,16 +239,135 @@ export const usePracticeStore = defineStore('practice', () => {
     if (isLast.value) {
       finishSession()
     } else {
+      settleRecord(s, s.index) // 结算上一题耗时
       s.index++
+      const rec = s.records[s.index]
+      if (rec) rec.enterAt = Date.now() // 进入下一题的时间戳
     }
   }
 
-  /** 结束会话并进入结算（逐题容错后到这里时数据已全部落库） */
+  /** 结算某题耗时（切题/收尾时调用；已结算则跳过），一律时间戳差值，不用计时器累加 */
+  function settleRecord(s, i) {
+    const rec = s && s.records[i]
+    if (!rec || rec.elapsedMs != null) return
+    rec.elapsedMs = Math.max(0, Date.now() - (rec.enterAt || Date.now()))
+  }
+
+  /**
+   * 结束会话并进入结算（逐题容错后到这里时数据已全部落库）
+   * 单题耗时批写异步进行：失败只记日志、不阻断结算（与 ExamBlock 逐题容错同款）
+   */
   function finishSession() {
     const s = session.value
     if (!s) return
+    settleRecord(s, s.index) // 结算最后一题
     s.finishedAt = Date.now()
     phase.value = 'result'
+    persistAttempts(s).catch((e) => console.error('[practice] 单题耗时落库失败:', e))
+  }
+
+  /** 组装 question_attempt 行（只记已作答的题；source 固定 practice） */
+  function buildAttempts(s) {
+    const out = []
+    s.questions.forEach((q, i) => {
+      const r = s.records[i]
+      if (!r || !r.assess) return
+      const elapsedMs = r.elapsedMs == null ? 0 : r.elapsedMs
+      out.push({
+        subject: q.subject,
+        unitNum: q.unitNum,
+        fileKey: q.fileKey,
+        questionKey: paperKeyOf(q),
+        itemType: q.itemType || '',
+        source: 'practice',
+        picked: r.picked,
+        assess: r.assess,
+        correct: r.picked !== null ? r.picked === q.correctIndex : null,
+        elapsedMs,
+        timedOut: elapsedMs >= TIMEOUT_MS,
+        reason: null,
+        createdAt: Date.now(),
+        createdAtDate: localDateStr()
+      })
+    })
+    return out
+  }
+
+  /** 单事务批写本次会话的单题耗时；写入结果回挂 session.attempts 供结算页取用 */
+  async function persistAttempts(s) {
+    const attempts = buildAttempts(s)
+    if (!attempts.length) {
+      s.attempts = []
+      return
+    }
+    s.attempts = await db.addAttempts(attempts)
+  }
+
+  /** 本地日期串 YYYY-MM-DD（与 studyDb.getDateStr 同口径） */
+  function localDateStr(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+
+  // ===== 错题归因（P0-4） =====
+
+  /**
+   * 提交归因：把 reason/kp 回写到刚入本的错题行（ReasonChips 的「一点即完成」出口）
+   * 跳过归因时勿传 reason/kp —— attributeError 只写非空值，不落空串
+   * @param {{reason?: string, kp?: string}} patch
+   */
+  async function setAttribution({ reason, kp } = {}) {
+    const pa = pendingAttribution.value
+    pendingAttribution.value = null
+    const s = session.value
+    const rec = pa && s ? s.records[pa.index] : null
+    if (!rec || !rec.errorId) return
+    try {
+      await db.attributeError(rec.errorId, { reason: reason || undefined, kp: kp || undefined })
+    } catch (e) {
+      console.error('[practice] 归因回写失败:', e)
+    }
+  }
+
+  /** 跳过归因（不写任何字段） */
+  function dismissAttribution() {
+    pendingAttribution.value = null
+  }
+
+  /** question_attempt.questionKey 形如 `${fileKey}|${question}`，反解题干 */
+  function questionOfAttempt(a) {
+    const key = (a && a.questionKey) || ''
+    const idx = key.indexOf('|')
+    return idx >= 0 ? key.slice(idx + 1) : ''
+  }
+
+  /**
+   * 一键归因超时（A-3.4）：把本次会话中 timedOut 的题标为「超时蒙猜」，
+   * 同步回写 question_attempt.reason 与对应 error_book.reason（按 fileKey + question 关联）
+   * @returns {Promise<number>} 归因的超时题数
+   */
+  async function attributeTimeouts() {
+    const s = session.value
+    if (!s || !Array.isArray(s.attempts) || !s.attempts.length) return 0
+    const timedOut = s.attempts.filter((a) => a.timedOut)
+    if (!timedOut.length) return 0
+    let errors = []
+    try {
+      errors = await db.getAllErrorsRaw()
+    } catch (e) {
+      console.error('[practice] 读取错题失败:', e)
+    }
+    for (const a of timedOut) {
+      try {
+        await db.setAttemptReason(a.id, '超时蒙猜')
+        a.reason = '超时蒙猜'
+        const question = questionOfAttempt(a)
+        const err = errors.find((e) => e.fileKey === a.fileKey && e.question === question)
+        if (err && err.id) await db.attributeError(err.id, { reason: '超时蒙猜' })
+      } catch (e) {
+        console.error('[practice] 超时归因失败:', e)
+      }
+    }
+    return timedOut.length
   }
 
   // ===== L4 结算 =====
@@ -348,6 +484,7 @@ export const usePracticeStore = defineStore('practice', () => {
     resultStats,
     reviewTargetRoute,
     sessionKeys,
+    pendingAttribution,
     // 动作
     ensureIndex,
     ensureBank,
@@ -364,6 +501,9 @@ export const usePracticeStore = defineStore('practice', () => {
     next,
     finishSession,
     redoErrors,
-    againSameConfig
+    againSameConfig,
+    setAttribution,
+    dismissAttribution,
+    attributeTimeouts
   }
 })

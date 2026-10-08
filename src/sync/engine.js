@@ -1,7 +1,7 @@
 /**
  * syncEngine —— 客户端同步引擎
  * 职责：
- *  - 采集本地 8 个仓库的全部变更（增量按 updatedAt 与服务端 LWW 裁决）
+ *  - 采集本地各仓库的全部变更（增量按 updatedAt 与服务端 LWW 裁决）
  *  - 推送本机变更 + 拉取远端变更并合并（墓碑删除）
  *  - 维护同步元信息（deviceId / since 游标），持久化到 localStorage
  *
@@ -21,7 +21,9 @@ const ENTITIES = [
   { entity: 'page_progress', store: 'page_progress', keyPath: 'key' },
   { entity: 'error_book', store: 'error_book', keyPath: 'id' },
   { entity: 'notes', store: 'notes', keyPath: 'pageKey' },
-  { entity: 'bookmarks', store: 'bookmarks', keyPath: 'pageKey' }
+  { entity: 'bookmarks', store: 'bookmarks', keyPath: 'pageKey' },
+  // 单题作答记录（P0-3）：整行 + updatedAt LWW，随同步上传（协议无字段白名单，服务端零改动）
+  { entity: 'question_attempt', store: 'question_attempt', keyPath: 'id' }
 ]
 
 /** 读取 / 初始化同步元信息 */
@@ -63,6 +65,7 @@ export function useSyncEngine() {
         case 'error_book': rows = await db.getAllErrorsRaw(); break
         case 'notes': rows = await db.getAllNotesRaw(); break
         case 'bookmarks': rows = await db.getAllBookmarksRaw(); break
+        case 'question_attempt': rows = await db.getAllAttempts(); break
         default: break
       }
       for (const row of rows) {

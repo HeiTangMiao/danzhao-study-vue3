@@ -1,7 +1,7 @@
 /**
  * studyDb Store —— IndexedDB 数据层（Pinia 封装）
  * 职责：
- *  - 封装 IndexedDB 的初始化与 7 个对象仓库的 CRUD 操作
+ *  - 封装 IndexedDB 的初始化与各对象仓库的 CRUD 操作
  *  - 替代旧版 assets/js/db.js 的 StudyDB 模块
  *  - 为各 composable 与 store 提供统一数据访问层（游戏化已移除）
  *
@@ -9,10 +9,12 @@
  *  - study_log：学习日志（每次访问/答题/测验的记录）
  *  - daily_stats：每日统计（文件数、题目数、学习时长）
  *  - page_progress：页面进度（访问状态、答题数、测验分数）
- *  - error_book：错题本（含 SM-2 间隔复习字段）
+ *  - error_book：错题本（含 SM-2 间隔复习字段 + 归因字段 reason/kp/wrongCount）
  *  - notes：每页笔记
  *  - bookmarks：书签收藏
  *  - user_progress：统一学习进度（completed 映射 + 最近学习时间戳）
+ *  - question_attempt：单题作答记录（elapsedMs 等，v7 新增，P0-3）
+ *  - content_cache / content_meta：S2 内容双轨预留空表（v7 建、当前不含数据）
  *
  * 版本历史：
  *  - v1~v3：曾在 daily_stats/study_log 等仓库记录 xp/checkin/成就等游戏字段
@@ -21,12 +23,14 @@
  *  - v6：error_book / study_log 移除自增主键，改由业务层生成 UUID 主键 ——
  *        历史自增数字 id 原样保留（服务端已同步过的行不受影响），新记录不再跨设备撞键；
  *        同时新增软删墓碑（deleted 字段），删除可跨设备传播
+ *  - v7：新增 question_attempt（单题作答记录，P0-3 本次消费）；同时**预留** S2 内容双轨
+ *        content_cache / content_meta 两表（形状已定稿，空表零成本，避免 S2 再升 v8）
  */
 import { defineStore } from 'pinia'
 
-// IndexedDB 配置（库名保持兼容；版本号 v6 收敛自增主键 + 墓碑）
+// IndexedDB 配置（库名保持兼容；版本号 v7 收敛单题作答记录 + S2 预留表）
 const DB_NAME = 'study_game_db'
-const DB_VERSION = 6
+const DB_VERSION = 7
 
 // 单例数据库连接
 let dbInstance = null
@@ -166,6 +170,25 @@ function openDB() {
               cursor.continue()
             }
           }
+        }
+      }
+
+      // v7：新增单题作答记录 question_attempt（本次 P0-3 消费）；同时**预留** S2 内容双轨两张表。
+      // 为什么一次升到 v7 并预留：IndexedDB 升版事务只跑一次、空表零成本 —— 预留后 S2 落地时
+      // DB 层零改动，兑现路线图「只升一次」的意图。D-2 学习计划的存储形态仍待定（预留可能键路径
+      // 错配），故**不**预留，若最终入库走后续独立 v8。
+      if (oldVersion < 7) {
+        if (!d.objectStoreNames.contains('question_attempt')) {
+          const s = d.createObjectStore('question_attempt', { keyPath: 'id' }) // 业务 UUID，无自增
+          s.createIndex('createdAt', 'createdAt', { unique: false })
+          s.createIndex('fileKey', 'fileKey', { unique: false })
+          s.createIndex('subject', 'subject', { unique: false })
+        }
+        if (!d.objectStoreNames.contains('content_cache')) {
+          d.createObjectStore('content_cache', { keyPath: 'key' })
+        }
+        if (!d.objectStoreNames.contains('content_meta')) {
+          d.createObjectStore('content_meta', { keyPath: 'key' })
         }
       }
     }
@@ -408,6 +431,84 @@ export const useStudyDbStore = defineStore('studyDb', {
       }
     },
 
+    /**
+     * 回写错题归因（A-3）：只写 reason/kp 的非空值 —— 跳过归因时不落空串，
+     * 对齐 validateBlock「可选字段给空串等于本想删」的纪律。
+     * @param {string} id error_book 主键
+     * @param {{reason?: string, kp?: string}} patch 归因补丁
+     * @returns {Promise<boolean>} 是否命中并写入
+     */
+    async attributeError(id, patch = {}) {
+      await this.init()
+      const rec = await dbGet('error_book', id)
+      if (!rec) return false
+      const next = { ...rec }
+      if (patch.reason) next.reason = patch.reason
+      if (patch.kp) next.kp = patch.kp
+      await dbPut('error_book', next)
+      return true
+    },
+
+    // ===== 单题作答记录（question_attempt，v7，P0-3 单题耗时） =====
+
+    /** 新增一条单题作答记录（主键由业务生成 UUID，无自增） */
+    async addAttempt(attempt) {
+      await this.init()
+      return dbAdd('question_attempt', { ...attempt, id: attempt.id || genId() })
+    },
+
+    /**
+     * 批量写入单题作答记录：一次会话 / 一次交卷 = 一个 IndexedDB 事务，
+     * 避免逐题写的写放大（路线图 A-2「写放大」风险）。落库失败由调用方捕获，
+     * 不阻断结算（与 ExamBlock 逐题容错同款）。
+     * @param {Array<object>} list 作答记录
+     * @returns {Promise<Array>} 实际落库的行（含生成的 UUID id 与 updatedAt）
+     */
+    async addAttempts(list) {
+      await this.init()
+      if (!Array.isArray(list) || list.length === 0) return []
+      const stamped = new Date().toISOString()
+      const rows = list.map((a) => ({
+        ...a,
+        id: a.id || genId(),
+        updatedAt: a.updatedAt || stamped
+      }))
+      return new Promise((resolve, reject) => {
+        const tx = dbInstance.transaction('question_attempt', 'readwrite')
+        const s = tx.objectStore('question_attempt')
+        for (const r of rows) s.put(r)
+        tx.oncomplete = () => resolve(rows)
+        tx.onerror = () => reject(tx.error)
+        tx.onabort = () => reject(tx.error)
+      })
+    },
+
+    /** 获取全部单题作答记录（只增不改，无墓碑需求） */
+    async getAllAttempts() {
+      await this.init()
+      return dbGetAll('question_attempt')
+    },
+
+    /** 按来源页面 fileKey 取单题作答记录（fileKey 索引） */
+    async getAttemptsByFileKey(fileKey) {
+      await this.init()
+      return new Promise((resolve, reject) => {
+        const r = getStore('question_attempt').index('fileKey').getAll(fileKey)
+        r.onsuccess = () => resolve(r.result || [])
+        r.onerror = () => reject(r.error)
+      })
+    },
+
+    /** 回写单题作答归因（A-3「一键归因超时」→ question_attempt.reason） */
+    async setAttemptReason(id, reason) {
+      await this.init()
+      const rec = await dbGet('question_attempt', id)
+      if (!rec) return false
+      if (reason) rec.reason = reason
+      await dbPut('question_attempt', rec)
+      return true
+    },
+
     // ===== 笔记 =====
 
     /** 获取某页笔记（软删墓碑视为无笔记） */
@@ -619,7 +720,9 @@ export const useStudyDbStore = defineStore('studyDb', {
     },
 
     /**
-     * 记录错题到错题本（SM-2 初始字段），同页面同题干去重
+     * 记录错题到错题本（SM-2 初始字段），同页面同题干去重。
+     * 归因字段（A-3）：reason / kp / wrongCount 经 extra 透传（行内加字段，零迁移，
+     * 随 engine.js 整行同步）—— 本 store **不**校验 reason 取值，由 UI 层用 REASONS 约束。
      * @returns {Promise<{ id, success, duplicated? }>}
      */
     async recordError(subject, unitNum, question, correctAnswer, userAnswer, explanation, extra) {
@@ -630,14 +733,20 @@ export const useStudyDbStore = defineStore('studyDb', {
         (e) => e.subject === subject && e.question === question &&
           (fileKey ? e.fileKey === fileKey : e.unitNum === unitNum)
       )
-      if (dup) return { id: dup.id, success: true, duplicated: true }
+      if (dup) {
+        // 重复入本：wrongCount 自增（**唯一自增点**，勿在 UI 层再加，避免双写翻倍）；
+        // 走 dbPut 刷新 updatedAt，令计数变更随同步上行
+        await dbPut('error_book', { ...dup, wrongCount: (dup.wrongCount || 1) + 1 })
+        return { id: dup.id, success: true, duplicated: true }
+      }
       const error = {
         subject, unitNum, question, correctAnswer, userAnswer,
         explanation: explanation || '',
         createdAt: Date.now(), createdAtDate: getDateStr(),
         reviewed: false, reviewCount: 0,
         easeFactor: 2.5, interval: 0, repetitions: 0,
-        nextReviewDate: getDateStr(), lastReviewedAt: null
+        nextReviewDate: getDateStr(), lastReviewedAt: null,
+        wrongCount: 1 // 首次入本计数为 1；重复入本走上方自增分支
       }
       if (extra && typeof extra === 'object') Object.assign(error, extra)
       const id = await this.addError(error)
@@ -681,13 +790,14 @@ export const useStudyDbStore = defineStore('studyDb', {
      */
     async exportAllData() {
       await this.init()
-      const [studyLogs, dailyStats, pageProgress, errors, notes, bookmarks] = await Promise.all([
+      const [studyLogs, dailyStats, pageProgress, errors, notes, bookmarks, attempts] = await Promise.all([
         this.getAllStudyLogs(),
         this.getAllDailyStats(),
         this.getAllPageProgress(),
         this.getAllErrors(),
         this.getAllNotes(),
-        this.getAllBookmarks()
+        this.getAllBookmarks(),
+        this.getAllAttempts()
       ])
 
       // 收集 localStorage 中与应用相关的数据（仅仍实际写入的键，避免备份历史残留键）
@@ -709,6 +819,7 @@ export const useStudyDbStore = defineStore('studyDb', {
         error_book: errors,
         notes,
         bookmarks,
+        question_attempt: attempts,
         localStorage: lsData
       }
     },
@@ -721,7 +832,7 @@ export const useStudyDbStore = defineStore('studyDb', {
       if (!data || typeof data !== 'object') throw new Error('无效的数据格式')
 
       // 参与导入的业务仓库（user_progress 已退役：完成状态由 page_progress 推导）
-      const stores = ['study_log', 'daily_stats', 'page_progress', 'error_book', 'notes', 'bookmarks']
+      const stores = ['study_log', 'daily_stats', 'page_progress', 'error_book', 'notes', 'bookmarks', 'question_attempt']
 
       // 数据格式校验（数组类仓库要求为数组）
       for (const key of stores) {
