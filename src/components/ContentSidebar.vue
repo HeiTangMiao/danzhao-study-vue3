@@ -33,7 +33,14 @@
     <div v-if="!collapsed" class="sidebar-inner">
       <!-- ===== 快捷操作区（吸顶） ===== -->
       <div class="sb-quick">
-        <div class="sb-title">快捷操作</div>
+        <!-- 标题行右端放「收起」：退出性操作与四个功能按钮语义不同类，分置更清晰；
+             侧栏在屏幕右侧，面板向右合拢 → chevron-right（桌面 UX 方案二批 1a） -->
+        <div class="sb-quick__head">
+          <div class="sb-title">快捷操作</div>
+          <button class="sb-quick__collapse" title="收起侧边栏" aria-label="收起侧边栏" @click="collapsed = true">
+            <AppIcon name="chevron-right" :size="16" />
+          </button>
+        </div>
         <div class="sb-actions">
           <!-- 首位「掌握」：页脚隐藏后（桌面 UX 方案 commit 1）主行动在此承接；
                on 态复用 sb-act.on 的 success 绿语义（与页脚 rf-master.on 一致） -->
@@ -44,7 +51,6 @@
           <button class="sb-act" :class="{ 'sb-act--marked': bookmarked }" :title="bookmarked ? '已收藏本页，点击取消' : '收藏本页'" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>{{ bookmarked ? '已收藏' : '收藏' }}</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
           <!-- 目录不设按钮：侧栏「本页章节」常驻即目录（用户裁定：toc-panel 浮层与目录按钮均为冗余） -->
-          <button class="sb-act" title="收起侧边栏" @click="collapsed = true"><AppIcon name="chevron-left" :size="16" /><span>收起</span></button>
         </div>
         <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处。
              桌面 UX 方案批 2：内容页不渲染（「学习中」对内容页是零信息量噪音）；
@@ -103,7 +109,8 @@
     <!-- 收起态：迷你图标徽标（完成状态不在此重复，展开后在快捷区查看）；
          展开入口集成在此按钮组首位（独立把手已按用户裁定移除） -->
     <div v-else class="sidebar-mini">
-      <button class="mini-item mini-item--expand" title="展开侧边栏" aria-label="展开侧边栏" @click="collapsed = false"><AppIcon name="chevron-right" :size="16" /></button>
+      <!-- 侧栏在屏幕右侧，面板向左展开 → chevron-left（桌面 UX 方案二批 1a 图标对调） -->
+      <button class="mini-item mini-item--expand" title="展开侧边栏" aria-label="展开侧边栏" @click="collapsed = false"><AppIcon name="chevron-left" :size="16" /></button>
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /></button>
       <!-- 掌握 mini 按钮：与展开态 sb-act 首位同语义（on = success 绿） -->
       <button class="mini-item" :class="{ on: mastered }" :title="mastered ? '已掌握本页，点击取消' : '标记本页已掌握'" :aria-label="mastered ? '取消掌握' : '标记掌握'" @click="emit('toggle-master')"><AppIcon name="target" :size="16" /></button>
@@ -389,9 +396,33 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   letter-spacing: 0.3px;
 }
 .sb-quick:first-child .sb-title { margin-top: 0; }
+/* 标题行：左标题 + 右端「收起」icon-only 幽灵钮（桌面 UX 方案二批 1b：开关独立出网格） */
+.sb-quick__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.sb-quick__head .sb-title { flex: 1; min-width: 0; }
+.sb-quick__collapse {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.sb-quick__collapse:hover { color: var(--primary); }
 .sb-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0,1fr) 掐死轨道不吃内容宽：「收藏↔已收藏」「掌握↔已掌握」文字变化不改按钮尺寸 */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
 }
 .sb-act {
@@ -407,6 +438,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   color: var(--text);
   transition: all 0.15s;
 }
+/* 等宽保险第二层：内容再长也裁切不出格（桌面 UX 方案二批 1b 双保险） */
+.sb-act span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sb-act:hover { border-color: var(--primary); color: var(--primary); }
 .sb-act.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
 
