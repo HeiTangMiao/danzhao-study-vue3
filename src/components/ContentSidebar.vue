@@ -699,17 +699,18 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     font-weight: 700;
   }
 
-  /* 快捷操作网格（原「更多操作」二级抽屉拍平进抽屉 body，3 列 × 2 行） */
+  /* 快捷操作网格（原「更多操作」二级抽屉拍平进抽屉 body，3 列 × 2 行）。
+     横排紧凑（图标+文字同行、44px 触达底线）：竖向堆叠占高约 144px 过大，横排压至 ~100px */
   .sb-shortcuts {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
     padding: 2px 0 4px;
   }
   .sb-shortcuts__item {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 6px;
-    min-height: 64px;
+    display: flex; flex-direction: row; align-items: center; justify-content: center;
+    gap: 8px;
+    min-height: 44px;
     background: var(--surface-muted);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
