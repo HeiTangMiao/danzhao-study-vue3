@@ -13,19 +13,20 @@
    - isDone      是否已完成
    - isMath      是否数学学科（侧边栏据此追加 math 主题类）
    - doneFiles   单元内各页面完成状态（布尔数组，移动端答题卡）
+   - mastered    本页是否已手动掌握（复用页脚主行动的数据落点 §5.7.7）
   移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
   注意：与 AppTabBar 互斥契约（system_design §4.1 / §9.3）：本组件只在详情页（UnitView）使用，
      而 AppTabBar 的底部 pill 在详情页（无 route.meta.tab）不渲染 —— 两个底栏永不同屏。
      若将来把 ContentSidebar 复用到一级 Tab 页，须同步收敛两处底栏的显示条件。
   emits:
    - scroll-to   跳转到区块 ({index})
-   - 完成状态由访问/交卷自动驱动（组件仅展示 isDone / doneFiles，无手动标记）
+   - toggle-master 标记/取消本页掌握（桌面 UX 方案 commit 1：页脚隐藏后侧栏承接）
    - toggle-bookmark 书签
    - toggle-notes 笔记
    - go-file     跳转同单元指定页
    - go-unit     跳转指定单元
-   - go-prev     上一页（移动端底部栏）
-   - go-next     下一页（移动端底部栏）
+   - go-prev     上一页（移动端底部栏 / 桌面侧栏翻页兜底）
+   - go-next     下一页（移动端底部栏 / 桌面侧栏翻页兜底）
 -->
 <template>
   <aside class="content-sidebar" :class="{ collapsed, 'math': isMath }">
@@ -34,6 +35,11 @@
       <div class="sb-quick">
         <div class="sb-title">快捷操作</div>
         <div class="sb-actions">
+          <!-- 首位「掌握」：页脚隐藏后（桌面 UX 方案 commit 1）主行动在此承接；
+               on 态复用 sb-act.on 的 success 绿语义（与页脚 rf-master.on 一致） -->
+          <button class="sb-act" :class="{ on: mastered }" :title="mastered ? '已掌握本页，点击取消' : '标记本页已掌握'" @click="emit('toggle-master')">
+            <AppIcon name="target" :size="16" /><span>{{ mastered ? '已掌握' : '掌握' }}</span>
+          </button>
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /><span>顶部</span></button>
           <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
@@ -70,6 +76,12 @@
             </button>
           </li>
         </ul>
+        <!-- 翻页兜底（桌面 UX 方案 commit 1）：键盘/分段条之外的三通道之一；
+             复用已声明的 go-prev/go-next 事件与 UnitView 既有绑定（零新增链路） -->
+        <div class="sb-pager">
+          <button class="sb-unit-btn" :disabled="!hasPrev" title="上一页" @click="emit('go-prev')">← 上一页</button>
+          <button class="sb-unit-btn" :disabled="!hasNext" title="下一页" @click="emit('go-next')">下一页 →</button>
+        </div>
       </nav>
 
       <!-- ===== 快捷导航区：单元切换 ===== -->
@@ -91,6 +103,8 @@
     <div v-else class="sidebar-mini">
       <button class="mini-item mini-item--expand" title="展开侧边栏" aria-label="展开侧边栏" @click="collapsed = false"><AppIcon name="chevron-right" :size="16" /></button>
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /></button>
+      <!-- 掌握 mini 按钮：与展开态 sb-act 首位同语义（on = success 绿） -->
+      <button class="mini-item" :class="{ on: mastered }" :title="mastered ? '已掌握本页，点击取消' : '标记本页已掌握'" :aria-label="mastered ? '取消掌握' : '标记掌握'" @click="emit('toggle-master')"><AppIcon name="target" :size="16" /></button>
       <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /></button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /></button>
     </div>
@@ -224,6 +238,8 @@ const props = defineProps({
   isMath: { type: Boolean, default: false },
   // 单元内各页面完成状态（布尔数组，供移动端答题卡网格）
   doneFiles: { type: Array, default: () => [] },
+  // 本页是否已手动掌握（页脚主行动同源数据，§5.7.7 语义③）
+  mastered: { type: Boolean, default: false },
   // v4 学习页（§5.7.0 空间账：页脚 130→52）：翻页职责移交 ReaderFooter，
   // 本组件的移动端底部操作栏不再渲染；抽屉/更多面板保留，由父组件经 expose 打开
   hideBar: { type: Boolean, default: false }
@@ -231,7 +247,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'scroll-to', 'scroll-top',
-  'toggle-bookmark', 'toggle-notes',
+  'toggle-master', 'toggle-bookmark', 'toggle-notes',
   'go-file', 'go-unit',
   'go-prev', 'go-next'
 ])
@@ -239,10 +255,6 @@ const emit = defineEmits([
 // 收起/展开状态（持久化）
 const collapsed = ref(localStorage.getItem('sidebar_collapsed') === '1')
 watch(collapsed, (v) => localStorage.setItem('sidebar_collapsed', v ? '1' : '0'))
-// 收起态同步到 body：reader.css 据此收窄功能条的避让量（侧栏只剩 mini 快捷列），
-// 用 body 类而非 :has() —— 不依赖选择器兼容性，卸载时清理防止状态残留到非学习页
-watch(collapsed, (v) => document.body.classList.toggle('sb-collapsed', v), { immediate: true })
-onBeforeUnmount(() => document.body.classList.remove('sb-collapsed'))
 
 // ===== 移动端：抽屉与更多面板 =====
 // 导航抽屉开关
@@ -449,6 +461,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   padding: 0 5px;
 }
 .sb-unit-goto { display: flex; gap: 6px; }
+/* 「本单元内容」区尾部的翻页兜底行（桌面 UX 方案 commit 1），样式复用 sb-unit-btn */
+.sb-pager { display: flex; gap: 6px; margin-top: 8px; }
 .sb-unit-btn {
   flex: 1;
   background: var(--surface-muted);

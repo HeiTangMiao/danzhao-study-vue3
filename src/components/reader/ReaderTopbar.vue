@@ -37,9 +37,21 @@
       </button>
     </div>
 
-    <!-- 2px 分段进度：段数自适应 segs = min(n, 12)（§5.7.0 第 2 条） -->
-    <div class="rt-segs" aria-hidden="true">
-      <i v-for="s in segCount" :key="s" :class="{ done: s < curSeg, cur: s === curSeg }"></i>
+    <!-- 2px 分段进度：段数自适应 segs = min(n, 12)（§5.7.0 第 2 条）。
+         桌面 UX 方案 commit 1：由纯刻度升级为可点击分段（点段 → 跳该段首页，带转场），
+         aria-hidden 随之移除（可交互元素必须可被辅助技术感知） -->
+    <div class="rt-segs" role="navigation" aria-label="单元分页">
+      <button
+        v-for="s in segCount"
+        :key="s"
+        type="button"
+        class="rt-seg"
+        :class="{ done: s < curSeg, cur: s === curSeg }"
+        :title="`第 ${segToFileIndex(s) + 1} 页`"
+        :aria-label="`第 ${segToFileIndex(s) + 1} 页`"
+        :aria-current="s === curSeg ? 'true' : null"
+        @click="emit('go-index', segToFileIndex(s))"
+      ></button>
     </div>
   </header>
 </template>
@@ -60,7 +72,7 @@ const props = defineProps({
   notesOpen: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['back', 'bookmark', 'notes', 'toc'])
+const emit = defineEmits(['back', 'bookmark', 'notes', 'toc', 'go-index'])
 
 // 首帧规避：玻璃容器先绘，下一帧再挂内联 SVG（WebKit bug #322045，§5.6.1 v4 失效项的补救）
 const iconsReady = ref(false)
@@ -80,6 +92,18 @@ const curSeg = computed(() => {
   if (!props.total) return 0
   return Math.min(segCount.value, Math.floor((props.fileIndex * segCount.value) / props.total) + 1)
 })
+
+/**
+ * 段 s（1 基）→ 该段首页的 fileIndex：curSeg 比例映射的逆映射。
+ * curSeg = floor(i × segs / n) + 1，floor(i × segs / n) = s - 1
+ * ⇒ i ≥ (s - 1) × n / segs，最小整数解 = ceil((s - 1) × n / segs)。
+ * clamp 到 [0, n-1] 兜底浮点边界（s = segs 时理论值必 ≤ n-1，防御性收口）。
+ */
+function segToFileIndex(s) {
+  if (!props.total) return 0
+  const i = Math.ceil(((s - 1) * props.total) / segCount.value)
+  return Math.min(Math.max(0, i), props.total - 1)
+}
 
 const pageLabel = computed(() =>
   props.total ? `${props.fileIndex + 1} / ${props.total}` : ''

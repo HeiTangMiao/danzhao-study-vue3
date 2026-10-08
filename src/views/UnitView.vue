@@ -35,6 +35,7 @@
       @toc="onTopbarToc"
       @bookmark="bookmark.toggleBookmark()"
       @notes="showNotes = !showNotes"
+      @go-index="goFile"
     />
 
     <!-- 加载中提示 -->
@@ -116,9 +117,11 @@
       :is-done="isDone"
       :is-math="subject === 'math'"
       :done-files="doneFiles"
+      :mastered="isPageMastered"
       :hide-bar="true"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
+      @toggle-master="togglePageMastered"
       @toggle-bookmark="bookmark.toggleBookmark()"
       @toggle-notes="showNotes = !showNotes"
       @go-file="goFile"
@@ -294,6 +297,8 @@ function onScroll() {
 }
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  // 桌面键盘翻页（桌面 UX 方案 commit 1）：页脚隐藏后补上的第三条翻页通道之一
+  window.addEventListener('keydown', onKeydown)
   if (typeof window.matchMedia === 'function') {
     narrowMq = window.matchMedia('(max-width: 899px)')
     isNarrowViewport.value = narrowMq.matches
@@ -303,6 +308,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('keydown', onKeydown)
   if (scrollRaf) cancelAnimationFrame(scrollRaf)
   narrowMq?.removeEventListener('change', onNarrowChange)
   // 进入动效的观察器随组件销毁，防止持有已卸载 DOM 的引用
@@ -506,6 +512,33 @@ async function pagingGo(dir, offset = dir === 'next' ? 1 : -1) {
       swipe.springBack(0)
     }
   }, 450)
+}
+
+/**
+ * 桌面键盘翻页（桌面 UX 方案 commit 1）：←/→ 走 pagingGo 统一转场路径。
+ * 守卫采用白名单式逐条 return 放行书写，缺省才触发翻页：
+ * ① 测验作答中（与滑动翻页 isBlocked 同源的 examState）
+ * ② 表单元素聚焦（←/→ 在输入框内是移动光标，不能被翻页劫持）
+ * ③ 离开确认弹层开着（confirmLeave 就在本组件内，可直接读）
+ * ④ 答题卡抽屉/更多面板开着——面板状态在 ContentSidebar 内部未 expose，
+ *    但其 watch 在面板打开时会锁 body 滚动（overflow:hidden），以该副作用作守卫
+ * ⑤ 翻页转场进行中（三态机单飞，避免连按堆积导航）
+ * 带修饰键的 ←/→ 是浏览器/系统快捷键（如 ⌘+← 回历史），一并不劫持。
+ */
+function isEditableTarget(el) {
+  if (!el) return false
+  const tag = el.tagName
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable
+}
+function onKeydown(e) {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
+  if (examState.active) return
+  if (isEditableTarget(document.activeElement)) return
+  if (confirmLeave.value) return
+  if (document.body.style.overflow === 'hidden') return
+  if (swipe.phase.value !== 'idle') return
+  pagingGo(e.key === 'ArrowLeft' ? 'prev' : 'next')
 }
 
 /**

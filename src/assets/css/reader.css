@@ -124,7 +124,9 @@
   .rt-actions { display: none; }
 }
 
-/* 2px 分段进度：放页眉内底边（不另起 fixed 元素，少一个层叠上下文，§5.7.0 第 2 条） */
+/* 2px 分段进度：放页眉内底边（不另起 fixed 元素，少一个层叠上下文，§5.7.0 第 2 条）。
+ * 桌面 UX 方案 commit 1：由纯刻度升级为可点击按钮（段 → 该段首页跳页），
+ * 所以用 button 承载并保留键盘可达性（focus-visible 描边） */
 .rt-segs {
   position: absolute;
   bottom: 0;
@@ -133,13 +135,22 @@
   height: 2px;
   display: flex;
 }
-.rt-segs i {
+.rt-segs .rt-seg {
   flex: 1;
+  border: none;
+  padding: 0;
   background: var(--line);
+  cursor: pointer;
 }
-.rt-segs i + i { margin-left: 2px; }
-.rt-segs i.done { background: color-mix(in srgb, var(--primary) 40%, transparent); }
-.rt-segs i.cur { background: var(--primary); }
+.rt-segs .rt-seg + .rt-seg { margin-left: 2px; }
+.rt-segs .rt-seg.done { background: color-mix(in srgb, var(--primary) 40%, transparent); }
+.rt-segs .rt-seg.cur { background: var(--primary); }
+/* 分段条只有 2px 高，focus 描边外扩到页眉下缘可见范围（键盘可达性） */
+.rt-segs .rt-seg:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+  border-radius: 1px;
+}
 
 /* ============================================================
  * ReaderFooter —— 52px 玻璃页脚（常驻）
@@ -306,27 +317,11 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
   }
 }
 
-/* ---------- 宽屏避让侧栏（≥1150）----------
- * 右侧固定侧栏（z 90）出现后，功能条若仍 left:0/right:0 会横穿其区域
- * （在侧栏左缘露出截断白条，用户实测发现）。右端避让 = 侧栏宽
- * --sb-rail-w + 侧栏 right 12px + 12px 视觉间隙。
- * ⚠️ 必须位于 .reader-topbar/.reader-footer 主规则之后：同特异性后者胜，
- *    放在主规则前会被 right:0 盖回（实测踩过）。 */
+/* ---------- 桌面端（≥1150）隐藏页脚 ----------
+ * 页脚的三个职责在桌面端已有更好的承接（桌面 UX 方案 commit 1，用户拍板）：
+ * 翻页 → 键盘 ←/→ + 分段条点击 + 侧栏翻页兜底；掌握 → 侧栏「掌握」按钮。
+ * display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动）；
+ * ≤1150 移动端页脚完全不受影响。 */
 @media (min-width: 1150px) {
-  .reader-topbar {
-    right: calc(var(--sb-rail-w, 236px) + 24px);
-  }
-  .reader-footer {
-    right: calc(var(--sb-rail-w, 236px) + 24px);
-  }
-}
-
-/* 侧栏收起态：右侧只剩 mini 快捷列（44px，right 12px）→ 避让量收窄，
-   否则功能条右端留 260px 空带（用户实测反馈的「顶栏缺口」）。
-   body.sb-collapsed 由 ContentSidebar watch 同步（卸载时移除）。 */
-@media (min-width: 1150px) {
-  body.sb-collapsed .reader-topbar,
-  body.sb-collapsed .reader-footer {
-    right: 68px; /* mini 列 44 + 右缝 12 + 间隙 12 */
-  }
+  .reader-footer { display: none; }
 }
