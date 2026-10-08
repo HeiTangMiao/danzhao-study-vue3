@@ -20,7 +20,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { collectBank, capText } from '../scripts/build-practice-bank.mjs'
+import { collectBank, capText, applyVerifiedFlags, isVerifiedEntry } from '../scripts/build-practice-bank.mjs'
 import { composePaper } from '@/utils/composePaper'
 import { normalizeBankItem, paperKeyOf } from '@/content/practiceBank'
 import { deriveJudge, isJudgeItem } from '@/content/judgeDerive'
@@ -204,6 +204,98 @@ describe('题库产物与归一化（A-4 同权口径）', () => {
     expect(normalizeBankItem({ k: 'x', dv: true, vf: true }).verified).toBe(true)
     expect(normalizeBankItem({ k: 'x', dv: true }).verified).toBe(false)
   })
+})
+
+describe('A-4 verified 白名单键含学科前缀（F1：防跨学科同键连带）', () => {
+  const mkItem = (over = {}) => ({
+    k: '01/0/0/2',
+    s: 'chinese',
+    q: '判断题题干',
+    a: '**正确。**解析',
+    g: true,
+    o: ['正确', '错误'],
+    ci: 0,
+    dv: true,
+    ...over
+  })
+
+  it('带学科前缀的核验键只作用于本学科；另一学科同键条目不被连带置 vf', () => {
+    const shards = {
+      chinese: [mkItem({ s: 'chinese' })],
+      computer: [mkItem({ s: 'computer', a: '**错误。**', ci: 1 })]
+    }
+    const { verifiedDerived, subjects, audit } = applyVerifiedFlags(
+      shards,
+      new Set(['chinese/01/0/0/2'])
+    )
+    expect(verifiedDerived).toBe(1)
+    expect(shards.chinese[0].vf).toBe(true)
+    expect(shards.computer[0].vf).toBeUndefined() // 关键：不被连带
+    expect(subjects.chinese.verified).toBe(1)
+    expect(subjects.computer.verified).toBe(0)
+    expect(audit).toHaveLength(2)
+    expect(audit[0]).toHaveProperty('s') // 抽检清单含学科，便于人工按前缀核验
+  })
+
+  it('裸键（旧格式/误用）不再命中任何条目', () => {
+    const shards = { chinese: [mkItem()] }
+    const { verifiedDerived } = applyVerifiedFlags(shards, new Set(['01/0/0/2']))
+    expect(verifiedDerived).toBe(0)
+    expect(shards.chinese[0].vf).toBeUndefined()
+  })
+
+  it('非派生条目（dv 非真）即使同键也不置 vf，且不进抽检清单', () => {
+    const shards = { chinese: [mkItem({ dv: false })] }
+    const { verifiedDerived, audit } = applyVerifiedFlags(shards, new Set(['chinese/01/0/0/2']))
+    expect(verifiedDerived).toBe(0)
+    expect(audit).toHaveLength(0)
+  })
+
+  it('单键核验 + 幂等：同输入重复求得一致结果；isVerifiedEntry 学科敏感', () => {
+    const build = () => ({ chinese: [mkItem()] })
+    const a = applyVerifiedFlags(build(), new Set(['chinese/01/0/0/2']))
+    const b = applyVerifiedFlags(build(), new Set(['chinese/01/0/0/2']))
+    expect(a.verifiedDerived).toBe(1)
+    expect(b.verifiedDerived).toBe(1)
+    expect(isVerifiedEntry(new Set(['chinese/01/0/0/2']), 'chinese', '01/0/0/2')).toBe(true)
+    expect(isVerifiedEntry(new Set(['chinese/01/0/0/2']), 'computer', '01/0/0/2')).toBe(false)
+  })
+
+  it(
+    '真实库：跨学科同键派生条目，核验其一不连带另一学科（QA 实测 415 同键场景）',
+    async () => {
+      const { shards } = await getBank()
+      // 找一个「跨学科同键且两学科均为派生题」的真实例子
+      const byKey = new Map()
+      for (const [subject, list] of Object.entries(shards)) {
+        for (const it of list) {
+          if (!it.dv) continue
+          const arr = byKey.get(it.k) || []
+          arr.push({ subject, item: it })
+          byKey.set(it.k, arr)
+        }
+      }
+      const cross = [...byKey.entries()].find(
+        ([, arr]) => new Set(arr.map((x) => x.subject)).size >= 2
+      )
+      expect(cross).toBeTruthy() // 内容库确有跨学科同键派生条目
+      const [key, arr] = cross
+      const subjectA = arr[0].subject
+      const expectedA = arr.filter((x) => x.subject === subjectA).length
+      // 深拷贝，避免污染共享 shards（getBank 有缓存）
+      const clone = JSON.parse(JSON.stringify(shards))
+      const { verifiedDerived } = applyVerifiedFlags(clone, new Set([`${subjectA}/${key}`]))
+      expect(verifiedDerived).toBe(expectedA)
+      // 其它学科的同键条目一律不得被置 vf
+      for (const [subject, list] of Object.entries(clone)) {
+        if (subject === subjectA) continue
+        for (const it of list) {
+          if (it.k === key) expect(it.vf).toBeUndefined()
+        }
+      }
+    },
+    60000
+  )
 })
 
 describe('真实题库组卷验收（§5.6）', () => {

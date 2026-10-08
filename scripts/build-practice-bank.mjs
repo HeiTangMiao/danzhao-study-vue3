@@ -41,8 +41,10 @@ const VERIFIED_FILE = join(ROOT, 'scripts', 'derived-verified.json')
 
 /**
  * 读取人工核验白名单（A-4）：支持 `{ keys: [...] }` 或裸数组
+ * 键格式为 **`${subject}/${key}`**（如 `chinese/01/0/0/2`）—— 因题库键 `k` 仅**学科内唯一**
+ * （全库存在大量跨学科同键），若按裸 `k` 匹配会跨学科连带置位（F1 缺陷）。
  * 文件缺失/损坏按空集处理，不阻断构建（构建脚本对人工输入的鲁棒性）
- * @returns {Set<string>}
+ * @returns {Set<string>} 元素形如 `chinese/01/0/0/2`
  */
 export function loadVerifiedKeys() {
   try {
@@ -52,6 +54,61 @@ export function loadVerifiedKeys() {
   } catch {
     return new Set()
   }
+}
+
+/**
+ * 判断某派生条目是否在人工核验白名单内（F1 修复）：
+ * 白名单键 = `${subject}/${key}`，**带学科前缀**，避免裸键跨学科连带。
+ * @param {Set<string>} verifiedKeys 白名单集合（元素形如 'chinese/01/0/0/2'）
+ * @param {string} subject 学科 key
+ * @param {string} key 题库键（学科内唯一）
+ * @returns {boolean}
+ */
+export function isVerifiedEntry(verifiedKeys, subject, key) {
+  return !!verifiedKeys && verifiedKeys.has(`${subject}/${key}`)
+}
+
+/**
+ * 合并人工核验结果并汇总计数（纯函数，便于单测；build() 直接消费）。
+ * 副作用：对 `shards` 中命中白名单的派生条目（it.dv===true）置 `it.vf = true`。
+ * @param {Record<string, Array>} shards 分片（学科 → 条目数组）
+ * @param {Set<string>} verifiedKeys 人工核验白名单（键 `${subject}/${key}`）
+ * @returns {{subjects: object, total: number, gradableTotal: number, derivedTotal: number, verifiedDerived: number, audit: Array}}
+ */
+export function applyVerifiedFlags(shards, verifiedKeys) {
+  const subjects = {}
+  const audit = [] // 派生抽检清单（A-4，供人工核验）
+  let total = 0
+  let gradableTotal = 0
+  let derivedTotal = 0
+  let verifiedDerived = 0
+  for (const [subject, list] of Object.entries(shards)) {
+    let gradable = 0
+    let derived = 0
+    let verified = 0
+    for (const it of list) {
+      if (it.g) gradable++
+      if (it.dv) {
+        derived++
+        // vf 只对派生题有意义；人工题缺省不写，避免污染既有 gradable 口径
+        if (isVerifiedEntry(verifiedKeys, it.s, it.k)) it.vf = true
+        if (it.vf) verified++
+        audit.push({
+          k: it.k,
+          s: it.s,
+          q: it.q,
+          verdict: it.ci === 0 ? '正确' : '错误',
+          aHead: it.a.slice(0, 24)
+        })
+      }
+    }
+    subjects[subject] = { count: list.length, gradable, derived, verified }
+    total += list.length
+    gradableTotal += gradable
+    derivedTotal += derived
+    verifiedDerived += verified
+  }
+  return { subjects, total, gradableTotal, derivedTotal, verifiedDerived, audit }
 }
 
 /**
@@ -237,42 +294,12 @@ function collectExamPapers(shards) {
 
 async function build() {
   const { shards, truncated, unregistered, judgeExceptions } = await collectBank()
-  // A-4：人工核验白名单（仅对 dv:true 的条目打 vf）
+  // A-4：人工核验白名单（键 `${subject}/${key}`；仅对 dv:true 的条目打 vf；F1 修复防跨学科连带）
   const verifiedKeys = loadVerifiedKeys()
 
   // 2) 汇总索引（小，L1 常驻）：学科题量 + gradable/derived/verified 计数 + 真题卷清单
-  const subjects = {}
-  let total = 0
-  let gradableTotal = 0
-  let derivedTotal = 0
-  let verifiedDerived = 0
-  const audit = [] // 派生抽检清单（A-4，供人工核验）
-  for (const [subject, list] of Object.entries(shards)) {
-    let gradable = 0
-    let derived = 0
-    let verified = 0
-    for (const it of list) {
-      if (it.g) gradable++
-      if (it.dv) {
-        derived++
-        // vf 只对派生题有意义；人工题缺省不写，避免污染既有 gradable 口径
-        if (verifiedKeys.has(it.k)) it.vf = true
-        if (it.vf) verified++
-        audit.push({
-          k: it.k,
-          s: it.s,
-          q: it.q,
-          verdict: it.ci === 0 ? '正确' : '错误',
-          aHead: it.a.slice(0, 24)
-        })
-      }
-    }
-    subjects[subject] = { count: list.length, gradable, derived, verified }
-    total += list.length
-    gradableTotal += gradable
-    derivedTotal += derived
-    verifiedDerived += verified
-  }
+  const { subjects, total, gradableTotal, derivedTotal, verifiedDerived, audit } =
+    applyVerifiedFlags(shards, verifiedKeys)
   const index = {
     generatedAt: new Date().toISOString(),
     total,
