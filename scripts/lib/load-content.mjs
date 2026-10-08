@@ -39,7 +39,8 @@ export const NON_PAGE_FILES = new Set([
   'index.js', // 多学科索引
   'pageMeta.js', // 页面元信息推导（纯 ESM，两端共用）
   'loadPage.js', // 页面加载入口（浏览器侧）
-  'searchIndex.js' // 搜索索引形状定义（纯 ESM，两端共用，见阶段 7.4）
+  'searchIndex.js', // 搜索索引形状定义（纯 ESM，两端共用，见阶段 7.4）
+  'practiceBank.js' // 练习题库形状定义（纯 ESM，两端共用，见 P6）
 ])
 
 /** 统一为正斜杠路径（兼容 Windows 的反斜杠） */

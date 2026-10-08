@@ -17,6 +17,7 @@
     "tauri:android:build": "tauri android build",
     "tauri:android:init": "tauri android init",
     "validate:content": "node scripts/validate-content.mjs",
+    "build:practice": "node scripts/build-practice-bank.mjs",
     "geogebra": "node scripts/fetch-geogebra.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

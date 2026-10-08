@@ -53,6 +53,18 @@ export function resolvePageMeta(site, unitNum, fileIndex) {
 }
 
 /**
+ * 页面唯一键（与 UnitView 的 pageKey 同一条规则）
+ * 背景：recordError / recordAnswered 的去重与累计键都是 fileKey，此前只有
+ *      UnitView 在浏览器侧拼这一串；P6 题库脚本需要在构建期给每题附上
+ *      相同格式的 fileKey，所以收敛到这里作为唯一真相源。
+ * @param {{subject: string, unitNum: string, name: string}} meta resolvePageMeta 的结果
+ * @returns {string} 形如 `math_02_一元二次不等式`
+ */
+export function pageFileKeyOf(meta) {
+  return `${meta.subject}_${meta.unitNum}_${meta.name}`
+}
+
+/**
  * 包装成渲染层消费的页面对象
  *
  * 关键：meta 优先，页面文件自带的旧元信息字段一律忽略。
