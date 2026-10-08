@@ -124,6 +124,19 @@
   .rt-actions { display: none; }
 }
 
+/* 移动端（≤1150px）触达放大：顶栏 44→52（与页脚 52 对称）、按钮 36→44（移动触达标准）、
+ * 图标 20/18→22/20。桌面 ≥1151 保持 44px / 36×36 / 原图标尺寸不变（本块只在窄端覆盖，
+ * --reader-topbar-h 默认值仍为 44px）。图标尺寸走 CSS（覆盖 AppIcon 的 width/height 属性）而非
+ * 改 :size —— 这是「窄端才放大」的响应式关切，交给媒体查询单点控制，组件无需读视口、
+ * 保持声明式且无 JS 断点耦合。分段条 rt-segs 绝对定位于 bottom:0，随顶部增高自然贴底，无需改。 */
+@media (max-width: 1150px) {
+  :root { --reader-topbar-h: 52px; }
+  .rt-back { width: 44px; height: 44px; }
+  .rt-back svg { width: 22px; height: 22px; }
+  .rt-act { width: 44px; height: 44px; }
+  .rt-act svg { width: 20px; height: 20px; }
+}
+
 /* 2px 分段进度：放页眉内底边（不另起 fixed 元素，少一个层叠上下文，§5.7.0 第 2 条）。
  * 桌面 UX 方案 commit 1：由纯刻度升级为可点击按钮（段 → 该段首页跳页），
  * 所以用 button 承载并保留键盘可达性（focus-visible 描边） */

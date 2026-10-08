@@ -14,7 +14,7 @@
    - isMath      是否数学学科（侧边栏据此追加 math 主题类）
    - doneFiles   单元内各页面完成状态（布尔数组，移动端答题卡）
    - mastered    本页是否已手动掌握（复用页脚主行动的数据落点 §5.7.7）
-  移动端（≤1150px）形态：底部操作栏（目录/上页/下页主按钮/更多）+ 答题卡导航抽屉（下滑手势关闭）+ 更多操作面板
+  移动端（≤1150px）形态：答题卡导航抽屉（下滑手势关闭；快捷操作 6 项已拍平进抽屉 body，无二级面板）+ 底部操作栏（hideBar 时不渲染）
   注意：与 AppTabBar 互斥契约（system_design §4.1 / §9.3）：本组件只在详情页（UnitView）使用，
      而 AppTabBar 的底部 pill 在详情页（无 route.meta.tab）不渲染 —— 两个底栏永不同屏。
      若将来把 ContentSidebar 复用到一级 Tab 页，须同步收敛两处底栏的显示条件。
@@ -122,12 +122,12 @@
     </div>
   </aside>
 
-  <!-- ===== 移动端（≤1150px）：底部操作栏（翻页优先）+ 答题卡导航抽屉 + 更多面板 ===== -->
+  <!-- ===== 移动端（≤1150px）：答题卡导航抽屉（内含快捷操作）+ 底部操作栏 ===== -->
   <div class="sb-mobile">
     <!-- 抽屉遮罩 -->
-    <div class="sb-backdrop" :class="{ show: sheetOpen || moreOpen }" @click="closeSheets"></div>
+    <div class="sb-backdrop" :class="{ show: sheetOpen }" @click="closeSheets"></div>
 
-    <!-- 导航抽屉：单元进度 + 答题卡网格 + 本页章节 + 单元切换 -->
+    <!-- 导航抽屉：快捷操作 + 单元进度 + 答题卡网格 + 本页章节 + 单元切换 -->
     <div
       class="sb-sheet"
       :class="{ open: sheetOpen, dragging: sheetDragging }"
@@ -148,13 +148,11 @@
       </div>
       <div class="sb-sheet__head">
         <span class="sb-sheet__title">{{ unit?.title }}</span>
-        <!-- 完成状态：移动端唯一的只读状态徽章（与桌面端一致，非按钮） -->
-        <span class="sb-status" :class="{ on: isDone }">
-          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
+        <!-- 完成状态：与桌面端同一条件（仅测验页渲染；内容页「访问即完成」恒显是零信息量噪音）；
+             文案/判定与桌面端 sb-status 完全一致（待作答 / 已交卷） -->
+        <span v-if="isTestPage" class="sb-status" :class="{ on: isDone }" :title="isDone ? '本页测验已交卷' : '本页测验待作答'">
+          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已交卷' : '待作答' }}
         </span>
-        <!-- 更多操作入口（QA F1）：hideBar 后 sb-bar 不渲染，「更多」面板（收藏/笔记/翻页/番茄钟）
-             唯一可达入口在此，与答题卡抽屉语义衔接（点开即切面板，body 滚动锁由既有 watch 无缝接管） -->
-        <button class="sb-sheet__more" title="更多操作" aria-label="更多操作" @click="openSheet('more')">⋯ 更多</button>
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false"><AppIcon name="x" :size="18" /></button>
       </div>
       <div class="sb-sheet__body">
@@ -165,6 +163,20 @@
           </div>
           <span class="sb-progress__text">{{ doneCount }}/{{ unit.files.length }} 已完成</span>
         </div>
+
+        <!-- 快捷操作：原「更多操作」二级抽屉（6 项）拍平进本抽屉（用户裁定：不再多访问一层）。
+             整格 3 列 × 2 行放答题卡之前；操作类项点击后关抽屉再触发，与并入前体验一致 -->
+        <nav class="sb-nav">
+          <div class="sb-title">快捷操作</div>
+          <div class="sb-shortcuts">
+            <button class="sb-shortcuts__item" title="收藏本页" @click="emit('toggle-bookmark'); sheetOpen = false"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏本页</span></button>
+            <button class="sb-shortcuts__item" title="学习笔记" @click="emit('toggle-notes'); sheetOpen = false"><AppIcon name="square-pen" :size="16" /><span>学习笔记</span></button>
+            <button class="sb-shortcuts__item" title="返回顶部" @click="emit('scroll-top'); sheetOpen = false"><AppIcon name="arrow-up" :size="16" /><span>返回顶部</span></button>
+            <button class="sb-shortcuts__item" :disabled="!hasPrev" title="上一页" @click="emit('go-prev'); sheetOpen = false"><AppIcon name="chevron-left" :size="16" /><span>上一页</span></button>
+            <button class="sb-shortcuts__item" :disabled="!hasNext" title="下一页" @click="emit('go-next'); sheetOpen = false"><AppIcon name="chevron-right" :size="16" /><span>下一页</span></button>
+            <button class="sb-shortcuts__item" title="番茄钟" @click="emit('toggle-pomodoro'); sheetOpen = false"><AppIcon name="timer" :size="16" /><span>番茄钟</span></button>
+          </div>
+        </nav>
 
         <!-- 答题卡网格：本单元页面一览（对勾 = 已完成 / 高亮 = 当前页 / 考 = 测验页） -->
         <nav v-if="unit" class="sb-nav">
@@ -213,33 +225,14 @@
       </div>
     </div>
 
-    <!-- 更多操作面板：收藏 / 笔记 / 顶部 + 上一页 / 下一页 / 番茄钟（6 项整格，桌面 UX 方案二批 2A） -->
-    <div class="sb-sheet sb-sheet--more" :class="{ open: moreOpen }" role="dialog" aria-modal="true" aria-label="更多操作" :aria-hidden="!moreOpen">
-      <div class="sb-sheet__head">
-        <span class="sb-sheet__title">⋯ 更多操作</span>
-        <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="moreOpen = false"><AppIcon name="x" :size="18" /></button>
-      </div>
-      <div class="sb-more">
-        <!-- 6 项整格（3 列 × 2 行）：页脚退场后翻页兜底进更多面板（桌面 UX 方案二批 2A）；
-             番茄钟项为方案三共用入口，emit toggle-pomodoro 由 UnitView 接面板开关 -->
-        <button class="sb-more__item" @click="emit('toggle-bookmark'); moreOpen = false"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏本页</span></button>
-        <button class="sb-more__item" @click="emit('toggle-notes'); moreOpen = false"><AppIcon name="square-pen" :size="16" /><span>学习笔记</span></button>
-        <button class="sb-more__item" @click="emit('scroll-top'); moreOpen = false"><AppIcon name="arrow-up" :size="16" /><span>返回顶部</span></button>
-        <button class="sb-more__item" :disabled="!hasPrev" @click="emit('go-prev'); moreOpen = false"><AppIcon name="chevron-left" :size="16" /><span>上一页</span></button>
-        <button class="sb-more__item" :disabled="!hasNext" @click="emit('go-next'); moreOpen = false"><AppIcon name="chevron-right" :size="16" /><span>下一页</span></button>
-        <button class="sb-more__item" @click="emit('toggle-pomodoro'); moreOpen = false"><AppIcon name="timer" :size="16" /><span>番茄钟</span></button>
-      </div>
-    </div>
-
-    <!-- 底部常驻操作栏：目录 / 上一页 / 下一页（主操作）/ 更多 -->
+    <!-- 底部常驻操作栏：目录 / 上一页 / 下一页（主操作）；「更多」概念已并入导航抽屉，不再单列 -->
     <!-- v4：翻页/入口职责移交 ReaderFooter 与 ReaderTopbar，hideBar 时不渲染（§5.7.0） -->
     <div v-if="!hideBar" class="sb-bar">
-      <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet('nav')"><AppIcon name="menu" :size="16" /><span>目录</span></button>
+      <button class="sb-bar__btn" :class="{ on: sheetOpen }" title="答题卡与章节导航" @click="openSheet()"><AppIcon name="menu" :size="16" /><span>目录</span></button>
       <button class="sb-bar__btn" :disabled="!hasPrev" title="上一页" @click="emit('go-prev')">←<span>上页</span></button>
       <button class="sb-bar__next" :title="nextBtnTitle" @click="onNextClick">
         {{ nextBtnLabel }}
       </button>
-      <button class="sb-bar__btn" :class="{ on: moreOpen }" title="更多操作" @click="openSheet('more')">⋯<span>更多</span></button>
     </div>
   </div>
 </template>
@@ -265,7 +258,7 @@ const props = defineProps({
   // 笔记面板是否打开（NotesPanel 显隐同源；sb-act--open 主色高亮，桌面 UX 方案二批 4）
   notesOpen: { type: Boolean, default: false },
   // v4 学习页（§5.7.0 空间账：页脚 130→52）：翻页职责移交 ReaderFooter，
-  // 本组件的移动端底部操作栏不再渲染；抽屉/更多面板保留，由父组件经 expose 打开
+  // 本组件的移动端底部操作栏不再渲染；抽屉保留（含快捷操作），由父组件经 expose 打开
   hideBar: { type: Boolean, default: false }
 })
 
@@ -280,33 +273,29 @@ const emit = defineEmits([
 const collapsed = ref(localStorage.getItem('sidebar_collapsed') === '1')
 watch(collapsed, (v) => localStorage.setItem('sidebar_collapsed', v ? '1' : '0'))
 
-// ===== 移动端：抽屉与更多面板 =====
-// 导航抽屉开关
+// ===== 移动端：答题卡导航抽屉 =====
+// 导航抽屉开关（唯一抽屉；原「更多操作」二级面板已拍平进其 body，见模板）
 const sheetOpen = ref(false)
-// 更多操作面板开关
-const moreOpen = ref(false)
 
-function openSheet(which) {
-  if (which === 'nav') { sheetOpen.value = !sheetOpen.value; moreOpen.value = false }
-  else { moreOpen.value = !moreOpen.value; sheetOpen.value = false }
+function openSheet() {
+  sheetOpen.value = !sheetOpen.value
 }
 function closeSheets() {
   sheetOpen.value = false
-  moreOpen.value = false
 }
 
-// v4：底部操作栏隐藏后，父组件（UnitView）经模板 ref 打开答题卡抽屉/更多面板
+// v4：底部操作栏隐藏后，父组件（UnitView）经模板 ref 打开答题卡抽屉
 defineExpose({ openSheet, closeSheets })
 
-// Esc 关闭抽屉 / 更多面板
+// Esc 关闭抽屉
 function onKeyDown(e) {
-  if (e.key === 'Escape' && (sheetOpen.value || moreOpen.value)) closeSheets()
+  if (e.key === 'Escape' && sheetOpen.value) closeSheets()
 }
 onMounted(() => window.addEventListener('keydown', onKeyDown))
 
-// 面板打开时锁定背景滚动（移动端手势隔离）
-watch([sheetOpen, moreOpen], ([s, m]) => {
-  document.body.style.overflow = (s || m) ? 'hidden' : ''
+// 抽屉打开时锁定背景滚动（移动端手势隔离）
+watch(sheetOpen, (s) => {
+  document.body.style.overflow = s ? 'hidden' : ''
 })
 onBeforeUnmount(() => {
   document.body.style.overflow = ''
@@ -338,7 +327,7 @@ function onGrabTouchEnd() {
 const hasPrev = computed(() => props.fileIndex > 0)
 const hasNext = computed(() => !!props.unit && props.fileIndex < props.unit.files.length - 1)
 
-// 当前页是否测验页（桌面徽章只对测验页渲染，已交卷/待作答；内容页零信息量不渲染）
+// 当前页是否测验页（双端徽章只对测验页渲染，已交卷/待作答；内容页零信息量不渲染）
 const isTestPage = computed(() => !!props.unit?.files[props.fileIndex]?.isTest)
 
 // 完成状态自动记录（访问即完成 / 测验交卷），底部主按钮只负责翻页与单元跳转
@@ -648,20 +637,6 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     background: var(--surface-muted);
     border: 1px solid var(--border);
   }
-  /* 抽屉头「更多操作」入口（QA F1）：导航抽屉 → 更多面板的切换钮 */
-  .sb-sheet__more {
-    flex: 0 0 auto;
-    height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0 12px;
-    border-radius: var(--radius-full);
-    background: var(--surface-muted);
-    border: 1px solid var(--border);
-    font-size: 0.8rem;
-    color: var(--text);
-    white-space: nowrap;
-  }
-  .sb-sheet__more:active { transform: scale(0.95); }
   .sb-sheet__body { overflow-y: auto; padding: 4px 12px 12px; }
   .sb-sheet .sb-title { margin-top: 12px; }
   .sb-sheet .sb-item { padding: 12px 8px; min-height: 44px; }
@@ -724,15 +699,14 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     font-weight: 700;
   }
 
-  /* 更多操作面板 */
-  .sb-sheet--more { max-height: none; }
-  .sb-more {
+  /* 快捷操作网格（原「更多操作」二级抽屉拍平进抽屉 body，3 列 × 2 行） */
+  .sb-shortcuts {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    padding: 2px 0 4px;
   }
-  .sb-more__item {
+  .sb-shortcuts__item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 6px;
     min-height: 64px;
@@ -743,12 +717,11 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     color: var(--text);
     transition: all 0.15s;
   }
-  .sb-more__item:active { transform: scale(0.95); }
-  .sb-more__item span { font-size: 0.75rem; color: var(--text-muted); }
-  .sb-more__item.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); }
-  .sb-more__item.on span { color: var(--success); }
+  .sb-shortcuts__item:active { transform: scale(0.95); }
+  .sb-shortcuts__item span { font-size: 0.75rem; color: var(--text-muted); }
+  .sb-shortcuts__item:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  /* ===== 底部常驻操作栏：目录 / 上页 / 下页（主操作）/ 更多 ===== */
+  /* ===== 底部常驻操作栏：目录 / 上页 / 下页（主操作） ===== */
   .sb-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 120;
     display: flex; align-items: stretch; gap: 6px;

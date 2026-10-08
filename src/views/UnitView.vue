@@ -595,7 +595,7 @@ function goHome() {
 
 /** 页眉「答题卡与目录」：移动端打开答题卡抽屉。桌面端目录常驻侧栏（toc-panel 浮层已按用户裁定移除） */
 function onTopbarToc() {
-  sidebarRef.value?.openSheet('nav')
+  sidebarRef.value?.openSheet()
 }
 
 // 滚动到顶部
