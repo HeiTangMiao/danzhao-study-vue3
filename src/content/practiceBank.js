@@ -72,6 +72,8 @@ export const BANK_ITEM_KEYS = {
   d: 'difficulty',
   it: 'itemType', // 内容侧题型：single / judge / fill / solution 等
   g: 'gradable', // 有 options 且有 correctIndex → 可机器判分
+  dv: 'derived', // 判断题构建期派生而来（A-1，布尔）
+  vf: 'verified', // 派生结论已人工核验（A-4；仅对 dv:true 有意义，缺省不写）
   sr: 'source' // 'quiz' | 'exam'（自动组卷默认排除 exam，见 prd-mobile §5.6）
 }
 
@@ -90,5 +92,8 @@ export function normalizeBankItem(raw) {
   item.difficulty = raw.d || ''
   item.options = Array.isArray(raw.o) ? raw.o : null
   item.correctIndex = typeof raw.ci === 'number' ? raw.ci : undefined
+  // 派生/核验标记：缺省即 false（紧凑键缺失时不污染运行时口径）
+  item.derived = raw.dv === true
+  item.verified = raw.vf === true
   return item
 }

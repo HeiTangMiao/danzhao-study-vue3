@@ -9,16 +9,18 @@
  *  - 文件遍历与元信息一律来自 scripts/lib/load-content.mjs（与 search-index /
  *    validate-content 共用同一实现，避免二次漂移，见 prd-mobile §5.5）
  *  - 分片路径 / 条目键 / 字段上限来自 src/content/practiceBank.js（两端共用）
+ *  - 判断题派生来自 src/content/judgeDerive.js（零 import 纯函数，页面内 QuizBlock 复用同一函数）
  *  - 任何截断必须 console.warn 点名，不允许静默失败
  *  - 只读内容、只写 public/practice-bank/，不碰 src/content/ 数据页
  *
  * 用法：node scripts/build-practice-bank.mjs（或 npm run build:practice）
  */
-import { writeFileSync, mkdirSync, rmSync, statSync } from 'node:fs'
+import { writeFileSync, mkdirSync, rmSync, statSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { ROOT, CONTENT_DIR, collectFiles, buildMetaIndex, importFresh, relPathOf } from './lib/load-content.mjs'
 import { pageFileKeyOf } from '../src/content/pageMeta.js'
+import { deriveJudge, isJudgeItem, scanJudgeExceptions } from '../src/content/judgeDerive.js'
 import {
   BANK_DIR,
   BANK_INDEX_FILE,
@@ -30,6 +32,27 @@ import {
 
 const PUBLIC_DIR = join(ROOT, 'public')
 const OUT_DIR = join(PUBLIC_DIR, BANK_DIR)
+
+/** 派生抽检清单文件名（A-4，构建产出、供人工核验） */
+const AUDIT_FILE = '_derived-audit.json'
+
+/** 人工核验白名单（A-4，人工维护后入库，构建时消费） */
+const VERIFIED_FILE = join(ROOT, 'scripts', 'derived-verified.json')
+
+/**
+ * 读取人工核验白名单（A-4）：支持 `{ keys: [...] }` 或裸数组
+ * 文件缺失/损坏按空集处理，不阻断构建（构建脚本对人工输入的鲁棒性）
+ * @returns {Set<string>}
+ */
+export function loadVerifiedKeys() {
+  try {
+    const obj = JSON.parse(readFileSync(VERIFIED_FILE, 'utf-8'))
+    const keys = Array.isArray(obj) ? obj : obj && Array.isArray(obj.keys) ? obj.keys : []
+    return new Set(keys.map((k) => String(k)))
+  } catch {
+    return new Set()
+  }
+}
 
 /**
  * 文本按上限裁剪
@@ -87,7 +110,8 @@ export function extractQuestions(block) {
 
 /**
  * 采集题库数据（不落盘，便于测试直接断言形状与覆盖数）
- * @returns {Promise<{shards: Record<string, Array>, truncated: Array<{rel: string, key: string}>, unregistered: string[]}>}
+ * @returns {Promise<{shards: Record<string, Array>, truncated: Array<{rel: string, key: string}>, unregistered: string[], judgeExceptions: Array}>}
+ *   judgeExceptions：命中判断题形态判据但答案不以加粗「正确。/错误。」开头的条目（A-1 例外清单，非阻塞）
  */
 export async function collectBank() {
   // 1) 依站点配置建立「文件相对路径 → 元信息」索引（保证只采已注册页面）
@@ -96,6 +120,8 @@ export async function collectBank() {
   const shards = {}
   const truncated = []
   const unregistered = []
+  // 判断题候选（含 k/s，供 scanJudgeExceptions 定位例外）——不在此处判例外，交纯函数统一处理
+  const judgeCandidates = []
 
   for (const file of collectFiles(CONTENT_DIR)) {
     const rel = relPathOf(file)
@@ -130,8 +156,10 @@ export async function collectBank() {
         const rawAnswer = typeof item.answer === 'string' && item.answer ? item.answer : item.solution
         const aCap = capText(rawAnswer, ANSWER_LIMIT)
         // 判分口径（prd-mobile §5.1）：有 options 且有 correctIndex → 可机器判分
-        const gradable =
+        let gradable =
           Array.isArray(item.options) && item.options.length > 0 && item.correctIndex !== undefined
+        // A-1：判断题构建期派生（唯一真相源 deriveJudge，页面内 QuizBlock 复用同一函数）
+        const derived = deriveJudge(item)
         const entry = {
           k: practiceKeyOf(info, blockIndex, itemIndex),
           s: info.subject,
@@ -151,6 +179,24 @@ export async function collectBank() {
         if (gradable) {
           entry.o = item.options
           entry.ci = item.correctIndex
+        } else if (derived) {
+          // 派生：补选项 + 正确答案索引，并打 dv 标记（vf 在 build() 合并白名单时打）
+          entry.o = derived.options
+          entry.ci = derived.correctIndex
+          entry.dv = true
+          gradable = true
+        }
+        entry.g = gradable
+        // 判断题候选：形态判据命中即登记（例外判定交 scanJudgeExceptions，末尾统一 warn）
+        if (isJudgeItem(item)) {
+          judgeCandidates.push({
+            type: item.type,
+            question: item.question,
+            answer: item.answer,
+            solution: item.solution,
+            k: entry.k,
+            s: info.subject
+          })
         }
         if (qCap.truncated || aCap.truncated) {
           truncated.push({ rel, key: entry.k })
@@ -160,7 +206,7 @@ export async function collectBank() {
     })
   }
 
-  return { shards, truncated, unregistered }
+  return { shards, truncated, unregistered, judgeExceptions: scanJudgeExceptions(judgeCandidates) }
 }
 
 /**
@@ -190,22 +236,49 @@ function collectExamPapers(shards) {
 }
 
 async function build() {
-  const { shards, truncated, unregistered } = await collectBank()
+  const { shards, truncated, unregistered, judgeExceptions } = await collectBank()
+  // A-4：人工核验白名单（仅对 dv:true 的条目打 vf）
+  const verifiedKeys = loadVerifiedKeys()
 
-  // 2) 汇总索引（小，L1 常驻）：学科题量 + gradable 占比 + 真题卷清单
+  // 2) 汇总索引（小，L1 常驻）：学科题量 + gradable/derived/verified 计数 + 真题卷清单
   const subjects = {}
   let total = 0
   let gradableTotal = 0
+  let derivedTotal = 0
+  let verifiedDerived = 0
+  const audit = [] // 派生抽检清单（A-4，供人工核验）
   for (const [subject, list] of Object.entries(shards)) {
-    const gradable = list.filter((it) => it.g).length
-    subjects[subject] = { count: list.length, gradable }
+    let gradable = 0
+    let derived = 0
+    let verified = 0
+    for (const it of list) {
+      if (it.g) gradable++
+      if (it.dv) {
+        derived++
+        // vf 只对派生题有意义；人工题缺省不写，避免污染既有 gradable 口径
+        if (verifiedKeys.has(it.k)) it.vf = true
+        if (it.vf) verified++
+        audit.push({
+          k: it.k,
+          s: it.s,
+          q: it.q,
+          verdict: it.ci === 0 ? '正确' : '错误',
+          aHead: it.a.slice(0, 24)
+        })
+      }
+    }
+    subjects[subject] = { count: list.length, gradable, derived, verified }
     total += list.length
     gradableTotal += gradable
+    derivedTotal += derived
+    verifiedDerived += verified
   }
   const index = {
     generatedAt: new Date().toISOString(),
     total,
     gradableTotal,
+    derivedTotal,
+    verifiedDerived,
     subjects,
     examPapers: collectExamPapers(shards)
   }
@@ -214,11 +287,12 @@ async function build() {
   rmSync(OUT_DIR, { recursive: true, force: true })
   mkdirSync(OUT_DIR, { recursive: true })
   writeFileSync(join(PUBLIC_DIR, BANK_INDEX_FILE), JSON.stringify(index), 'utf-8')
+  writeFileSync(join(OUT_DIR, AUDIT_FILE), JSON.stringify(audit), 'utf-8')
   for (const [subject, list] of Object.entries(shards)) {
     writeFileSync(join(PUBLIC_DIR, practiceShardPath(subject)), JSON.stringify(list), 'utf-8')
   }
 
-  // 4) 超限必报告：截断与未注册文件必须点名
+  // 4) 超限必报告：截断、未注册文件、判断题例外必须点名
   if (truncated.length) {
     console.warn(
       `[practice-bank] ⚠️ 以下题目文本超过上限（题干 ${QUESTION_LIMIT} / 答案 ${ANSWER_LIMIT} 字符）已截断：\n  ` +
@@ -228,6 +302,15 @@ async function build() {
   if (unregistered.length) {
     console.warn(`[practice-bank] ⚠️ 以下文件未注册进 site.js，已跳过：\n  ` + unregistered.join('\n  '))
   }
+  // A-1 例外清单：命中判断题形态判据但答案不以加粗「正确。/错误。」开头（不派生、不阻塞，请内容侧核对）
+  if (judgeExceptions.length) {
+    console.warn(
+      `[practice-bank] ⚠️ 以下判断题形态命中但答案非加粗「正确。/错误。」开头，未派生（请内容侧核对）：\n  ` +
+        judgeExceptions
+          .map((e) => `${e.s}/${e.k} reason=${e.reason} aHead=「${e.answerHead}」`)
+          .join('\n  ')
+    )
+  }
 
   const sizes = Object.keys(shards)
     .map((subject) => {
@@ -236,7 +319,8 @@ async function build() {
     })
     .join('、')
   console.log(
-    `[practice-bank] 已生成 ${BANK_INDEX_FILE}（共 ${total} 题，gradable ${gradableTotal}）+ ${sizes}`
+    `[practice-bank] 已生成 ${BANK_INDEX_FILE}（共 ${total} 题，gradable ${gradableTotal}，` +
+      `derived ${derivedTotal}，verified ${verifiedDerived}）+ ${sizes}`
   )
 }
 
