@@ -1,0 +1,54 @@
+sequenceDiagram
+    autonumber
+    participant App as App.vue / 启动
+    participant Store as contentStore(导航派生)
+    participant Client as contentClient
+    participant IDB as IndexedDB(content_cache)
+    participant SRV as 远程静态目录
+    participant Loader as loadPage
+    participant Builtin as 内置内容 chunk
+
+    Note over App: ① 启动：内置基线即时可用，不阻塞首屏
+    App->>Store: init()
+    Store->>Client: loadCachedManifest()
+    Client->>IDB: 读 manifest + pages + maxSeenVersion
+    IDB-->>Client: 缓存（可能为空）
+    Client->>Client: mergeSite(内置 site.js, sitePatch)
+    Client-->>Store: resolvedSite（内置 + 远程增量）
+    Store-->>App: 立即渲染（离线也成立）
+
+    Note over Client,SRV: ② 后台静默更新（不阻塞）
+    Client->>SRV: GET manifest.json（异步）
+    alt 远程 contentVersion > 本地 maxSeen
+        SRV-->>Client: manifest（新版）
+        Client->>SRV: GET 变更单元分片
+        SRV-->>Client: 分片 JSON
+        Client->>Client: verifyHash() + 结构轻校验
+        alt 校验通过
+            Client->>IDB: 原子写入 pages + manifest + maxSeen
+            Client-->>Store: 通知刷新 resolvedSite
+        else 校验失败
+            Client->>Client: 丢弃该页 · 保持缓存/内置 · 上报
+        end
+    else 无更新 / 网络失败
+        Client-->>Client: 静默跳过（用缓存或内置）
+    end
+
+    Note over Loader,Builtin: ③ 打开某页：远程优先，内置兜底
+    Loader->>Store: resolvePageMeta(resolvedSite, subject, unitNum, fileIndex)
+    Store-->>Loader: meta（含 title/subtitle/isTest）
+    Loader->>Client: getPage(subject, unitNum, fileIndex)
+    Client->>IDB: 查 content_cache
+    IDB-->>Client: 命中？
+    alt 命中远程页（已更新）
+        Client-->>Loader: PageEntry
+        Loader->>Loader: hydratePage(remote, meta)
+    else 未命中 / 远程不可用
+        Loader->>Builtin: import('@/content/…') 内置兜底
+        alt 内置存在
+            Builtin-->>Loader: 内置页面
+            Loader->>Loader: hydratePage(builtin, meta)
+        else 纯新增坐标且远程失败
+            Loader-->>Loader: 返回 null → 「内容加载失败」占位（不崩溃）
+        end
+    end

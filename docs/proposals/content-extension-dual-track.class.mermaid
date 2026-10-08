@@ -1,0 +1,121 @@
+classDiagram
+    direction TB
+
+    class BuiltinContent {
+        <<轨道A 内置基线·零改动>>
+        +139 页纯数据 ESM
+        +export default { blocks }
+    }
+    class SiteConfig {
+        +subject : string
+        +units : Unit[]
+        +files[] 顺序即 fileIndex
+    }
+    class Unit {
+        +num : string
+        +title : string
+        +folder : string
+        +phase : number
+        +files : FileRef[]
+    }
+    class FileRef {
+        +name : string
+        +title : string
+        +subtitle : string
+        +isTest? : boolean
+    }
+
+    class ContentManifest {
+        <<轨道B 清单·常驻>>
+        +schemaVersion : int
+        +contentVersion : int
+        +generatedAt : ISO8601
+        +sitePatchHash : string
+        +sitePatch : SitePatch?
+        +units : Map~unitKey, UnitRef~
+    }
+    class UnitRef {
+        +hash : string
+        +updatedAt : ISO8601
+        +path : string
+        +count : int
+        +version : int
+    }
+    class SitePatch {
+        <<只追加>>
+        +units : AppendUnit[]
+        +fileMetaUpdates? : FileMetaUpdate[]
+    }
+    class ContentSnapshot {
+        <<轨道B 分片·按需>>
+        +schemaVersion : int
+        +contentVersion : int
+        +unitKey : string
+        +pages : PageEntry[]
+    }
+    class PageEntry {
+        +subject : string
+        +unitNum : string
+        +fileIndex : int
+        +fileKey : string
+        +op : upsert|append
+        +hash : string
+        +blocks : Block[]
+    }
+
+    class contentManifestJs {
+        <<纯ESM 零import·两端共用>>
+        +SCHEMA_VERSION
+        +manifestPath() : string
+        +snapshotPath(unitKey) : string
+        +pageKeyOf(meta) : string
+    }
+    class contentClient {
+        <<浏览器运行时>>
+        +loadManifest() : ContentManifest
+        +getPage(subject,unitNum,fileIndex) : PageEntry|null
+        +refresh() : void
+        +getResolvedSite(subject) : SiteConfig
+    }
+    class mergeContent {
+        <<纯函数·易测>>
+        +mergeSite(builtin, sitePatch) : SiteConfig
+        +pickPage(builtin, remote) : Page
+        +verifyHash(page, expected) : bool
+    }
+    class ContentCache {
+        <<IndexedDB v7>>
+        +content_cache : {key,version,payload,hash}
+        +content_meta : {key,manifest,maxSeenVersion}
+    }
+    class loadPage {
+        <<唯一加载入口>>
+        +loadPage(subject,unitNum,fileIndex)
+        +importPageModule() 内置兜底
+    }
+    class buildContentRemote {
+        <<Node 发布脚本>>
+        +collectSnapshot()
+        +validateAll()
+        +emitManifest() + emitShards()
+    }
+
+    SiteConfig "1" *-- "*" Unit
+    Unit "1" *-- "*" FileRef
+    ContentManifest "1" *-- "*" UnitRef
+    ContentManifest "0..1" *-- "1" SitePatch
+    ContentSnapshot "1" *-- "*" PageEntry
+
+    contentManifestJs ..> ContentManifest : 定义形状
+    contentManifestJs ..> ContentSnapshot : 定义形状
+    contentClient --> ContentManifest : 加载/缓存
+    contentClient --> ContentSnapshot : 拉取/缓存
+    contentClient --> ContentCache : 读写
+    contentClient --> mergeContent : 复用
+    contentClient --> contentManifestJs : 复用路径/键
+    loadPage --> contentClient : 远程优先
+    loadPage --> BuiltinContent : 兜底 import
+    mergeContent ..> SiteConfig : 产出
+    buildContentRemote --> ContentSnapshot : 产出
+    buildContentRemote --> ContentManifest : 产出
+    buildContentRemote ..> SiteConfig : 读取内置
