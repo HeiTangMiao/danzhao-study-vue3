@@ -28,12 +28,13 @@
       role="dialog"
       aria-label="学习笔记"
     >
-      <!-- 头部 = 唯一拖拽把手 -->
+      <!-- 头部 = 唯一拖拽把手；pointercancel 兜底（指针在窗外释放时 pointerup 不派发） -->
       <div
         class="notes-head"
         @pointerdown="onHandleDown"
         @pointermove="onHandleMove"
         @pointerup="onHandleUp"
+        @pointercancel="onHandleUp"
       >
         <span class="notes-head__title"><AppIcon name="square-pen" :size="16" /> 我的笔记</span>
         <span class="notes-status" :class="'notes-' + state.statusType.value">{{ state.status.value }}</span>
@@ -128,11 +129,11 @@ function applyPos() {
 let lockOwned = false
 function syncBodyLock(open) {
   const mobile = typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_MQ).matches
-  if (!mobile) return
-  if (open && document.body.style.overflow !== 'hidden') {
+  if (mobile && open && document.body.style.overflow !== 'hidden') {
     document.body.style.overflow = 'hidden'
     lockOwned = true
-  } else if (!open && lockOwned) {
+  } else if ((!open || !mobile) && lockOwned) {
+    // 关闭、或断点穿梭回桌面（浮窗形态不锁滚动）→ 释放自己加的锁
     document.body.style.overflow = ''
     lockOwned = false
   }
@@ -147,7 +148,11 @@ watch(() => props.open, (v) => {
 })
 
 function onResize() {
-  if (props.open) applyPos()
+  if (props.open) {
+    applyPos()
+    // 断点穿梭（桌面开面板 → 缩到移动端）时补抽屉滚动锁 / 反向时释放
+    syncBodyLock(true)
+  }
 }
 onMounted(() => window.addEventListener('resize', onResize))
 onBeforeUnmount(() => {
@@ -173,6 +178,9 @@ function onHandleDown(e) {
 
 function onHandleMove(e) {
   if (!dragging.value || !dragStart) return
+  // 兜底：鼠标键已松开但 pointerup 未派发（释放发生在窗外/ capture 丢失）→ 按抬起收口，
+  // 否则面板会持续跟随无按键的 hover 移动
+  if (e.pointerType === 'mouse' && e.buttons === 0) { onHandleUp(); return }
   dragDx.value = dragStart.dx + (e.clientX - dragStart.px)
   dragDy.value = dragStart.dy + (e.clientY - dragStart.py)
 }
