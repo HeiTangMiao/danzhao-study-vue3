@@ -49,8 +49,11 @@
           </button>
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /><span>顶部</span></button>
           <button class="sb-act" :class="{ 'sb-act--marked': bookmarked }" :title="bookmarked ? '已收藏本页，点击取消' : '收藏本页'" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>{{ bookmarked ? '已收藏' : '收藏' }}</span></button>
-          <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
+          <!-- 笔记按钮的 open 态用 --open（primary）三义分立：.on 绿=掌握 / --marked 星=收藏 -->
+          <button class="sb-act" :class="{ 'sb-act--open': notesOpen }" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
           <!-- 目录不设按钮：侧栏「本页章节」常驻即目录（用户裁定：toc-panel 浮层与目录按钮均为冗余） -->
+          <!-- 番茄钟入口（桌面 UX 方案二批 3）：占满整行（2×2 之下），文案静态无状态切换 -->
+          <button class="sb-act sb-act--wide" title="番茄钟" @click="emit('toggle-pomodoro')"><AppIcon name="timer" :size="16" /><span>番茄钟</span></button>
         </div>
         <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处。
              桌面 UX 方案批 2：内容页不渲染（「学习中」对内容页是零信息量噪音）；
@@ -256,6 +259,8 @@ const props = defineProps({
   mastered: { type: Boolean, default: false },
   // 本页是否已收藏（useBookmarks 同源数据；收藏态用主色星标而非 success 绿）
   bookmarked: { type: Boolean, default: false },
+  // 笔记面板是否打开（NotesPanel 显隐同源；sb-act--open 主色高亮，桌面 UX 方案二批 4）
+  notesOpen: { type: Boolean, default: false },
   // v4 学习页（§5.7.0 空间账：页脚 130→52）：翻页职责移交 ReaderFooter，
   // 本组件的移动端底部操作栏不再渲染；抽屉/更多面板保留，由父组件经 expose 打开
   hideBar: { type: Boolean, default: false }
@@ -453,6 +458,13 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
  * AppIcon 的 fill="none" 是 presentation attribute，CSS fill 可覆盖 → 星标实心 */
 .sb-act--marked { border-color: var(--primary); color: var(--primary); }
 .sb-act--marked svg { fill: currentColor; }
+
+/* 笔记面板开启态：primary 描边高亮（桌面 UX 方案二批 4）。
+ * 三义分立：.on（success 绿）=掌握 / --marked（primary+实心星）=收藏 / --open（primary）=笔记面板开启 */
+.sb-act--open { border-color: var(--primary); color: var(--primary); }
+
+/* 番茄钟入口：占满整行（桌面 UX 方案二批 3），与四个主钮的 2×2 分层 */
+.sb-act--wide { grid-column: 1 / -1; }
 
 /* 完成状态只读徽章（审计 §2-4 收敛：替代原先 3 处永远 disabled 的按钮；桌面/移动端共用） */
 .sb-status {

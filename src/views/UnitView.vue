@@ -52,23 +52,9 @@
       <router-link to="/" class="back-link">← 返回首页</router-link>
     </div>
 
-    <!-- 笔记面板（折叠式） -->
-    <section v-if="showNotes && page" class="notes-section card">
-      <div class="notes-head">
-        <span><AppIcon name="square-pen" :size="16" /> 我的笔记</span>
-        <span class="notes-status" :class="'notes-' + notes.statusType.value">{{ notes.status.value }}</span>
-      </div>
-      <textarea
-        v-model="notes.content.value"
-        class="notes-textarea"
-        placeholder="在此记录学习笔记…（自动保存）"
-        @input="notes.scheduleAutosave()"
-      ></textarea>
-      <div class="notes-foot">
-        <span>{{ notes.wordCount.value }} 字</span>
-        <button class="notes-save" @click="notes.manualSave()">保存</button>
-      </div>
-    </section>
+    <!-- 笔记浮动面板（桌面 UX 方案二批 4 组件化）：桌面拖拽浮窗 / 移动端底部抽屉；
+         数据链路 useNotes 透传零改动，翻页时面板保持打开、内容随 pageKey 自动切换 -->
+    <NotesPanel :open="showNotes" :notes="notes" @close="showNotes = false" />
 
     <!-- 内容主体：逐块渲染。
          ⚠️ 本元素是全页唯一被 transform/opacity 动画的元素（§5.7.4）：
@@ -121,6 +107,7 @@
       :done-files="doneFiles"
       :mastered="isPageMastered"
       :bookmarked="bookmark.isBookmarked.value"
+      :notes-open="showNotes"
       :hide-bar="true"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
@@ -134,36 +121,26 @@
       @toggle-pomodoro="pomodoroOpen = !pomodoroOpen"
     />
 
-    <!-- 番茄钟悬浮计时器（学习时随时开启，状态自动持久化） -->
-    <div class="pomodoro-fab">
-      <transition name="fade">
-        <div v-if="pomodoroOpen" class="pomodoro-card card" @click.stop>
-          <div class="pomodoro-card__head">
-            <span class="pomodoro-mode" :class="'mode-' + pomodoro.mode.value"><AppIcon name="timer" :size="14" /> {{ pomodoro.modeLabel.value }}</span>
-            <span v-if="pomodoro.running.value" class="pomodoro-running">进行中</span>
-          </div>
-          <div class="pomodoro-time">{{ pomodoro.display.value }}</div>
-          <div class="pomodoro-progress">
-            <div class="pomodoro-progress__bar" :style="{ width: pomodoro.progress.value * 100 + '%' }"></div>
-          </div>
-          <div class="pomodoro-today">今日已完成 {{ pomodoro.sessionsCompleted.value }} 个番茄</div>
-          <div class="pomodoro-actions">
-            <button class="pomodoro-btn pomodoro-btn--primary" @click="pomodoro.running.value ? pomodoro.pause() : pomodoro.start()">
-              {{ pomodoro.running.value ? '⏸ 暂停' : '▶ 开始' }}
-            </button>
-            <button class="pomodoro-btn" @click="pomodoro.reset()">↺ 重置</button>
-            <button class="pomodoro-btn" @click="pomodoro.skip()">⏭ 跳过</button>
-          </div>
-        </div>
-      </transition>
+    <!-- 状态自动持久化；计时 interval 在 usePomodoro 内，面板关闭计时照跑 -->
+    <PomodoroPanel
+      :pomodoro="pomodoro"
+      :open="pomodoroOpen"
+      :pinned="pomodoroPinned"
+      @close="pomodoroOpen = false"
+      @toggle-pin="pomodoroPinned = !pomodoroPinned"
+    />
+    <!-- 番茄钟 FAB：仅固定态渲染（桌面 UX 方案二批 3：取消默认固定，
+         非固定态走居中浮层 + 侧栏/更多面板入口；pinned 时点 FAB 开合面板，现有交互回归） -->
+    <transition name="fade">
       <button
+        v-if="pomodoroPinned"
         class="pomodoro-fab__btn"
         :class="{ open: pomodoroOpen }"
         :aria-label="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
         :title="pomodoroOpen ? '收起番茄钟' : '打开番茄钟'"
         @click="pomodoroOpen = !pomodoroOpen"
       ><AppIcon name="timer" :size="20" /></button>
-    </div>
+    </transition>
 
     <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
     <transition name="fade">
@@ -197,6 +174,8 @@ import BlockRenderer from '@/components/BlockRenderer.vue'
 import { iconOf } from '@/components/blocks/registry'
 import { kindOf } from '@/components/blocks/blockTypes'
 import ContentSidebar from '@/components/ContentSidebar.vue'
+import PomodoroPanel from '@/components/PomodoroPanel.vue'
+import NotesPanel from '@/components/NotesPanel.vue'
 import ReaderTopbar from '@/components/reader/ReaderTopbar.vue'
 import ReaderFooter from '@/components/reader/ReaderFooter.vue'
 import AppIcon from '@/components/AppIcon.vue'
@@ -212,6 +191,10 @@ const db = useStudyDbStore()
 // 番茄钟（学习页悬浮计时器）
 const pomodoro = usePomodoro()
 const pomodoroOpen = ref(false)
+// 固定态（桌面 UX 方案二批 3）：默认不固定——FAB 不渲染，由侧栏/更多面板入口进入；
+// pinned 只管 UI 形态，持久化 key 命名与 pomodoro_state / sidebar_collapsed 风格一致
+const pomodoroPinned = ref(localStorage.getItem('pomodoro_pin') === '1')
+watch(pomodoroPinned, (v) => localStorage.setItem('pomodoro_pin', v ? '1' : '0'))
 
 // 当前学科（从路由参数获取，默认 math）
 const subject = computed(() => route.params.subject || 'math')
@@ -707,22 +690,7 @@ watch(
 .error-detail { color: var(--text-muted); font-size: 0.85rem; }
 .back-link { display: inline-block; margin-top: var(--spacer-12); color: var(--primary); }
 
-/* 笔记面板 */
-.notes-section { padding: var(--spacer-16); margin-bottom: var(--spacer-16); }
-.notes-head { display: flex; justify-content: space-between; margin-bottom: var(--spacer-8); font-weight: 600; }
-.notes-status { font-weight: 400; font-size: 0.8rem; }
-.notes-saved { color: var(--success); }
-.notes-saving { color: var(--warning); }
-.notes-error { color: var(--danger); }
-.notes-textarea {
-  width: 100%; min-height: 100px;
-  background: var(--surface-muted); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: var(--spacer-12);
-  color: var(--text); font-family: inherit; font-size: 0.9rem;
-  resize: vertical;
-}
-.notes-foot { display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacer-8); font-size: 0.8rem; color: var(--text-muted); }
-.notes-save { background: var(--primary-soft); color: var(--primary); border: none; border-radius: var(--radius-full); padding: 4px 12px; cursor: pointer; }
+/* 笔记面板样式已迁入 NotesPanel.vue（桌面 UX 方案二批 4 组件化） */
 
 /* 阶段 3 第二步：区块间距统一为 32px —— gap 归零，靠 .block-anchor 相邻选择器给间距。
  * 各区块自身的 margin-bottom 已一并移除（间距双来源问题，见交接文档第六节第 4 条） */
@@ -764,12 +732,10 @@ watch(
 .leave-confirm__cancel { background: var(--surface-muted); color: var(--text); border: 1px solid var(--border); }
 .leave-confirm__ok { background: var(--danger); color: #fff; }
 
-/* 番茄钟悬浮计时器 */
-.pomodoro-fab {
-  position: fixed; right: 24px; bottom: 24px; z-index: 150;
-  display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
-}
+/* 番茄钟卡片样式已迁入 PomodoroPanel.vue（桌面 UX 方案二批 3 组件化）。
+ * FAB 留守本组件：仅固定态渲染（v-if="pomodoroPinned"），右下角锚定 */
 .pomodoro-fab__btn {
+  position: fixed; right: 24px; bottom: 24px; z-index: 150;
   width: 56px; height: 56px; border-radius: 50%;
   background: var(--primary); color: #fff; border: none;
   font-size: 1.5rem; cursor: pointer;
@@ -778,39 +744,9 @@ watch(
   transition: transform var(--dur-1) var(--ease-standard);
 }
 .pomodoro-fab__btn:active { transform: scale(0.92); }
-.pomodoro-card {
-  width: 250px; padding: 14px 16px;
-  box-shadow: var(--shadow-pop);
-}
-.pomodoro-card__head { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
-.pomodoro-mode { font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
-.pomodoro-mode.mode-focus { color: var(--danger); }
-.pomodoro-mode.mode-break, .pomodoro-mode.mode-long_break { color: var(--success); }
-.pomodoro-running { color: var(--warning); font-size: 0.75rem; }
-.pomodoro-time {
-  text-align: center; font-size: 2.3rem; font-weight: 700;
-  font-variant-numeric: tabular-nums; margin: 6px 0;
-}
-.pomodoro-progress { height: 6px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
-.pomodoro-progress__bar {
-  height: 100%; background: var(--primary);
-  border-radius: var(--radius-full); transition: width 1s linear;
-}
-.pomodoro-today { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; }
-.pomodoro-actions { display: flex; gap: 8px; margin-top: 10px; }
-.pomodoro-btn {
-  flex: 1; min-height: 40px;
-  border: 1px solid var(--border); background: var(--surface-muted);
-  color: var(--text); border-radius: var(--radius-full);
-  font-size: 0.78rem; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.pomodoro-btn--primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
 
-/* 移动端：悬浮在系统手势区上方（页脚已全端退场，桌面 UX 方案二批 2A——不再避让 --reader-footer-h），
- * 触控目标 ≥44px */
+/* 移动端：悬浮在系统手势区上方（页脚已全端退场，桌面 UX 方案二批 2A——不再避让 --reader-footer-h） */
 @media (max-width: 1150px) {
-  .pomodoro-fab { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + 12px); }
-  .pomodoro-btn { min-height: 44px; }
+  .pomodoro-fab__btn { right: 16px; bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + 12px); }
 }
 </style>
