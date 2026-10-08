@@ -305,3 +305,18 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
     );
   }
 }
+
+/* ---------- 宽屏避让侧栏（≥1150）----------
+ * 右侧固定侧栏（z 90）出现后，功能条若仍 left:0/right:0 会横穿其区域
+ * （在侧栏左缘露出截断白条，用户实测发现）。右端避让 = 侧栏宽
+ * --sb-rail-w + 侧栏 right 12px + 12px 视觉间隙。
+ * ⚠️ 必须位于 .reader-topbar/.reader-footer 主规则之后：同特异性后者胜，
+ *    放在主规则前会被 right:0 盖回（实测踩过）。 */
+@media (min-width: 1150px) {
+  .reader-topbar {
+    right: calc(var(--sb-rail-w, 236px) + 24px);
+  }
+  .reader-footer {
+    right: calc(var(--sb-rail-w, 236px) + 24px);
+  }
+}

@@ -342,7 +342,8 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
   right: 12px;
   bottom: 12px;
   z-index: 90;
-  width: 236px;
+  /* 宽度取全局 token：reader.css 的功能条避让量与这里耦合，单一取值来源（main.css） */
+  width: var(--sb-rail-w, 236px);
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease, width 0.25s ease;
