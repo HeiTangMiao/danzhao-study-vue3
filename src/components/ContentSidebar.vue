@@ -41,14 +41,16 @@
             <AppIcon name="target" :size="16" /><span>{{ mastered ? '已掌握' : '掌握' }}</span>
           </button>
           <button class="sb-act" title="返回顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /><span>顶部</span></button>
-          <button class="sb-act" title="收藏本页" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>收藏</span></button>
+          <button class="sb-act" :class="{ 'sb-act--marked': bookmarked }" :title="bookmarked ? '已收藏本页，点击取消' : '收藏本页'" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /><span>{{ bookmarked ? '已收藏' : '收藏' }}</span></button>
           <button class="sb-act" title="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /><span>笔记</span></button>
           <!-- 目录不设按钮：侧栏「本页章节」常驻即目录（用户裁定：toc-panel 浮层与目录按钮均为冗余） -->
           <button class="sb-act" title="收起侧边栏" @click="collapsed = true"><AppIcon name="chevron-left" :size="16" /><span>收起</span></button>
         </div>
-        <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处 -->
-        <span class="sb-status" :class="{ on: isDone }" :title="isDone ? '已完成' : '学习中'">
-          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
+        <!-- 完成状态：只读徽章。原三处「永远 disabled 的按钮」是把状态伪装成可交互元素，已收敛到此一处。
+             桌面 UX 方案批 2：内容页不渲染（「学习中」对内容页是零信息量噪音）；
+             仅测验页显示 已交卷/待作答。移动端抽屉头徽章不受影响（保持已完成/学习中） -->
+        <span v-if="isTestPage" class="sb-status" :class="{ on: isDone }" :title="isDone ? '本页测验已交卷' : '本页测验待作答'">
+          <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已交卷' : '待作答' }}
         </span>
       </div>
 
@@ -105,7 +107,7 @@
       <button class="mini-item" title="顶部" aria-label="顶部" @click="emit('scroll-top')"><AppIcon name="arrow-up" :size="16" /></button>
       <!-- 掌握 mini 按钮：与展开态 sb-act 首位同语义（on = success 绿） -->
       <button class="mini-item" :class="{ on: mastered }" :title="mastered ? '已掌握本页，点击取消' : '标记本页已掌握'" :aria-label="mastered ? '取消掌握' : '标记掌握'" @click="emit('toggle-master')"><AppIcon name="target" :size="16" /></button>
-      <button class="mini-item" title="收藏" aria-label="收藏" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /></button>
+      <button class="mini-item" :class="{ 'mini-item--marked': bookmarked }" :title="bookmarked ? '已收藏本页，点击取消' : '收藏本页'" :aria-label="bookmarked ? '取消收藏' : '收藏本页'" @click="emit('toggle-bookmark')"><AppIcon name="star" :size="16" :stroke-width="1.8" /></button>
       <button class="mini-item" title="笔记" aria-label="笔记" @click="emit('toggle-notes')"><AppIcon name="square-pen" :size="16" /></button>
     </div>
   </aside>
@@ -240,6 +242,8 @@ const props = defineProps({
   doneFiles: { type: Array, default: () => [] },
   // 本页是否已手动掌握（页脚主行动同源数据，§5.7.7 语义③）
   mastered: { type: Boolean, default: false },
+  // 本页是否已收藏（useBookmarks 同源数据；收藏态用主色星标而非 success 绿）
+  bookmarked: { type: Boolean, default: false },
   // v4 学习页（§5.7.0 空间账：页脚 130→52）：翻页职责移交 ReaderFooter，
   // 本组件的移动端底部操作栏不再渲染；抽屉/更多面板保留，由父组件经 expose 打开
   hideBar: { type: Boolean, default: false }
@@ -313,6 +317,9 @@ function onGrabTouchEnd() {
 // ===== 翻页（底部栏主操作） =====
 const hasPrev = computed(() => props.fileIndex > 0)
 const hasNext = computed(() => !!props.unit && props.fileIndex < props.unit.files.length - 1)
+
+// 当前页是否测验页（桌面徽章只对测验页渲染，已交卷/待作答；内容页零信息量不渲染）
+const isTestPage = computed(() => !!props.unit?.files[props.fileIndex]?.isTest)
 
 // 完成状态自动记录（访问即完成 / 测验交卷），底部主按钮只负责翻页与单元跳转
 function onNextClick() {
@@ -402,6 +409,12 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 .sb-act:hover { border-color: var(--primary); color: var(--primary); }
 .sb-act.on { background: rgba(var(--success-rgb), 0.12); border-color: var(--success); color: var(--success); }
+
+/* 收藏态：主色 + 星标实心。刻意不复用 .on——success 绿语义专属「掌握/完成」
+ * （桌面 UX 方案批 2，避免把收藏误读成已完成）。
+ * AppIcon 的 fill="none" 是 presentation attribute，CSS fill 可覆盖 → 星标实心 */
+.sb-act--marked { border-color: var(--primary); color: var(--primary); }
+.sb-act--marked svg { fill: currentColor; }
 
 /* 完成状态只读徽章（审计 §2-4 收敛：替代原先 3 处永远 disabled 的按钮；桌面/移动端共用） */
 .sb-status {
@@ -506,6 +519,9 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 .mini-item:hover { border-color: var(--primary); }
 .mini-item.on { color: var(--success); }
+/* 收藏态 mini：与 sb-act--marked 一致用主色（.on 的 success 绿是掌握语义，不混用） */
+.mini-item--marked { color: var(--primary); }
+.mini-item--marked svg { fill: currentColor; }
 /* 展开入口：收起态唯一的展开方式，primary 描边着色保证可发现性（用户实测反馈） */
 .mini-item--expand { border-color: var(--primary); color: var(--primary); }
 

@@ -118,6 +118,7 @@
       :is-math="subject === 'math'"
       :done-files="doneFiles"
       :mastered="isPageMastered"
+      :bookmarked="bookmark.isBookmarked.value"
       :hide-bar="true"
       @scroll-to="scrollToBlock"
       @scroll-top="scrollTop"
