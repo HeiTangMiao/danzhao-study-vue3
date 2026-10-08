@@ -152,6 +152,9 @@
         <span class="sb-status" :class="{ on: isDone }">
           <span class="sb-status__dot" aria-hidden="true"></span>{{ isDone ? '已完成' : '学习中' }}
         </span>
+        <!-- 更多操作入口（QA F1）：hideBar 后 sb-bar 不渲染，「更多」面板（收藏/笔记/翻页/番茄钟）
+             唯一可达入口在此，与答题卡抽屉语义衔接（点开即切面板，body 滚动锁由既有 watch 无缝接管） -->
+        <button class="sb-sheet__more" title="更多操作" aria-label="更多操作" @click="openSheet('more')">⋯ 更多</button>
         <button class="sb-sheet__close" title="关闭" aria-label="关闭" @click="sheetOpen = false"><AppIcon name="x" :size="18" /></button>
       </div>
       <div class="sb-sheet__body">
@@ -645,6 +648,20 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
     background: var(--surface-muted);
     border: 1px solid var(--border);
   }
+  /* 抽屉头「更多操作」入口（QA F1）：导航抽屉 → 更多面板的切换钮 */
+  .sb-sheet__more {
+    flex: 0 0 auto;
+    height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 12px;
+    border-radius: var(--radius-full);
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .sb-sheet__more:active { transform: scale(0.95); }
   .sb-sheet__body { overflow-y: auto; padding: 4px 12px 12px; }
   .sb-sheet .sb-title { margin-top: 12px; }
   .sb-sheet .sb-item { padding: 12px 8px; min-height: 44px; }

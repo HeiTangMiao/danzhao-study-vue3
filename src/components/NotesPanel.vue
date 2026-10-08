@@ -94,16 +94,26 @@ const panelStyle = computed(() =>
   dragDx.value || dragDy.value ? { transform: `translate(${dragDx.value}px, ${dragDy.value}px)` } : null
 )
 
-/** 未位移的默认落点（getBoundingClientRect 含当前 transform，须减掉偏移还原） */
+/**
+ * 未位移的默认落点。用 offsetLeft/offsetTop（fixed 元素相对视口）而非
+ * getBoundingClientRect——后者含 transform，进场过渡（translateY(8px)）进行中
+ * 量测会把 -8px 系统性偏差算进记忆位置（QA F3）
+ */
 function baseRect() {
   const el = panelEl.value
   if (!el) return null
-  const r = el.getBoundingClientRect()
-  return { x: r.left - dragDx.value, y: r.top - dragDy.value, w: r.width, h: r.height }
+  return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }
 }
 
 /** 把记忆位置换算成 transform 偏移并重新 clamp（开面板 / 窗口 resize 时调用） */
 function applyPos() {
+  // 移动端抽屉形态不做自由定位：记忆位置是桌面拖出来的（QA F2），照搬会把抽屉
+  // translate 出屏幕——清零偏移落回 CSS 抽屉位
+  if (typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_MQ).matches) {
+    dragDx.value = 0
+    dragDy.value = 0
+    return
+  }
   const base = baseRect()
   if (!base) return
   if (!pos.value) { dragDx.value = 0; dragDy.value = 0; return }
