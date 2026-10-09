@@ -167,6 +167,17 @@ describe('practiceBank：nz 紧凑键展开（B-2）', () => {
   })
 })
 
+/** 轮询等待（fake-indexeddb 在 jsdom 下经多个宏任务落地，固定 sleep 会偶发假红） */
+async function waitUntil(check, timeout = 4000) {
+  const t0 = Date.now()
+  for (;;) {
+    const v = await check()
+    if (v) return v
+    if (Date.now() - t0 > timeout) return v
+    await new Promise((r) => setTimeout(r, 20))
+  }
+}
+
 describe('ExamBlock：fill 自动计分与作答行（B-2）', () => {
   let db
 
@@ -228,13 +239,14 @@ describe('ExamBlock：fill 自动计分与作答行（B-2）', () => {
     await options[0].trigger('click')
 
     await wrapper.find('.exam-submit-btn').trigger('click')
-    // fake-indexeddb 在 jsdom 下按宏任务落地事务：放行一轮宏任务 + 微任务
-    await new Promise((r) => setTimeout(r, 200))
-    await flushPromises()
+    // 交卷是异步多段落库：等结果页出现（phase→result）再断言作答行
+    await waitUntil(() => wrapper.find('.exam-result').exists())
     expect(wrapper.find('.exam-result').exists()).toBe(true)
 
-    const attempts = await db.getAllAttempts()
-    const fillRow = attempts.find((a) => a.itemType === 'fill')
+    const fillRow = await waitUntil(async () => {
+      const rows = await db.getAllAttempts()
+      return rows.find((a) => a.itemType === 'fill' && a.typed === '3') || null
+    })
     expect(fillRow).toBeTruthy()
     expect(fillRow.correct).toBe(true)
     expect(fillRow.assess).toBe(null)
@@ -262,12 +274,13 @@ describe('ExamBlock：fill 自动计分与作答行（B-2）', () => {
     await wrapper.findAll('.option-btn')[0].trigger('click')
 
     await wrapper.find('.exam-submit-btn').trigger('click')
-    await new Promise((r) => setTimeout(r, 200))
     await flushPromises()
 
-    const attempts = await db.getAllAttempts()
     // fake-indexeddb 跨用例残留：按本次输入原文精确定位（typed '999' 只属本用例）
-    const fillRow = attempts.find((a) => a.itemType === 'fill' && a.typed === '999')
+    const fillRow = await waitUntil(async () => {
+      const rows = await db.getAllAttempts()
+      return rows.find((a) => a.itemType === 'fill' && a.typed === '999') || null
+    })
     expect(fillRow).toBeTruthy()
     expect(fillRow.correct).toBe(null) // 自评行沿用原语义（correct 由 answer 正误决定，自评对不置 true）
     expect(fillRow.assess).toBe('known')
