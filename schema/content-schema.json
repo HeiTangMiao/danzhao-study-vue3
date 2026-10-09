@@ -53,7 +53,7 @@
         { "if": { "properties": { "type": { "const": "compare" } } }, "then": { "required": ["left", "right", "aspects"], "properties": { "left": { "type": "string", "description": "左侧名称：如「列举法」" }, "right": { "type": "string", "description": "右侧名称：如「描述法」" }, "aspects": { "type": "array", "items": { "$ref": "#/definitions/compareAspect" }, "description": "对照维度：每项一行，左右两侧各一句（中性对照，不分对错）" } } } },
         { "if": { "properties": { "type": { "const": "vocab" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/vocabItem" } } } } },
         { "if": { "properties": { "type": { "const": "code" } } }, "then": { "required": ["code"], "properties": { "lang": { "type": "string", "description": "语言标签：如 python / cmd / sql，仅作角标，不做语法高亮" }, "code": { "type": "string", "description": "代码文本：按原样等宽显示，会自动去掉行首缩进，不要写行号和围栏" } } } },
-        { "if": { "properties": { "type": { "const": "cloze" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/clozeItem" }, "description": "挖空默写：每项一句，用 {{答案}} 标出空位，点击揭晓" } } } }
+        { "if": { "properties": { "type": { "const": "cloze" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/clozeItem" }, "description": "挖空默写：每项一句，用 {{答案}} 标出空位" }, "mode": { "enum": ["reveal", "input"], "description": "交互模式：reveal 点击揭晓（缺省，存量兼容）| input 输入默写（批 B P0-8，逐空比对，判分复用 answerNorm）" } } } }
       ]
     },
     "layoutKind": {
@@ -138,7 +138,8 @@
       "type": "object",
       "required": ["text"],
       "properties": {
-        "text": { "type": "string", "description": "挖空文本：用 {{答案}} 标出空位，如\"海内存知己，{{天涯若比邻}}。\"" }
+        "text": { "type": "string", "description": "挖空文本：用 {{答案}} 标出空位，如\"海内存知己，{{天涯若比邻}}。\"" },
+        "alts": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "该句空位的其他可接受答案（与 {{}} 内主答案并列判对；禁空串、禁嵌套 {{}}；通假/异体字走 clozeVariants 映射表，勿写这里）" }
       }
     },
     "errorFocusItem": {

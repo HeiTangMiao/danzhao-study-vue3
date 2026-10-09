@@ -296,6 +296,10 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
         }
         break
       case 'cloze':
+        // 交互模式白名单（B-3）：schema 会拦非法值，这里补 human-readable 文案
+        if (block.mode !== undefined && !['reveal', 'input'].includes(block.mode)) {
+          errors.push(`挖空区块 mode 仅支持 reveal / input: ${block.mode}`)
+        }
         if (!Array.isArray(block.items) || block.items.length === 0) errors.push('挖空区块缺少 items')
         else {
           block.items.forEach((it, ii) => {
@@ -306,14 +310,28 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
             const text = String(it.text ?? '')
             if (isEmpty(text)) {
               errors.push(`挖空[${ii}] text 为空`)
-              return
+            } else {
+              // 挖空标记必须成对且至少一处；空挖空等于没挖，一并拦下
+              const openings = (text.match(/\{\{/g) || []).length
+              const closings = (text.match(/\}\}/g) || []).length
+              if (openings !== closings) errors.push(`挖空[${ii}] {{ }} 标记不配对`)
+              else if (openings === 0) errors.push(`挖空[${ii}] 没有 {{答案}} 标记`)
+              if (/\{\{\s*\}\}/.test(text)) errors.push(`挖空[${ii}] 存在空挖空 {{}}`)
             }
-            // 挖空标记必须成对且至少一处；空挖空等于没挖，一并拦下
-            const openings = (text.match(/\{\{/g) || []).length
-            const closings = (text.match(/\}\}/g) || []).length
-            if (openings !== closings) errors.push(`挖空[${ii}] {{ }} 标记不配对`)
-            else if (openings === 0) errors.push(`挖空[${ii}] 没有 {{答案}} 标记`)
-            if (/\{\{\s*\}\}/.test(text)) errors.push(`挖空[${ii}] 存在空挖空 {{}}`)
+            // alts（B-3）：可接受答案别名；空串=本想删（对齐既有纪律）；禁嵌套挖空标记
+            if (it.alts !== undefined) {
+              if (!Array.isArray(it.alts)) {
+                errors.push(`挖空[${ii}] alts 应为数组`)
+              } else {
+                it.alts.forEach((a, ai) => {
+                  if (isEmpty(a)) {
+                    errors.push(`挖空[${ii}] alts[${ai}] 为空串（如需省略请删掉该元素）`)
+                  } else if (String(a).includes('{{') || String(a).includes('}}')) {
+                    errors.push(`挖空[${ii}] alts[${ai}] 不能包含 {{ }} 挖空标记`)
+                  }
+                })
+              }
+            }
           })
         }
         break

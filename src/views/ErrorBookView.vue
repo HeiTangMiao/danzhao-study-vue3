@@ -123,6 +123,8 @@
               {{ diffLabel(err.difficulty) }}
             </span>
             <span v-if="err.reason" class="reason-tag">{{ err.reason }}</span>
+            <!-- 来源角标（B-4）：'cloze' = 默写专项错句入队（练习/考试入队无此字段） -->
+            <span v-if="err.source === 'cloze'" class="cloze-tag">默写</span>
             <span v-if="err.wrongCount > 1" class="wrongcount-tag">错 {{ err.wrongCount }} 次</span>
             <span v-if="err.unitTitle" class="source-tag">{{ err.unitTitle }}</span>
             <span class="error-date">{{ fmtDate(err.createdAt) }}</span>
@@ -392,6 +394,7 @@ onMounted(async () => {
 .source-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface-muted); color: var(--text-muted); }
 .reason-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--primary-soft); color: var(--primary); }
 .wrongcount-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--danger-rgb), 0.1); color: var(--danger); }
+.cloze-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
 .error-date { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); }
 
 .error-question { margin-bottom: var(--spacer-10); }
