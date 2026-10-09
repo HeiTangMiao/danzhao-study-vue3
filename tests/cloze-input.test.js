@@ -56,6 +56,21 @@ describe('cloze 输入模式（B-3）', () => {
     expect(wrapper.text()).toContain('只看错的那句')
   })
 
+  it('① 移动端约定（F2/F3）：input 模式容器挂 data-no-swipe，reveal 模式不挂', () => {
+    const input = mountCloze({
+      type: 'cloze',
+      mode: 'input',
+      items: [{ text: '{{会当凌绝顶}}，{{一览众山小}}。' }]
+    })
+    expect(input.find('.cloze-list').attributes('data-no-swipe')).toBeDefined()
+    const reveal = mountCloze({
+      type: 'cloze',
+      title: '名句默写',
+      items: [{ text: '海内存知己，{{天涯若比邻}}。' }]
+    })
+    expect(reveal.find('.cloze-list').attributes('data-no-swipe')).toBeUndefined()
+  })
+
   it('② blankAnswerOf 并集：alts 与主答案同权判对', async () => {
     const wrapper = mountCloze({
       type: 'cloze',

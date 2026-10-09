@@ -10,7 +10,7 @@
 -->
 <template>
   <BlockShell :title="block.title" variant="plain">
-    <div class="cloze-list" :class="{ 'cloze-list--input': isInput }">
+    <div class="cloze-list" :class="{ 'cloze-list--input': isInput }" :data-no-swipe="isInput ? '' : null">
       <p
         v-for="(item, i) in items"
         :key="i"
@@ -337,7 +337,7 @@ async function enqueueWrongSentences() {
   font-size: 16px;
   line-height: 1.5;
   min-width: 4em;
-  min-height: 36px;
+  min-height: 44px; /* 触控目标 ≥44px（F2，移动端约定） */
   padding: 2px var(--space-2);
   margin: 0 var(--space-1);
   color: var(--text);

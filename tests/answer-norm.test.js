@@ -108,6 +108,18 @@ describe('extractCandidates 期望值抽取（只产候选，不判对）', () =
     ).toContain('-5')
   })
 
+  it('★ 多解闸门（F1）：≥2 段含 = 的 LaTeX / 多数值 → 返回空数组（回落自评）', () => {
+    const multi =
+      '通项 \\(T_{r+1} = C_4^r (2x)^{4-r} (-1)^r\\)，常数项需 \\(4 - r = 0\\) 即 \\(r = 4\\)，\\(T_5 = C_4^4 (2x)^0 (-1)^4 = 1\\)。'
+    expect(extractCandidates(multi)).toEqual([])
+    // 单一 LaTeX 段内多 '='（连等推导）**不**触发闸门：取最右 RHS
+    expect(
+      extractCandidates(
+        '由正弦定理 \\(b = \\frac{a\\sin B}{\\sin A} = \\frac{2}{\\frac{1}{2}} = 4\\)。'
+      )
+    ).toContain('4')
+  })
+
   it('语文短语：句读切分取首分句', () => {
     const cands = extractCandidates('转折。"出淤泥而不染"中…')
     expect(cands[0]).toBe('转折')
@@ -161,6 +173,16 @@ describe('answerMatches 判分唯一入口', () => {
       matched: false,
       mode: 'none'
     })
+  })
+
+  it('★ 多解闸门（F1 真实题库复现）：中间推导的 4 / 0 不得命中', () => {
+    const A =
+      '通项 \\(T_{r+1} = C_4^r (2x)^{4-r} (-1)^r\\)，常数项需 \\(4 - r = 0\\) 即 \\(r = 4\\)，\\(T_5 = C_4^4 (2x)^0 (-1)^4 = 1\\)。'
+    // 中间方程 \(4 - r = 0\) / \(r = 4\) 的 0、4 绝不能被当成答案
+    expect(answerMatches('4', A)).toEqual({ matched: false, mode: 'none' })
+    expect(answerMatches('0', A)).toEqual({ matched: false, mode: 'none' })
+    // 多解无法唯一确定 → 整体回落自评（连正确值 1 也回落，代价≈现状）
+    expect(answerMatches('1', A)).toEqual({ matched: false, mode: 'none' })
   })
 
   it('③ 全半角与空格容错', () => {

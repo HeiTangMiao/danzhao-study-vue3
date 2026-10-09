@@ -141,6 +141,11 @@ const ANSWER_LABEL_RE = /^(?:\*\*)?\s*(?:答案|答)\s*[:：]\s*/
  * 步骤（有序，全去重）：
  *   0) **主值区截断**：只在首个解说边界（。；;！!/换行/全角左括号）之前抽候选，
  *      并剥前缀标签（`答案：`）与强调标记（`**`）——从源头杜绝从解析段误抽候选（§0.1）；
+ *   0b) **多解闸门**：主值区内仍是「多方程推导」时无法唯一确定答案 → 返回空数组（回落自评）：
+ *       · ≥2 段含 '=' 的 LaTeX（逗号/连词连接的中间推导，如 `通项 \(T_{r+1}=…\)，` +
+ *         `常数项需 \(4 - r = 0\) 即 \(r = 4\)，\(T_5 = … = 1\)`）；或
+ *       · ≥2 个**不同数值**候选（多个数值无法唯一命中）。
+ *     两道闸门都只删候选、不新增 → 方向恒为从严（§0.1 第一公理）；
  *   1) 逐段剥 LaTeX：段内文含 '=' 取最右 RHS（`a = 3` → `3`）；
  *      LaTeX 外的普通文本剥尾部解说括号后按句读切分取首个非空短句
  *   2) 兜底：整串规整化结果本身也是候选
@@ -168,6 +173,7 @@ export function extractCandidates(expectRaw, opts) {
 
   const out = []
   const seen = new Set()
+  let eqLatexSegments = 0 // 主值区内「含 '=' 的 LaTeX 段」计数（多解闸门用）
   const push = (text) => {
     const norm = normalizeAnswer(text, opts)
     if (norm && !seen.has(norm)) {
@@ -181,6 +187,7 @@ export function extractCandidates(expectRaw, opts) {
     if (!inner) return
     const eq = inner.lastIndexOf('=')
     if (eq >= 0 && eq < inner.length - 1) {
+      eqLatexSegments++
       push(inner.slice(eq + 1))
     } else {
       push(inner)
@@ -206,6 +213,20 @@ export function extractCandidates(expectRaw, opts) {
     last = m.index + m[0].length
   }
   if (last < valueRegion.length) pushText(valueRegion.slice(last))
+
+  // 多解闸门（判对从严闸门②）：主值区内仍是「多方程推导 / 多数值」时无法唯一确定答案。
+  //   截断只挡 `。；;！!（`，挡不住**逗号/连词连接的中间推导**（如
+  //   `通项 \(T_{r+1} = …\)，常数项需 \(4 - r = 0\) 即 \(r = 4\)，\(T_5 = … = 1\)。`：
+  //   中间段 \(4-r=0\)、\(r=4\) 会产出 0、4 两个数值候选 → 学生填 4 被误判对）。
+  //   故追加两道只删不增的闸门：≥2 段含 '=' 的 LaTeX，或 ≥2 个不同数值候选 → 返回空数组（回落自评）。
+  if (eqLatexSegments >= 2) return []
+  const numericVals = new Set()
+  for (const c of out) {
+    const n = parseNumeric(c)
+    if (n !== null) numericVals.add(n)
+  }
+  if (numericVals.size >= 2) return []
+
   push(raw) // 兜底：整串归一化结果本身也是候选
   return out
 }
