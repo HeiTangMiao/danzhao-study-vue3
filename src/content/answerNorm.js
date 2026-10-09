@@ -127,9 +127,20 @@ const SENTENCE_SPLIT_RE = /[。；;!\n]/
 const TRAILING_PAREN_RE = /\s*[（(][^（）()]*[）)]\s*$/
 
 /**
+ * 主值区切割符：首个句末标点（。；;！!）/ 换行 / **全角左括号（解说括号起始）**。
+ * 逗号「，」**不切**（保留多值 / 连写型答案）；冒号「：」**不切**（`答案：` 标签与「…：<推导>」均需保留）。
+ */
+const VALUE_REGION_CUT_RE = /[。；;！!\n（]/
+
+/** 主值区前缀标签：`答案：` / `答：`（含可选 `**` 强调包裹）——剥离后主值不再被标签黏连而漏抽 */
+const ANSWER_LABEL_RE = /^(?:\*\*)?\s*(?:答案|答)\s*[:：]\s*/
+
+/**
  * 期望值抽取（batch-b-tasks 更正 1 的核心；启发式，**只产候选、不判对**）：
  * 从「值+解析」复合答案文本抽候选值，返回 0..N 个**已规整**的规范串。
  * 步骤（有序，全去重）：
+ *   0) **主值区截断**：只在首个解说边界（。；;！!/换行/全角左括号）之前抽候选，
+ *      并剥前缀标签（`答案：`）与强调标记（`**`）——从源头杜绝从解析段误抽候选（§0.1）；
  *   1) 逐段剥 LaTeX：段内文含 '=' 取最右 RHS（`a = 3` → `3`）；
  *      LaTeX 外的普通文本剥尾部解说括号后按句读切分取首个非空短句
  *   2) 兜底：整串规整化结果本身也是候选
@@ -143,6 +154,17 @@ export function extractCandidates(expectRaw, opts) {
   const raw = typeof expectRaw === 'string' ? expectRaw : ''
   if (!raw.trim()) return []
   if (raw.includes('→') || /_{3,}/.test(raw)) return []
+
+  // 主值区（判对从严的关键闸门）：「值 + 解析」复合答案的**解析段**常含数字/等式
+  //   （如 `\(16\pi\)。由 \(V=…=8\) …`、`\(\log_3 9 = 2\)（因为 \(3^2 = 9\)）`）。
+  //   若整串逐段抽候选，会把解析里的 8、9 当成候选 → 学生填 8/9 被**误判对**（§0.1 严禁）。
+  //   故只在首个「解说边界」之前的主值区抽候选：
+  //   · 边界 = 句末标点（。；;！!）/ 换行 / 全角左括号（解说括号起始）；
+  //   · 截断**只删候选、不新增** → 仅可能把「判对」降级为「回落自评」，方向恒为从严；
+  //   · 再剥前缀标签（`答案：`/`答：`）与强调标记（`**`），使 `答案：4` / `**590**` 的主值可被抽出。
+  const cut = raw.search(VALUE_REGION_CUT_RE)
+  const region = cut >= 0 ? raw.slice(0, cut) : raw
+  const valueRegion = region.replace(ANSWER_LABEL_RE, '').replace(/\*\*/g, '')
 
   const out = []
   const seen = new Set()
@@ -174,16 +196,16 @@ export function extractCandidates(expectRaw, opts) {
     if (first) push(first)
   }
 
-  // 逐段扫描：LaTeX 段（\( \) \[ \] $$ $）与段间普通文本交替
+  // 逐段扫描主值区：LaTeX 段（\( \) \[ \] $$ $）与段间普通文本交替
   const re = /\\([\[(])([\s\S]*?)\\[\])]|\$\$([\s\S]*?)\$\$|\$([^$\n]*?)\$/g
   let last = 0
   let m
-  while ((m = re.exec(raw)) !== null) {
-    if (m.index > last) pushText(raw.slice(last, m.index))
+  while ((m = re.exec(valueRegion)) !== null) {
+    if (m.index > last) pushText(valueRegion.slice(last, m.index))
     pushLatex(m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4])
     last = m.index + m[0].length
   }
-  if (last < raw.length) pushText(raw.slice(last))
+  if (last < valueRegion.length) pushText(valueRegion.slice(last))
   push(raw) // 兜底：整串归一化结果本身也是候选
   return out
 }
@@ -200,9 +222,10 @@ export function extractCandidates(expectRaw, opts) {
  * @returns {{matched: boolean, mode: 'numeric'|'exact'|'none'}}
  */
 export function answerMatches(userRaw, expectRaw, opts) {
-  const tolOpt = opts && typeof opts.numericTol === 'number' && opts.numericTol > 0
-    ? opts.numericTol
-    : DEFAULT_NUMERIC_TOL
+  const tolOpt =
+    opts && typeof opts.numericTol === 'number' && opts.numericTol > 0
+      ? opts.numericTol
+      : DEFAULT_NUMERIC_TOL
   const candidates = extractCandidates(expectRaw, opts)
   if (!candidates.length) return { matched: false, mode: 'none' }
   const userNorm = normalizeAnswer(typeof userRaw === 'string' ? userRaw : '', opts)

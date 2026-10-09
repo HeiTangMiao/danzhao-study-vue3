@@ -84,7 +84,28 @@ describe('extractCandidates 期望值抽取（只产候选，不判对）', () =
   it('LaTeX 段含 = 取最右 RHS（更正 1 主路径）', () => {
     const cands = extractCandidates('\\(a = 3\\)（因为 \\(2^3 = 8\\)）。')
     expect(cands).toContain('3')
-    expect(cands).toContain('8')
+  })
+
+  it('★ 判对从严：解析段的数字不得成为候选（主值区截断）', () => {
+    // 解析段 \(2^3 = 8\) 里的 8 不是答案，绝不能进候选 → 否则学生填 8 被误判对（§0.1）
+    const cands = extractCandidates('\\(a = 3\\)（因为 \\(2^3 = 8\\)）。')
+    expect(cands).not.toContain('8')
+    expect(cands).not.toContain('(因为')
+    // 解析段跟在句号后（无括号）时同样不得漏网
+    expect(
+      extractCandidates('\\(16\\pi\\)。由 \\(V = \\dfrac{4}{3}\\pi R^3 = 8\\) 得 \\(R=2\\)。')
+    ).not.toContain('8')
+    expect(extractCandidates('\\(\\log_3 9 = 2\\)（因为 \\(3^2 = 9\\)）。')).not.toContain('9')
+  })
+
+  it('★ 主值区标签 / 强调剥离：`答案：4` 与 `**590**` 的主值仍可抽出', () => {
+    expect(
+      extractCandidates('答案：4。\\(x + \\frac{4}{x} \\ge 4\\)，当 \\(x=2\\) 取等。')
+    ).toContain('4')
+    expect(extractCandidates('**590**。\\(a_1 = 1\\)，\\(S_{20} = 590\\)。')).toContain('590')
+    expect(
+      extractCandidates('答案：\\(-5\\)。奇函数 \\(f(-x) = -f(x)\\)，所以 \\(f(-2) = -5\\)。')
+    ).toContain('-5')
   })
 
   it('语文短语：句读切分取首分句', () => {
@@ -124,6 +145,21 @@ describe('answerMatches 判分唯一入口', () => {
     expect(answerMatches('3', '\\(a = 3\\)（因为 \\(2^3 = 8\\)）。')).toEqual({
       matched: true,
       mode: 'numeric'
+    })
+  })
+
+  it('★ 判对从严（误判对红线）：解析段的数字一律不得命中', () => {
+    const area = '\\(16\\pi\\)。由 \\(V = \\dfrac{4}{3}\\pi R^3 = 8\\) 得 \\(R = 2\\)。'
+    // 8 / 2 只出现在解析里 → 必须回落自评，绝不误判对
+    expect(answerMatches('8', area)).toEqual({ matched: false, mode: 'none' })
+    expect(answerMatches('2', area)).toEqual({ matched: false, mode: 'none' })
+    expect(answerMatches('8', '\\(a = 3\\)（因为 \\(2^3 = 8\\)）。')).toEqual({
+      matched: false,
+      mode: 'none'
+    })
+    expect(answerMatches('9', '\\(\\log_3 9 = 2\\)（因为 \\(3^2 = 9\\)）。')).toEqual({
+      matched: false,
+      mode: 'none'
     })
   })
 
@@ -169,7 +205,10 @@ describe('answerMatches 判分唯一入口', () => {
   })
 
   it('⑥ 容差边界：|a-b| 恰等于 tol*max(1,|b|) 计 matched；超出即不计（显式 tol 隔离浮点噪声）', () => {
-    expect(answerMatches('1.1', '1', { numericTol: 0.1 })).toEqual({ matched: true, mode: 'numeric' })
+    expect(answerMatches('1.1', '1', { numericTol: 0.1 })).toEqual({
+      matched: true,
+      mode: 'numeric'
+    })
     expect(answerMatches('1.10001', '1', { numericTol: 0.1 }).matched).toBe(false)
     expect(answerMatches('2', '1', { numericTol: 1 })).toEqual({ matched: true, mode: 'numeric' })
   })
