@@ -20,6 +20,7 @@ import { useStudyDbStore } from './studyDb'
 import { loadBankIndex, loadSubjectBank } from '@/utils/practiceBankClient'
 import { composePaper, weakAreasOf, weakWeightsFromErrors } from '@/utils/composePaper'
 import { paperKeyOf } from '@/content/practiceBank'
+import { isFillItem, answerMatches } from '@/content/answerNorm'
 import { TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 export const usePracticeStore = defineStore('practice', () => {
@@ -113,6 +114,10 @@ export const usePracticeStore = defineStore('practice', () => {
         picked: null,
         revealed: false,
         assess: null,
+        // fill 题（B-2）：typed=输入原文（判分与 recordError.userAnswer 共用）；
+        // autoMatched: null=未自动判 / true=判对 / false=未命中（回落自评）
+        typed: null,
+        autoMatched: null,
         enterAt: Date.now(), // 进入该题的时间戳（切题时重设），用于结算 elapsedMs
         elapsedMs: null, // 结算后写入（毫秒）
         errorId: null // 若入错题本，记录其 id 供归因回写
@@ -182,6 +187,27 @@ export const usePracticeStore = defineStore('practice', () => {
     rec.revealed = true
   }
 
+  /**
+   * fill 提交判分（B-2）：仅 isFillItem(q) 且未自评、未提交过时有效（幂等，防重复提交）。
+   * - matched → autoMatched=true + 揭示参考答案（assess 仍为 null：自评才是单题完成唯一标志，
+   *   D2 强制规则不动，判对后用户仍需点「我会了/我还不会」才能下一题）
+   * - 未命中 → autoMatched=false + 揭示参考答案；UI 提示「未自动匹配，请对照答案自评」，
+   *   回落点 = 现有 assess 流程（自评通路零改动，H3 二分保持）
+   * - 不直接写 assess / 不落库
+   * @param {string} input 学生输入原文
+   */
+  function submitFill(input) {
+    const s = session.value
+    if (!s) return
+    const q = s.questions[s.index]
+    const rec = s.records[s.index]
+    if (!isFillItem(q) || rec.assess || rec.autoMatched !== null) return
+    const typed = typeof input === 'string' ? input : ''
+    rec.typed = typed
+    rec.autoMatched = typed.trim() ? answerMatches(typed, q.answer).matched : false
+    rec.revealed = true
+  }
+
   /** 揭示参考答案（自由文本「看答案」；结构化题点选时已自动揭示） */
   function revealAnswer() {
     const s = session.value
@@ -205,10 +231,13 @@ export const usePracticeStore = defineStore('practice', () => {
     try {
       await db.recordAnswered(1, { fileKey: q.fileKey })
       if (kind === 'unknown') {
+        // fill 且有输入时，错题本记真实输入（B-2）；其余沿用既有口径
         const userAnswer =
           q.gradable && rec.picked !== null
             ? `选项 ${'ABCDEFGH'[rec.picked]}`
-            : '自评：我还不会'
+            : isFillItem(q) && rec.typed
+              ? rec.typed
+              : '自评：我还不会'
         // fileKey 必须传：去重键是 subject+question+fileKey，缺了退化为单元粒度（§5.4 注意点 1）
         const r = await db.recordError(
           q.subject,
@@ -373,8 +402,9 @@ export const usePracticeStore = defineStore('practice', () => {
   // ===== L4 结算 =====
 
   /**
-   * 结算统计——判分口径必须二分（prd-mobile §5.2 D3）：
-   * 「自动判」（picked 非空，机器判定）与「自评」（picked 为空）分开统计，禁止合并
+   * 结算统计——判分口径必须二分（prd-mobile §5.2 D3，H3，B-2 扩展）：
+   * 「自动判」（选择/判断点选 picked≠null ∪ fill 判对 autoMatched===true）与
+   * 「自评」（其余，含 fill 未命中回落自评）分开统计，禁止合并
    */
   const resultStats = computed(() => {
     const s = session.value
@@ -386,9 +416,11 @@ export const usePracticeStore = defineStore('practice', () => {
     s.questions.forEach((q, i) => {
       const r = s.records[i]
       if (!r.assess) return
-      if (r.picked !== null) {
+      if (r.picked !== null || r.autoMatched === true) {
         autoCount++
-        if (r.picked === q.correctIndex) autoCorrect++
+        if ((r.picked !== null && r.picked === q.correctIndex) || r.autoMatched === true) {
+          autoCorrect++
+        }
       } else {
         selfCount++
         if (r.assess === 'known') selfKnown++
@@ -496,6 +528,7 @@ export const usePracticeStore = defineStore('practice', () => {
     quitSession,
     discardSession,
     pickOption,
+    submitFill,
     revealAnswer,
     assess,
     next,

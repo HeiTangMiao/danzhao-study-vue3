@@ -49,6 +49,28 @@
         </button>
       </div>
 
+      <!-- 填空题（B-2）：输入 + 提交自动判分；未命中回落自评（不判错、不阻塞） -->
+      <div v-else-if="isFill(q)" class="ps-fill" data-no-swipe>
+        <div class="ps-fill-row">
+          <input
+            v-model="fillInput"
+            type="text"
+            class="ps-fill-input"
+            placeholder="输入你的答案"
+            :disabled="rec.autoMatched !== null"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            autocomplete="off"
+            enterkeyhint="done"
+            @keyup.enter="submitFill"
+          />
+          <button class="ps-fill-submit" :disabled="rec.autoMatched !== null || !fillInput.trim()" @click="submitFill">提交</button>
+        </div>
+        <p v-if="rec.autoMatched === true" class="ps-fill-hint ps-fill-hint--ok">回答正确（已自动判定），请确认后自评</p>
+        <p v-else-if="rec.autoMatched === false" class="ps-fill-hint ps-fill-hint--miss">未自动匹配，请对照答案自评</p>
+      </div>
+
       <!-- 参考答案卡：默认折叠，严禁与题面同屏可见（看答案后才滑出） -->
       <transition name="ps-fade">
         <div v-if="rec.revealed" class="ps-answer">
@@ -111,12 +133,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import ReasonChips from '@/components/ReasonChips.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
+import { isFillItem } from '@/content/answerNorm'
 import { usePracticeStore } from '@/stores/practice'
 import { warmKatex } from '@/composables/useKatex'
 import { useRouter } from 'vue-router'
@@ -164,6 +187,23 @@ function optionClass(oi) {
     'option-right': oi === q.value.correctIndex,
     'option-wrong': oi === rec.value.picked && oi !== q.value.correctIndex
   }
+}
+
+// ===== 填空题输入（B-2）=====
+const isFill = (item) => isFillItem(item)
+// 输入框本地草稿：切题即清空（正式作答存 record.typed，随 record 持有）
+const fillInput = ref('')
+watch(
+  () => store.session?.index,
+  () => {
+    fillInput.value = ''
+  }
+)
+
+/** 提交判分：store.submitFill 幂等（已提交/已自评时 no-op），这里只挡无效提交 */
+function submitFill() {
+  if (!fillInput.value.trim() || rec.value.autoMatched !== null || rec.value.assess) return
+  store.submitFill(fillInput.value)
 }
 
 // ===== 离开保护 =====
@@ -300,6 +340,26 @@ onBeforeUnmount(() => {
 .option-wrong { border-color: var(--danger); background: rgba(var(--danger-rgb), 0.06); }
 .option-wrong .option-letter { background: var(--danger); color: #fff; border-color: var(--danger); }
 .option-mark--no { color: var(--danger); }
+
+/* 填空题输入（B-2）：移动端约定 —— 全部输入属性关闭、字号 ≥16px 防 iOS 聚焦缩放、触控目标 ≥44px */
+.ps-fill { margin-bottom: var(--space-4); }
+.ps-fill-row { display: flex; gap: var(--space-2); }
+.ps-fill-input {
+  flex: 1; min-height: 44px; font-size: 16px; font-family: inherit;
+  background: var(--surface-muted); border: 2px solid var(--border);
+  border-radius: var(--radius-md); padding: 0 var(--space-3); color: var(--text);
+}
+.ps-fill-input:focus { outline: none; border-color: var(--primary); }
+.ps-fill-input:disabled { opacity: 0.7; }
+.ps-fill-submit {
+  flex: 0 0 auto; min-height: 44px; padding: 0 var(--space-4);
+  background: var(--primary); color: #fff; border-radius: var(--radius-md);
+  font-weight: var(--fw-semibold); font-size: var(--fs-base);
+}
+.ps-fill-submit:disabled { opacity: 0.45; }
+.ps-fill-hint { margin-top: var(--space-2); font-size: var(--fs-sm); font-weight: var(--fw-semibold); }
+.ps-fill-hint--ok { color: var(--success); }
+.ps-fill-hint--miss { color: var(--warning); }
 
 /* 参考答案卡（默认折叠，看答案后底部滑出，非阻断不夺焦点） */
 .ps-answer {

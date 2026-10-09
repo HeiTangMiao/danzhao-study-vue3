@@ -56,6 +56,33 @@
           </button>
         </div>
 
+        <!-- 填空题（B-2）：输入 + 提交自动比对；命中绿标并展开答案，未命中回落「查看答案」（不判对错） -->
+        <div v-else-if="isFillItem(item)" class="fill-assess" data-no-swipe>
+          <div class="fill-row">
+            <input
+              v-model="fillInputs[i]"
+              type="text"
+              class="fill-input"
+              placeholder="输入你的答案"
+              :disabled="fillState[i]?.result === 'hit'"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              autocomplete="off"
+              enterkeyhint="done"
+              @keyup.enter="submitFill(i)"
+            />
+            <button
+              class="fill-submit"
+              :disabled="fillState[i]?.result === 'hit' || !(fillInputs[i] || '').trim()"
+              @click="submitFill(i)"
+            >提交</button>
+          </div>
+          <p v-if="fillState[i]?.result === 'hit'" class="judge-feedback judge-ok">回答正确</p>
+          <p v-else-if="fillState[i]?.result === 'miss'" class="fill-miss-hint">未自动匹配，请对照答案确认</p>
+          <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看答案' }}</button>
+        </div>
+
         <!-- 非选择题：仅查看答案 -->
         <div v-else class="self-assess">
           <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看答案' }}</button>
@@ -90,6 +117,7 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import AppIcon from '@/components/AppIcon.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { deriveJudge, isJudgeItem } from '@/content/judgeDerive'
+import { isFillItem, answerMatches } from '@/content/answerNorm'
 
 const props = defineProps({
   // 区块数据：{ type:'quiz', title, items:[{type,difficulty,question,options,correctIndex,answer}] }
@@ -102,12 +130,17 @@ const props = defineProps({
 const states = reactive({})
 // 答案展开状态
 const opened = reactive({})
+// 填空题（B-2）：输入草稿（键为题号）与判定状态 { typed, result: 'hit' | 'miss' | null }
+const fillInputs = reactive({})
+const fillState = reactive({})
 
-// 区块进度统计（统计「可点选题」= 原生选择题 + 判断题派生题）
+// 区块进度统计（统计「可作答题」= 原生选择题 + 判断题派生题 + 填空题）
 const stats = computed(() => {
   const items = props.block.items || []
-  const total = items.filter((_, i) => choiceOf(items[i]) !== null).length
-  const answered = items.filter((_, i) => states[i]?.selected !== undefined).length
+  const total = items.filter((it) => choiceOf(it) !== null || isFillItem(it)).length
+  const answered = items.filter(
+    (it, i) => states[i]?.selected !== undefined || fillState[i]?.result != null
+  ).length
   return { answered, total }
 })
 
@@ -154,6 +187,19 @@ function pickChoice(i, oi) {
   if (eff.derived) next.correct = oi === eff.correctIndex
   states[i] = next
   opened[i] = true
+}
+
+// 填空提交（B-2）：命中 → result:'hit' 绿标并自动展开答案面板（与 pickChoice 同款）；
+// 未命中 → result:'miss' 不判对错，回落「查看答案」按钮路径（QuizBlock 契约不变：
+// 不记错题本、不计正确率）。未命中允许修改后重试，命中即锁定。
+function submitFill(i) {
+  const item = props.block.items[i]
+  if (!isFillItem(item) || fillState[i]?.result === 'hit') return
+  const typed = String(fillInputs[i] ?? '')
+  if (!typed.trim()) return
+  const matched = answerMatches(typed, item.answer).matched
+  fillState[i] = { typed, result: matched ? 'hit' : 'miss' }
+  if (matched) opened[i] = true
 }
 
 // 切换答案/解析显隐
@@ -224,6 +270,24 @@ function toggle(i) { opened[i] = !opened[i] }
 /* 非选择题操作区 */
 .self-assess { display: flex; align-items: center; gap: var(--spacer-8); flex-wrap: wrap; }
 
+/* 填空输入（B-2）：移动端约定 —— 输入属性全关、字号 ≥16px 防 iOS 聚焦缩放、触控目标 ≥44px */
+.fill-assess { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spacer-8); }
+.fill-row { display: flex; gap: var(--spacer-8); width: 100%; max-width: 480px; }
+.fill-input {
+  flex: 1; min-height: 44px; font-size: 16px; font-family: inherit;
+  background: var(--surface-muted); border: 2px solid var(--border);
+  border-radius: var(--radius-md); padding: 0 var(--spacer-10); color: var(--text);
+}
+.fill-input:focus { outline: none; border-color: var(--primary); }
+.fill-input:disabled { opacity: 0.7; }
+.fill-submit {
+  flex: 0 0 auto; min-height: 44px; padding: 0 var(--spacer-16);
+  background: var(--primary); color: #fff; border-radius: var(--radius-md);
+  font-weight: 600; font-size: var(--fs-base);
+}
+.fill-submit:disabled { opacity: 0.45; }
+.fill-miss-hint { font-size: var(--fs-sm); font-weight: 600; color: var(--warning); }
+
 .answer-toggle {
   background: var(--primary-soft); color: var(--primary);
   border: 1px solid var(--primary); border-radius: var(--radius-full);
@@ -253,7 +317,7 @@ function toggle(i) { opened[i] = !opened[i] }
 
 /* 移动端触控目标 ≥44px */
 @media (max-width: 600px) {
-  .answer-toggle, .option-btn {
+  .answer-toggle, .option-btn, .fill-submit {
     min-height: 44px;
     display: inline-flex; align-items: center; justify-content: center;
   }

@@ -70,6 +70,37 @@
           </button>
         </div>
 
+        <!-- 填空题（B-2）：输入 + 提交自动比对；命中自动计分，未命中保留自评按钮（回落，不判错） -->
+        <div v-else-if="isFill(item)" class="fill-assess" data-no-swipe>
+          <div class="fill-row">
+            <input
+              v-model="fillInputs[i]"
+              type="text"
+              class="fill-input"
+              placeholder="输入你的答案"
+              :disabled="answers[i]?.autoMatched === true"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              autocomplete="off"
+              enterkeyhint="done"
+              @keyup.enter="submitFill(i)"
+            />
+            <button
+              class="fill-submit"
+              :disabled="answers[i]?.autoMatched === true || !(fillInputs[i] || '').trim()"
+              @click="submitFill(i)"
+            >提交</button>
+          </div>
+          <p v-if="answers[i]?.autoMatched === true" class="fill-hint fill-hint--ok">回答正确（自动判定）</p>
+          <p v-else-if="answers[i]?.autoMatched === false" class="fill-hint fill-hint--miss">未自动匹配，请对照答案自评</p>
+          <div class="self-assess">
+            <span class="self-label">作答情况：</span>
+            <button class="self-btn self-ok" :class="{ active: answers[i]?.correct === true }" @click="selfAssess(i, true)"><AppIcon name="check" :size="14" /> 答对了</button>
+            <button class="self-btn self-no" :class="{ active: answers[i]?.correct === false }" @click="selfAssess(i, false)"><AppIcon name="x" :size="14" /> 答错了</button>
+          </div>
+        </div>
+
         <!-- 非选择题：自评 -->
         <div v-else class="self-assess">
           <span class="self-label">作答情况：</span>
@@ -146,6 +177,7 @@ import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useProgressStore } from '@/stores/progress'
 import { paperKeyOf } from '@/content/practiceBank'
+import { isFillItem, answerMatches } from '@/content/answerNorm'
 import { TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 const props = defineProps({
@@ -167,6 +199,8 @@ const phase = ref('intro')
 const timeLeft = ref(0)
 // 每题作答状态
 const answers = ref({})
+// 填空题输入草稿（B-2）：键为题号，正式作答存 answers[i].typed
+const fillInputs = ref({})
 // 得分
 const score = ref(0)
 // 交卷中标记：防止连点/并发触发重复记分与错题入库
@@ -259,6 +293,7 @@ function startExam() {
   examStartAt = Date.now()
   timeLeft.value = (props.block.duration || 90) * 60
   answers.value = {}
+  fillInputs.value = {}
   answerOrder = []
   answerAt = new Set()
   attrQueue.value = []
@@ -281,9 +316,34 @@ function selectOption(i, oi) {
   markAnswered(i)
 }
 
-// 自评
+// 是否填空题（B-2）：形态判据与练习/构建期共用同一纯函数（H7）
+function isFill(item) {
+  return isFillItem(item)
+}
+
+// 填空提交（B-2）：命中 → 自动计分 correct:true（与选择题同口径）；
+// 未命中 → 不置 correct，保留 selfAssess 两个按钮（回落自评），typed 留在框里
+function submitFill(i) {
+  const item = props.block.items[i]
+  const typed = String(fillInputs.value[i] ?? '')
+  if (!typed.trim() || answers.value[i]?.autoMatched === true) return
+  const matched = answerMatches(typed, item.answer).matched
+  answers.value[i] = matched
+    ? { answered: true, selected: null, correct: true, autoMatched: true, typed }
+    : { answered: true, selected: null, correct: null, autoMatched: false, typed }
+  markAnswered(i)
+}
+
+// 自评（fill 未命中回落点 / 非选择题通路）：保留已有 typed，不丢输入痕迹
 function selfAssess(i, correct) {
-  answers.value[i] = { answered: true, selected: null, correct }
+  const prev = answers.value[i]
+  answers.value[i] = {
+    answered: true,
+    selected: null,
+    correct,
+    typed: prev?.typed,
+    autoMatched: prev?.autoMatched ?? null
+  }
   markAnswered(i)
 }
 
@@ -328,8 +388,12 @@ function buildExamAttempts() {
       itemType: item.type || '',
       source: 'exam',
       picked: choice && a.selected !== null ? a.selected : null,
-      assess: choice ? null : a.correct ? 'known' : 'unknown',
-      correct: choice ? a.correct === true : null,
+      // fill 判对（B-2）走机器判定口径：assess 置空、correct 置真；
+      // 自评行（含 fill 未命中回落）沿用 assess/correct 原语义
+      assess: choice ? null : a.autoMatched === true ? null : a.correct ? 'known' : 'unknown',
+      correct: choice ? a.correct === true : a.autoMatched === true ? true : null,
+      // fill 输入原文随行透传（行内加字段，零迁移）
+      typed: a.typed || null,
       elapsedMs,
       timedOut: elapsedMs >= TIMEOUT_MS,
       reason: null,
@@ -361,7 +425,7 @@ function onAttrSkip() {
   attrIndex.value++
 }
 
-// 结果页：展示用户作答（选择题显示所选选项，自评题显示对错）
+// 结果页：展示用户作答（选择题显示所选选项，填空显示输入原文，自评题显示对错）
 function userAnswer(i) {
   const a = answers.value[i]
   if (!a) return ''
@@ -369,6 +433,7 @@ function userAnswer(i) {
   if (isChoice(item) && a.selected !== undefined && a.selected !== null) {
     return `${'ABCDEFGH'[a.selected]}. ${item.options[a.selected] || ''}`
   }
+  if (isFill(item) && a.typed) return a.typed
   return a.correct ? '自评答对' : '自评答错'
 }
 
@@ -435,7 +500,10 @@ async function submitExam() {
     const queue = []
     for (const [i, item] of props.block.items.entries()) {
       if (answers.value[i]?.answered && !answers.value[i]?.correct) {
-        const selectedText = isChoice(item) ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}` : '自评答错'
+        // 填空错题（B-2）：userAnswer 用真实输入，未输入才回落「自评答错」
+        const selectedText = isChoice(item)
+          ? `选项 ${'ABCDEFGH'[answers.value[i].selected]}`
+          : answers.value[i].typed || '自评答错'
         try {
           const r = await db.recordError(
             c.subject || 'math',
@@ -473,6 +541,7 @@ function restartExam() {
   phase.value = 'intro'
   score.value = 0
   answers.value = {}
+  fillInputs.value = {}
   submitError.value = ''
   answerOrder = []
   answerAt = new Set()
@@ -626,6 +695,26 @@ onBeforeUnmount(() => {
 .self-btn { padding: 5px 14px; border-radius: var(--radius-full); font-size: var(--fs-md); border: 1px solid var(--border); background: var(--surface); }
 .self-ok.active { border-color: var(--success); color: var(--success); background: rgba(var(--success-rgb), 0.1); }
 .self-no.active { border-color: var(--danger); color: var(--danger); background: rgba(var(--danger-rgb), 0.1); }
+
+/* 填空输入（B-2）：移动端约定 —— 输入属性全关、字号 ≥16px 防 iOS 聚焦缩放、触控目标 ≥44px */
+.fill-assess { display: flex; flex-direction: column; gap: var(--spacer-8); }
+.fill-row { display: flex; gap: var(--spacer-8); }
+.fill-input {
+  flex: 1; min-height: 44px; font-size: 16px; font-family: inherit;
+  background: var(--surface-muted); border: 2px solid var(--border);
+  border-radius: var(--radius-md); padding: 0 var(--spacer-10); color: var(--text);
+}
+.fill-input:focus { outline: none; border-color: var(--primary); }
+.fill-input:disabled { opacity: 0.7; }
+.fill-submit {
+  flex: 0 0 auto; min-height: 44px; padding: 0 var(--spacer-16);
+  background: var(--primary); color: #fff; border-radius: var(--radius-md);
+  font-weight: 600; font-size: var(--fs-base);
+}
+.fill-submit:disabled { opacity: 0.45; }
+.fill-hint { font-size: var(--fs-sm); font-weight: 600; }
+.fill-hint--ok { color: var(--success); }
+.fill-hint--miss { color: var(--warning); }
 
 /* 结果页（极简：无卡片，靠发丝线与留白分段） */
 .result-hero {

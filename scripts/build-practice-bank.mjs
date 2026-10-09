@@ -21,6 +21,7 @@ import { pathToFileURL } from 'node:url'
 import { ROOT, CONTENT_DIR, collectFiles, buildMetaIndex, importFresh, relPathOf } from './lib/load-content.mjs'
 import { pageFileKeyOf } from '../src/content/pageMeta.js'
 import { deriveJudge, isJudgeItem, scanJudgeExceptions } from '../src/content/judgeDerive.js'
+import { isFillItem, extractCandidates } from '../src/content/answerNorm.js'
 import {
   BANK_DIR,
   BANK_INDEX_FILE,
@@ -82,12 +83,15 @@ export function applyVerifiedFlags(shards, verifiedKeys) {
   let gradableTotal = 0
   let derivedTotal = 0
   let verifiedDerived = 0
+  let normTotal = 0 // fill 题可规整标注计数（B-2，统计口径）
   for (const [subject, list] of Object.entries(shards)) {
     let gradable = 0
     let derived = 0
     let verified = 0
+    let normalizable = 0
     for (const it of list) {
       if (it.g) gradable++
+      if (it.nz) normalizable++
       if (it.dv) {
         derived++
         // vf 只对派生题有意义；人工题缺省不写，避免污染既有 gradable 口径
@@ -102,13 +106,14 @@ export function applyVerifiedFlags(shards, verifiedKeys) {
         })
       }
     }
-    subjects[subject] = { count: list.length, gradable, derived, verified }
+    subjects[subject] = { count: list.length, gradable, derived, verified, normalizable }
     total += list.length
     gradableTotal += gradable
     derivedTotal += derived
     verifiedDerived += verified
+    normTotal += normalizable
   }
-  return { subjects, total, gradableTotal, derivedTotal, verifiedDerived, audit }
+  return { subjects, total, gradableTotal, derivedTotal, verifiedDerived, normTotal, audit }
 }
 
 /**
@@ -244,6 +249,11 @@ export async function collectBank() {
           gradable = true
         }
         entry.g = gradable
+        // B-2：fill 题构建期只标「可规整性」布尔 nz（期望值抽取非空），不预生成规整结果
+        // —— 期望值抽取是启发式，算法升级不应要求重建产物；标注仅供组卷统计 / M1 测算
+        if (isFillItem(item)) {
+          entry.nz = extractCandidates(aCap.text).length > 0
+        }
         // 判断题候选：形态判据命中即登记（例外判定交 scanJudgeExceptions，末尾统一 warn）
         if (isJudgeItem(item)) {
           judgeCandidates.push({
@@ -297,8 +307,8 @@ async function build() {
   // A-4：人工核验白名单（键 `${subject}/${key}`；仅对 dv:true 的条目打 vf；F1 修复防跨学科连带）
   const verifiedKeys = loadVerifiedKeys()
 
-  // 2) 汇总索引（小，L1 常驻）：学科题量 + gradable/derived/verified 计数 + 真题卷清单
-  const { subjects, total, gradableTotal, derivedTotal, verifiedDerived, audit } =
+  // 2) 汇总索引（小，L1 常驻）：学科题量 + gradable/derived/verified/normalizable 计数 + 真题卷清单
+  const { subjects, total, gradableTotal, derivedTotal, verifiedDerived, normTotal, audit } =
     applyVerifiedFlags(shards, verifiedKeys)
   const index = {
     generatedAt: new Date().toISOString(),
@@ -306,6 +316,7 @@ async function build() {
     gradableTotal,
     derivedTotal,
     verifiedDerived,
+    normTotal,
     subjects,
     examPapers: collectExamPapers(shards)
   }
@@ -347,7 +358,7 @@ async function build() {
     .join('、')
   console.log(
     `[practice-bank] 已生成 ${BANK_INDEX_FILE}（共 ${total} 题，gradable ${gradableTotal}，` +
-      `derived ${derivedTotal}，verified ${verifiedDerived}）+ ${sizes}`
+      `derived ${derivedTotal}，verified ${verifiedDerived}，normalizable ${normTotal}）+ ${sizes}`
   )
 }
 
