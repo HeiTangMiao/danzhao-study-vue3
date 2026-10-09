@@ -1,0 +1,47 @@
+sequenceDiagram
+    autonumber
+    participant Eng as Engineer
+    participant AN as answerNorm.js(纯函数)
+    participant CV as clozeVariants.js(纯数据)
+    participant Build as build-practice-bank.mjs
+    participant Prod as practice-bank/*.json
+    participant PS as practice store
+    participant PSession as PracticeSession.vue
+    participant Exam as ExamBlock.vue
+    participant Quiz as QuizBlock.vue
+    participant Cloze as ClozeBlock.vue
+    participant DB as studyDb(error_book/daily_stats)
+
+    Note over Eng,Prod: ① 构建期：fill 可规整性标注（B-2）
+    Eng->>Build: npm run build:practice
+    Build->>AN: isFillItem(item) / extractCandidates(answer)
+    AN-->>Build: true/false → entry.nz
+    Build->>Prod: 产物(nz) + index.json(normTotal)
+
+    Note over PSession,AN: ② 练习会话 fill（B-2）
+    PSession->>PS: submitFill(input)
+    PS->>AN: answerMatches(input, q.answer)
+    AN-->>PS: {matched, mode}
+    alt matched
+        PS->>PS: autoMatched=true + 揭示答案 → 仍走 assess（H3 二分）
+    else 未命中
+        PS->>PS: autoMatched=false → 回落自评（assess 通路原样）
+    end
+    PS->>DB: assess → recordError(userAnswer=typed)
+
+    Note over Exam,AN: ③ 模拟卷 fill（B-2）
+    Exam->>AN: answerMatches(typed, item.answer)
+    AN-->>Exam: matched → correct:true 计分 / 未命中 → 保留 selfAssess（回落）
+
+    Note over Quiz,AN: ④ 页面 QuizBlock fill（B-2，QuizBlock 契约不变）
+    Quiz->>AN: answerMatches(typed, item.answer)
+    AN-->>Quiz: 命中 → 绿/红 + 展开答案；未命中 → 回落「查看答案」
+
+    Note over Cloze,CV: ⑤ cloze 输入默写（B-3 + B-4）
+    Cloze->>CV: CLOZE_VARIANTS（通假/异体）
+    Cloze->>AN: answerMatches(typed, blank, {variantMap}) 逐空
+    AN-->>Cloze: results[]（逐空对错）
+    Cloze->>Cloze: 全部重默 / 只重默错句
+    Cloze->>DB: 错句 → recordError(..., {fileKey, source:'cloze'})
+    DB->>DB: 去重命中 → wrongCount++；新行带 SM-2 初始字段
+    Note over DB: loadDueReviews 读 error_book → 默写错句自动进复习队列（SM-2 打通，零接线）

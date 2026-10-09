@@ -1,0 +1,65 @@
+classDiagram
+    direction TB
+
+    class AnswerNorm {
+        <<纯ESM 零import · H7 · src/content>>
+        +DEFAULT_NUMERIC_TOL = 1e-9
+        +stripLatex(s) string
+        +foldWidth(s) string
+        +collapseSpace(s) string
+        +parseNumeric(s) number|null
+        +extractCandidates(expectRaw) string[]
+        +normalizeAnswer(raw, opts) string
+        +answerMatches(user, expect, opts) MatchResult
+        +isFillItem(item) boolean
+    }
+    class MatchResult {
+        +matched : boolean
+        +mode : numeric|exact|none
+    }
+    class ClozeVariants {
+        <<纯数据 · src/content>>
+        +CLOZE_VARIANTS : Map
+    }
+    class BankItem {
+        <<题库产物 紧凑键>>
+        +k q a it g
+        +dv : derived
+        +vf : verified
+        +nz : normalizable
+    }
+    class PracticeRecord {
+        +picked : int|null
+        +typed : string|null
+        +autoMatched : bool|null
+        +assess : known|unknown|null
+        +elapsedMs : int
+    }
+    class ClozeBlockState {
+        +values : string[]
+        +results : (bool|null)[]
+        +submitDictation()
+        +retryAll()
+        +retryWrongSentences()
+    }
+    class ErrorBookRow {
+        <<零迁移 行内加字段>>
+        +question : 原句
+        +userAnswer : typed
+        +source? : 'cloze'
+        +wrongCount : int
+        +SM-2 字段
+    }
+    class StudyDb {
+        <<零改动预期>>
+        +recordError(...,extra)
+        +recordAnswered(n,page)
+    }
+
+    AnswerNorm --> MatchResult : 产出
+    ClozeVariants ..> AnswerNorm : variantMap 注入
+    AnswerNorm ..> BankItem : 构建期 nz 标注
+    AnswerNorm ..> PracticeRecord : submitFill 判定
+    AnswerNorm ..> ClozeBlockState : 逐空比对
+    ClozeBlockState ..> ErrorBookRow : 错句入队
+    StudyDb --> ErrorBookRow : recordError/去重/SM-2
