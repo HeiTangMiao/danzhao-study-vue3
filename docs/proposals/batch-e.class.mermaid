@@ -1,0 +1,116 @@
+%% 批 E 关键结构（classDiagram）
+%% 角色：架构师（高见远）｜实测基准 HEAD=1a26e3a｜配套 docs/proposals/batch-e-tasks.md §3.5
+classDiagram
+    direction TB
+
+    class TauriSecurity {
+        <<src-tauri/tauri.conf.json · app.security>>
+        +csp : 生产 CSP(script-src 'self')
+        +devCsp : dev CSP(含 HMR 授权)
+    }
+    class CspGuardTest {
+        <<tests/csp-guard.test.js · P1-T5>>
+        +L1 生产 CSP 不得放宽
+        +L2 dev/prod 能力差登记(核心)
+        +L3 全仓无「字符串转代码」
+        +L4 外部主机被 prod CSP 覆盖
+        +L6 无运行时拼接 import()(新增)
+        +DEV_ONLY_ALLOWED / EVAL_ALLOWLIST / HOST_ALLOWLIST
+    }
+    class CspLock {
+        <<tests/helpers/csp-lock.js · L5>>
+        +withCspLocked(fn)
+    }
+
+    class PracticeStore {
+        <<src/stores/practice.js>>
+        +SELF_TIERS : known|seen|unknown
+        +assess(kind) : 三档
+        +resultStats : 二分不变(H3)
+        +redoErrors() : 含 seen
+    }
+    class PracticeSession {
+        <<src/views/practice/PracticeSession.vue>>
+        +自评区三按钮(行为化文案)
+        +assess(kind) 三档
+    }
+    class ComposePaper {
+        <<src/utils/composePaper.js · 纯函数>>
+        +weakWeightsFromErrors(errors, topN, dim)
+        +seen 档聚合 +0.5(中间态权重减半)
+        +weightKeyOf(item, dim)
+    }
+    class CalibrationPanel {
+        <<DashboardView.vue · 新增区块>>
+        +selfTier × repetitions 复测召回率
+        +仅相对排序(不出绝对分数)
+    }
+
+    class ProgressStore {
+        <<src/stores/progress.js>>
+        +completed : 已接触快照
+        +mastered : 页面级已掌握快照(masteredAt)
+        +subjectTotalCompleted(subject) : 已接触计数
+        +masteredCount(subject) : 已掌握计数(新增)
+    }
+    class DashboardView {
+        <<src/views/DashboardView.vue>>
+        +学科进度双轨(已接触/已掌握)
+        +校准率面板
+    }
+
+    class UsePomodoro {
+        <<src/composables/usePomodoro.js>>
+        +activeSubject
+        +recordStudyMinutes(min, subject)
+        +loadTodaySessions() : pomodoroCount 真实计数
+    }
+    class PomodoroPanel {
+        <<src/components/PomodoroPanel.vue>>
+        +选科目(默认当前页)
+        +产出登记(可跳过)
+    }
+    class StudyDb {
+        <<src/stores/studyDb.js · v7>>
+        +getDailyStat(date) : 含分科/番茄数兜底
+        +updateDailyStat(delta)
+        +recordError(..., extra) : 透传 selfTier
+    }
+    class DailyStats {
+        <<daily_stats 行 · 行内加字段零迁移>>
+        +studyMinutes : 全局(不变)
+        +studyMinutesBySubject : P1-12 分科
+        +pomodoroCount : P1-12 真实番茄数
+    }
+    class PlanView {
+        <<src/views/PlanView.vue>>
+        +今日耗时: 分科 实际 vs 预算
+    }
+
+    class BuildSearchIndex {
+        <<scripts/build-search-index.mjs>>
+        +collectIndex() : 正文 + 题库题干
+        +clean() / capBody() 复用
+    }
+    class SearchIndex {
+        <<src/content/searchIndex.js · 形状单一来源>>
+        +BODY_LIMIT / META_FILE / bodyShardPath / bodyKeyOf
+    }
+    class SearchPanel {
+        <<src/components/SearchPanel.vue>>
+        +题库命中渲染 + 跳来源页
+    }
+
+    CspGuardTest ..> TauriSecurity : 读 csp/devCsp
+    CspGuardTest ..> CspLock : L5 复用(可选)
+    PracticeSession --> PracticeStore : assess(kind)
+    PracticeStore ..> StudyDb : recordError(selfTier)
+    PracticeStore --> ComposePaper : weakWeightsFromErrors
+    CalibrationPanel ..> StudyDb : getAllErrors(selfTier × SM-2 快照)
+    DashboardView --> ProgressStore : 双轨计数
+    PomodoroPanel --> UsePomodoro : activeSubject / 产出登记
+    UsePomodoro ..> StudyDb : recordStudyMinutes / loadTodaySessions
+    StudyDb --> DailyStats : 行内加字段
+    PlanView ..> StudyDb : getDailyStat.studyMinutesBySubject
+    BuildSearchIndex ..> SearchIndex : 形状常量
+    SearchPanel ..> SearchIndex : bodyKeyOf / bodyShardPath

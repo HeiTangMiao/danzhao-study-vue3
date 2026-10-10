@@ -1,0 +1,53 @@
+%% 批 E 关键程序调用流（sequenceDiagram）
+%% 角色：架构师（高见远）｜实测基准 HEAD=1a26e3a｜配套 docs/proposals/batch-e-tasks.md §3
+sequenceDiagram
+    autonumber
+    participant CFG as tauri.conf.json(csp/devCsp)
+    participant CG as tests/csp-guard.test.js
+    participant LK as tests/helpers/csp-lock.js
+    participant SRC as src/**(去注释)
+    participant PS as PracticeSession.vue
+    participant PSx as practice store
+    participant CP as composePaper.weakWeightsFromErrors
+    participant DB as studyDb(error_book)
+    participant DASH as DashboardView.vue
+    participant PRG as progress store
+    participant POM as usePomodoro / PomodoroPanel
+    participant DS as daily_stats
+    participant PLAN as PlanView.vue
+    participant BSI as build-search-index.mjs
+    participant SP as SearchPanel.vue
+
+    Note over CFG,LK: ① E-0 CSP 护栏（L1/L2 配置 + L3/L4/L6 源码）
+    CG->>CFG: readFileSync(tauri.conf.json)
+    CG->>CG: L1 prod 不得放宽；L2 dev 多出的授权逐条登记
+    Note over CG: 实测 dev 多出 5 项，其中 'unsafe-eval' 未登记 → L2 fail(预期)<br/>从 devCsp 移除 'unsafe-eval' → L2 转绿
+    CG->>SRC: walkSrc + stripComments
+    CG->>CG: L3 无「字符串转代码」(0 命中) / L4 主机覆盖 / L6 无运行时拼接 import()
+    LK-->>CG: withCspLocked(fn)（L5，按需复用）
+
+    Note over PS,DB: ② E-1 自评三档 + 中间态权重减半
+    PS->>PSx: assess('seen') / assess('unknown') / assess('known')
+    PSx->>DB: recordError(..., { selfTier:'seen'|'unknown' })（seen 也入本）
+    PSx->>PSx: resultStats（二分不变，selfKnown 只计 known，H3）
+    PSx->>CP: weakWeightsFromErrors(errors)（seen 聚合 +0.5）
+    DASH->>DB: getAllErrors() → 校准率面板（selfTier × repetitions）
+    Note over DASH: 仅相对排序，不下结论、不出绝对分数
+
+    Note over DASH,PRG: ③ E-2 双轨进度（数据层已双轨，仅改 UI/文案）
+    DASH->>PRG: subjectTotalCompleted(subject)（已接触）
+    DASH->>PRG: masteredCount(subject)（已掌握，页面级 masteredAt）
+    Note over DASH: 两「掌握」有意分离：页面级 masteredAt ≠ 复习侧 isMastered(SM-2)
+
+    Note over POM,PLAN: ④ E-3 番茄绑任务 + 分科耗时
+    POM->>POM: 启动选 activeSubject（默认当前页 subject）
+    POM->>DS: recordStudyMinutes(25, subject) + pomodoroCount++
+    POM->>DS: loadTodaySessions() 读 pomodoroCount（真实计数，去 /25 反推）
+    POM->>DB: addStudyLog({action:'pomodoro_output', note})（产出登记）
+    PLAN->>DS: getDailyStat(today).studyMinutesBySubject
+    PLAN->>PLAN: 分科 实际 vs budget[subject]/7
+
+    Note over BSI,SP: ⑤ E-4 搜索覆盖题干
+    BSI->>BSI: collectIndex()（正文 + 题库题干，同一 clean）
+    BSI-->>SP: search-body/{subject}.json（题干并入正文，+9%）
+    SP->>SP: matchSearch（题干子串命中 → 跳来源页）
