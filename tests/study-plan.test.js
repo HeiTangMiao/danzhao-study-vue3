@@ -191,10 +191,17 @@ describe('D-2 PlanView 组件（⑦）', () => {
     wrapper.unmount()
   })
 
-  it('⑦ 分科耗时标「等待 P1-12」；每日预算目标常量可导出', async () => {
+  it('⑦ 分科耗时逐科展示（E-3 P1-12）取代占位；每日预算目标常量可导出', async () => {
     const wrapper = mount(PlanView, { global: { plugins: [pinia] } })
     await nextTick()
-    expect(wrapper.text()).toContain('分科耗时待 P1-12')
+    // E-3：旧占位「分科耗时待 P1-12」已由逐科「实际 / 目标」对比取代
+    expect(wrapper.text()).not.toContain('分科耗时待 P1-12')
+    expect(wrapper.text()).not.toContain('待 P1-12')
+    // 三学科 + 其他 = 4 行分科对比（每行含科目名与「/ 目标」）
+    const rows = wrapper.findAll('.plan-subject__row')
+    expect(rows).toHaveLength(4)
+    expect(wrapper.text()).toContain('数学')
+    expect(wrapper.text()).toContain('/ 目标')
     expect(DAILY_BUDGET_HOURS).toBeCloseTo(WEEKLY_BUDGET_HOURS / 7, 5)
     wrapper.unmount()
   })

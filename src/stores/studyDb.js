@@ -281,6 +281,19 @@ function getDateStr(d = new Date()) {
 }
 
 /**
+ * 分科耗时的科目键（P1-12）—— 与 studyPlan.budget 键、番茄钟 SUBJECTS **对齐**。
+ * 'other' 收纳未归到三学科的学习时间（复习/整理等）。
+ */
+const SUBJECT_KEYS = ['math', 'chinese', 'computer', 'other']
+
+/** 分科耗时零值结构（每次新建，防调用方共享引用互相污染） */
+function zeroMinutesBySubject() {
+  const o = {}
+  for (const k of SUBJECT_KEYS) o[k] = 0
+  return o
+}
+
+/**
  * 生成全局唯一主键（error_book / study_log 的同步键，避免跨设备自增撞号）
  * 优先用 Web Crypto UUID；不可用时退化为时间戳 + 随机串
  */
@@ -334,12 +347,28 @@ export const useStudyDbStore = defineStore('studyDb', {
 
     /**
      * 获取某日统计（不存在则返回默认结构）
+     * P1-12：行内新增 studyMinutesBySubject / pomodoroCount；旧行缺字段时**按 0 兜底**
+     * （零迁移，不回填历史行 —— 历史 studyMinutes 无法反推真实番茄数）。
      * @param {string} date - 日期字符串 YYYY-MM-DD
      */
     async getDailyStat(date) {
       await this.init()
       const r = await dbGet('daily_stats', date)
-      return r || { date, filesVisited: 0, questionsAnswered: 0, studyMinutes: 0 }
+      if (!r) {
+        return {
+          date,
+          filesVisited: 0,
+          questionsAnswered: 0,
+          studyMinutes: 0,
+          studyMinutesBySubject: zeroMinutesBySubject(),
+          pomodoroCount: 0
+        }
+      }
+      return {
+        ...r,
+        studyMinutesBySubject: { ...zeroMinutesBySubject(), ...(r.studyMinutesBySubject || {}) },
+        pomodoroCount: r.pomodoroCount || 0
+      }
     },
 
     /** 保存 / 更新每日统计 */
@@ -608,7 +637,8 @@ export const useStudyDbStore = defineStore('studyDb', {
 
     /**
      * 更新今日学习统计（不含游戏化字段）
-     * @param {{ filesVisited?: number, questionsAnswered?: number, studyMinutes?: number }} delta
+     * @param {{ filesVisited?: number, questionsAnswered?: number, studyMinutes?: number,
+     *           studyMinutesBySubject?: Record<string, number>, pomodoroCount?: number }} delta
      */
     async updateDailyStat(delta = {}) {
       await this.init()
@@ -617,6 +647,18 @@ export const useStudyDbStore = defineStore('studyDb', {
       stat.filesVisited = (stat.filesVisited || 0) + (delta.filesVisited || 0)
       stat.questionsAnswered = (stat.questionsAnswered || 0) + (delta.questionsAnswered || 0)
       stat.studyMinutes = (stat.studyMinutes || 0) + (delta.studyMinutes || 0)
+      // P1-12 分科耗时：**与 studyMinutes 在同一次写入中**逐科累加 ——
+      // 这是「ΣstudyMinutesBySubject == studyMinutes（番茄来源部分）」的**唯一保证点**
+      // （同一函数、同一份 stat、一次 saveDailyStat，杜绝两处分别计算导致漂移）。
+      if (delta.studyMinutesBySubject && typeof delta.studyMinutesBySubject === 'object') {
+        const bySub = { ...(stat.studyMinutesBySubject || {}) }
+        for (const [key, val] of Object.entries(delta.studyMinutesBySubject)) {
+          bySub[key] = (bySub[key] || 0) + (Number(val) || 0)
+        }
+        stat.studyMinutesBySubject = bySub
+      }
+      // P1-12 真实番茄数：直接累加（不再由 studyMinutes/25 反推）
+      stat.pomodoroCount = (stat.pomodoroCount || 0) + (delta.pomodoroCount || 0)
       await this.saveDailyStat(stat)
     },
 

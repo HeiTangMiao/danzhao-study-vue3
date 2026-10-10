@@ -11,7 +11,7 @@
       <p class="plan-sub">周预算 · 里程碑倒计时 · 每日清单（漏一天自动顺延，不惩罚）</p>
     </header>
 
-    <!-- ⑧ 今日实际耗时 vs 每日预算目标（P-D6：本批只做全局；分科等待 P1-12） -->
+    <!-- ⑧ 今日耗时：全局 + 分科对比（P1-12；分科目标 = 各科周预算 / 7） -->
     <section class="card plan-today">
       <div class="plan-today__row">
         <span class="plan-today__val">{{ todayHours }}</span>
@@ -19,8 +19,16 @@
       </div>
       <div class="plan-today__meta">
         <span>今日已学 / 目标约 {{ dailyTargetH }} h</span>
-        <span class="plan-today__hint">分科耗时待 P1-12</span>
       </div>
+      <ul class="plan-subject">
+        <li v-for="s in subjectRows" :key="s.key" class="plan-subject__row">
+          <span class="plan-subject__name">{{ s.name }}</span>
+          <span class="plan-subject__bar">
+            <span class="plan-subject__fill" :style="{ width: s.pct + '%' }"></span>
+          </span>
+          <span class="plan-subject__val">{{ s.hours }} / 目标 {{ s.target }} h</span>
+        </li>
+      </ul>
     </section>
 
     <!-- ② 里程碑倒计时 -->
@@ -164,10 +172,27 @@ function addTask() {
 /** 已完成任务（保留在 tasks 中，供取消勾选 → 不清零） */
 const doneTasks = computed(() => store.tasks.filter((t) => t.done))
 
-// 今日实际总耗时（全局 daily_stats.studyMinutes；分科等待 P1-12）
+// 今日实际总耗时（全局 daily_stats.studyMinutes）+ 分科耗时（P1-12 studyMinutesBySubject）
 const todayMinutes = ref(0)
+const todayBySubject = ref({})
 const todayHours = computed(() => (todayMinutes.value / 60).toFixed(1))
 const dailyTargetH = DAILY_BUDGET_HOURS.toFixed(1)
+
+// 分科对比（P1-12）：逐科「实际 vs 周预算/7」；无预算（target=0）时进度条按 0
+const subjectRows = computed(() =>
+  budgetSubjects.value.map((s) => {
+    const minutes = Number(todayBySubject.value[s.key]) || 0
+    const hours = minutes / 60
+    const target = (Number(store.budget[s.key]) || 0) / 7
+    return {
+      key: s.key,
+      name: s.name,
+      hours: hours.toFixed(1),
+      target: target.toFixed(1),
+      pct: target > 0 ? Math.min(100, Math.round((hours / target) * 100)) : 0
+    }
+  })
+)
 
 onMounted(async () => {
   store.load()
@@ -175,6 +200,8 @@ onMounted(async () => {
   try {
     const stat = await db.getDailyStat(store.today)
     todayMinutes.value = stat?.studyMinutes || 0
+    // 旧行无分科字段 → 按空对象兜底（零迁移，不回填历史行）
+    todayBySubject.value = stat?.studyMinutesBySubject || {}
   } catch (e) {
     console.warn('[plan] 今日耗时加载失败:', e)
   }
@@ -186,13 +213,19 @@ onMounted(async () => {
 .plan-header h1 { font-size: var(--fs-2xl); margin: 0; font-weight: var(--fw-semibold); }
 .plan-sub { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--fs-md); }
 
-/* 今日耗时 */
-.plan-today { display: flex; align-items: baseline; gap: var(--space-3); padding: var(--space-4); }
+/* 今日耗时（全局 + 分科） */
+.plan-today { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); padding: var(--space-4); }
 .plan-today__row { display: flex; align-items: baseline; gap: 2px; }
 .plan-today__val { font-size: var(--fs-3xl); font-weight: var(--fw-semibold); color: var(--primary); }
 .plan-today__unit { font-size: var(--fs-lg); color: var(--text-muted); }
 .plan-today__meta { display: flex; flex-direction: column; gap: 2px; color: var(--text-muted); font-size: var(--fs-md); }
-.plan-today__hint { font-size: var(--fs-xs); }
+/* 分科对比（P1-12）：逐科 实际 / 目标（周预算/7） */
+.plan-subject { flex: 1 0 100%; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); }
+.plan-subject__row { display: flex; align-items: center; gap: var(--space-2); font-size: var(--fs-md); }
+.plan-subject__name { flex: 0 0 3.4em; color: var(--text-muted); }
+.plan-subject__bar { flex: 1; height: 8px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
+.plan-subject__fill { display: block; height: 100%; background: var(--primary); border-radius: var(--radius-full); }
+.plan-subject__val { flex: 0 0 auto; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 /* 通用区块 */
 .plan-block { padding: var(--space-4); }

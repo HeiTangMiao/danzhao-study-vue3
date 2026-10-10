@@ -3,8 +3,9 @@
  * 职责：
  *  - 25 分钟专注 + 5 分钟休息，每 4 个番茄后长休息 15 分钟
  *  - 状态持久化到 localStorage（防止刷新丢失）
- *  - 完成专注后记录学习时长到 daily_stats
- *  - 提供音效与通知能力
+ *  - 完成专注后记录学习时长到 daily_stats（P1-12：**按科目归集**到 studyMinutesBySubject，
+ *    与全局 studyMinutes 同一次写入；番茄数用真实计数 pomodoroCount，不再 studyMinutes/25 反推）
+ *  - 提供音效 / 通知 / 产出登记（study_log action='pomodoro_output'）
  *
  * 替代旧版 assets/js/pomodoro.js
  * 依赖：studyDb store
@@ -17,6 +18,12 @@ const FOCUS_DURATION = 25 * 60      // 专注 25 分钟
 const BREAK_DURATION = 5 * 60       // 短休息 5 分钟
 const LONG_BREAK_DURATION = 15 * 60 // 长休息 15 分钟
 const STORAGE_KEY = 'pomodoro_state'
+
+/**
+ * 科目取值域（P1-12）—— 单一来源，**禁止视图内联**。
+ * 与 studyPlan.budget 键、studyDb 的 studyMinutesBySubject 键对齐；'other' 收纳未归科时间。
+ */
+export const SUBJECTS = ['math', 'chinese', 'computer', 'other']
 
 // 全局复用的音频上下文（避免每次提示音都新建 AudioContext）
 let audioCtx = null
@@ -33,7 +40,11 @@ function getDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-export function usePomodoro() {
+/**
+ * 番茄钟计时器 composable
+ * @param {string} [initialSubject='other'] 启动时的默认科目（UnitView 传当前页 subject）
+ */
+export function usePomodoro(initialSubject = 'other') {
   const db = useStudyDbStore()
 
   // 响应式状态
@@ -42,6 +53,15 @@ export function usePomodoro() {
   const timeLeft = ref(FOCUS_DURATION)
   const sessionsCompleted = ref(0)    // 今日已完成番茄数
   const cycleCount = ref(0)           // 当前周期番茄数（0-3）
+  // 当前科目（P1-12）：启动时选定；默认由 UnitView 传入当前页 subject
+  const activeSubject = ref(SUBJECTS.includes(initialSubject) ? initialSubject : 'other')
+  // 最近一次「真实完成」的专注时间戳（rewarded 才置位）—— 供面板弹「本次产出」登记（skip 不弹）
+  const lastFocusDoneAt = ref(0)
+
+  /** 切换当前科目（视图段控/下拉用；非法值忽略） */
+  function setSubject(subject) {
+    if (SUBJECTS.includes(subject)) activeSubject.value = subject
+  }
 
   let intervalId = null
   // 当前阶段开始的时间戳（秒/毫秒），用于时间戳基准校准计时
@@ -169,17 +189,53 @@ export function usePomodoro() {
   }
 
   /**
-   * 记录学习时长到 daily_stats
+   * 记录学习时长到 daily_stats（P1-12 分科归集）
+   * 全局 studyMinutes 与分科 studyMinutesBySubject 由 updateDailyStat **同一次写入**完成，
+   * 保证 ΣstudyMinutesBySubject == studyMinutes（番茄来源部分）恒成立（禁止两处分别算）。
    * @param {number} minutes - 学习分钟数
+   * @param {string} [subject] - 科目（默认当前 activeSubject）
    */
-  async function recordStudyMinutes(minutes) {
+  async function recordStudyMinutes(minutes, subject = activeSubject.value) {
     try {
       await db.init()
-      const stat = await db.getDailyStat(getDateStr())
-      stat.studyMinutes = (stat.studyMinutes || 0) + minutes
-      await db.saveDailyStat(stat)
+      await db.updateDailyStat({
+        studyMinutes: minutes,
+        // 分科与全局同一 delta 原子写入（唯一保证点）
+        studyMinutesBySubject: { [subject]: minutes }
+      })
     } catch (e) {
       console.warn('[Pomodoro] 记录学习时长失败:', e)
+    }
+  }
+
+  /** 真实番茄数 +1（P1-12）：focus **真实完成**时调用；skip 不调用 → 不用 studyMinutes/25 反推 */
+  async function bumpPomodoroCount() {
+    try {
+      await db.init()
+      await db.updateDailyStat({ pomodoroCount: 1 })
+    } catch (e) {
+      console.warn('[Pomodoro] 记录番茄数失败:', e)
+    }
+  }
+
+  /**
+   * 登记「本次产出」（P1-12）：复用 study_log 时间线（零新表），action='pomodoro_output'。
+   * note 存「做了什么 / 卡在哪」一行文本；空 note 不写（等同跳过）。
+   */
+  async function recordOutput(note) {
+    const text = String(note || '').trim()
+    if (!text) return
+    try {
+      await db.init()
+      await db.addStudyLog({
+        date: getDateStr(),
+        timestamp: Date.now(),
+        subject: activeSubject.value,
+        action: 'pomodoro_output',
+        note: text
+      })
+    } catch (e) {
+      console.warn('[Pomodoro] 登记产出失败:', e)
     }
   }
 
@@ -196,9 +252,13 @@ export function usePomodoro() {
       // 专注完成
       cycleCount.value++
       if (rewarded) {
+        // 分科归集学习时长（全局 + 分科同一次写入）+ 真实番茄数 +1（skip 不计）
         await recordStudyMinutes(FOCUS_DURATION / 60)
+        await bumpPomodoroCount()
         // 以 daily_stats 为单一数据源刷新今日番茄数
         await loadTodaySessions()
+        // 置位：面板据此弹「本次产出」登记（true 完成才弹，skip 不弹）
+        lastFocusDoneAt.value = Date.now()
         notify('番茄钟完成！', '专注了25分钟，休息一下吧')
       }
 
@@ -260,12 +320,12 @@ export function usePomodoro() {
     }
   }
 
-  /** 加载今日已完成番茄数 */
+  /** 加载今日已完成番茄数（P1-12：真实计数，不再 studyMinutes/25 反推） */
   async function loadTodaySessions() {
     try {
       await db.init()
       const stat = await db.getDailyStat(getDateStr())
-      sessionsCompleted.value = Math.floor((stat.studyMinutes || 0) / 25)
+      sessionsCompleted.value = stat.pomodoroCount || 0
     } catch (e) { sessionsCompleted.value = 0 }
   }
 
@@ -282,9 +342,11 @@ export function usePomodoro() {
   return {
     // 状态
     running, mode, timeLeft, sessionsCompleted, cycleCount,
+    activeSubject, lastFocusDoneAt,
     // 计算属性
     display, progress, modeLabel, totalDuration,
     // 操作
-    start, pause, reset, skip
+    start, pause, reset, skip,
+    setSubject, recordStudyMinutes, bumpPomodoroCount, loadTodaySessions, recordOutput
   }
 }

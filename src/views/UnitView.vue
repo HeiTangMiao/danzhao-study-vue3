@@ -126,8 +126,12 @@
     <PomodoroPanel
       :pomodoro="pomodoro"
       :open="pomodoroOpen"
+      :page-subject="subject"
+      :page-unit-title="unit?.title || ''"
+      :page-title="fileMeta?.title || ''"
       @close="pomodoroOpen = false"
       @toggle="pomodoroOpen = !pomodoroOpen"
+      @request-open="pomodoroOpen = true"
     />
 
     <!-- 离开确认弹层（考试作答中导航离开前统一弹确认） -->
@@ -175,14 +179,17 @@ const router = useRouter()
 const progress = useProgressStore()
 const db = useStudyDbStore()
 
+// 当前学科（从路由参数获取，默认 math）—— 提前定义，供番茄钟默认科目使用
+const subject = computed(() => route.params.subject || 'math')
+
 // 番茄钟：常驻悬浮球 + 锚定面板（交互模型见 PomodoroPanel 头注）。
 // pomodoroOpen 由本组件持有，侧栏入口与点球共用同一状态源；
 // 球位置与「固定位置」锁均在 PomodoroPanel 内部持久化，本组件不再关心 pinned
-const pomodoro = usePomodoro()
+// P1-12：默认科目跟随当前页 subject
+const pomodoro = usePomodoro(subject.value)
 const pomodoroOpen = ref(false)
-
-// 当前学科（从路由参数获取，默认 math）
-const subject = computed(() => route.params.subject || 'math')
+// 路由切页（学科变化）→ 番茄钟默认科目跟随当前页
+watch(subject, (s) => pomodoro.setSubject(s))
 
 // 当前学科配置（动态获取）
 const site = computed(() => getSubjectConfig(subject.value))

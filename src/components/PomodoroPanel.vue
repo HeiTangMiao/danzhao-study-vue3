@@ -16,9 +16,11 @@
    - pomodoro  usePomodoro() 返回对象整体透传（refs 嵌在对象内，模板按 .value 取）；
                计时 interval 在 composable 内，与面板开合解耦——面板关闭计时照跑
    - open      面板显隐（由 UnitView 持有，侧栏入口与点球共用同一状态源）
+   - pageSubject / pageUnitTitle / pageTitle  当前页上下文（P1-12）：默认任务来源
   emits:
-   - close     关闭面板（× 按钮）
-   - toggle    点球时请求开合面板（UnitView 翻转 open）
+   - close         关闭面板（× 按钮）
+   - toggle        点球时请求开合面板（UnitView 翻转 open）
+   - request-open  请求展开面板（本次产出登记弹出时，UnitView 置 open=true）
 -->
 <template>
   <!-- 常驻悬浮球：可拖拽移动 + 点击开合面板。
@@ -62,11 +64,47 @@
           <button class="pomodoro-tool" title="关闭" aria-label="关闭番茄钟" @click="emit('close')"><AppIcon name="x" :size="16" /></button>
         </span>
       </div>
+      <!-- 科目选择（P1-12）：启动前选定；默认当前页 subject。运行中隐藏（本轮归属已定） -->
+      <div v-if="!pomodoro.running.value" class="pomodoro-subject">
+        <span class="pomodoro-subject__label">科目</span>
+        <select
+          class="pomodoro-subject__select"
+          aria-label="番茄钟科目"
+          :value="pomodoro.activeSubject.value"
+          @change="pomodoro.setSubject($event.target.value)"
+        >
+          <option v-for="s in SUBJECTS" :key="s" :value="s">{{ subjectName(s) }}</option>
+        </select>
+      </div>
+      <!-- 当前页任务上下文（默认任务来源；P1-12 更正 5） -->
+      <div v-if="pageTitle || pageUnitTitle" class="pomodoro-task">{{ subjectName(pageSubject) }} · {{ pageUnitTitle || pageTitle }}</div>
       <div class="pomodoro-time">{{ pomodoro.display.value }}</div>
       <div class="pomodoro-progress">
         <div class="pomodoro-progress__bar" :style="{ width: pomodoro.progress.value * 100 + '%' }"></div>
       </div>
       <div class="pomodoro-today">今日已完成 {{ pomodoro.sessionsCompleted.value }} 个番茄</div>
+
+      <!-- 本次产出登记（P1-12）：focus 真实完成后弹出，一行输入，可跳过（仅写 study_log） -->
+      <div v-if="outputOpen" class="pomodoro-output">
+        <div class="pomodoro-output__title">本次产出（可跳过）</div>
+        <input
+          v-model="outputNote"
+          class="pomodoro-output__input"
+          type="text"
+          placeholder="做了什么 / 卡在哪？"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          autocomplete="off"
+          enterkeyhint="done"
+          @keyup.enter="submitOutput"
+        />
+        <div class="pomodoro-output__actions">
+          <button class="pomodoro-btn" @click="skipOutput">跳过</button>
+          <button class="pomodoro-btn pomodoro-btn--primary" :disabled="!outputNote.trim()" @click="submitOutput">保存</button>
+        </div>
+      </div>
+
       <div class="pomodoro-actions">
         <button class="pomodoro-btn pomodoro-btn--primary" @click="pomodoro.running.value ? pomodoro.pause() : pomodoro.start()">
           {{ pomodoro.running.value ? '⏸ 暂停' : '▶ 开始' }}
@@ -81,6 +119,8 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
+import { SUBJECTS } from '@/composables/usePomodoro'
+import { SUBJECT_META } from '@/content/index'
 import {
   clampBallPos,
   isDrag,
@@ -93,10 +133,45 @@ const PIN_KEY = 'pomodoro_pin'
 
 const props = defineProps({
   pomodoro: { type: Object, required: true },
-  open: { type: Boolean, default: false }
+  open: { type: Boolean, default: false },
+  // 当前页上下文（P1-12，来自 UnitView）：作为默认任务上下文（科目默认 / 产出登记预填）
+  pageSubject: { type: String, default: '' },
+  pageUnitTitle: { type: String, default: '' },
+  pageTitle: { type: String, default: '' }
 })
 
-const emit = defineEmits(['close', 'toggle'])
+const emit = defineEmits(['close', 'toggle', 'request-open'])
+
+/** 科目显示名：三学科取 SUBJECT_META，其余（other）固定为「其他」 */
+function subjectName(key) {
+  if (key === 'other') return '其他'
+  return SUBJECT_META[key]?.name || key
+}
+
+// 本次产出登记（P1-12）：focus 真实完成后弹出
+const outputOpen = ref(false)
+const outputNote = ref('')
+function submitOutput() {
+  const text = outputNote.value.trim()
+  if (!text) return
+  props.pomodoro.recordOutput(text)
+  outputOpen.value = false
+  outputNote.value = ''
+}
+function skipOutput() {
+  outputOpen.value = false
+  outputNote.value = ''
+}
+// 真实完成一次专注 → 弹产出登记并请求展开面板（skip 时不置位，故不弹）
+watch(
+  () => props.pomodoro.lastFocusDoneAt.value,
+  (t) => {
+    if (!t) return
+    outputOpen.value = true
+    outputNote.value = props.pageTitle || ''
+    emit('request-open')
+  }
+)
 
 const ballEl = ref(null)
 const panelEl = ref(null)
@@ -297,6 +372,30 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-full); transition: width 1s linear;
 }
 .pomodoro-today { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; }
+
+/* 科目选择（P1-12）：启动前一行段控 */
+.pomodoro-subject { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.78rem; }
+.pomodoro-subject__label { flex: 0 0 auto; color: var(--text-muted); }
+.pomodoro-subject__select {
+  flex: 1; min-height: 36px; padding: 0 8px; font-size: 16px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface-muted); color: var(--text);
+}
+/* 当前页任务上下文（默认任务来源） */
+.pomodoro-task {
+  margin-top: 6px; font-size: 0.72rem; color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* 本次产出登记（P1-12）：focus 完成后的一行输入 */
+.pomodoro-output { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.pomodoro-output__title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+.pomodoro-output__input {
+  width: 100%; min-height: 40px; padding: 0 8px; font-size: 16px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text);
+}
+.pomodoro-output__actions { display: flex; gap: 6px; margin-top: 6px; }
 .pomodoro-actions { display: flex; gap: 8px; margin-top: 10px; }
 .pomodoro-btn {
   flex: 1; min-height: 40px;
