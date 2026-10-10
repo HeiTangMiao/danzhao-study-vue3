@@ -133,6 +133,40 @@ export function calculateSM2(
   grade: number
 ): { interval: number; repetitions: number; easeFactor: number; nextReviewDate: string }
 
+/** 单次复习上限（单一真相源，P0-6 验收 2） */
+export const REVIEW_SESSION_LIMIT: number
+
+/** 四档元信息（UI 文案与 grade 值唯一来源） */
+export const GRADE_META: Array<{ grade: number; key: string; label: string; tone: string }>
+
+/** 「已掌握」唯一判据（SM-2 真掌握 OR 存量手动标注 legacyMastered/reviewed） */
+export function isMastered(e: Partial<ReviewItem> | null | undefined): boolean
+
+/** 「已复习过」判据（lastReviewedAt 非空），与 isMastered 彻底分开 */
+export function hasReviewed(e: Partial<ReviewItem> | null | undefined): boolean
+
+/** due 判据唯一真相源 */
+export function isDue(e: Partial<ReviewItem> | null | undefined, today?: string): boolean
+
+/** 今日到期计数（与复习页队列同一判据） */
+export function countDue(list: Array<Partial<ReviewItem>>, today?: string): number
+
+/** 复习页队列：筛选到期 → 排期升序 → 截断（不改入参） */
+export function pickDue(
+  list: Array<Partial<ReviewItem>>,
+  opts?: { limit?: number; today?: string }
+): Array<Partial<ReviewItem>>
+
+/** 统一评分入口（唯一写库点；不写 reviewed） */
+export function gradeCard(
+  db: any,
+  error: Partial<ReviewItem>,
+  grade: number
+): Promise<{
+  next: Partial<ReviewItem>
+  sm2: { interval: number; repetitions: number; easeFactor: number; nextReviewDate: string }
+}>
+
 export interface UseSpacedReviewReturn {
   dueReviews: Ref<ReviewItem[]>
   reviewStats: Ref<ReviewStats | null>

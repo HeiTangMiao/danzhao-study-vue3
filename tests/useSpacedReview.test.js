@@ -107,6 +107,39 @@ describe('calculateSM2 - easeFactor 公式', () => {
   })
 })
 
+describe('calculateSM2 - 四档真实驱动间隔（P0-6 验收 4 算法侧证据）', () => {
+  /** 本地日期串（与 calculateSM2 内 getDateStr 同口径） */
+  function localDate(offsetDays = 0) {
+    const d = new Date()
+    d.setDate(d.getDate() + offsetDays)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+
+  it('四档产生至少 2 个不同 interval（AGAIN 重置为 1，成功档进入下一轮）', () => {
+    // 说明：经典 SM-2 中「成功档的间隔倍数与档位无关」——首次复习（repetitions=0）时
+    // AGAIN/HARD/GOOD/EASY 的 interval 同为 1，无法产生差异；故取一条已复习过两轮的行，
+    // 让 AGAIN 的重置（→1）与成功档（→round(6×easeFactor)）拉开间距。这是算法本来的性质。
+    const e = makeError({ repetitions: 2, interval: 6, easeFactor: 2.5 })
+    const intervals = [GRADES.AGAIN, GRADES.HARD, GRADES.GOOD, GRADES.EASY].map(
+      (g) => calculateSM2(e, g).interval
+    )
+    expect(new Set(intervals).size).toBeGreaterThanOrEqual(2)
+  })
+
+  it('AGAIN 的 repetitions 归零且 nextReviewDate = 明天', () => {
+    const r = calculateSM2(makeError({ repetitions: 4, interval: 30, easeFactor: 2.5 }), GRADES.AGAIN)
+    expect(r.repetitions).toBe(0)
+    expect(r.interval).toBe(1)
+    expect(r.nextReviewDate).toBe(localDate(1))
+  })
+
+  it('EASY 的 easeFactor > GOOD（档位真实影响难度因子）', () => {
+    const easy = calculateSM2(makeError(), GRADES.EASY).easeFactor
+    const good = calculateSM2(makeError(), GRADES.GOOD).easeFactor
+    expect(easy).toBeGreaterThan(good)
+  })
+})
+
 describe('calculateSM2 - nextReviewDate', () => {
   it('返回合法的 YYYY-MM-DD 日期字符串', () => {
     const r = calculateSM2(makeError(), GRADES.GOOD)
