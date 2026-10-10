@@ -38,7 +38,10 @@
       >
         <span class="res-icon"><AppIcon :name="r.isTest ? 'clipboard-list' : subjectIconName(r.subject)" :size="16" /></span>
         <span class="res-body">
-          <span class="res-title">{{ r.title }}</span>
+          <span class="res-title">
+            {{ r.title }}
+            <span v-if="r.matchedQuestion" class="res-badge" title="命中练习题库题干">题目</span>
+          </span>
           <span class="res-unit">{{ r.name }} · {{ r.unitTitle }}</span>
           <span v-if="r.snippet" class="res-snippet">{{ r.snippet }}</span>
         </span>
@@ -295,6 +298,14 @@ function go(r) {
 .res-icon { font-size: 1.2rem; flex: 0 0 auto; }
 .res-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .res-title { font-weight: 700; font-size: 0.92rem; }
+/* E-4：命中题库题干时的「题目」小标（与正文命中区分，便于用户判断去练习） */
+.res-badge {
+  display: inline-block; vertical-align: middle;
+  margin-left: 6px; padding: 1px 6px;
+  font-size: 0.66rem; font-weight: 600; line-height: 1.4;
+  color: var(--primary); background: var(--primary-soft);
+  border-radius: var(--radius-full);
+}
 .res-unit { font-size: 0.76rem; color: var(--text-muted); }
 .res-snippet {
   font-size: 0.78rem; color: var(--text-muted);

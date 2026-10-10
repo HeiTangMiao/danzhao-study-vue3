@@ -10,12 +10,24 @@
  * 说明：文件遍历与「路径 → 元信息」索引均来自 scripts/lib/load-content.mjs，
  *      与 scripts/validate-content.mjs 共用同一份实现，避免两处各写一遍后慢慢漂移。
  *      索引形状（正文上限 / 分片路径 / 正文键）来自 src/content/searchIndex.js，两端共用。
+ *
+ * E-4（P1-13）：正文末尾并入「练习题库题干」，用 QUESTION_MARKER 分段，供运行期把命中
+ *      标成「题目」。题库分片由 scripts/build-practice-bank.mjs 产出，故构建顺序上
+ *      **build:practice 必须先于 build:search**（见 package.json 的 build:index，P-E5）。
  */
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs'
+import { writeFileSync, mkdirSync, rmSync, statSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { ROOT, CONTENT_DIR, collectFiles, buildMetaIndex, importFresh, relPathOf } from './lib/load-content.mjs'
-import { BODY_LIMIT, META_FILE, bodyShardPath, bodyKeyOf } from '../src/content/searchIndex.js'
+import {
+  BODY_LIMIT,
+  BODY_BUDGET_BYTES,
+  QUESTION_MARKER,
+  META_FILE,
+  bodyShardPath,
+  bodyKeyOf
+} from '../src/content/searchIndex.js'
+import { practiceShardPath } from '../src/content/practiceBank.js'
 
 const PUBLIC_DIR = join(ROOT, 'public')
 const META_OUT = join(PUBLIC_DIR, META_FILE)
@@ -82,19 +94,84 @@ function toMetaEntry(m) {
 }
 
 /**
- * 采集索引数据（不落盘，便于测试直接断言形状）
- * @param {{limit?: number}} options 正文上限（默认 BODY_LIMIT）
- * @returns {Promise<{meta: Array, bodies: Record<string, Record<string, string>>, truncated: Array<{rel: string, len: number}>, unregistered: string[]}>}
+ * 把题库分片条目按「正文键（unitNum/fileIndex）」归并为题干文本表（纯函数，便于单测）。
+ * 清洗规则与页面正文一致（clean），保证运行期子串匹配口径统一。
+ * @param {Array} list 题库分片（public/practice-bank/{学科}.json 解析结果）
+ * @returns {Map<string, string[]>} 正文键 → 该页全部题干（清洗后，丢弃空串）
  */
-export async function collectIndex({ limit = BODY_LIMIT } = {}) {
+export function groupBankQuestions(list) {
+  const byKey = new Map()
+  for (const it of list || []) {
+    const key = `${it.u}/${it.fi}`
+    const q = clean(it.q)
+    if (!q) continue
+    if (!byKey.has(key)) byKey.set(key, [])
+    byKey.get(key).push(q)
+  }
+  return byKey
+}
+
+/**
+ * 读取练习题库分片，按学科归并题干（依赖 build:practice 先于 build:search）。
+ * 分片缺失/损坏时该学科记为 missing（不阻断，由调用方告警）。
+ * @param {string[]} subjects 学科 key 列表
+ * @returns {{bySubject: Map<string, Map<string, string[]>>, missing: string[]}}
+ */
+export function readBankShards(subjects) {
+  const bySubject = new Map()
+  const missing = []
+  for (const subject of subjects) {
+    let list
+    try {
+      list = JSON.parse(readFileSync(join(PUBLIC_DIR, practiceShardPath(subject)), 'utf-8'))
+    } catch {
+      missing.push(subject)
+      continue
+    }
+    bySubject.set(subject, groupBankQuestions(list))
+  }
+  return { bySubject, missing }
+}
+
+/**
+ * 把题库题干并入页面正文，用 QUESTION_MARKER 分段（纯函数）。
+ * 无题干时原样返回，避免给纯知识页插入无意义的分段标记。
+ * @param {string} pageText 清洗后的页面正文
+ * @param {string[]} questions 该页题干（清洗后）
+ * @returns {string} 正文（可能含 `… 【题目】 题干1 题干2`）
+ */
+export function mergeQuestions(pageText, questions) {
+  if (!questions || !questions.length) return pageText
+  return `${pageText} ${QUESTION_MARKER} ${questions.join(' ')}`
+}
+
+/**
+ * 采集索引数据（不落盘，便于测试直接断言形状）
+ * @param {{limit?: number, bankBySubject?: Map|null, withBank?: boolean}} options
+ *   正文上限（默认 BODY_LIMIT）；bankBySubject 注入式题库表（测试用）；
+ *   withBank=true 时从 public/practice-bank/ 读题库（构建用，依赖 build:practice 先跑）
+ * @returns {Promise<{meta: Array, bodies: Record<string, Record<string, string>>, truncated: Array<{rel: string, len: number}>, unregistered: string[], bankMissing: string[], questionCount: number}>}
+ */
+export async function collectIndex({ limit = BODY_LIMIT, bankBySubject = null, withBank = false } = {}) {
   // 1) 依站点配置建立「文件相对路径 → 元信息」索引（保证有序且覆盖全部注册页面）
   const metaByRel = await buildMetaIndex()
+
+  // E-4：题库题干表。未显式注入且要求并入时才读盘（构建路径），避免测试隐式依赖 public/ 产物
+  let bank = bankBySubject
+  let bankMissing = []
+  if (!bank && withBank) {
+    const subjects = [...new Set([...metaByRel.values()].map((m) => m.subject))]
+    const r = readBankShards(subjects)
+    bank = r.bySubject
+    bankMissing = r.missing
+  }
 
   // 2) 遍历磁盘采样页面文件，import 正文并回填文本
   const meta = []
   const bodies = {}
   const truncated = []
   const unregistered = []
+  let questionCount = 0
   for (const file of collectFiles(CONTENT_DIR)) {
     const rel = relPathOf(file)
     const info = metaByRel.get(rel)
@@ -109,26 +186,36 @@ export async function collectIndex({ limit = BODY_LIMIT } = {}) {
       page = mod.default
     } catch (e) { /* 单页加载失败不影响其余 */ }
 
-    const full = page && Array.isArray(page.blocks) ? clean(extractText(page.blocks)) : ''
-    const { text, truncated: cut } = capBody(full, limit)
-    if (cut) truncated.push({ rel, len: full.length })
+    const pageText = page && Array.isArray(page.blocks) ? clean(extractText(page.blocks)) : ''
+    // E-4：把该页题库题干并入正文（键与运行期 bodyKeyOf 同源）
+    const questions = bank ? bank.get(info.subject)?.get(bodyKeyOf(info)) || [] : []
+    questionCount += questions.length
+    const merged = mergeQuestions(pageText, questions)
+    const { text, truncated: cut } = capBody(merged, limit)
+    if (cut) truncated.push({ rel, len: merged.length })
     meta.push(toMetaEntry(info))
     if (!bodies[info.subject]) bodies[info.subject] = {}
     bodies[info.subject][bodyKeyOf(info)] = text
   }
-  return { meta, bodies, truncated, unregistered }
+  return { meta, bodies, truncated, unregistered, bankMissing, questionCount }
 }
 
 async function build() {
-  const { meta, bodies, truncated, unregistered } = await collectIndex()
+  // E-4：并入题库题干（withBank 会读 public/practice-bank/，故需 build:practice 先跑，见 P-E5）
+  const { meta, bodies, truncated, unregistered, bankMissing, questionCount } = await collectIndex({
+    withBank: true
+  })
 
   // 3) 输出：先清掉整个分片目录，避免学科下线后旧分片残留在产物里
   mkdirSync(PUBLIC_DIR, { recursive: true })
   rmSync(BODY_DIR, { recursive: true, force: true })
   mkdirSync(BODY_DIR, { recursive: true })
   writeFileSync(META_OUT, JSON.stringify(meta), 'utf-8')
+  const shardBytes = []
   for (const [subject, shard] of Object.entries(bodies)) {
-    writeFileSync(join(PUBLIC_DIR, bodyShardPath(subject)), JSON.stringify(shard), 'utf-8')
+    const out = join(PUBLIC_DIR, bodyShardPath(subject))
+    writeFileSync(out, JSON.stringify(shard), 'utf-8')
+    shardBytes.push(statSync(out).size)
   }
 
   // 4) 把静默失败变成构建日志：仍被截断的页面必须点名，不能只留一个数字
@@ -141,10 +228,27 @@ async function build() {
   if (unregistered.length) {
     console.warn(`[search-index] ⚠️ 以下文件未注册进 site.js，已跳过：\n  ` + unregistered.join('\n  '))
   }
+  // E-4：题库分片缺失 → 题干搜不到，必须点名（通常是漏跑 build:practice）
+  if (bankMissing.length) {
+    console.warn(
+      `[search-index] ⚠️ 未找到以下学科的题库分片（请先执行 build:practice）：${bankMissing.join('、')} —— 本次未并入题干`
+    )
+  }
+  // E-4：正文合计体积预算（题库题干并入后约 +9%），超限必须报告
+  const totalBytes = shardBytes.reduce((a, b) => a + b, 0)
+  if (totalBytes > BODY_BUDGET_BYTES) {
+    console.warn(
+      `[search-index] ⚠️ 正文分片合计 ${(totalBytes / 1024 / 1024).toFixed(2)} MB，` +
+        `超过预算 ${(BODY_BUDGET_BYTES / 1024 / 1024).toFixed(2)} MB —— 请评估拆分或压缩`
+    )
+  }
   const shards = Object.entries(bodies)
     .map(([subject, shard]) => `${bodyShardPath(subject)}（${Object.keys(shard).length} 条）`)
     .join('、')
-  console.log(`[search-index] 已生成 public/${META_FILE}（${meta.length} 条）+ ${shards}`)
+  console.log(
+    `[search-index] 已生成 public/${META_FILE}（${meta.length} 条）+ ${shards}` +
+      `；并入题干 ${questionCount} 题，分片合计 ${(totalBytes / 1024).toFixed(0)} KB`
+  )
 }
 
 // 直接执行时构建；被测试 import 时只暴露 collectIndex（避免测试一 import 就往 public/ 里写）

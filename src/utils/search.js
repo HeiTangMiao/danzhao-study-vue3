@@ -8,11 +8,24 @@
  * 注意：契约：`prepareSearchIndex` 的第二个参数必须与调用 `matchSearch` 时传入的 bodies 为同一份，
  *    否则 _hay 里不含正文，正文命中会被静默漏掉（SearchPanel 在分片到位后重新 prepare 一次）。
  */
-import { bodyKeyOf } from '@/content/searchIndex'
+import { bodyKeyOf, QUESTION_MARKER } from '@/content/searchIndex'
 
-/** 检索串：标题 / 单元 / 副标题 / 正文（bodies 缺省时不含正文） */
+/**
+ * 把正文切成「页面正文段 / 题干段」（E-4）
+ * 构建期用 QUESTION_MARKER 分段：marker 之前是页面正文本体，之后是并入的题库题干。
+ * 纯知识页无题干 → 没有 marker，题干段为空。
+ * @param {string} body 分片里的正文
+ * @returns {{page: string, question: string}}
+ */
+function splitBody(body) {
+  const i = body.indexOf(QUESTION_MARKER)
+  if (i < 0) return { page: body, question: '' }
+  return { page: body.slice(0, i), question: body.slice(i + QUESTION_MARKER.length).trim() }
+}
+
+/** 检索串：标题 / 单元 / 副标题 / 正文（bodies 缺省时不含正文；marker 不入串，避免「题目」被当噪音命中） */
 function hayOf(item, bodies) {
-  const body = bodies ? bodies[bodyKeyOf(item)] || '' : ''
+  const body = bodies ? (bodies[bodyKeyOf(item)] || '').split(QUESTION_MARKER).join(' ') : ''
   return [item.title, item.unitTitle, item.subtitle, body].join(' ').toLowerCase()
 }
 
@@ -39,7 +52,8 @@ function snippetOf(body, pos, len) {
  * @param {Array} items - 索引条目（可含 _hay 预计算字段）
  * @param {string} query - 查询关键词（子串匹配，不区分大小写）
  * @param {{limit?: number, bodies?: Object|null}} options - 命中上限（默认 30）与正文分片
- * @returns {Array<Object>} 命中条目（附 snippet：从正文取的命中上下文，未命中正文时为空串）
+ * @returns {Array<Object>} 命中条目（附 snippet：从正文取的命中上下文；
+ *   matchedQuestion：命中是否落在并入的题干段，供面板标「题目」）
  */
 export function matchSearch(items, query, options = {}) {
   const { limit = 30, bodies = null } = options
@@ -50,10 +64,18 @@ export function matchSearch(items, query, options = {}) {
     // 优先使用预计算的检索串，缺失时按原逻辑现场拼接（兼容旧调用方/单测）
     const hay = item._hay || hayOf(item, bodies)
     if (!hay.includes(kw)) continue
-    // 摘要取自正文：标题命中时标题本身已显示，不需要再截一段关键词串
-    const body = (bodies && bodies[bodyKeyOf(item)]) || ''
-    const pos = body.toLowerCase().indexOf(kw)
-    hits.push({ ...item, snippet: pos >= 0 ? snippetOf(body, pos, kw.length) : '' })
+    // 摘要与「题目」标记都基于分段正文：题干段命中优先标「题目」（E-4）
+    const raw = (bodies && bodies[bodyKeyOf(item)]) || ''
+    const { page, question } = splitBody(raw)
+    const qPos = question.toLowerCase().indexOf(kw)
+    const pPos = page.toLowerCase().indexOf(kw)
+    const matchedQuestion = qPos >= 0
+    const snippet = matchedQuestion
+      ? snippetOf(question, qPos, kw.length)
+      : pPos >= 0
+        ? snippetOf(page, pPos, kw.length)
+        : ''
+    hits.push({ ...item, snippet, matchedQuestion })
     if (hits.length >= limit) break
   }
   return hits
