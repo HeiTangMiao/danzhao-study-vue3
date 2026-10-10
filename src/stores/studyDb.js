@@ -749,9 +749,21 @@ export const useStudyDbStore = defineStore('studyDb', {
           (fileKey ? e.fileKey === fileKey : e.unitNum === unitNum)
       )
       if (dup) {
-        // 重复入本：wrongCount 自增（**唯一自增点**，勿在 UI 层再加，避免双写翻倍）；
-        // 走 dbPut 刷新 updatedAt，令计数变更随同步上行
-        await dbPut('error_book', { ...dup, wrongCount: (dup.wrongCount || 1) + 1 })
+        // 重复答错 = 用户又把这张卡忘了 → 它必须重新回到复习队列，不能继续躺在「已掌握」里。
+        // 「已掌握」是 OR 判据（legacyMastered 或 reviewed 任一为真即成立），所以两个字段都要清；
+        // 只清一个会留下哑键 —— 卡片在错题本显示为待复习，却因另一字段为真而永远不进队列。
+        // 同时把 SM-2 归零到「今日到期」，让它立刻重新出现（wrongCount 自增 = 唯一自增点）。
+        // lastReviewedAt 刻意保持不动：那是「已复习过」的历史事实，与「已掌握」无关，保留才不破坏 hasReviewed 语义。
+        await dbPut('error_book', {
+          ...dup,
+          wrongCount: (dup.wrongCount || 1) + 1,
+          legacyMastered: false,
+          reviewed: false,
+          repetitions: 0,
+          interval: 0,
+          easeFactor: 2.5,
+          nextReviewDate: getDateStr()
+        })
         return { id: dup.id, success: true, duplicated: true }
       }
       const error = {
