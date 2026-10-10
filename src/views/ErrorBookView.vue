@@ -20,6 +20,13 @@
     <div v-if="loading" class="loading">加载中…</div>
 
     <template v-else>
+      <!-- 去复习入口：错题本降为二级入口，实际复习行动在 /review（P0-6） -->
+      <router-link to="/review" class="review-entry card" :class="{ 'has-due': dueCount > 0 }">
+        <span class="review-entry__icon"><AppIcon name="refresh-cw" :size="18" /></span>
+        <span class="review-entry__text">去复习（{{ dueCount }}）</span>
+        <span class="review-entry__go">→</span>
+      </router-link>
+
       <!-- 统计概览 -->
       <section class="card stats-card">
         <div class="stat-item">
@@ -31,7 +38,7 @@
           <span class="stat-label">待复习</span>
         </div>
         <div class="stat-item">
-          <span class="stat-num stat-ok">{{ reviewedCount }}</span>
+          <span class="stat-num stat-ok">{{ masteredCount }}</span>
           <span class="stat-label">已掌握</span>
         </div>
         <div class="stat-item">
@@ -111,7 +118,7 @@
           v-for="(err, i) in filtered"
           :key="err.id"
           class="card error-item"
-          :class="{ mastered: err.reviewed }"
+          :class="{ mastered: isMastered(err) }"
         >
           <div class="error-head">
             <span class="error-index">{{ i + 1 }}</span>
@@ -154,7 +161,7 @@
           <!-- 操作区 -->
           <div class="error-actions">
             <button
-              v-if="!err.reviewed"
+              v-if="!isMastered(err)"
               class="act-btn act-master"
               @click="markMastered(err)"
             ><AppIcon name="check" :size="14" /> 已掌握</button>
@@ -182,7 +189,7 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
-import { calculateSM2, GRADES } from '@/composables/useSpacedReview'
+import { GRADES, gradeCard, isMastered, countDue } from '@/composables/useSpacedReview'
 import { REASONS, reasonDistribution } from '@/utils/practiceMetrics'
 import AppIcon from '@/components/AppIcon.vue'
 
@@ -212,13 +219,16 @@ const statusFilters = [
   { key: 'reviewed', label: '已掌握' }
 ]
 
-// 统计
-const unreviewedCount = computed(() => errors.value.filter((e) => !e.reviewed).length)
-const reviewedCount = computed(() => errors.value.filter((e) => e.reviewed).length)
+// 统计（判据唯一真相源 isMastered，H7）——
+// 存量数字零变化：迁移把 reviewed===true 固化为 legacyMastered 后，isMastered 仍为 true
+const masteredCount = computed(() => errors.value.filter(isMastered).length)
+const unreviewedCount = computed(() => errors.value.filter((e) => !isMastered(e)).length)
 const masteredRate = computed(() => {
   if (!errors.value.length) return 0
-  return Math.round((reviewedCount.value / errors.value.length) * 100)
+  return Math.round((masteredCount.value / errors.value.length) * 100)
 })
+// 今日待复习（与 /review 队列同一判据）—— 顶部「去复习（N）」入口用
+const dueCount = computed(() => countDue(errors.value))
 
 // 归因分布（六选一 + 未归因；H3：与自动判分口径分开，纯函数单一真相源）
 const distribution = computed(() => reasonDistribution(errors.value))
@@ -229,8 +239,9 @@ const filtered = computed(() => {
   if (subjectFilter.value !== 'all') {
     list = list.filter((e) => e.subject === subjectFilter.value)
   }
-  if (statusFilter.value === 'unreviewed') list = list.filter((e) => !e.reviewed)
-  if (statusFilter.value === 'reviewed') list = list.filter((e) => e.reviewed)
+  // key 保持 'unreviewed'/'reviewed' 不动（防 statusFilter 默认值漂移），只换判据为 isMastered
+  if (statusFilter.value === 'unreviewed') list = list.filter((e) => !isMastered(e))
+  if (statusFilter.value === 'reviewed') list = list.filter(isMastered)
   if (reasonFilter.value === 'none') list = list.filter((e) => !e.reason)
   else if (reasonFilter.value !== 'all') list = list.filter((e) => e.reason === reasonFilter.value)
   return [...list].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
@@ -262,20 +273,19 @@ function sourceRoute(err) {
   return { name: 'unit', params: { subject, unitNum, fileIndex } }
 }
 
-// 标记为已掌握（复用 useSpacedReview 的 SM-2 算法，统一难度评估口径）
+// 标记为已掌握（统一评分入口 gradeCard，仅换入口不改行为）
 async function markMastered(err) {
-  const updated = {
-    ...err,
-    // 伪参数：此路「已掌握」未做四档自评，借用 GOOD 档（P0-6 复习器落地后改为真实评分入口，
-    // 见路线图 C-1）；本批只做常量命名留痕，行为不变（批 A 拍板 #3）
-    ...calculateSM2(err, GRADES.GOOD),
-    reviewed: true,
-    reviewCount: (err.reviewCount || 0) + 1,
-    lastReviewedAt: Date.now()
+  try {
+    // gradeCard 是唯一 SM-2 写库入口（**不写 reviewed**）；「已掌握」按钮的语义是用户手动标注，
+    // 故在此基础上显式补写 reviewed:true —— 行为与改造前一致，只是评分路径统一了
+    const { next } = await gradeCard(db, err, GRADES.GOOD)
+    const updated = { ...next, reviewed: true }
+    await db.updateError(updated)
+    const idx = errors.value.findIndex((e) => e.id === err.id)
+    if (idx >= 0) errors.value[idx] = updated
+  } catch (e) {
+    console.error('[ErrorBook] 标记已掌握失败:', e)
   }
-  await db.updateError(updated)
-  const idx = errors.value.findIndex((e) => e.id === err.id)
-  if (idx >= 0) errors.value[idx] = updated
 }
 
 // 标记为仍需复习（重置 SM-2）
@@ -283,6 +293,8 @@ async function markRelearn(err) {
   const updated = {
     ...err,
     reviewed: false,
+    // 必须清 legacyMastered：迁移固化后若不清，isMastered 仍返回 true，按钮会变哑键（最易漏的一处）
+    legacyMastered: false,
     repetitions: 0,
     interval: 0,
     easeFactor: 2.5,
@@ -311,6 +323,10 @@ async function clearAll() {
 // 加载错题
 onMounted(async () => {
   try {
+    // 一次性迁移（幂等）：把存量 reviewed===true 固化为 legacyMastered，保证「已掌握」计数稳定。
+    // 迁移属数据面变更，写入行数留痕一行（H6 精神）；失败不阻断页面渲染。
+    const migrated = await db.migrateLegacyMastered()
+    if (migrated > 0) console.info(`[ErrorBook] 已迁移 ${migrated} 条历史「已掌握」标注`)
     errors.value = await db.getAllErrors()
   } catch (e) {
     console.error('[ErrorBook] 加载失败:', e)
@@ -325,6 +341,19 @@ onMounted(async () => {
 .breadcrumb { color: var(--text-muted); font-size: 0.85rem; }
 .crumb-sep { margin: 0 var(--spacer-8); }
 .loading { text-align: center; padding: var(--spacer-48); color: var(--text-muted); }
+
+/* 去复习入口 */
+.review-entry {
+  display: flex; align-items: center; gap: var(--spacer-10);
+  padding: var(--spacer-12) var(--spacer-16);
+  color: var(--text); text-decoration: none;
+  border-left-width: 4px; border-left-color: var(--primary);
+}
+.review-entry.has-due { border-left-color: var(--warning); }
+.review-entry__icon { display: inline-flex; color: var(--primary); }
+.review-entry.has-due .review-entry__icon { color: var(--warning); }
+.review-entry__text { flex: 1; font-weight: 600; }
+.review-entry__go { color: var(--text-muted); }
 
 /* 统计卡片 */
 .stats-card { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacer-12); }

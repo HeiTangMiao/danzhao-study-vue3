@@ -416,6 +416,21 @@ export const useStudyDbStore = defineStore('studyDb', {
       return dbPut('error_book', error)
     },
 
+    /**
+     * 一次性迁移：把旧口径的 reviewed===true 固化为 legacyMastered=true（行内加字段，零升版）。
+     * 为什么固化而不按 SM-2 真口径重算：存量 reviewed===true 的行 repetitions 多为 1（只评过一次
+     * GOOD），按真口径重算会全部掉回「待复习」，等于推翻用户当年的手动标注 —— 尊重存量标注。
+     * 幂等：只处理 legacyMastered === undefined 的行；迁移完成后恒返回 0。
+     * @returns {Promise<number>} 本次迁移行数
+     */
+    async migrateLegacyMastered() {
+      await this.init()
+      const all = await this.getAllErrors()
+      const todo = all.filter((e) => e.reviewed === true && e.legacyMastered === undefined)
+      for (const e of todo) await dbPut('error_book', { ...e, legacyMastered: true })
+      return todo.length
+    },
+
     /** 物理清空全部错题（仅供“彻底清除”场景；跨设备删除请用 clearAllErrorsSoft） */
     async clearAllErrors() {
       await this.init()

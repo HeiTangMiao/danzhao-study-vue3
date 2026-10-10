@@ -42,6 +42,13 @@ const routes = [
     redirect: (to) => ({ name: 'unit', params: { subject: 'math', unitNum: to.params.unitNum, fileIndex: to.params.fileIndex } })
   },
   {
+    // 复习：单卡会话（P0-6）—— 一级 Tab「复习」直达行动页，错题本降为二级入口
+    path: '/review',
+    name: 'review',
+    meta: { tab: 'review', tabOrder: 2 },
+    component: () => import('@/views/ReviewView.vue')
+  },
+  {
     // 学习仪表盘
     path: '/dashboard',
     name: 'dashboard',

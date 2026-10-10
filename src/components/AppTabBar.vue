@@ -74,10 +74,11 @@ defineProps({
 const route = useRoute()
 
 // 4 个一级 Tab（D3）。数组顺序即一级导航顺序；to 指向顶层路由。
+// 「复习」直达行动页 /review（P0-6「先复习」）—— 错题本降为二级入口（/review 顶部 + Dashboard + 首页三处可达）。
 const tabs = [
   { id: 'study', label: '学习', to: '/', icon: 'book' },
   { id: 'practice', label: '练习', to: '/practice', icon: 'pencil' },
-  { id: 'review', label: '复习', to: '/error-book', icon: 'refresh' },
+  { id: 'review', label: '复习', to: '/review', icon: 'refresh' },
   { id: 'me', label: '我的', to: '/profile', icon: 'user' }
 ]
 

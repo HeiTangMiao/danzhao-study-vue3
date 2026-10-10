@@ -97,7 +97,7 @@
         <div v-if="todayDue > 0" class="insight-due">
           <AppIcon name="bell" :size="16" />
           今日有 <strong>{{ todayDue }}</strong> 道错题到期待复习
-          <router-link to="/error-book" class="insight-link">去复习 →</router-link>
+          <router-link to="/review" class="insight-link">去复习 →</router-link>
         </div>
         <div v-else class="insight-due insight-clear"><AppIcon name="check" :size="16" /> 今日没有到期错题，可以学习新内容</div>
         <p v-if="weakest" class="insight-tip">
@@ -122,6 +122,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
+import { countDue } from '@/composables/useSpacedReview'
 import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
@@ -152,13 +153,8 @@ const subjectTotals = computed(() => {
 
 // ===== 学情分析：薄弱知识点 + 复习建议（基于错题本聚合） =====
 
-// 今日到期待复习数（SM-2：未掌握且到期）
-const todayDue = computed(() => {
-  const errs = overview.value?.allErrors || []
-  const d = new Date()
-  const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-  return errs.filter((e) => !e.reviewed && e.nextReviewDate <= ds).length
-})
+// 今日到期待复习数 —— 判据唯一真相源 countDue（与首页 / 复习页同一口径，H7）
+const todayDue = computed(() => countDue(overview.value?.allErrors || []))
 
 // 把 subject + unitNum 解析成单元标题（配置缺失时兜底）
 function getUnitTitle(subject, unitNum) {

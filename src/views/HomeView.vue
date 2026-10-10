@@ -21,6 +21,26 @@
       <p class="home-subtitle">多学科备考平台 | 知识体系 + 高效练习 + 全真模拟</p>
     </header>
 
+    <!-- 今日任务提醒：待复习错题 + 快捷入口。
+         P0-6 验收 1「先复习、后学新」的唯一落地动作 = 本区块置顶于「继续学习」之前。 -->
+    <section v-if="dueCount !== null" class="today-task card" :class="{ 'has-due': dueCount > 0 }">
+      <router-link v-if="dueCount > 0" to="/review" class="today-task__due">
+        <span class="due-icon"><AppIcon name="bell" :size="20" /></span>
+        <span class="due-text">
+          <span class="due-title">今日待复习 <strong>{{ dueCount }}</strong> 道错题</span>
+          <span class="due-sub">按遗忘曲线安排复习，点击开始复习</span>
+        </span>
+        <span class="due-go">→</span>
+      </router-link>
+      <div v-else class="today-task__clear">
+        <span class="due-icon"><AppIcon name="check" :size="20" /></span>
+        <span class="due-text">
+          <span class="due-title">今日无待复习错题</span>
+          <span class="due-sub">可以安心学习新内容</span>
+        </span>
+      </div>
+    </section>
+
     <!-- 继续学习卡片：上次学习位置一键直达 -->
     <section v-if="lastStudy" class="continue-card card">
       <button class="continue-card__main" @click="continueStudy">
@@ -36,25 +56,6 @@
     <!-- 全文搜索 -->
     <section class="home-search">
       <SearchPanel />
-    </section>
-
-    <!-- 今日任务提醒：待复习错题 + 快捷入口 -->
-    <section v-if="dueCount !== null" class="today-task card" :class="{ 'has-due': dueCount > 0 }">
-      <router-link v-if="dueCount > 0" to="/error-book" class="today-task__due">
-        <span class="due-icon"><AppIcon name="bell" :size="20" /></span>
-        <span class="due-text">
-          <span class="due-title">今日待复习 <strong>{{ dueCount }}</strong> 道错题</span>
-          <span class="due-sub">按遗忘曲线安排复习，点击前往错题本</span>
-        </span>
-        <span class="due-go">→</span>
-      </router-link>
-      <div v-else class="today-task__clear">
-        <span class="due-icon"><AppIcon name="check" :size="20" /></span>
-        <span class="due-text">
-          <span class="due-title">今日无待复习错题</span>
-          <span class="due-sub">可以安心学习新内容</span>
-        </span>
-      </div>
     </section>
 
     <!-- 学科选择卡片 -->
@@ -143,12 +144,15 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProgressStore } from '@/stores/progress'
+import { useStudyDbStore } from '@/stores/studyDb'
+import { countDue } from '@/composables/useSpacedReview'
 import { SUBJECT_LIST, SUBJECT_META, getSubjectConfig } from '@/content/index'
 import SearchPanel from '@/components/SearchPanel.vue'
 import AppIcon from '@/components/AppIcon.vue'
 
 const router = useRouter()
 const progress = useProgressStore()
+const db = useStudyDbStore()
 
 // 学科列表
 const subjectList = SUBJECT_LIST
@@ -169,23 +173,15 @@ onMounted(async () => {
   heroIconMounted.value = true
 })
 
-// 今日待复习错题数（SM-2 到期）：首页复习提醒
+// 今日待复习错题数（SM-2 到期）：判据唯一真相源 countDue（与 Dashboard / 复习页同一口径，H7）
 const dueCount = ref(null)
 onMounted(async () => {
   try {
     // 刷新完成快照（访问/交卷后回首页能立即看到最新进度）
     await progress.refresh()
-    const db = (await import('@/stores/studyDb')).useStudyDbStore()
     await db.init()
     const errors = await db.getAllErrors()
-    const d = new Date()
-    const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    // 从未复习的新错题视为到期；否则按 SM-2 nextReviewDate 判断
-    dueCount.value = errors.filter((e) => {
-      if (e.reviewed) return false
-      if (e.reviewed === false && !e.lastReviewedAt) return true
-      return (e.nextReviewDate || '') <= ds
-    }).length
+    dueCount.value = countDue(errors)
   } catch { dueCount.value = 0 }
 })
 
