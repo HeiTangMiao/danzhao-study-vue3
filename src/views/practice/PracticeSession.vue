@@ -14,6 +14,15 @@
       <div class="ps-progress" aria-hidden="true">
         <div class="ps-progress-fill" :style="{ width: progressPct + '%' }"></div>
       </div>
+      <!-- 限时仿真倒计时（D-1）：按 deadline 校准，剩余 ≤60s 变色提醒 -->
+      <span
+        v-if="store.session.timed"
+        class="ps-timer"
+        :class="{ 'is-warn': timeLeft <= 60 }"
+        aria-label="剩余时间"
+      >
+        <AppIcon name="timer" :size="14" /> {{ fmtTime(timeLeft) }}
+      </span>
       <span class="ps-count">{{ store.session.index + 1 }}/{{ total }}</span>
     </header>
 
@@ -82,6 +91,10 @@
 
     <!-- 底部常驻动作条（拇指区）：看答案 → 我会了 / 我还不会 → 下一题 -->
     <footer class="ps-actions" data-no-swipe>
+      <!-- 限时仿真：中途交卷（未答完 → 二次确认） -->
+      <button v-if="store.session.timed" class="ps-btn ps-btn--submit" @click="askSubmit">
+        <AppIcon name="timer" :size="14" /> 交卷
+      </button>
       <button v-if="!rec.revealed" class="ps-btn ps-btn--primary" @click="store.revealAnswer()">看答案</button>
       <template v-else>
         <button
@@ -105,6 +118,22 @@
         </button>
       </template>
     </footer>
+
+    <!-- 提前交卷二次确认（限时，未答完时） -->
+    <transition name="ps-fade">
+      <div v-if="submitConfirmOpen" class="ps-overlay" @click.self="submitConfirmOpen = false">
+        <div class="ps-confirm card">
+          <div class="ps-confirm__title">确定要交卷吗？</div>
+          <p class="ps-confirm__msg">
+            还有 {{ unansweredCount }} 题未作答，交卷后按未答计入本次结果，不可再改。
+          </p>
+          <div class="ps-confirm__actions">
+            <button class="ps-confirm__btn ps-confirm__cancel" @click="submitConfirmOpen = false">继续作答</button>
+            <button class="ps-confirm__btn ps-confirm__ok" @click="confirmSubmit">交卷</button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- 退出二次确认（有作答时） -->
     <transition name="ps-fade">
@@ -206,6 +235,55 @@ function submitFill() {
   store.submitFill(fillInput.value)
 }
 
+// ===== 限时仿真倒计时（D-1，复用 ExamBlock 的 deadline 时序骨架）=====
+const timeLeft = ref(0)
+let timer = null
+
+/** 秒 → mm:ss */
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
+/** 启动倒计时：每秒按 deadline - Date.now() **重算**（不用 timeLeft-- 累减，
+ *  否则后台/切标签回来的 setInterval 节流会让剩余时间漂移、到点不准）。 */
+function startTimer() {
+  const s = store.session
+  if (!s || !s.timed || !s.deadline) return
+  timeLeft.value = Math.max(0, Math.ceil((s.deadline - Date.now()) / 1000))
+  timer = setInterval(() => {
+    const cur = store.session
+    if (!cur || !cur.deadline) return
+    timeLeft.value = Math.max(0, Math.ceil((cur.deadline - Date.now()) / 1000))
+    if (timeLeft.value <= 0) {
+      stopTimer()
+      // 到点自动交卷：直接 finishSession（不另写收尾逻辑，H7；也不弹确认）
+      store.finishSession()
+    }
+  }, 1000)
+}
+
+function stopTimer() {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+
+// ===== 提前交卷（D-1）：未答完 → 二次确认 =====
+const submitConfirmOpen = ref(false)
+const unansweredCount = computed(() => Math.max(0, total.value - store.answeredCount))
+
+function askSubmit() {
+  if (unansweredCount.value > 0) submitConfirmOpen.value = true
+  else store.finishSession()
+}
+function confirmSubmit() {
+  submitConfirmOpen.value = false
+  store.finishSession()
+}
+
 // ===== 离开保护 =====
 const confirmOpen = ref(false)
 // 记录被拦截的导航目标：确认后补跳（undefined = 仅退出回首页）
@@ -278,10 +356,12 @@ onMounted(() => {
   // 题目普遍含 \(...\)：进入会话前预热 KaTeX（幂等）
   warmKatex()
   window.addEventListener('beforeunload', onBeforeUnload)
+  startTimer() // 限时会话启动倒计时（非限时会话内部直接 return）
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', onBeforeUnload)
+  stopTimer() // 离开会话页务必清计时器，防泄漏
 })
 </script>
 
@@ -303,6 +383,13 @@ onBeforeUnmount(() => {
 .ps-progress { flex: 1; height: 3px; border-radius: var(--radius-full); background: var(--surface-muted); overflow: hidden; }
 .ps-progress-fill { height: 100%; background: var(--primary); border-radius: var(--radius-full); transition: width var(--dur-3) var(--ease-out); }
 .ps-count { flex: 0 0 auto; font-size: var(--fs-md); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+/* 限时倒计时（D-1）：等宽数字防跳动；剩余 ≤60s 转危险色 */
+.ps-timer {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 3px;
+  font-size: var(--fs-md); font-weight: var(--fw-semibold);
+  color: var(--primary); font-variant-numeric: tabular-nums;
+}
+.ps-timer.is-warn { color: var(--danger); }
 
 /* 题面 */
 .ps-stage { flex: 1; padding: var(--space-4) 0; }
@@ -395,6 +482,11 @@ onBeforeUnmount(() => {
 .ps-btn--active-ok { border-color: var(--success); color: var(--success); background: rgba(var(--success-rgb), 0.1); }
 .ps-btn--next { flex: 1.2; background: var(--primary); color: #fff; }
 .ps-btn--next:disabled { background: var(--surface-muted); color: var(--text-muted); }
+.ps-btn--submit {
+  flex: 0 0 auto; padding: 0 var(--space-4);
+  border: 1.5px solid var(--primary); color: var(--primary);
+  background: var(--surface);
+}
 
 /* 退出确认 */
 .ps-overlay {

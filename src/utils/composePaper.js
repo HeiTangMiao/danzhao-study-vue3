@@ -168,6 +168,7 @@ function shuffle(arr, rng) {
  * @param {boolean} [opt.includeExam=false] 是否纳入真题卷题目（默认关闭）
  * @param {Record<string, number>} [opt.unitWeights={}] 单元权重（weakWeightsFromErrors 产物）
  * @param {'unit'|'kp'} [opt.weightDimension='unit'] 加权维度（D-3：缺省恒 'unit' 保持既有行为）
+ * @param {number|null} [opt.maxPerPage=null] 同一 fileKey 最多保留几题（null = 不限，既有行为；D-1）
  * @param {Set<string>|string[]} [opt.existingKeys=null] 会话内已用键（paperKeyOf），命中即排除
  * @returns {{questions: Array, poolSize: number}} questions 已洗牌；poolSize 为有效池大小
  */
@@ -178,8 +179,9 @@ export function composePaper(items, opt = {}) {
     difficulty = '',
     includeExam = false,
     unitWeights = {},
-    existingKeys = null,
-    weightDimension = WEIGHT_DIMENSIONS.UNIT
+    weightDimension = WEIGHT_DIMENSIONS.UNIT,
+    maxPerPage = null,
+    existingKeys = null
   } = opt
   const rng = mulberry32(seed)
 
@@ -204,6 +206,20 @@ export function composePaper(items, opt = {}) {
   //    ⚠️ 字段是 key（practiceBank normalizeBankItem 展开的运行时名），不是紧凑键 k——
   //    写错字段比较器恒 undefined → 排序静默失效（QA F4 实证：同 seed 乱序喂入结果漂移）
   pool = pool.slice().sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
+
+  // 3b) per-page 抽取上限（D-1）：同一 fileKey 在候选池最多保留 maxPerPage 条（超出剔除）。
+  //     只删候选、不新增（与 extractCandidates 的多解闸门同向）→ 不改判分/去重/难度配额口径；
+  //     剔除后弱单元的重复条目减少 → 150 档不会堆在同一页/单元，覆盖更多考点。
+  //     放在「池不足全给」之前，保证小池也受上限约束。
+  if (Number.isInteger(maxPerPage) && maxPerPage > 0) {
+    const perKey = new Map()
+    pool = pool.filter((it) => {
+      const fk = it.fileKey || ''
+      const n = (perKey.get(fk) || 0) + 1
+      perKey.set(fk, n)
+      return n <= maxPerPage
+    })
+  }
 
   // 池不足：全给（仍洗牌保持出题顺序随机感）
   if (pool.length <= count) {

@@ -16,6 +16,19 @@
       <p class="presult-meta">共 {{ st.total }} 题 · 用时 {{ fmtTime(st.durationSec) }}</p>
     </div>
 
+    <!-- 限时仿真：距上次仿真的间隔提示（D-1，P-D5；温和、非强制、不阻断） -->
+    <section v-if="simInfo" class="card presult-sim">
+      <p v-if="simInfo.first" class="presult-sim__tip">
+        <AppIcon name="timer" :size="15" /> 这是你的首次限时仿真 —— 建议两次仿真间隔 ≥ 14 天。
+      </p>
+      <p v-else-if="simInfo.enough" class="presult-sim__tip presult-sim__tip--ok">
+        <AppIcon name="check" :size="15" /> 距上次仿真 {{ simInfo.days }} 天，可以再进行仿真。
+      </p>
+      <p v-else class="presult-sim__tip">
+        <AppIcon name="timer" :size="15" /> 距上次仿真 {{ simInfo.days }} 天 —— 建议间隔 ≥ 14 天，先消化错题再仿真。
+      </p>
+    </section>
+
     <!-- 新入错题：一键直达复习 Tab（接上「错题收录后无提示」的断点） -->
     <button v-if="st.newErrors > 0" class="card presult-errors" @click="goReview">
       <AppIcon name="siren" :size="18" />
@@ -99,6 +112,19 @@ const router = useRouter()
 const st = computed(() => store.resultStats || { total: 0, autoCount: 0, autoCorrect: 0, selfCount: 0, selfKnown: 0, newErrors: 0, durationSec: 0 })
 
 const showReview = ref(false)
+
+// ===== 限时仿真间隔提示（D-1）=====
+// simPrevAt 是会话开始时读到的「上次仿真」时间戳（session 携带；因开始会话时会覆写
+// localStorage，故不能再从存储里读旧值）。>14 天为「可进行」，否则温和提示（不阻断）。
+const SIM_INTERVAL_DAYS = 14
+const simInfo = computed(() => {
+  const s = store.session
+  if (!s || !s.timed) return null
+  const prev = s.simPrevAt
+  if (prev == null) return { first: true }
+  const days = Math.floor((Date.now() - prev) / 86400000)
+  return { days, enough: days >= SIM_INTERVAL_DAYS }
+})
 
 // ===== 单题耗时（P0-3）=====
 const attempts = computed(() => store.session?.attempts || [])
@@ -204,6 +230,14 @@ async function again() {
 .line-tag--auto { background: var(--primary-soft); color: var(--primary); }
 .line-tag--self { background: var(--surface-muted); color: var(--text-muted); }
 .presult-meta { margin-top: var(--space-3); color: var(--text-muted); font-size: var(--fs-md); }
+
+/* 限时仿真间隔提示（D-1）：温和提示卡，非阻断 */
+.presult-sim { padding: var(--space-4); }
+.presult-sim__tip {
+  display: flex; align-items: center; gap: var(--space-2);
+  color: var(--text-muted); font-size: var(--fs-md); line-height: var(--lh-snug);
+}
+.presult-sim__tip--ok { color: var(--success); }
 
 .presult-errors {
   display: flex; align-items: center; gap: var(--space-2);

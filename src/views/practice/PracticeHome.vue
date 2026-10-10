@@ -24,7 +24,7 @@
       <button class="resume-discard" @click="store.discardSession()">放弃</button>
     </div>
 
-    <!-- 三入口 -->
+    <!-- 四入口 -->
     <section class="entry-grid">
       <button class="card entry" @click="store.openConfig({ mode: 'unit' })">
         <span class="entry-icon"><AppIcon name="book-open" :size="22" /></span>
@@ -34,12 +34,17 @@
       <button class="card entry" @click="weakOpen = !weakOpen">
         <span class="entry-icon"><AppIcon name="target" :size="22" /></span>
         <span class="entry-name">薄弱专项</span>
-        <span class="entry-desc">错题多的单元优先</span>
+        <span class="entry-desc">错题多的优先</span>
       </button>
       <button class="card entry" @click="examOpen = !examOpen">
         <span class="entry-icon"><AppIcon name="timer" :size="22" /></span>
         <span class="entry-name">模拟冲刺</span>
-        <span class="entry-desc">真题卷 · 自定义组卷</span>
+        <span class="entry-desc">真题卷 · 自定义</span>
+      </button>
+      <button class="card entry" @click="timedOpen = !timedOpen">
+        <span class="entry-icon"><AppIcon name="crosshair" :size="22" /></span>
+        <span class="entry-name">限时仿真</span>
+        <span class="entry-desc">三档 · 倒计时</span>
       </button>
     </section>
 
@@ -79,6 +84,23 @@
       </button>
     </section>
 
+    <!-- 限时仿真展开：三档预设（TIMED_PRESETS 单一来源，不在此内联 25/50/150） -->
+    <section v-if="timedOpen" class="card sub-panel">
+      <h2>限时仿真</h2>
+      <p class="sub-empty">倒计时到点自动交卷，也可中途交卷；建议两次仿真间隔 ≥ 14 天。</p>
+      <button
+        v-for="p in timedPresets"
+        :key="p.id"
+        class="paper-item"
+        :disabled="timedStarting"
+        @click="startTimed(p.id)"
+      >
+        <span class="paper-name">{{ p.label }}</span>
+        <span class="paper-count">{{ p.includeExam ? '含真题卷' : '非真题' }}</span>
+      </button>
+      <p v-if="timedError" class="sub-error">{{ timedError }}</p>
+    </section>
+
     <!-- 底部统计：只显示真实数据，无数据不占位（§6 AI 味清单第 9 条） -->
     <section v-if="weekCount > 0 || weekErrors > 0" class="card week-stats">
       <div class="week-item">
@@ -96,7 +118,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
-import { usePracticeStore } from '@/stores/practice'
+import { usePracticeStore, TIMED_PRESETS } from '@/stores/practice'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
 
@@ -105,6 +127,27 @@ const db = useStudyDbStore()
 
 const weakOpen = ref(false)
 const examOpen = ref(false)
+const timedOpen = ref(false)
+
+// 限时仿真三档（单一来源 TIMED_PRESETS；视图不内联数值）
+const timedPresets = TIMED_PRESETS
+const timedStarting = ref(false)
+const timedError = ref('')
+
+/** 开始某档限时仿真（全科混卷口径由 store.startTimed 决定） */
+async function startTimed(presetId) {
+  if (timedStarting.value) return
+  timedStarting.value = true
+  timedError.value = ''
+  try {
+    await store.startTimed(presetId)
+  } catch (e) {
+    console.error('[practice] 限时仿真组卷失败:', e)
+    timedError.value = e.message || '组卷失败，请重试'
+  } finally {
+    timedStarting.value = false
+  }
+}
 
 // 真题卷清单（来自题库索引的 examPapers，坐标可直接跳既有 ExamBlock 页面）
 const papers = computed(() => store.bankIndex?.examPapers || [])
@@ -167,22 +210,24 @@ onMounted(() => {
   color: var(--text-muted); font-size: var(--fs-sm); background: var(--surface-muted);
 }
 
-/* 三入口 */
-.entry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+/* 四入口：2×2 网格（移动端拇指区更稳） */
+.entry-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
 .entry { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding: var(--space-4); text-align: left; }
 .entry-icon { color: var(--primary); margin-bottom: var(--space-1); }
 .entry-name { font-weight: var(--fw-semibold); font-size: var(--fs-base); }
 .entry-desc { font-size: var(--fs-xs); color: var(--text-muted); line-height: var(--lh-snug); }
 .entry:active { transform: scale(0.98); }
 
-/* 子面板（薄弱 / 模拟冲刺展开） */
+/* 子面板（薄弱 / 模拟冲刺 / 限时仿真展开） */
 .sub-panel h2 { font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-3); }
-.sub-empty { color: var(--text-muted); font-size: var(--fs-md); line-height: var(--lh-snug); }
+.sub-empty { color: var(--text-muted); font-size: var(--fs-md); line-height: var(--lh-snug); margin-bottom: var(--space-2); }
+.sub-error { margin-top: var(--space-2); color: var(--danger); font-size: var(--fs-md); }
 .weak-item, .paper-item {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
   width: 100%; padding: var(--space-3); border-radius: var(--radius-md);
   background: var(--surface-muted); margin-bottom: var(--space-2); text-align: left;
 }
+.paper-item:disabled { opacity: 0.5; }
 .weak-name, .paper-name { font-size: var(--fs-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .weak-count, .paper-count { flex: 0 0 auto; font-size: var(--fs-xs); color: var(--text-muted); }
 .paper-custom {

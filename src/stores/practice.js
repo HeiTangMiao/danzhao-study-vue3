@@ -23,6 +23,24 @@ import { paperKeyOf } from '@/content/practiceBank'
 import { isFillItem, answerMatches } from '@/content/answerNorm'
 import { TIMEOUT_MS } from '@/utils/practiceMetrics'
 
+/**
+ * 限时仿真三档（P0-5）。单一真相源 —— 禁止视图 / 测试另写 25/50/150 或 10/20/60。
+ *  - 150 档允许 includeExam（仿真需含真题卷）；25/50 档默认排除真题卷（去重规则 2）。
+ *  - maxPerPage 为页级抽取上限（§7 P-D4 裁决：25=3 / 50=4 / 150=5），防 150 档堆在同一页/单元。
+ *  - 与 draft.count（unit/weak/custom 题量档，PracticeConfig countOptions）互不干扰。
+ */
+export const TIMED_PRESETS = [
+  { id: 't25', count: 25, durationMin: 10, includeExam: false, maxPerPage: 3, label: '25 题 · 10 分钟' },
+  { id: 't50', count: 50, durationMin: 20, includeExam: false, maxPerPage: 4, label: '50 题 · 20 分钟' },
+  { id: 't150', count: 150, durationMin: 60, includeExam: true, maxPerPage: 5, label: '150 题 · 60 分钟（仿真）' }
+]
+
+/** 上次限时仿真时间戳的存储键（P-D5：零 DB、可逆；会话开始写入、结算读旧值算间隔） */
+const SIM_LAST_AT_KEY = 'sim_last_at'
+
+/** 全科混卷的学科清单（150 档全科混卷口径：单科语文可判分仅 200，独卷 150 占比过高） */
+const ALL_SUBJECTS = ['math', 'chinese', 'computer']
+
 export const usePracticeStore = defineStore('practice', () => {
   const db = useStudyDbStore()
 
@@ -102,10 +120,10 @@ export const usePracticeStore = defineStore('practice', () => {
   )
 
   /**
-   * 开启会话（题已组好；startFromDraft 与「重做错题」都走这里）
-   * @param {object} opt { mode, title, subject, unitNums, questions, compose }
+   * 开启会话（题已组好；startFromDraft / startTimed / 「重做错题」都走这里）
+   * @param {object} opt { mode, title, subject, unitNums, questions, compose, timed?, durationSec?, simPrevAt? }
    */
-  function startSession({ mode, title, subject, unitNums, questions, compose }) {
+  function startSession({ mode, title, subject, unitNums, questions, compose, timed = false, durationSec = 0, simPrevAt = null }) {
     session.value = {
       mode,
       title: title || '练习',
@@ -129,7 +147,13 @@ export const usePracticeStore = defineStore('practice', () => {
       finishedAt: null,
       newErrorIds: [],
       attempts: null, // finishSession 批写后的 question_attempt 行
-      compose: compose || null
+      compose: compose || null,
+      // 限时仿真（D-1）：timed 决定是否显示倒计时 / 结算页出「≤14 天」提示
+      timed,
+      durationSec, // 限时总秒数（0 = 不限时）
+      // deadline 毫秒截止戳：计时用 deadline - Date.now() 校准（不用 timeLeft--，防节流漂移）
+      deadline: timed ? Date.now() + durationSec * 1000 : null,
+      simPrevAt // 上次仿真的时间戳（会话开始时读旧值 → 结算页据此算「距上次 N 天」）
     }
     phase.value = 'session'
   }
@@ -160,6 +184,82 @@ export const usePracticeStore = defineStore('practice', () => {
       unitNums: cfg.unitNums,
       questions,
       compose: { ...cfg, seed: undefined }
+    })
+  }
+
+  /**
+   * 读取上次限时仿真时间戳并写入本次（会话开始调用）。
+   * 返回**旧值**（本次即成为「上次」）—— 结算页据此算「距上次仿真 N 天」。
+   * localStorage 不可用（隐私模式 / 测试环境）时静默降级为 null，不阻断组卷。
+   * @returns {number|null}
+   */
+  function touchSimLastAt() {
+    let prev = null
+    try {
+      const raw = localStorage.getItem(SIM_LAST_AT_KEY)
+      if (raw !== null) {
+        const n = Number(raw)
+        prev = Number.isFinite(n) ? n : null
+      }
+      localStorage.setItem(SIM_LAST_AT_KEY, String(Date.now()))
+    } catch (e) {
+      // 存储不可用：降级为「首次仿真」语义，不影响核心流程
+    }
+    return prev
+  }
+
+  /**
+   * 开始限时仿真会话（P0-5）
+   *  - 默认**全科混卷**（subject=null 时并拉三学科分片；150 档尤其必要 —— 语文可判分仅 200 题）
+   *  - 单元/考点权重沿用 weakWeightsFromErrors（D-3 后为 kp 维度）
+   *  - 题量档恒取 TIMED_PRESETS（不复用 draft.count，避免两套题量口径互相污染）
+   * @param {string} presetId TIMED_PRESETS[].id
+   * @param {{ subject?: string|null, seed?: number }} [scope] subject=null → 全科混卷
+   */
+  async function startTimed(presetId, scope = {}) {
+    const preset = TIMED_PRESETS.find((p) => p.id === presetId)
+    if (!preset) throw new Error(`未知限时档位：${presetId}`)
+    const subject = scope.subject ?? null // null → 全科混卷
+    let items
+    if (subject) {
+      items = await ensureBank(subject)
+    } else {
+      // 全科混卷：三学科分片并发加载后 concat（ensureBank 是单学科加载）
+      const lists = await Promise.all(ALL_SUBJECTS.map((s) => ensureBank(s)))
+      items = lists.flat()
+    }
+    const errors = await db.getAllErrors()
+    const dimension = WEIGHT_DIMENSIONS.KP
+    const { questions } = composePaper(items, {
+      count: preset.count, // 恒取档位阈值，不参与 UI 二次编辑
+      seed: scope.seed ?? ((Date.now() % 2147483647) || 1),
+      includeExam: preset.includeExam,
+      maxPerPage: preset.maxPerPage,
+      weightDimension: dimension,
+      unitWeights: weakWeightsFromErrors(errors, 5, dimension)
+    })
+    if (!questions.length) throw new Error('该范围内没有可用题目')
+    // 会话开始即写 sim_last_at（本次 = 下次的「上次」），并把旧值挂到会话供结算页读
+    const simPrevAt = touchSimLastAt()
+    startSession({
+      mode: 'timed',
+      title: `限时仿真 · ${preset.label}`,
+      subject: subject || 'all',
+      unitNums: [],
+      questions,
+      timed: true,
+      durationSec: preset.durationMin * 60,
+      simPrevAt,
+      compose: {
+        mode: 'timed',
+        presetId: preset.id,
+        scopeSubject: subject, // 供「再来一组」按同档位重开
+        count: preset.count,
+        includeExam: preset.includeExam,
+        maxPerPage: preset.maxPerPage,
+        weightDimension: dimension,
+        difficulty: ''
+      }
     })
   }
 
@@ -467,6 +567,11 @@ export const usePracticeStore = defineStore('practice', () => {
     const s = session.value
     if (!s || !s.compose) return
     const cfg = s.compose
+    // 限时仿真：按同档位重开（口径与首次一致；全科混卷 scopeSubject 透传 null 亦正确）
+    if (cfg.presetId) {
+      await startTimed(cfg.presetId, { subject: cfg.scopeSubject ?? null })
+      return
+    }
     const items = await ensureBank(cfg.subject)
     const errors = await db.getAllErrors()
     const seed = (Date.now() % 2147483647) || 1
@@ -531,6 +636,7 @@ export const usePracticeStore = defineStore('practice', () => {
     openConfig,
     refreshWeakAreas,
     startFromDraft,
+    startTimed,
     startSession,
     resumeSession,
     quitSession,
