@@ -172,6 +172,33 @@ export default {
           answer: "答案：3。令 \\(t = x-1 > 0\\)，则 \\(y = t + 1 + \\frac{1}{t} = 1 + (t + \\frac{1}{t}) \\ge 1 + 2 = 3\\)。当 \\(t = 1\\) 即 \\(x = 2\\) 时取等。最小值为3。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：对任意正实数 \\(a, b\\)，都有 \\(a + b \\ge 2\\sqrt{ab}\\)。",
+          answer: "**正确。**基本不等式，当且仅当 \\(a = b\\) 时取等号。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：函数 \\(y = x + \\frac{1}{x}\\)（\\(x > 0\\)）的最小值是 2。",
+          answer: "**正确。**由基本不等式 \\(x + \\frac{1}{x} \\ge 2\\)，当 \\(x = 1\\) 时取到最小值 2。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(x > 0\\)，则 \\(y = 2x + \\frac{8}{x}\\) 的最小值为（　）",
+          options: ["A. 4", "B. 6", "C. 8", "D. 10"],
+          correctIndex: 2,
+          answer: "**C**。\\(2x + \\frac{8}{x} \\ge 2\\sqrt{2x \\cdot \\frac{8}{x}} = 2\\sqrt{16} = 8\\)，当 \\(x = 2\\) 时取等号。"
+        }
+      ]
     }
   ]
 }

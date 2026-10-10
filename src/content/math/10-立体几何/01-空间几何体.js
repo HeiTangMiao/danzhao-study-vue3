@@ -150,6 +150,61 @@ export default {
           answer: "解：三个视图都是正方形，该几何体是正方体（棱长等于正方形边长）。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "棱柱的两个底面是全等的多边形。",
+          answer: "**正确。**棱柱的两底面平行且全等，这是棱柱的基本特征。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "圆柱的侧面展开图是一个扇形。",
+          answer: "**错误。**圆柱侧面展开图是矩形（长为底面周长、宽为母线）；圆锥的侧面展开图才是扇形。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "三视图中的「正视图」是从哪个方向看到的图形（　）",
+          options: ["A. 从正面看", "B. 从上面看", "C. 从侧面看", "D. 从底面看"],
+          correctIndex: 0,
+          answer: "答案：A。正视图（主视图）是从正面观察得到的图形；俯视图从上面看、侧视图从侧面看。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：棱柱的两个底面是全等的多边形。",
+          answer: "**正确。**棱柱的定义要求两底面全等且平行，侧面为平行四边形。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：用平面去截球，得到的截面一定是圆面。",
+          answer: "**正确。**球的任意截面都是圆面，过球心的截面是最大的圆面。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "正方体的棱长为 2，则它的体积为（　）",
+          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          correctIndex: 2,
+          answer: "**C**。\\(V = a^3 = 2^3 = 8\\)。"
+        }
+      ]
     }
   ]
 }

@@ -153,7 +153,9 @@ export const SITE_CONFIG = {
       files: [
         { name: "01-考试技巧", title: "考试技巧与得分策略（数学）", subtitle: "考场时间分配、抢分技巧与常见失分点" },
         { name: "02-真题模拟卷一", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true },
-        { name: "03-真题模拟卷二", title: "真题模拟卷（二）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true }
+        { name: "03-真题模拟卷二", title: "真题模拟卷（二）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true },
+        { name: "04-真题模拟卷三", title: "真题模拟卷（三）", subtitle: "全真模拟 · 限时 120 分钟 · 满分 150 分", isTest: true },
+        { name: "05-错因诊断与纠正手册", title: "错因诊断与纠正手册（数学）", subtitle: "六类错因对照表 + 错题处理四步法" }
       ]
     }
   ],

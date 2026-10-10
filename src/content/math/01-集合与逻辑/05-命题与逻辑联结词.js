@@ -209,6 +209,61 @@ export default {
           answer: "答案：假命题。其逆否命题为\"若 \\(x + y\\) 是偶数，则 \\(x, y\\) 都是奇数\"，如 \\(x = 2, y = 4\\) 时 \\(x + y = 6\\) 是偶数但 \\(x, y\\) 不都是奇数，逆否命题为假，故原命题为假。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "「3 是质数」是一个真命题。",
+          answer: "**正确。**3 只有 1 和它本身两个因数，是质数，该语句为真命题。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "「\\(x > 1\\)」是一个命题。",
+          answer: "**错误。**含有变量 \\(x\\)、无法判断真假的语句不是命题。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "命题「2 是偶数且 3 是偶数」的真假是（　）",
+          options: ["A. 真命题", "B. 假命题", "C. 不是命题", "D. 无法判断"],
+          correctIndex: 1,
+          answer: "答案：B。「且」联结的复合命题要求两个都真；「3 是偶数」为假，故整个命题为假。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：命题「p 且 q」为真，当且仅当 p、q 同时为真。",
+          answer: "**正确。**「且」要求两个命题都为真，一假即假。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：命题「p 或 q」为假时，p、q 都为假。",
+          answer: "**正确。**「或」只要有一个为真就为真，为假说明两个都为假。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 p：2 是偶数（真），q：3 是偶数（假），则下列命题为真的是（　）",
+          options: ["A. p 且 q", "B. p 或 q", "C. 非 p", "D. 非 p 且 q"],
+          correctIndex: 1,
+          answer: "**B**。p 真 q 假：p 且 q 为假，p 或 q 为真，非 p 为假，非 p 且 q 为假。"
+        }
+      ]
     }
   ]
 }

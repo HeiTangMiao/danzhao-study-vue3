@@ -129,6 +129,61 @@ export default {
           answer: "解：平均数 \\(= 2 \\times 10 + 1 = 21\\)；方差 \\(= 2^2 \\times 2 = 8\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "一组数据的中位数一定是这组数据中的某一个数。",
+          answer: "**错误。**当数据个数为偶数时，中位数取中间两数的平均值，可能不是原数据中的数（如 1、2、3、4 的中位数是 2.5）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "数据的方差越大，说明数据的波动越大。",
+          answer: "**正确。**方差（标准差）是衡量数据离散程度（波动大小）的数字特征。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "数据 2、3、5、6 的平均数是（　）",
+          options: ["A. 3", "B. 4", "C. 4.5", "D. 5"],
+          correctIndex: 1,
+          answer: "答案：B。平均数 = \\(\\dfrac{2+3+5+6}{4} = \\dfrac{16}{4} = 4\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：一组数据的平均数一定大于它的中位数。",
+          answer: "**错误。**平均数与中位数的大小关系取决于数据分布，没有固定结论。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：方差越大，说明这组数据的波动越大。",
+          answer: "**正确。**方差（标准差）刻画离散程度，值越大波动越大。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "数据 2, 4, 6, 8, 10 的平均数是（　）",
+          options: ["A. 5", "B. 6", "C. 7", "D. 8"],
+          correctIndex: 1,
+          answer: "**B**。\\(\\frac{2+4+6+8+10}{5} = \\frac{30}{5} = 6\\)。"
+        }
+      ]
     }
   ]
 }

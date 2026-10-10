@@ -143,6 +143,61 @@ export default {
           answer: "解：\\(d=\\dfrac{|-1-5|}{\\sqrt{4+9}}=\\dfrac{6}{\\sqrt{13}}=\\dfrac{6\\sqrt{13}}{13}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "经过点 \\((1, 2)\\) 且斜率为 3 的直线方程可写成 \\(y - 2 = 3(x - 1)\\)。",
+          answer: "**正确。**这是点斜式的直接应用：\\(y - y_0 = k(x - x_0)\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "若两条直线的斜率都存在，且斜率之积为 \\(-1\\)，则这两条直线互相垂直。",
+          answer: "**正确。**斜率都存在时，\\(k_1 k_2 = -1\\) 是两直线垂直的充要条件。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "直线 \\(x + y - 1 = 0\\) 的斜率为（　）",
+          options: ["A. 1", "B. -1", "C. \\(\\dfrac{1}{2}\\)", "D. -2"],
+          correctIndex: 1,
+          answer: "答案：B。化为斜截式 \\(y = -x + 1\\)，斜率为 \\(-1\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：直线 \\(y = kx + b\\) 的斜率为 \\(k\\)。",
+          answer: "**正确。**斜截式中的 \\(k\\) 即斜率，\\(b\\) 为直线在 y 轴上的截距。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：过任意两点都能唯一确定一条直线。",
+          answer: "**正确。**两点确定一条直线（两点不重合时），斜率为 \\(\\frac{y_2-y_1}{x_2-x_1}\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "过点 \\((1, 2)\\) 且斜率为 3 的直线方程是（　）",
+          options: ["A. \\(y = 3x + 1\\)", "B. \\(y = 3x - 1\\)", "C. \\(y = 2x + 3\\)", "D. \\(y = 3x + 5\\)"],
+          correctIndex: 1,
+          answer: "**B**。点斜式 \\(y - 2 = 3(x - 1)\\)，整理得 \\(y = 3x - 1\\)。"
+        }
+      ]
     }
   ]
 }

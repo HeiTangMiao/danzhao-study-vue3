@@ -202,6 +202,33 @@ export default {
           answer: "答案：\\(a \\ge 3\\)。由 \\(x^2-2x-3 \\le 0\\) 得 \\((x-3)(x+1) \\le 0\\)，即 \\(A = [-1, 3]\\)。要使 \\([-1,3] \\subseteq (-\\infty, a]\\)，需要 \\(a \\ge 3\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：空集是任何集合的子集。",
+          answer: "**正确。**规定：\\(\\varnothing \\subseteq A\\) 对任意集合 \\(A\\) 成立；空集是任何非空集合的真子集。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(A \\subseteq B\\)，则 \\(A\\) 的元素个数一定少于 \\(B\\)。",
+          answer: "**错误。**\\(A = B\\) 时也有 \\(A \\subseteq B\\)，此时元素个数相等；真子集才一定更少。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知集合 \\(A = \\{1, 2\\}\\)，则满足 \\(A \\subseteq B \\subseteq \\{1, 2, 3, 4\\}\\) 的集合 \\(B\\) 共有（　）",
+          options: ["A. 2 个", "B. 3 个", "C. 4 个", "D. 6 个"],
+          correctIndex: 2,
+          answer: "**C**。\\(B\\) 必须含 1、2，再从 \\(\\{3, 4\\}\\) 中任选元素，共 \\(2^2 = 4\\) 个。"
+        }
+      ]
     }
   ]
 }

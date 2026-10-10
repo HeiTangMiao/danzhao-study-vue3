@@ -173,6 +173,61 @@ export default {
           answer: "设半径为 \\(r\\)，弧长为 \\(l\\)。周长：\\(2r + l = 16\\)；面积：\\(\\frac{1}{2}lr = 12\\)，即 \\(lr = 24\\)。由 \\(l = 16 - 2r\\) 代入得 \\(r(16-2r) = 24\\)，即 \\(r^2 - 8r + 12 = 0\\)，解得 \\(r = 2\\) 或 \\(r = 6\\)。当 \\(r=6\\) 时 \\(l=4\\)，\\(\\alpha = \\frac{4}{6} = \\frac{2}{3}\\) rad；当 \\(r=2\\) 时 \\(l=12\\)，\\(\\alpha = \\frac{12}{2} = 6\\) rad（舍去，因为 \\(\\alpha > 2\\pi\\)）。所以圆心角为 \\(\\frac{2}{3}\\) rad。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "终边相同的角不一定相等。",
+          answer: "**正确。**终边相同的角相差 360° 的整数倍，如 30° 与 390° 终边相同但不相等。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(-30°\\) 角是第一象限角。",
+          answer: "**错误。**\\(-30°\\) 与 330° 终边相同，终边在第四象限。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "下列各角中，与 \\(60°\\) 角终边相同的是（　）",
+          options: ["A. 120°", "B. \\(-60°\\)", "C. 420°", "D. 300°"],
+          correctIndex: 2,
+          answer: "答案：C。与 60° 终边相同的角可表示为 \\(60° + k \\cdot 360°\\)，取 \\(k=1\\) 得 420°。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(180^\\circ = \\pi\\) 弧度。",
+          answer: "**正确。**角度与弧度的换算关系为 \\(180^\\circ = \\pi\\)，\\(1^\\circ = \\frac{\\pi}{180}\\) 弧度。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：终边相同的角一定相等。",
+          answer: "**错误。**终边相同的角相差 \\(360^\\circ\\) 的整数倍（\\(\\beta = \\alpha + k \\cdot 360^\\circ\\)），不一定相等。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\frac{5\\pi}{6}\\) 弧度等于（　）",
+          options: ["A. \\(120^\\circ\\)", "B. \\(150^\\circ\\)", "C. \\(135^\\circ\\)", "D. \\(160^\\circ\\)"],
+          correctIndex: 1,
+          answer: "**B**。\\(\\frac{5\\pi}{6} = \\frac{5}{6} \\times 180^\\circ = 150^\\circ\\)。"
+        }
+      ]
     }
   ]
 }

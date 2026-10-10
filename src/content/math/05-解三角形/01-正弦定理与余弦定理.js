@@ -155,6 +155,61 @@ export default {
           answer: "由余弦定理 \\(a^2 = b^2+c^2-2bc\\cos A\\)，与 \\(a^2 = b^2+c^2+bc\\) 比较：\\(-2bc\\cos A = bc\\)，\\(\\cos A = -\\frac{1}{2}\\)，所以 \\(A = 120°\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "在 \\(\\triangle ABC\\) 中，已知两角及一边，可以用正弦定理解出其余边角。",
+          answer: "**正确。**已知两角一边（AAS 或 ASA 型）时，先用内角和求第三角，再用正弦定理求边。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "余弦定理只能用于已知三边求角的情况。",
+          answer: "**错误。**余弦定理还常用于已知两边及夹角求第三边，以及已知三边求任意角。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "在 \\(\\triangle ABC\\) 中，\\(a = 3\\)，\\(b = 4\\)，\\(C = 90°\\)，则 \\(c = \\)（　）",
+          options: ["A. 5", "B. 7", "C. \\(\\sqrt{7}\\)", "D. 25"],
+          correctIndex: 0,
+          answer: "答案：A。由余弦定理（或勾股定理）：\\(c^2 = 3^2 + 4^2 = 25\\)，\\(c = 5\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：在 \\(\\triangle ABC\\) 中，\\(\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C}\\)。",
+          answer: "**正确。**正弦定理：各边与其对角正弦之比相等（等于 \\(2R\\)）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：余弦定理 \\(a^2 = b^2 + c^2 - 2bc\\cos A\\) 只适用于锐角三角形。",
+          answer: "**错误。**余弦定理对任意三角形都成立，钝角时 \\(\\cos A < 0\\)，公式自动体现符号。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在 \\(\\triangle ABC\\) 中，若 \\(a = 3\\)，\\(b = 4\\)，\\(C = 60^\\circ\\)，则 \\(c\\) 等于（　）",
+          options: ["A. \\(\\sqrt{13}\\)", "B. 5", "C. \\(\\sqrt{7}\\)", "D. 13"],
+          correctIndex: 0,
+          answer: "**A**。\\(c^2 = 9 + 16 - 2 \\times 3 \\times 4 \\times \\cos 60^\\circ = 25 - 12 = 13\\)，故 \\(c = \\sqrt{13}\\)。"
+        }
+      ]
     }
   ]
 }

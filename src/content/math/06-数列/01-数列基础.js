@@ -138,6 +138,61 @@ export default {
           answer: "\\(a_2 = 2 \\times 2 + 1 = 5\\)，\\(a_3 = 2 \\times 5 + 1 = 11\\)，\\(a_4 = 2 \\times 11 + 1 = 23\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "数列 \\(1, 3, 5, 7, \\cdots\\) 的通项公式可以写成 \\(a_n = 2n - 1\\)。",
+          answer: "**正确。**逐项验证：\\(n=1\\) 时 \\(2 \\times 1 - 1 = 1\\)，与首项一致，奇数数列的通项即为 \\(a_n = 2n-1\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "任何一个数列都能写出它的通项公式。",
+          answer: "**错误。**并非所有数列都存在通项公式，如某些随机数列或复杂规律数列难以用公式统一表示。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "数列 \\(-1, 1, -1, 1, \\cdots\\) 的一个通项公式是（　）",
+          options: ["A. \\(a_n = (-1)^n\\)", "B. \\(a_n = (-1)^{n+1}\\)", "C. \\(a_n = 2n - 1\\)", "D. \\(a_n = \\sin\\dfrac{n\\pi}{2}\\)"],
+          correctIndex: 0,
+          answer: "答案：A。逐项检验：\\((-1)^1=-1\\)、\\((-1)^2=1\\)，与数列一致；B 项首项为 1，C 项首项为 1，D 项 \\(\\sin\\dfrac{\\pi}{2}=1\\)，均不符。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：数列的通项公式唯一确定了数列的每一项。",
+          answer: "**正确。**通项公式 \\(a_n = f(n)\\) 给定后，任一项都被唯一确定。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若数列的前 n 项和 \\(S_n = n^2\\)，则 \\(a_1 = 1\\)。",
+          answer: "**正确。**\\(a_1 = S_1 = 1^2 = 1\\)；\\(n \\ge 2\\) 时用 \\(a_n = S_n - S_{n-1}\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "数列 \\(\\frac{1}{2}, \\frac{2}{3}, \\frac{3}{4}, \\ldots\\) 的一个通项公式是（　）",
+          options: ["A. \\(a_n = \\frac{n}{n+1}\\)", "B. \\(a_n = \\frac{n-1}{n}\\)", "C. \\(a_n = \\frac{n}{n+2}\\)", "D. \\(a_n = \\frac{n+1}{n+2}\\)"],
+          correctIndex: 0,
+          answer: "**A**。第 1 项 \\(\\frac{1}{2}\\)、第 2 项 \\(\\frac{2}{3}\\)，分子为 \\(n\\)、分母为 \\(n+1\\)。"
+        }
+      ]
     }
   ]
 }

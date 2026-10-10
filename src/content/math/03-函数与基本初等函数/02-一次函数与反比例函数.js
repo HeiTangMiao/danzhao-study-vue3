@@ -176,6 +176,33 @@ export default {
           answer: "答案：\\(k > 0\\)。反比例函数在 \\((0,+\\infty)\\) 上递减，需要 \\(k > 0\\)（此时图像在一、三象限，在第一象限部分递减）。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：反比例函数 \\(y = \\frac{k}{x}\\)（\\(k \\neq 0\\)）的图像关于原点对称。",
+          answer: "**正确。**反比例函数是奇函数，图像关于原点中心对称。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：一次函数 \\(y = kx + b\\) 中，\\(k\\) 决定图像的倾斜方向，\\(b\\) 决定图像与 y 轴的交点。",
+          answer: "**正确。**\\(k\\) 为斜率，\\(b\\) 为纵截距，交点坐标为 \\((0, b)\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "若反比例函数 \\(y = \\frac{k}{x}\\) 的图像经过点 \\((2, 3)\\)，则 \\(k\\) 等于（　）",
+          options: ["A. 5", "B. 6", "C. \\(\\frac{2}{3}\\)", "D. \\(\\frac{3}{2}\\)"],
+          correctIndex: 1,
+          answer: "**B**。由 \\(3 = \\frac{k}{2}\\) 得 \\(k = 6\\)（反比例函数中 \\(k = xy\\)）。"
+        }
+      ]
     }
   ]
 }

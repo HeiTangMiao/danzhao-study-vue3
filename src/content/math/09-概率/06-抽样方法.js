@@ -150,6 +150,61 @@ export default {
           answer: "解：抽样比 \\(\\dfrac{200}{10000} = \\dfrac{1}{50}\\)。农村居民 \\(6000 \\times \\dfrac{1}{50} = 120\\) 人。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "简单随机抽样要求总体中每个个体被抽到的机会均等。",
+          answer: "**正确。**机会均等是简单随机抽样的本质要求。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "分层抽样时，各层应按相同的比例抽取样本。",
+          answer: "**正确。**分层抽样按各层在总体中所占的比例分配样本量，所以各层抽取比例相同。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "某校高一年级 600 人、高二年级 400 人。用分层抽样抽取 50 人，高一应抽取（　）",
+          options: ["A. 20 人", "B. 30 人", "C. 25 人", "D. 40 人"],
+          correctIndex: 1,
+          answer: "答案：B。抽样比 \\(\\dfrac{50}{1000} = \\dfrac{1}{20}\\)，高一抽 \\(600 \\times \\dfrac{1}{20} = 30\\) 人。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：简单随机抽样适用于总体个数较少的情况。",
+          answer: "**正确。**总体较小时便于编号并逐个随机抽取（抽签法、随机数法）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：系统抽样是先将总体分成若干部分，再按固定间隔抽取个体。",
+          answer: "**正确。**系统抽样又称等距抽样，先分段再按同一间隔取样。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "从 1000 名学生中抽取 50 人，若按学号等距抽取，这种抽样方法是（　）",
+          options: ["A. 简单随机抽样", "B. 系统抽样", "C. 分层抽样", "D. 整群抽样"],
+          correctIndex: 1,
+          answer: "**B**。按固定间隔（等距）抽取属于系统抽样。"
+        }
+      ]
     }
   ]
 }

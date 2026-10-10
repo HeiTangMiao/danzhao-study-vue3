@@ -194,6 +194,61 @@ export default {
           answer: "\\(A = 2\\)，\\(T = \\pi\\)，\\(\\omega = \\frac{2\\pi}{\\pi} = 2\\)。由 \\(x=0, y=1\\)：\\(2\\sin\\varphi = 1\\)，\\(\\sin\\varphi = \\frac{1}{2}\\)，\\(\\varphi = \\frac{\\pi}{6}\\)（锐角）。解析式为 \\(y = 2\\sin\\left(2x + \\frac{\\pi}{6}\\right)\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "函数 \\(y = \\sin x\\) 的最小正周期是 \\(2\\pi\\)。",
+          answer: "**正确。**正弦函数的最小正周期为 \\(2\\pi\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "函数 \\(y = \\cos x\\) 是奇函数。",
+          answer: "**错误。**余弦函数是偶函数（\\(\\cos(-x) = \\cos x\\)）；正弦函数才是奇函数。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "函数 \\(y = 2\\sin x\\) 的最大值是（　）",
+          options: ["A. 1", "B. 2", "C. 4", "D. \\(2\\pi\\)"],
+          correctIndex: 1,
+          answer: "答案：B。\\(\\sin x\\) 的最大值为 1，故 \\(y = 2\\sin x\\) 的最大值为 2。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：函数 \\(y = \\sin x\\) 的最小正周期是 \\(2\\pi\\)。",
+          answer: "**正确。**正弦函数的最小正周期为 \\(2\\pi\\)，余弦同理；正切为 \\(\\pi\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(y = \\sin x\\) 在 \\([0, \\frac{\\pi}{2}]\\) 上单调递减。",
+          answer: "**错误。**在 \\([0, \\frac{\\pi}{2}]\\) 上 \\(\\sin x\\) 由 0 增到 1，是单调递增。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "函数 \\(y = 2\\sin x + 1\\) 的最大值是（　）",
+          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          correctIndex: 2,
+          answer: "**C**。\\(\\sin x\\) 最大为 1，故 \\(y_{\\max} = 2 \\times 1 + 1 = 3\\)。"
+        }
+      ]
     }
   ]
 }

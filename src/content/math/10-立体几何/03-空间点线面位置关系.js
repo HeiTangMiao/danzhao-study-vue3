@@ -145,6 +145,61 @@ export default {
           answer: "解：直线在平面内、直线与平面平行、直线与平面相交（共三种）。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "不共线的三点确定一个平面。",
+          answer: "**正确。**这是平面的基本性质（公理）之一。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "空间中两条直线不相交，则它们一定平行。",
+          answer: "**错误。**空间中两直线不相交还可能异面——「平行」要求共面且无公共点。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "空间中两条异面直线所成角的取值范围是（　）",
+          options: ["A. \\((0°, 90°]\\)", "B. \\([0°, 90°]\\)", "C. \\((0°, 180°)\\)", "D. \\([0°, 180°]\\)"],
+          correctIndex: 0,
+          answer: "答案：A。异面直线所成角定义为所平移成的相交直线所成的锐角或直角，范围 \\((0°, 90°]\\)（异面直线不在同一平面，夹角不为 0°）。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：空间中两条直线不相交就一定平行。",
+          answer: "**错误。**空间中还有异面直线：既不平行也不相交。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：任意三个点可以确定一个平面。",
+          answer: "**错误。**只有不在同一直线上的三点才能确定一个平面。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "空间中两条直线的位置关系共有（　）",
+          options: ["A. 2 种", "B. 3 种", "C. 4 种", "D. 5 种"],
+          correctIndex: 1,
+          answer: "**B**。相交、平行、异面共 3 种。"
+        }
+      ]
     }
   ]
 }

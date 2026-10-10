@@ -160,6 +160,61 @@ export default {
           answer: "\\(\\tan\\frac{7\\pi}{4} = \\tan\\left(2\\pi - \\frac{\\pi}{4}\\right) = -\\tan\\frac{\\pi}{4} = -1\\)；\\(\\sin\\frac{11\\pi}{3} = \\sin\\left(2\\pi + \\frac{5\\pi}{3}\\right) = \\sin\\frac{5\\pi}{3} = \\sin\\left(2\\pi - \\frac{\\pi}{3}\\right) = -\\sin\\frac{\\pi}{3} = -\\frac{\\sqrt{3}}{2}\\)。原式 \\(= -1 + \\left(-\\frac{\\sqrt{3}}{2}\\right) = -1 - \\frac{\\sqrt{3}}{2}\\)"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(\\sin(180° + \\alpha) = -\\sin\\alpha\\)。",
+          answer: "**正确。**这是诱导公式：\\(180°+\\alpha\\) 的终边在第三象限，正弦为负、绝对值不变。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(\\cos(-\\alpha) = -\\cos\\alpha\\)。",
+          answer: "**错误。**余弦是偶函数，\\(\\cos(-\\alpha) = \\cos\\alpha\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\sin 210° = \\)（　）",
+          options: ["A. \\(\\dfrac{1}{2}\\)", "B. \\(-\\dfrac{1}{2}\\)", "C. \\(\\dfrac{\\sqrt{3}}{2}\\)", "D. \\(-\\dfrac{\\sqrt{3}}{2}\\)"],
+          correctIndex: 1,
+          answer: "答案：B。\\(\\sin 210° = \\sin(180° + 30°) = -\\sin 30° = -\\dfrac{1}{2}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\sin(\\pi - \\alpha) = \\sin\\alpha\\)。",
+          answer: "**正确。**诱导公式：\\(\\pi - \\alpha\\) 的正弦值等于 \\(\\sin\\alpha\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\cos(\\frac{\\pi}{2} - \\alpha) = -\\sin\\alpha\\)。",
+          answer: "**错误。**正确为 \\(\\cos(\\frac{\\pi}{2} - \\alpha) = \\sin\\alpha\\)（奇变偶不变，符号看象限）。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\sin 210^\\circ\\) 的值等于（　）",
+          options: ["A. \\(\\frac{1}{2}\\)", "B. \\(-\\frac{1}{2}\\)", "C. \\(\\frac{\\sqrt{3}}{2}\\)", "D. \\(-\\frac{\\sqrt{3}}{2}\\)"],
+          correctIndex: 1,
+          answer: "**B**。\\(\\sin 210^\\circ = \\sin(180^\\circ + 30^\\circ) = -\\sin 30^\\circ = -\\frac{1}{2}\\)。"
+        }
+      ]
     }
   ]
 }

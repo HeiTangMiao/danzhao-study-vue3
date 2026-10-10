@@ -151,6 +151,61 @@ export default {
           answer: "解：设 A=\"男性\"，B=\"色盲\"。\\(P(A) = 0.5\\)，\\(P(B|A) = 0.05\\)，\\(P(B|\\bar{A}) = 0.005\\)。\\(P(AB) = 0.5 \\times 0.05 = 0.025\\)，\\(P(B) = 0.025 + 0.5 \\times 0.005 = 0.0275\\)。\\(P(A|B) = \\dfrac{0.025}{0.0275} = \\dfrac{10}{11}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "若事件 \\(A\\) 与 \\(B\\) 相互独立，则 \\(P(AB) = P(A)P(B)\\)。",
+          answer: "**正确。**这是相互独立事件的定义式（也是判定条件）。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "互斥事件一定是相互独立事件。",
+          answer: "**错误。**互斥事件不能同时发生，\\(P(AB) = 0\\)；而独立要求 \\(P(AB) = P(A)P(B)\\)。当 \\(P(A)\\)、\\(P(B)\\) 均不为零时两者不可能同时成立。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "已知 \\(P(A) = 0.5\\)，\\(P(B) = 0.4\\)，且 \\(A\\)、\\(B\\) 相互独立，则 \\(P(AB) = \\)（　）",
+          options: ["A. 0.9", "B. 0.2", "C. 0.1", "D. 0.5"],
+          correctIndex: 1,
+          answer: "答案：B。独立事件同时发生的概率相乘：\\(0.5 \\times 0.4 = 0.2\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若事件 A 与 B 相互独立，则 \\(P(AB) = P(A)P(B)\\)。",
+          answer: "**正确。**这是相互独立的定义式，也是判定依据。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：互斥的两个事件一定相互独立。",
+          answer: "**错误。**互斥时 \\(P(AB) = 0\\)，若 \\(P(A), P(B) > 0\\) 则不等于 \\(P(A)P(B)\\)，故不独立。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(P(A) = 0.5\\)，\\(P(B) = 0.4\\)，且 A、B 相互独立，则 \\(P(AB)\\) 等于（　）",
+          options: ["A. 0.1", "B. 0.2", "C. 0.9", "D. 0.5"],
+          correctIndex: 1,
+          answer: "**B**。\\(P(AB) = 0.5 \\times 0.4 = 0.2\\)。"
+        }
+      ]
     }
   ]
 }

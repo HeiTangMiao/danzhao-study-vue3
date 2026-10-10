@@ -126,6 +126,61 @@ export default {
           answer: "解：由 \\(V=\\dfrac{4}{3}\\pi R^3=\\dfrac{32\\pi}{3}\\)，得 \\(R^3=8\\)，\\(R=2\\)。表面积 \\(S=4\\pi R^2=16\\pi\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "球的表面积公式为 \\(S = 4\\pi R^2\\)。",
+          answer: "**正确。**这是球的表面积公式（注意与体积公式 \\(\\dfrac{4}{3}\\pi R^3\\) 区分）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "等底等高的圆柱体积是圆锥体积的 3 倍。",
+          answer: "**正确。**\\(V_{柱} = Sh\\)，\\(V_{锥} = \\dfrac{1}{3}Sh\\)，故圆柱体积为圆锥的 3 倍。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "棱长为 2 的正方体的体积是（　）",
+          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          correctIndex: 2,
+          answer: "答案：C。正方体体积 \\(V = a^3 = 2^3 = 8\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：圆柱的侧面积等于底面周长乘以高。",
+          answer: "**正确。**\\(S_{侧} = 2\\pi r h\\)，即底面周长 \\(2\\pi r\\) 与高 \\(h\\) 的乘积。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：半径为 1 的球的表面积是 \\(4\\pi\\)。",
+          answer: "**正确。**\\(S = 4\\pi r^2 = 4\\pi \\times 1 = 4\\pi\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知圆锥的底面半径为 3，高为 4，则它的体积为（　）",
+          options: ["A. \\(12\\pi\\)", "B. \\(36\\pi\\)", "C. \\(4\\pi\\)", "D. \\(24\\pi\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi \\times 9 \\times 4 = 12\\pi\\)。"
+        }
+      ]
     }
   ]
 }

@@ -150,6 +150,61 @@ export default {
           answer: "解：抛物线离心率恒为 \\(e = 1\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "抛物线 \\(y^2 = 8x\\) 的焦点在 \\(x\\) 轴的正半轴上。",
+          answer: "**正确。**\\(y^2 = 2px\\)（\\(p>0\\)）的焦点为 \\((\\dfrac{p}{2}, 0)\\)，此处 \\(p=4\\)，焦点 \\((2, 0)\\) 在 \\(x\\) 轴正半轴。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "抛物线 \\(y^2 = 4x\\) 的准线方程是 \\(x = 1\\)。",
+          answer: "**错误。**\\(p=2\\)，焦点为 \\((1, 0)\\)，准线方程应为 \\(x = -1\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "抛物线 \\(y^2 = 12x\\) 的焦点坐标是（　）",
+          options: ["A. \\((3, 0)\\)", "B. \\((6, 0)\\)", "C. \\((0, 3)\\)", "D. \\((0, 6)\\)"],
+          correctIndex: 0,
+          answer: "答案：A。\\(2p=12\\)，\\(p=6\\)，焦点为 \\((\\dfrac{p}{2}, 0)\\)，即 \\((3, 0)\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：抛物线 \\(y^2 = 2px\\)（\\(p > 0\\)）的焦点在 x 轴正半轴上。",
+          answer: "**正确。**焦点为 \\((\\frac{p}{2}, 0)\\)，准线为 \\(x = -\\frac{p}{2}\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：抛物线的离心率等于 1。",
+          answer: "**正确。**抛物线上点到焦点与到准线距离相等，故 \\(e = 1\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "抛物线 \\(y^2 = 8x\\) 的焦点坐标是（　）",
+          options: ["A. \\((2, 0)\\)", "B. \\((4, 0)\\)", "C. \\((0, 2)\\)", "D. \\((8, 0)\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(2p = 8\\) 得 \\(p = 4\\)，焦点为 \\((\\frac{p}{2}, 0) = (2, 0)\\)。"
+        }
+      ]
     }
   ]
 }

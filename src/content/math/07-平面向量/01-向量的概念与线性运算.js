@@ -162,6 +162,61 @@ export default {
           answer: "\\(\\overrightarrow{AC} = \\overrightarrow{AB} + \\overrightarrow{AD} = \\boldsymbol{a} + \\boldsymbol{b}\\)；\\(\\overrightarrow{BD} = \\overrightarrow{AD} - \\overrightarrow{AB} = \\boldsymbol{b} - \\boldsymbol{a}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "零向量与任意向量都平行。",
+          answer: "**正确。**这是零向量的规定性质：零向量方向任意，与任何向量平行。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "两个向量相等只需它们的模相等，方向可以不同。",
+          answer: "**错误。**向量相等要求模相等**且**方向相同，两者缺一不可。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "\\(\\overrightarrow{AB} + \\overrightarrow{BC} = \\)（　）",
+          options: ["A. \\(\\overrightarrow{AC}\\)", "B. \\(\\overrightarrow{CA}\\)", "C. \\(\\overrightarrow{BA}\\)", "D. \\(\\overrightarrow{CB}\\)"],
+          correctIndex: 0,
+          answer: "答案：A。三角形法则：首尾相接的向量和等于从起点指向终点的向量。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：零向量的方向是任意的。",
+          answer: "**正确。**规定零向量长度为 0、方向任意，且它与任意向量平行。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(\\vec{a}\\) 与 \\(\\vec{b}\\) 都是单位向量，则 \\(\\vec{a} = \\vec{b}\\)。",
+          answer: "**错误。**单位向量只要求长度为 1，方向可以不同；方向不同则不是相等向量。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "化简 \\(\\vec{AB} + \\vec{BC} - \\vec{AC}\\) 的结果是（　）",
+          options: ["A. \\(\\vec{0}\\)", "B. \\(\\vec{AC}\\)", "C. \\(2\\vec{AC}\\)", "D. \\(\\vec{CA}\\)"],
+          correctIndex: 0,
+          answer: "**A**。由三角形法则 \\(\\vec{AB} + \\vec{BC} = \\vec{AC}\\)，故原式 \\(= \\vec{AC} - \\vec{AC} = \\vec{0}\\)。"
+        }
+      ]
     }
   ]
 }

@@ -189,6 +189,33 @@ export default {
           answer: "答案：\\(\\alpha = 3\\)。由 \\(2^\\alpha = 8 = 2^3\\) 得 \\(\\alpha = 3\\)。\\(f(x) = x^3\\)，\\(f(-x) = (-x)^3 = -x^3 = -f(x)\\)，为奇函数。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：幂函数 \\(y = x^\\alpha\\) 的图像都经过点 \\((1, 1)\\)。",
+          answer: "**正确。**因为 \\(1^\\alpha = 1\\)，与 \\(\\alpha\\) 取值无关。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：函数 \\(y = x^{-1}\\) 在 \\((0, +\\infty)\\) 上单调递增。",
+          answer: "**错误。**\\(y = \\frac{1}{x}\\) 在 \\((0, +\\infty)\\) 上单调递减。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "下列函数中是幂函数的是（　）",
+          options: ["A. \\(y = 2x^2\\)", "B. \\(y = x^2 + 1\\)", "C. \\(y = x^{-2}\\)", "D. \\(y = 2^x\\)"],
+          correctIndex: 2,
+          answer: "**C**。幂函数形如 \\(y = x^\\alpha\\)（系数为 1、只有一项）；A 系数不为 1，B 是多项式，D 是指数函数。"
+        }
+      ]
     }
   ]
 }

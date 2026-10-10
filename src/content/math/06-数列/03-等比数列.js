@@ -153,6 +153,61 @@ export default {
           answer: "设三个数为 \\(\\frac{a}{q}, a, aq\\)。积：\\(\\frac{a}{q} \\cdot a \\cdot aq = a^3 = 64\\)，\\(a = 4\\)。和：\\(\\frac{4}{q} + 4 + 4q = 14\\)，\\(\\frac{4}{q} + 4q = 10\\)，\\(4 + 4q^2 = 10q\\)，\\(2q^2 - 5q + 2 = 0\\)，\\(q = 2\\) 或 \\(q = \\frac{1}{2}\\)。当 \\(q=2\\) 时，三个数为 \\(2, 4, 8\\)；当 \\(q=\\frac{1}{2}\\) 时，三个数为 \\(8, 4, 2\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "等比数列的公比 \\(q\\) 不能为 0。",
+          answer: "**正确。**公比定义要求从第二项起每一项与前一项的比恒等，若 \\(q=0\\) 会出现分母为零的比值，无意义。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "数列 \\(2, 6, 18, 54, \\cdots\\) 是公比为 3 的等比数列。",
+          answer: "**正确。**逐项比：\\(6 \\div 2 = 3\\)，\\(18 \\div 6 = 3\\)，公比为 3。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "等比数列中 \\(a_1 = 2\\)，\\(q = 3\\)，则 \\(a_4 = \\)（　）",
+          options: ["A. 18", "B. 54", "C. 162", "D. 486"],
+          correctIndex: 1,
+          answer: "答案：B。\\(a_4 = a_1 q^3 = 2 \\times 3^3 = 54\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：等比数列的公比可以为 0。",
+          answer: "**错误。**等比数列要求各项非零，公比 \\(q \\neq 0\\)；若 \\(q = 0\\) 则从第二项起全为 0。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：等比数列中，若 \\(m + n = p + q\\)，则 \\(a_m \\cdot a_n = a_p \\cdot a_q\\)。",
+          answer: "**正确。**等比数列性质：下标和相等的项之积相等。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "等比数列 \\(\\{a_n\\}\\) 中，\\(a_1 = 1\\)，\\(q = 2\\)，则前 5 项和等于（　）",
+          options: ["A. 31", "B. 32", "C. 15", "D. 63"],
+          correctIndex: 0,
+          answer: "**A**。\\(S_5 = \\frac{1 \\times (2^5 - 1)}{2 - 1} = 31\\)。"
+        }
+      ]
     }
   ]
 }

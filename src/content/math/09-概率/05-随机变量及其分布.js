@@ -163,6 +163,61 @@ export default {
           answer: "解：\\(X\\) 可取 0, 1, 2。\\(P(X=0) = \\dfrac{C_3^2}{C_5^2} = \\dfrac{3}{10}\\)；\\(P(X=1) = \\dfrac{C_2^1 C_3^1}{C_5^2} = \\dfrac{6}{10} = \\dfrac{3}{5}\\)；\\(P(X=2) = \\dfrac{C_2^2}{C_5^2} = \\dfrac{1}{10}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "离散型随机变量分布列中，所有概率之和等于 1。",
+          answer: "**正确。**这是分布列的基本性质，常用于检验分布列是否正确。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "若 \\(X \\sim B(n, p)\\)，则 \\(E(X) = np\\)。",
+          answer: "**正确。**二项分布的数学期望公式为 \\(E(X) = np\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "抛掷一枚均匀硬币 3 次，记正面出现次数为 \\(X\\)，则 \\(X\\) 服从（　）",
+          options: ["A. 两点分布", "B. 二项分布 \\(B(3, \\dfrac{1}{2})\\)", "C. 超几何分布", "D. 正态分布"],
+          correctIndex: 1,
+          answer: "答案：B。3 次独立重复试验、每次成功概率 \\(\\dfrac{1}{2}\\)，符合二项分布 \\(B(3, \\dfrac{1}{2})\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：离散型随机变量的分布列中，各个概率之和等于 1。",
+          answer: "**正确。**分布列的两条性质：\\(p_i \\ge 0\\) 且 \\(\\sum p_i = 1\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：随机变量的期望一定等于它的某个可能取值。",
+          answer: "**错误。**期望是加权平均值，可能不是任何一个可能取值（如掷骰子期望为 3.5）。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知随机变量 X 满足 \\(P(X=1)=0.2\\)，\\(P(X=2)=0.5\\)，\\(P(X=3)=0.3\\)，则 \\(E(X)\\) 等于（　）",
+          options: ["A. 2", "B. 2.1", "C. 2.5", "D. 3"],
+          correctIndex: 1,
+          answer: "**B**。\\(E(X) = 1\\times0.2 + 2\\times0.5 + 3\\times0.3 = 0.2 + 1 + 0.9 = 2.1\\)。"
+        }
+      ]
     }
   ]
 }

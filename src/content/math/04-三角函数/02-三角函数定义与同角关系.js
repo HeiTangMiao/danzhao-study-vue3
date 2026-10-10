@@ -183,6 +183,61 @@ export default {
           answer: "\\(r = \\sqrt{(-3)^2 + 4^2} = \\sqrt{9 + 16} = 5\\)。\\(\\sin\\alpha = \\frac{y}{r} = \\frac{4}{5}\\)，\\(\\cos\\alpha = \\frac{x}{r} = \\frac{-3}{5} = -\\frac{3}{5}\\)，\\(\\tan\\alpha = \\frac{y}{x} = \\frac{4}{-3} = -\\frac{4}{3}\\)"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "若 \\(\\sin\\alpha > 0\\) 且 \\(\\cos\\alpha < 0\\)，则 \\(\\alpha\\) 是第二象限角。",
+          answer: "**正确。**第二象限角的正弦为正、余弦为负，符号特征吻合。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "对任意角 \\(\\alpha\\)，\\(\\tan\\alpha = \\dfrac{\\sin\\alpha}{\\cos\\alpha}\\) 都成立。",
+          answer: "**错误。**当 \\(\\cos\\alpha = 0\\)（终边在 \\(y\\) 轴上）时正切无意义，等式不成立。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(\\sin\\alpha = \\dfrac{3}{5}\\)，且 \\(\\alpha\\) 是第二象限角，则 \\(\\cos\\alpha = \\)（　）",
+          options: ["A. \\(\\dfrac{4}{5}\\)", "B. \\(-\\dfrac{4}{5}\\)", "C. \\(\\dfrac{3}{4}\\)", "D. \\(-\\dfrac{3}{4}\\)"],
+          correctIndex: 1,
+          answer: "答案：B。由 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\) 得 \\(\\cos\\alpha = \\pm\\dfrac{4}{5}\\)；第二象限余弦为负，取 \\(-\\dfrac{4}{5}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：对任意角 \\(\\alpha\\)，都有 \\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\)。",
+          answer: "**正确。**同角基本关系（平方关系），由单位圆或直角三角形定义推出。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(\\sin\\alpha = \\frac{3}{5}\\)，则 \\(\\cos\\alpha = \\frac{4}{5}\\)。",
+          answer: "**错误。**由平方关系 \\(\\cos\\alpha = \\pm\\frac{4}{5}\\)，符号取决于 \\(\\alpha\\) 所在象限。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(\\sin\\alpha = \\frac{3}{5}\\)，且 \\(\\alpha\\) 是第二象限角，则 \\(\\cos\\alpha\\) 等于（　）",
+          options: ["A. \\(\\frac{4}{5}\\)", "B. \\(-\\frac{4}{5}\\)", "C. \\(\\frac{3}{4}\\)", "D. \\(-\\frac{3}{4}\\)"],
+          correctIndex: 1,
+          answer: "**B**。第二象限余弦为负，故 \\(\\cos\\alpha = -\\sqrt{1 - \\frac{9}{25}} = -\\frac{4}{5}\\)。"
+        }
+      ]
     }
   ]
 }

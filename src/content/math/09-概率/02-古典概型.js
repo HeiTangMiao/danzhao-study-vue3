@@ -114,6 +114,61 @@ export default {
           answer: "解：总数 \\(C_8^2 = 28\\)，用对立事件：全是男生 \\(C_5^2=10\\)。至少1名女生 \\(P = 1 - \\dfrac{10}{28} = \\dfrac{18}{28} = \\dfrac{9}{14}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "古典概型要求试验结果为有限个，且每个结果出现的可能性相等。",
+          answer: "**正确。**有限性与等可能性是古典概型的两个基本特征。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "抛掷两枚硬币，恰好一枚正面朝上的概率是 \\(\\dfrac{1}{2}\\)。",
+          answer: "**正确。**基本事件为（正正）（正反）（反正）（反反）共 4 个，恰好一枚正面占 2 个，概率为 \\(\\dfrac{2}{4} = \\dfrac{1}{2}\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "从 1、2、3、4 中任取一个数，取到偶数的概率是（　）",
+          options: ["A. \\(\\dfrac{1}{4}\\)", "B. \\(\\dfrac{1}{2}\\)", "C. \\(\\dfrac{3}{4}\\)", "D. 1"],
+          correctIndex: 1,
+          answer: "答案：B。偶数有 2、4 共 2 个，概率为 \\(\\dfrac{2}{4} = \\dfrac{1}{2}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：古典概型要求基本事件个数有限且每个基本事件等可能。",
+          answer: "**正确。**这是古典概型的两个必要条件，缺一不可。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：从 1, 2, 3, 4, 5 中任取一个数，取到偶数的概率是 \\(\\frac{2}{5}\\)。",
+          answer: "**正确。**偶数有 2、4 两个，\\(P = \\frac{2}{5}\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "从 1, 2, 3, 4, 5, 6 中任取两个不同的数，两数之和为 7 的概率是（　）",
+          options: ["A. \\(\\frac{1}{5}\\)", "B. \\(\\frac{1}{6}\\)", "C. \\(\\frac{1}{3}\\)", "D. \\(\\frac{1}{15}\\)"],
+          correctIndex: 0,
+          answer: "**A**。共 \\(C_6^2 = 15\\) 种取法，和为 7 的有 (1,6)(2,5)(3,4) 共 3 种，\\(P = \\frac{3}{15} = \\frac{1}{5}\\)。"
+        }
+      ]
     }
   ]
 }

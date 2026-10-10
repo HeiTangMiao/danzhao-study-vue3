@@ -122,6 +122,61 @@ export default {
           answer: "解：分两类：经 B 的有 \\(3 \\times 2 = 6\\) 种，经 D 的有 \\(2 \\times 4 = 8\\) 种。共 \\(6 + 8 = 14\\) 种。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "从甲地到乙地有 2 条路，从乙地到丙地有 3 条路，则从甲地经乙地到丙地共有 6 种走法。",
+          answer: "**正确。**分步完成用乘法：\\(2 \\times 3 = 6\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "完成一件事有 3 类办法，各类分别有 2、3、4 种方法，则总方法数为 24 种。",
+          answer: "**错误。**分类完成用加法：\\(2 + 3 + 4 = 9\\) 种；24 是把各类相乘的错误结果。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "从 3 名男生、2 名女生中各选 1 人参加活动，共有多少种选法（　）",
+          options: ["A. 5", "B. 6", "C. 9", "D. 3"],
+          correctIndex: 1,
+          answer: "答案：B。分步完成：\\(3 \\times 2 = 6\\) 种。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：分类完成一件事用加法原理，分步完成用乘法原理。",
+          answer: "**正确。**分类计数加法、分步计数乘法，这是两个基本原理的核心区别。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：从 5 人中选 3 人排成一排，不同的排法有 10 种。",
+          answer: "**错误。**排列数 \\(A_5^3 = 5 \\times 4 \\times 3 = 60\\) 种。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "从甲地到乙地有 3 条路，从乙地到丙地有 2 条路，则从甲地经乙地到丙地共有（　）",
+          options: ["A. 5 种走法", "B. 6 种走法", "C. 8 种走法", "D. 9 种走法"],
+          correctIndex: 1,
+          answer: "**B**。分步完成，用乘法原理：\\(3 \\times 2 = 6\\)。"
+        }
+      ]
     }
   ]
 }

@@ -176,6 +176,33 @@ export default {
           answer: "答案：\\(-3 < 2a-1 < 3\\)。由 \\(-1 < a < 2\\)，两边同乘2（正数，方向不变）：\\(-2 < 2a < 4\\)。两边同减1：\\(-3 < 2a-1 < 3\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(a > b\\)，则 \\(ac^2 > bc^2\\)。",
+          answer: "**错误。**当 \\(c = 0\\) 时 \\(ac^2 = bc^2 = 0\\)，不等号不成立。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(a > b > 0\\)，则 \\(\\frac{1}{a} < \\frac{1}{b}\\)。",
+          answer: "**正确。**同号两数取倒数，不等号方向改变。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(a < b < 0\\)，则下列不等式一定成立的是（　）",
+          options: ["A. \\(a^2 < b^2\\)", "B. \\(\\frac{1}{a} < \\frac{1}{b}\\)", "C. \\(a^2 > b^2\\)", "D. \\(|a| < |b|\\)"],
+          correctIndex: 2,
+          answer: "**C**。\\(a < b < 0\\) 说明 \\(|a| > |b|\\)，故 \\(a^2 > b^2\\)；取倒数后 \\(\\frac{1}{a} > \\frac{1}{b}\\)。"
+        }
+      ]
     }
   ]
 }

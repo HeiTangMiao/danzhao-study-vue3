@@ -163,6 +163,61 @@ export default {
           answer: "由共线条件：\\(2 \\times 3 - m \\times 1 = 0\\)，\\(6 - m = 0\\)，\\(m = 6\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "若 \\(\\vec{a} = (1, 2)\\)，则 \\(2\\vec{a} = (2, 4)\\)。",
+          answer: "**正确。**数乘向量：每个坐标分量都乘 2。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "向量 \\((1, 2)\\) 与向量 \\((2, 4)\\) 共线。",
+          answer: "**正确。**由共线条件 \\(x_1 y_2 - x_2 y_1 = 1 \\times 4 - 2 \\times 2 = 0\\)，两向量共线。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "已知 \\(\\vec{a} = (1, 2)\\)，\\(\\vec{b} = (3, -1)\\)，则 \\(\\vec{a} + \\vec{b} = \\)（　）",
+          options: ["A. \\((4, 1)\\)", "B. \\((2, -3)\\)", "C. \\((3, -2)\\)", "D. \\((4, 3)\\)"],
+          correctIndex: 0,
+          answer: "答案：A。坐标相加：\\((1+3, \\; 2+(-1)) = (4, 1)\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(\\vec{a} = (x_1, y_1)\\)，\\(\\vec{b} = (x_2, y_2)\\)，则 \\(\\vec{a} + \\vec{b} = (x_1 + x_2,\\; y_1 + y_2)\\)。",
+          answer: "**正确。**向量坐标运算即对应分量相加减。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：向量 \\(\\vec{a} = (1, 2)\\) 与 \\(\\vec{b} = (2, 4)\\) 不共线。",
+          answer: "**错误。**\\(\\vec{b} = 2\\vec{a}\\)，两向量共线（平行）。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(\\vec{a} = (2, -1)\\)，\\(\\vec{b} = (-1, 3)\\)，则 \\(\\vec{a} + \\vec{b}\\) 等于（　）",
+          options: ["A. \\((1, 2)\\)", "B. \\((3, -4)\\)", "C. \\((1, -4)\\)", "D. \\((-3, 4)\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\((2 + (-1),\\; -1 + 3) = (1, 2)\\)。"
+        }
+      ]
     }
   ]
 }

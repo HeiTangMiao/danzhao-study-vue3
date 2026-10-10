@@ -207,6 +207,61 @@ export default {
           answer: "答案：\\(a < 3\\)。\\(A=[1,3]\\)，\\(B=(a,+\\infty)\\)。\\(A\\cap B \\ne \\varnothing\\) 要求 \\(a < 3\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "若 \\(A \\subseteq B\\)，则 \\(A \\cup B = B\\)。",
+          answer: "**正确。**A 被 B 包含时，A、B 的所有元素合起来仍都在 B 中，故并集等于 B。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "并集 \\(A \\cup B\\) 中的元素是既属于 \\(A\\) 又属于 \\(B\\) 的元素。",
+          answer: "**错误。**并集取「属于 A **或**属于 B」的元素；「既属于 A 又属于 B」是交集 \\(A \\cap B\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "设 \\(A = \\{1, 2, 3\\}\\)，\\(B = \\{2, 3, 4\\}\\)，则 \\(A \\cap B = \\)（　）",
+          options: ["A. \\(\\{1, 2, 3, 4\\}\\)", "B. \\(\\{2, 3\\}\\)", "C. \\(\\{1, 4\\}\\)", "D. \\(\\varnothing\\)"],
+          correctIndex: 1,
+          answer: "答案：B。交集取公共元素：2、3 同时属于 A、B。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(A \\cup B = A\\)，则 \\(B \\subseteq A\\)。",
+          answer: "**正确。**并集等于 \\(A\\) 说明 \\(B\\) 的元素都在 \\(A\\) 中，即 \\(B \\subseteq A\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\complement_U(A \\cap B) = \\complement_U A \\cup \\complement_U B\\)。",
+          answer: "**正确。**这是德摩根定律，交的补等于补的并。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "设全集 \\(U = \\{1,2,3,4,5\\}\\)，\\(A = \\{1,3,5\\}\\)，\\(B = \\{2,3\\}\\)，则 \\(\\complement_U(A \\cup B)\\) 等于（　）",
+          options: ["A. \\(\\{4\\}\\)", "B. \\(\\{3\\}\\)", "C. \\(\\{1,2,5\\}\\)", "D. \\(\\varnothing\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(A \\cup B = \\{1,2,3,5\\}\\)，在 \\(U\\) 中的补集为 \\(\\{4\\}\\)。"
+        }
+      ]
     }
   ]
 }

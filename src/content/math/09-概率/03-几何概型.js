@@ -144,6 +144,61 @@ export default {
           answer: "解：面积型。全部区域为单位正方形，面积 1。\\(x + y \\le 1\\) 对应直线 \\(x + y = 1\\) 与坐标轴围成的三角形，面积 \\(\\dfrac{1}{2}\\)。\\(P = \\dfrac{1}{2}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "几何概型的试验结果有无限多个，且每个结果出现的可能性相等。",
+          answer: "**正确。**无限性与等可能性是几何概型的两个基本特征。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "在长度为 10 的线段上随机取一点，该点落在长度为 3 的子线段内的概率是 \\(\\dfrac{3}{10}\\)。",
+          answer: "**正确。**长度型几何概型：概率等于子线段长度与总长度之比。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在区间 \\([0, 4]\\) 内随机取一个数，它小于 1 的概率是（　）",
+          options: ["A. \\(\\dfrac{1}{4}\\)", "B. \\(\\dfrac{1}{3}\\)", "C. \\(\\dfrac{1}{2}\\)", "D. 1"],
+          correctIndex: 0,
+          answer: "答案：A。长度型几何概型，概率为 \\(\\dfrac{1-0}{4-0} = \\dfrac{1}{4}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：几何概型的概率与区域的长度、面积或体积有关。",
+          answer: "**正确。**几何概型用几何度量之比计算概率，度量可为长度、面积、体积。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：几何概型的基本事件有有限个。",
+          answer: "**错误。**几何概型的基本事件有无限多个，这是它与古典概型的区别。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在区间 \\([0, 6]\\) 上随机取一个数，该数落在 \\([1, 3]\\) 内的概率是（　）",
+          options: ["A. \\(\\frac{1}{2}\\)", "B. \\(\\frac{1}{3}\\)", "C. \\(\\frac{1}{6}\\)", "D. \\(\\frac{2}{3}\\)"],
+          correctIndex: 1,
+          answer: "**B**。长度比 \\(= \\frac{3 - 1}{6 - 0} = \\frac{2}{6} = \\frac{1}{3}\\)。"
+        }
+      ]
     }
   ]
 }

@@ -117,8 +117,8 @@ export default {
         },
         {
           difficulty: "basic",
-          question: "求和：\\(S_n = 1 \\times 3 + 2 \\times 3^2 + 3 \\times 3^3 + \\cdots + n \\times 3^n\\)",
-          answer: "用错位相减法。\\(S_n = 1\\cdot3 + 2\\cdot3^2 + \\cdots + n\\cdot3^n\\) ... ①。\\(3S_n = 1\\cdot3^2 + 2\\cdot3^3 + \\cdots + (n-1)\\cdot3^n + n\\cdot3^{n+1}\\) ... ②。①-②：\\(-2S_n = 3 + 3^2 + 3^3 + \\cdots + 3^n - n\\cdot3^{n+1} = \\frac{3(3^n-1)}{2} - n\\cdot3^{n+1}\\)。\\(S_n = \\frac{n\\cdot3^{n+1} - \\frac{3(3^n-1)}{2}}{2} = \\frac{2n\\cdot3^{n+1} - 3(3^n-1)}{4} = \\frac{2n\\cdot3^{n+1} - 3^{n+1} + 3}{4} = \\frac{(2n-1)\\cdot3^{n+1} + 3}{4}\\)。"
+          question: "求和：\\(S_n = 1 \\times 2 + 2 \\times 2^2 + 3 \\times 2^3 + \\cdots + n \\times 2^n\\)",
+          answer: "用错位相减法。\\(S_n = 1\\cdot2 + 2\\cdot2^2 + \\cdots + n\\cdot2^n\\) ... ①。\\(2S_n = 1\\cdot2^2 + 2\\cdot2^3 + \\cdots + (n-1)\\cdot2^n + n\\cdot2^{n+1}\\) ... ②。②-①：\\(S_n = n\\cdot2^{n+1} - (2 + 2^2 + \\cdots + 2^n) = n\\cdot2^{n+1} - \\frac{2(2^n-1)}{2-1} = n\\cdot2^{n+1} - 2^{n+1} + 2 = (n-1)\\cdot2^{n+1} + 2\\)。"
         },
         {
           difficulty: "medium",
@@ -134,6 +134,61 @@ export default {
           difficulty: "advanced",
           question: "求数列 \\(1, \\frac{1}{2}, \\frac{1}{4}, \\frac{1}{8}, \\ldots, \\frac{1}{2^{n-1}}\\) 的前 \\(n\\) 项和。",
           answer: "这是等比数列，\\(a_1 = 1\\)，\\(q = \\frac{1}{2}\\)。\\(S_n = \\frac{1 \\times \\left(1 - \\frac{1}{2^n}\\right)}{1 - \\frac{1}{2}} = 2\\left(1 - \\frac{1}{2^n}\\right) = 2 - \\frac{1}{2^{n-1}}\\)。"
+        }
+      ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "数列 \\(1, 2, 3, \\cdots, n\\) 的前 \\(n\\) 项和为 \\(\\dfrac{n(n+1)}{2}\\)。",
+          answer: "**正确。**等差数列求和公式：\\(S_n = \\dfrac{n(a_1 + a_n)}{2} = \\dfrac{n(n+1)}{2}\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "求 \\(2 + 4 + 8 + \\cdots + 2^n\\) 的和，适合使用裂项相消法。",
+          answer: "**错误。**这是等比数列求和，应使用公式法；裂项相消法适用于每项可拆分为两个分式之差的情形。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "数列 \\(\\dfrac{1}{1\\times2}, \\dfrac{1}{2\\times3}, \\dfrac{1}{3\\times4}, \\cdots\\) 适合的求和方法是（　）",
+          options: ["A. 公式法", "B. 裂项相消法", "C. 错位相减法", "D. 分组求和法"],
+          correctIndex: 1,
+          answer: "答案：B。\\(\\dfrac{1}{n(n+1)} = \\dfrac{1}{n} - \\dfrac{1}{n+1}\\)，可拆项后前后相消。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：裂项相消法适用于通项能拆成两项之差的数列。",
+          answer: "**正确。**拆项后中间项前后相消，只剩首尾若干项，是裂项法的核心。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：错位相减法适用于「等差×等比」型数列求和。",
+          answer: "**正确。**两边同乘公比后错位相减，中间项化为等比数列求和。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\frac{1}{1 \\times 2} + \\frac{1}{2 \\times 3} + \\cdots + \\frac{1}{n(n+1)}\\) 等于（　）",
+          options: ["A. \\(\\frac{1}{n+1}\\)", "B. \\(\\frac{n}{n+1}\\)", "C. \\(1 - \\frac{1}{n}\\)", "D. \\(\\frac{n-1}{n}\\)"],
+          correctIndex: 1,
+          answer: "**B**。\\(\\frac{1}{k(k+1)} = \\frac{1}{k} - \\frac{1}{k+1}\\)，相加得 \\(1 - \\frac{1}{n+1} = \\frac{n}{n+1}\\)。"
         }
       ]
     }

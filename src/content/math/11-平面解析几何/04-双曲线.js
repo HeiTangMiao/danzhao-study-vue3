@@ -141,6 +141,61 @@ export default {
           answer: "解：\\(b^2=3\\)，\\(c^2=a^2+3\\)，\\(e=\\dfrac{c}{a}=2 \\Rightarrow c=2a \\Rightarrow c^2=4a^2=a^2+3 \\Rightarrow 3a^2=3 \\Rightarrow a=1\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "双曲线 \\(\\dfrac{x^2}{9} - \\dfrac{y^2}{16} = 1\\) 的渐近线方程是 \\(y = \\pm\\dfrac{3}{4}x\\)。",
+          answer: "**错误。**渐近线为 \\(y = \\pm\\dfrac{b}{a}x\\)，此处 \\(b=4\\)、\\(a=3\\)，应为 \\(y = \\pm\\dfrac{4}{3}x\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "双曲线的离心率 \\(e\\) 大于 1。",
+          answer: "**正确。**\\(e = \\dfrac{c}{a}\\)，双曲线中 \\(c > a > 0\\)，故 \\(e > 1\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "双曲线 \\(\\dfrac{x^2}{4} - y^2 = 1\\) 中 \\(a = \\)（　）",
+          options: ["A. 2", "B. 4", "C. 1", "D. \\(\\sqrt{5}\\)"],
+          correctIndex: 0,
+          answer: "答案：A。标准形式中 \\(x^2\\) 的分母 \\(a^2 = 4\\)，故 \\(a = 2\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：双曲线 \\(\\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 1\\) 的渐近线方程为 \\(y = \\pm\\frac{b}{a}x\\)。",
+          answer: "**正确。**令右端为 0 即得渐近线方程。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：双曲线上任意一点到两个焦点的距离之差为常数。",
+          answer: "**正确。**差的绝对值等于 \\(2a\\)，这是双曲线的定义。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "双曲线 \\(\\frac{x^2}{9} - \\frac{y^2}{16} = 1\\) 的实半轴长为（　）",
+          options: ["A. 3", "B. 4", "C. 5", "D. 9"],
+          correctIndex: 0,
+          answer: "**A**。\\(a^2 = 9\\)，故 \\(a = 3\\)。"
+        }
+      ]
     }
   ]
 }

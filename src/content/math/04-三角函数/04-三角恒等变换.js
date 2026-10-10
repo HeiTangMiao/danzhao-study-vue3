@@ -130,6 +130,61 @@ export default {
           answer: "逆用二倍角公式 \\(\\cos 2\\alpha = \\cos^2\\alpha - \\sin^2\\alpha\\)：\n原式 \\(= \\cos(2 \\times 22.5°) = \\cos 45° = \\frac{\\sqrt{2}}{2}\\)"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(\\sin(\\alpha + \\beta) = \\sin\\alpha + \\sin\\beta\\) 对任意角都成立。",
+          answer: "**错误。**两角和的正弦为 \\(\\sin(\\alpha+\\beta) = \\sin\\alpha\\cos\\beta + \\cos\\alpha\\sin\\beta\\)，不能把函数「拆开」相加。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(\\cos 2\\alpha = 2\\cos^2\\alpha - 1\\)。",
+          answer: "**正确。**由 \\(\\cos 2\\alpha = \\cos^2\\alpha - \\sin^2\\alpha\\) 结合 \\(\\sin^2\\alpha = 1 - \\cos^2\\alpha\\) 可得。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\sin 15° \\cos 15° = \\)（　）",
+          options: ["A. \\(\\dfrac{1}{4}\\)", "B. \\(\\dfrac{1}{2}\\)", "C. \\(\\dfrac{\\sqrt{3}}{4}\\)", "D. \\(\\dfrac{\\sqrt{2}}{4}\\)"],
+          correctIndex: 0,
+          answer: "答案：A。\\(\\sin 15°\\cos 15° = \\dfrac{1}{2}\\sin 30° = \\dfrac{1}{4}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\sin 2\\alpha = 2\\sin\\alpha\\cos\\alpha\\)。",
+          answer: "**正确。**二倍角正弦公式，由两角和的正弦公式取 \\(\\beta = \\alpha\\) 得到。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\cos(\\alpha + \\beta) = \\cos\\alpha\\cos\\beta - \\sin\\alpha\\sin\\beta\\)。",
+          answer: "**正确。**两角和的余弦公式，符号为「异名相乘取负」。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\cos 75^\\circ\\) 的值等于（　）",
+          options: ["A. \\(\\frac{\\sqrt{6} - \\sqrt{2}}{4}\\)", "B. \\(\\frac{\\sqrt{6} + \\sqrt{2}}{4}\\)", "C. \\(\\frac{\\sqrt{3} - 1}{2}\\)", "D. \\(\\frac{\\sqrt{2}}{2}\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(\\cos 75^\\circ = \\cos(45^\\circ + 30^\\circ) = \\frac{\\sqrt{2}}{2}\\cdot\\frac{\\sqrt{3}}{2} - \\frac{\\sqrt{2}}{2}\\cdot\\frac{1}{2} = \\frac{\\sqrt{6} - \\sqrt{2}}{4}\\)。"
+        }
+      ]
     }
   ]
 }

@@ -218,6 +218,61 @@ export default {
           answer: "答案：\\(\\dfrac{2\\sqrt{3}}{3}\\)。平面 \\(ABC\\) 的法向量 \\(\\boldsymbol{n} = (1, 1, 1)\\)（由 \\(\\overrightarrow{AB}=(-1,1,0)\\)、\\(\\overrightarrow{AC}=(-1,0,1)\\) 求得）。\\(\\overrightarrow{AP} = (0, 1, 1)\\)，\\(\\boldsymbol{n} \\cdot \\overrightarrow{AP} = 2\\)，\\(|\\boldsymbol{n}| = \\sqrt{3}\\)，\\(d = \\dfrac{2}{\\sqrt{3}} = \\dfrac{2\\sqrt{3}}{3}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "空间向量可以用三元有序实数组 \\((x, y, z)\\) 表示。",
+          answer: "**正确。**建立空间直角坐标系后，空间向量与有序实数组一一对应。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "空间向量不能进行数量积运算。",
+          answer: "**错误。**空间向量与平面向量一样有数量积运算：\\(\\vec{a} \\cdot \\vec{b} = x_1 x_2 + y_1 y_2 + z_1 z_2\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知空间向量 \\(\\vec{a} = (1, 0, 2)\\)，则 \\(|\\vec{a}| = \\)（　）",
+          options: ["A. 3", "B. \\(\\sqrt{5}\\)", "C. 5", "D. \\(\\sqrt{3}\\)"],
+          correctIndex: 1,
+          answer: "答案：B。\\(|\\vec{a}| = \\sqrt{1^2 + 0^2 + 2^2} = \\sqrt{5}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：空间向量也可以进行数量积运算。",
+          answer: "**正确。**数量积定义可推广到空间向量，形式与平面向量一致。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：空间中任意三个向量都可以作为一组基底。",
+          answer: "**错误。**作为基底的三个向量必须不共面。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在空间直角坐标系中，点 \\(A(1, 2, 3)\\) 关于原点对称的点的坐标是（　）",
+          options: ["A. \\((-1, -2, -3)\\)", "B. \\((1, -2, -3)\\)", "C. \\((-1, 2, 3)\\)", "D. \\((-1, -2, 3)\\)"],
+          correctIndex: 0,
+          answer: "**A**。关于原点对称时三个坐标都取相反数。"
+        }
+      ]
     }
   ]
 }

@@ -159,6 +159,61 @@ export default {
           answer: "\\(\\cos\\theta = \\frac{\\boldsymbol{a}\\cdot\\boldsymbol{b}}{|\\boldsymbol{a}||\\boldsymbol{b}|} = \\frac{-3}{2\\times 3} = -\\frac{1}{2}\\)，\\(\\theta = \\frac{2\\pi}{3}\\)（\\(120°\\)）。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "两个向量的数量积是一个实数。",
+          answer: "**正确。**数量积的结果是数量（实数），不是向量——这是与数乘的本质区别。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "若 \\(\\vec{a} \\cdot \\vec{b} = 0\\)，则必有 \\(\\vec{a} = \\vec{0}\\) 或 \\(\\vec{b} = \\vec{0}\\)。",
+          answer: "**错误。**还可能是两个非零向量垂直（夹角 90°），此时数量积也为 0。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "已知 \\(\\vec{a} = (1, 1)\\)，\\(\\vec{b} = (1, -1)\\)，则 \\(\\vec{a} \\cdot \\vec{b} = \\)（　）",
+          options: ["A. 2", "B. 0", "C. -2", "D. 1"],
+          correctIndex: 1,
+          answer: "答案：B。\\(\\vec{a} \\cdot \\vec{b} = 1 \\times 1 + 1 \\times (-1) = 0\\)（两向量垂直）。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(\\vec{a} \\cdot \\vec{b} = 0\\)，则 \\(\\vec{a} = \\vec{0}\\) 或 \\(\\vec{b} = \\vec{0}\\)。",
+          answer: "**错误。**还可能是两非零向量互相垂直（\\(\\cos 90^\\circ = 0\\)）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta\\)，其中 \\(\\theta\\) 为两向量的夹角。",
+          answer: "**正确。**数量积的定义式，结果为数量而非向量。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "已知 \\(|\\vec{a}| = 3\\)，\\(|\\vec{b}| = 4\\)，夹角为 \\(60^\\circ\\)，则 \\(\\vec{a} \\cdot \\vec{b}\\) 等于（　）",
+          options: ["A. 6", "B. 12", "C. \\(6\\sqrt{3}\\)", "D. \\(12\\sqrt{3}\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(3 \\times 4 \\times \\cos 60^\\circ = 12 \\times \\frac{1}{2} = 6\\)。"
+        }
+      ]
     }
   ]
 }

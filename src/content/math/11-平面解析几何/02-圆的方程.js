@@ -154,6 +154,61 @@ export default {
           answer: "解：圆心距 \\(d=3\\)，\\(R+r=2\\)，\\(d>R+r\\)，两圆相离。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "方程 \\(x^2 + y^2 = 9\\) 表示圆心在原点、半径为 3 的圆。",
+          answer: "**正确。**标准方程 \\((x-a)^2+(y-b)^2=r^2\\) 中 \\(a=b=0\\)，\\(r=3\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "一条直线与一个圆最多有两个公共点。",
+          answer: "**正确。**相交时 2 个公共点，相切时 1 个，相离时 0 个——最多 2 个。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "圆 \\((x-1)^2 + (y+2)^2 = 4\\) 的圆心坐标是（　）",
+          options: ["A. \\((1, -2)\\)", "B. \\((-1, 2)\\)", "C. \\((1, 2)\\)", "D. \\((-1, -2)\\)"],
+          correctIndex: 0,
+          answer: "答案：A。由 \\((x-1)^2+(y+2)^2 = (x-1)^2 + (y-(-2))^2\\) 知圆心为 \\((1, -2)\\)，半径为 2。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：圆 \\((x-1)^2 + (y+2)^2 = 4\\) 的圆心是 \\((1, -2)\\)，半径为 2。",
+          answer: "**正确。**标准式 \\((x-a)^2 + (y-b)^2 = r^2\\) 中圆心 \\((a,b)\\)、半径 \\(r = 2\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：任意一个关于 x、y 的二次方程都表示圆。",
+          answer: "**错误。**需满足 \\(x^2, y^2\\) 系数相等且不为 0、无 xy 项，且 \\(D^2 + E^2 - 4F > 0\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "圆心在原点、半径为 3 的圆的方程是（　）",
+          options: ["A. \\(x^2 + y^2 = 3\\)", "B. \\(x^2 + y^2 = 9\\)", "C. \\(x^2 + y^2 = 6\\)", "D. \\((x-3)^2 + y^2 = 9\\)"],
+          correctIndex: 1,
+          answer: "**B**。标准式中右端为 \\(r^2 = 9\\)。"
+        }
+      ]
     }
   ]
 }

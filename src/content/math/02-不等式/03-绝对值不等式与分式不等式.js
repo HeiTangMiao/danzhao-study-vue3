@@ -177,6 +177,33 @@ export default {
           answer: "答案：\\(a = 2\\)，\\(b = 3\\)。\\(|x-a| < b\\) 的解集为 \\(a-b < x < a+b\\)，所以 \\(a-b = -1\\)，\\(a+b = 5\\)，解得 \\(a = 2\\)，\\(b = 3\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(|x| < 2\\) 的解集是 \\((-2, 2)\\)。",
+          answer: "**正确。**\\(|x| < a\\)（\\(a>0\\)）的解为 \\(-a < x < a\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：不等式 \\(\\frac{x-1}{x+2} > 0\\) 与 \\((x-1)(x+2) > 0\\) 同解。",
+          answer: "**正确。**\\(x \\neq -2\\) 时两式同号；而 \\(x = -2\\) 使分母为 0 不合法，且此时 \\((x-1)(x+2) = 0\\) 也不满足 > 0，故同解。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "不等式 \\(|2x - 1| \\ge 3\\) 的解集是（　）",
+          options: ["A. \\([-1, 2]\\)", "B. \\((-\\infty, -1] \\cup [2, +\\infty)\\)", "C. \\((-\\infty, -2] \\cup [1, +\\infty)\\)", "D. \\([2, +\\infty)\\)"],
+          correctIndex: 1,
+          answer: "**B**。\\(2x - 1 \\ge 3\\) 或 \\(2x - 1 \\le -3\\)，解得 \\(x \\ge 2\\) 或 \\(x \\le -1\\)。"
+        }
+      ]
     }
   ]
 }

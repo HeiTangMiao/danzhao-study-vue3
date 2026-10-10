@@ -137,6 +137,61 @@ export default {
           answer: "由正弦定理 \\(a = 2R\\sin A, b = 2R\\sin B\\) 代入：\\(2R\\sin A\\cos B = 2R\\sin B\\cos A\\)，即 \\(\\sin A\\cos B - \\sin B\\cos A = 0\\)，\\(\\sin(A-B) = 0\\)。因为 \\(A, B \\in (0, \\pi)\\)，所以 \\(A - B = 0\\)，即 \\(A = B\\)。三角形为等腰三角形。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "测量底部不可到达的建筑物的高度时，常通过测量仰角构造三角形求解。",
+          answer: "**正确。**这类问题通常归结为解直角三角形或解斜三角形。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "三角形面积公式 \\(S = \\dfrac{1}{2}ab\\sin C\\) 中，角 \\(C\\) 必须是边 \\(a\\)、\\(b\\) 的夹角。",
+          answer: "**正确。**公式要求两边及其夹角一一对应，用错角是最常见的失分点。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在 \\(\\triangle ABC\\) 中，\\(a = 2\\)，\\(b = 3\\)，\\(C = 60°\\)，则 \\(\\triangle ABC\\) 的面积为（　）",
+          options: ["A. \\(\\dfrac{3\\sqrt{3}}{2}\\)", "B. \\(3\\sqrt{3}\\)", "C. \\(\\dfrac{3}{2}\\)", "D. 3"],
+          correctIndex: 0,
+          answer: "答案：A。\\(S = \\dfrac{1}{2}ab\\sin C = \\dfrac{1}{2} \\times 2 \\times 3 \\times \\dfrac{\\sqrt{3}}{2} = \\dfrac{3\\sqrt{3}}{2}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：已知三角形的两边及其中一边的对角，解三角形时可能出现两解。",
+          answer: "**正确。**已知 SSA 时可能无解、一解或两解，需结合正弦值判断。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：三角形面积公式 \\(S = \\frac{1}{2}ab\\sin C\\) 对任意三角形成立。",
+          answer: "**正确。**两边及其夹角的正弦形式面积公式，与三角形形状无关。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在 \\(\\triangle ABC\\) 中，若 \\(a = 2\\)，\\(b = 3\\)，\\(C = 30^\\circ\\)，则 \\(\\triangle ABC\\) 的面积为（　）",
+          options: ["A. \\(\\frac{3}{2}\\)", "B. 3", "C. \\(\\frac{\\sqrt{3}}{2}\\)", "D. \\(3\\sqrt{3}\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(S = \\frac{1}{2} \\times 2 \\times 3 \\times \\sin 30^\\circ = 3 \\times \\frac{1}{2} = \\frac{3}{2}\\)。"
+        }
+      ]
     }
   ]
 }

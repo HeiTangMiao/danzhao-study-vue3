@@ -207,6 +207,61 @@ export default {
           answer: "答案：\\(\\frac{2a+b}{1-a}\\)。用换底公式：\\(\\log_5 12 = \\frac{\\lg 12}{\\lg 5}\\)。\\(\\lg 12 = \\lg(4 \\times 3) = \\lg 4 + \\lg 3 = 2\\lg 2 + \\lg 3 = 2a + b\\)。\\(\\lg 5 = \\lg \\frac{10}{2} = \\lg 10 - \\lg 2 = 1 - a\\)。所以 \\(\\log_5 12 = \\frac{2a+b}{1-a}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(\\log_a 1 = 0\\)（\\(a > 0\\) 且 \\(a \\neq 1\\)）。",
+          answer: "**正确。**任何底数的 0 次幂都等于 1，故对数值为 0。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "\\(\\log_2 4 + \\log_2 8 = \\log_2 12\\)。",
+          answer: "**错误。**对数加法对应真数相乘：\\(\\log_2 4 + \\log_2 8 = \\log_2 32 = 5\\)，而非 \\(\\log_2 12\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "\\(\\log_3 9 = \\)（　）",
+          options: ["A. 2", "B. 3", "C. \\(\\dfrac{1}{2}\\)", "D. 9"],
+          correctIndex: 0,
+          answer: "答案：A。因为 \\(3^2 = 9\\)，所以 \\(\\log_3 9 = 2\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\log_a 1 = 0\\)（\\(a > 0, a \\neq 1\\)）。",
+          answer: "**正确。**因为 \\(a^0 = 1\\)，化为对数式即得。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\log_a (MN) = \\log_a M \\cdot \\log_a N\\)。",
+          answer: "**错误。**正确公式为 \\(\\log_a(MN) = \\log_a M + \\log_a N\\)（乘积的对数等于对数之和）。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(\\log_2 8 + \\log_2 \\frac{1}{2}\\) 的值等于（　）",
+          options: ["A. 2", "B. 3", "C. 4", "D. \\(\\frac{7}{2}\\)"],
+          correctIndex: 0,
+          answer: "**A**。\\(\\log_2 8 = 3\\)，\\(\\log_2 \\frac{1}{2} = -1\\)，和为 2。"
+        }
+      ]
     }
   ]
 }

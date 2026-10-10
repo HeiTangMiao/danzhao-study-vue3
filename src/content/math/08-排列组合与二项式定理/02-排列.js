@@ -128,6 +128,61 @@ export default {
           answer: "解：三个职务不同，有序，用排列：\\(A_5^3 = 60\\) 种。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(A_5^2 = 20\\)。",
+          answer: "**正确。**\\(A_5^2 = 5 \\times 4 = 20\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "排列问题与选取元素的顺序无关。",
+          answer: "**错误。**排列与顺序**有关**（选 2 人排队，甲乙与乙甲是不同排列）；与顺序无关的是组合。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "从 4 名同学中选 2 人进行排队，不同的排法共有（　）",
+          options: ["A. 6 种", "B. 12 种", "C. 8 种", "D. 24 种"],
+          correctIndex: 1,
+          answer: "答案：B。有顺序的选取用排列：\\(A_4^2 = 4 \\times 3 = 12\\) 种。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：排列问题与元素的顺序有关。",
+          answer: "**正确。**排列是「取出并排序」，交换顺序得到不同的排列。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(A_n^n = n!\\)。",
+          answer: "**正确。**全排列 \\(A_n^n = n \\times (n-1) \\times \\cdots \\times 1 = n!\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(A_5^2\\) 的值等于（　）",
+          options: ["A. 10", "B. 20", "C. 25", "D. 120"],
+          correctIndex: 1,
+          answer: "**B**。\\(A_5^2 = 5 \\times 4 = 20\\)。"
+        }
+      ]
     }
   ]
 }

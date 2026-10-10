@@ -186,6 +186,61 @@ export default {
           answer: "答案：否定为 \\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 - 4x + 3 < 0\\)。原命题：\\(x^2 - 4x + 3 = (x-1)(x-3)\\)，当 \\(1 < x < 3\\) 时小于 0，存在反例，故原命题为假命题，其否定为真命题。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "「所有的正方形都是矩形」是全称命题。",
+          answer: "**正确。**含「所有」全称量词，是全称命题。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "「存在一个实数 \\(x\\)，使 \\(x^2 < 0\\)」是真命题。",
+          answer: "**错误。**任意实数的平方都非负，故该存在性命题为假。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "命题「\\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 \\geq 0\\)」的否定是（　）",
+          options: ["A. \\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "B. \\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "C. \\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 \\geq 0\\)", "D. \\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 > 0\\)"],
+          correctIndex: 1,
+          answer: "答案：B。全称命题的否定是特称命题：量词「\\(\\forall\\)」换「\\(\\exists\\)」，结论「\\(\\geq\\)」否定为「\\(<\\)」。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：命题「对任意 \\(x \\in \\mathbb{R}\\)，\\(x^2 \\ge 0\\)」的否定是「存在 \\(x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)」。",
+          answer: "**正确。**全称命题的否定：量词「任意」换「存在」，结论取否定。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：全称命题的否定仍是全称命题。",
+          answer: "**错误。**全称命题的否定是特称（存在）命题，量词要改变。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "命题「存在一个实数 \\(x\\)，使 \\(x^2 + 1 = 0\\)」的否定是（　）",
+          options: ["A. 对任意实数 \\(x\\)，都有 \\(x^2 + 1 \\neq 0\\)", "B. 存在实数 \\(x\\)，使 \\(x^2 + 1 \\neq 0\\)", "C. 对任意实数 \\(x\\)，都有 \\(x^2 + 1 = 0\\)", "D. 存在实数 \\(x\\)，使 \\(x^2 + 1 > 0\\)"],
+          correctIndex: 0,
+          answer: "**A**。特称命题的否定：量词「存在」换「任意」，结论取否定（=0 变 ≠0）。"
+        }
+      ]
     }
   ]
 }

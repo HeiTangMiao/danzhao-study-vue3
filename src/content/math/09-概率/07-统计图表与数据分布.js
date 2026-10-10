@@ -114,6 +114,61 @@ export default {
           answer: "解：所有小矩形面积之和等于各组频率之和，应为 1。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "频率分布直方图中，各小长方形的面积之和等于 1。",
+          answer: "**正确。**直方图以面积表示频率，所有组频率之和为 1。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "频率分布直方图中，纵轴表示的是频率。",
+          answer: "**错误。**直方图纵轴表示「频率/组距」，面积才是频率——这是最常见的混淆点。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "某组数据的频率为 0.25，样本容量为 40，则该组的频数为（　）",
+          options: ["A. 10", "B. 25", "C. 4", "D. 16"],
+          correctIndex: 0,
+          answer: "答案：A。频数 = 频率 × 样本容量 = \\(0.25 \\times 40 = 10\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：频率分布直方图中，各小长方形的面积之和等于 1。",
+          answer: "**正确。**每个小长方形面积 = 组距 × 频率/组距 = 频率，故总和为 1。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：茎叶图可以保留原始数据的信息。",
+          answer: "**正确。**茎叶图既显示分布形状，又保留每个数据的具体数值。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "频率分布直方图中，某组的频率为 0.2，样本容量为 100，则该组的频数为（　）",
+          options: ["A. 20", "B. 2", "C. 5", "D. 200"],
+          correctIndex: 0,
+          answer: "**A**。频数 \\(= \\) 样本容量 \\(\\times\\) 频率 \\(= 100 \\times 0.2 = 20\\)。"
+        }
+      ]
     }
   ]
 }

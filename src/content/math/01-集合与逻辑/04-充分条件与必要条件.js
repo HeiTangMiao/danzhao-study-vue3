@@ -194,6 +194,33 @@ export default {
           answer: "答案：必要不充分条件。\\(x=y \\Rightarrow |x|=|y|\\) 成立（必要）。但 \\(|x|=|y|\\) 时可能 \\(x=-y\\)（不充分）。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 p 是 q 的充分条件，则 q 是 p 的必要条件。",
+          answer: "**正确。**\\(p \\Rightarrow q\\) 成立时，q 是 p 成立的必要条件，两者是同一关系的两种说法。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(x > 1\\) 是 \\(x > 2\\) 的充分条件。",
+          answer: "**错误。**\\(x > 1 \\not\\Rightarrow x > 2\\)，但 \\(x > 2 \\Rightarrow x > 1\\)，故它是必要不充分条件。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\(x = 2\\) 是 \\(x^2 - 4 = 0\\) 的（　）",
+          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          correctIndex: 0,
+          answer: "**A**。\\(x = 2 \\Rightarrow x^2 - 4 = 0\\) 成立；反过来 \\(x^2 - 4 = 0\\) 还可能是 \\(x = -2\\)，故充分不必要。"
+        }
+      ]
     }
   ]
 }

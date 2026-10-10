@@ -134,6 +134,61 @@ export default {
           answer: "解：1 件次品从 2 件中取 \\(C_2^1 = 2\\)，2 件正品从 8 件中取 \\(C_8^2 = 28\\)。共 \\(2 \\times 28 = 56\\) 种。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\(C_5^2 = 10\\)。",
+          answer: "**正确。**\\(C_5^2 = \\dfrac{5 \\times 4}{2 \\times 1} = 10\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "从 5 人中选 3 人组成一个小组，共有 \\(A_5^3\\) 种选法。",
+          answer: "**错误。**组队与顺序无关，应用组合 \\(C_5^3 = 10\\) 种；\\(A_5^3 = 60\\) 把同一小组的不同顺序重复计数了。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "从 5 本不同的书中任取 2 本，共有多少种取法（　）",
+          options: ["A. 10", "B. 20", "C. 25", "D. 5"],
+          correctIndex: 0,
+          answer: "答案：A。取书不计顺序，用组合：\\(C_5^2 = 10\\) 种。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：组合问题与元素的顺序无关。",
+          answer: "**正确。**组合只关心「取出哪些」，不排序。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(C_5^2 = C_5^3\\)。",
+          answer: "**正确。**由组合数性质 \\(C_n^m = C_n^{n-m}\\)，\\(C_5^2 = C_5^3 = 10\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "从 6 人中选 2 人参加比赛，不同的选法共有（　）",
+          options: ["A. 12 种", "B. 15 种", "C. 30 种", "D. 36 种"],
+          correctIndex: 1,
+          answer: "**B**。\\(C_6^2 = \\frac{6 \\times 5}{2} = 15\\)。"
+        }
+      ]
     }
   ]
 }

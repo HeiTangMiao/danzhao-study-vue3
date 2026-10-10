@@ -145,6 +145,61 @@ export default {
           answer: "设三个数为 \\(a-d, a, a+d\\)。和：\\(3a = 12\\)，\\(a = 4\\)。积：\\((4-d) \\times 4 \\times (4+d) = 4(16-d^2) = 48\\)，\\(16 - d^2 = 12\\)，\\(d^2 = 4\\)，\\(d = \\pm 2\\)。当 \\(d=2\\) 时，三个数为 \\(2, 4, 6\\)；当 \\(d=-2\\) 时，三个数为 \\(6, 4, 2\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "等差数列 \\(2, 5, 8, 11, \\cdots\\) 的公差是 3。",
+          answer: "**正确。**相邻两项之差：\\(5-2=3\\)，公差为 3。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "常数列一定是等差数列。",
+          answer: "**正确。**常数列相邻两项之差恒为 0，公差为 0，是特殊的等差数列。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "等差数列中 \\(a_1 = 1\\)，\\(d = 2\\)，则 \\(a_{10} = \\)（　）",
+          options: ["A. 19", "B. 20", "C. 21", "D. 18"],
+          correctIndex: 0,
+          answer: "答案：A。\\(a_{10} = a_1 + 9d = 1 + 9 \\times 2 = 19\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：等差数列中，若 \\(m + n = p + q\\)，则 \\(a_m + a_n = a_p + a_q\\)。",
+          answer: "**正确。**等差数列性质：下标和相等的项之和相等。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：等差数列的前 n 项和一定是关于 n 的二次函数。",
+          answer: "**错误。**\\(S_n = \\frac{d}{2}n^2 + (a_1 - \\frac{d}{2})n\\)；当 \\(d = 0\\) 时 \\(S_n = na_1\\) 是一次函数。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "等差数列 \\(\\{a_n\\}\\) 中，\\(a_1 = 2\\)，\\(d = 3\\)，则 \\(a_{10}\\) 等于（　）",
+          options: ["A. 29", "B. 30", "C. 32", "D. 27"],
+          correctIndex: 0,
+          answer: "**A**。\\(a_{10} = a_1 + 9d = 2 + 27 = 29\\)。"
+        }
+      ]
     }
   ]
 }

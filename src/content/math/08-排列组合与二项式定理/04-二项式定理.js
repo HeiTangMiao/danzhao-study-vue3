@@ -131,6 +131,61 @@ export default {
           answer: "解：令 \\(x=1\\)，得 \\(2^n = 32\\)，所以 \\(n = 5\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "\\((a + b)^2\\) 的展开式共有 3 项。",
+          answer: "**正确。**\\((a+b)^2 = a^2 + 2ab + b^2\\)，共 3 项；一般 \\((a+b)^n\\) 展开式有 \\(n+1\\) 项。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "二项展开式中，二项式系数与对应项的系数总是相等的。",
+          answer: "**错误。**仅当两个字母的系数都为 1 时才相等（如 \\((1+2x)^n\\) 的项系数会含 2 的幂，与二项式系数不同）。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\((1 + x)^4\\) 的展开式中，\\(x^2\\) 项的系数是（　）",
+          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          correctIndex: 1,
+          answer: "答案：B。\\(x^2\\) 项系数为二项式系数 \\(C_4^2 = \\dfrac{4 \\times 3}{2 \\times 1} = 6\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\((a + b)^n\\) 的展开式共有 \\(n + 1\\) 项。",
+          answer: "**正确。**按 a 的降幂排列，从 \\(a^n\\) 到 \\(b^n\\) 共 \\(n+1\\) 项。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\((1 + x)^5\\) 的展开式中，\\(x^2\\) 项的系数是 10。",
+          answer: "**正确。**通项为 \\(C_5^k x^k\\)，\\(x^2\\) 项系数 \\(= C_5^2 = 10\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "\\((x + 1)^4\\) 的展开式中，\\(x^2\\) 项的系数是（　）",
+          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          correctIndex: 1,
+          answer: "**B**。\\(x^2\\) 项系数为 \\(C_4^2 = \\frac{4 \\times 3}{2} = 6\\)。"
+        }
+      ]
     }
   ]
 }

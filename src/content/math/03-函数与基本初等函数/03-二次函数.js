@@ -192,6 +192,33 @@ export default {
           answer: "答案：\\(a \\ge 1\\)。开口向上，对称轴 \\(x = a\\)。函数在 \\((-\\infty, a]\\) 上递减。要使在 \\((-\\infty, 1]\\) 上递减，需要 \\((-\\infty, 1] \\subseteq (-\\infty, a]\\)，即 \\(a \\ge 1\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：二次函数 \\(y = ax^2 + bx + c\\)（\\(a \\neq 0\\)）的对称轴是 \\(x = -\\frac{b}{2a}\\)。",
+          answer: "**正确。**配方可得顶点横坐标即为 \\(-\\frac{b}{2a}\\)，也是对称轴。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：二次函数 \\(y = 2x^2 - 4x + 1\\) 的最小值是 -1。",
+          answer: "**正确。**当 \\(x = 1\\) 时，\\(y = 2 - 4 + 1 = -1\\)，开口向上故为最小值。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "抛物线 \\(y = x^2 - 2x - 3\\) 与 x 轴的交点个数是（　）",
+          options: ["A. 0 个", "B. 1 个", "C. 2 个", "D. 3 个"],
+          correctIndex: 2,
+          answer: "**C**。\\(\\Delta = (-2)^2 - 4 \\times 1 \\times (-3) = 16 > 0\\)，与 x 轴有两个交点。"
+        }
+      ]
     }
   ]
 }

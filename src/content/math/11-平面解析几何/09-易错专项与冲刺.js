@@ -57,10 +57,10 @@ export default {
         },
         {
           type: "single", difficulty: "sprint",
-          question: "直线 \\(y = x + 1\\) 与圆 \\(x^2 + y^2 = 1\\) 的位置关系是（　）",
+          question: "直线 \\(y = x - 2\\) 与圆 \\(x^2 + y^2 = 1\\) 的位置关系是（　）",
           options: ["相离", "相切", "相交", "无法确定"],
-          correctIndex: 2,
-          answer: "**C**。圆心 \\((0,0)\\) 到直线 \\(x - y + 1 = 0\\) 的距离 \\(d = \\frac{|1|}{\\sqrt{1^2 + 1^2}} = \\frac{\\sqrt{2}}{2} \\approx 0.707 < 1\\)（半径），故直线与圆**相交**。"
+          correctIndex: 0,
+          answer: "**A**。圆心 \\((0,0)\\) 到直线 \\(x - y - 2 = 0\\) 的距离 \\(d = \\frac{|-2|}{\\sqrt{1^2 + (-1)^2}} = \\sqrt{2} \\approx 1.414 > 1\\)（半径），故直线与圆**相离**。"
         },
         {
           type: "single", difficulty: "sprint",

@@ -143,6 +143,61 @@ export default {
           answer: "解：焦点在 \\(x\\) 轴，故 \\(a^2 = m\\)，\\(b^2 = 4\\)，需 \\(m > 4\\)。\n\\(c^2 = a^2 - b^2 = m - 4\\)。\n由 \\(e^2 = \\dfrac{c^2}{a^2} = \\dfrac{m-4}{m} = \\left(\\dfrac{\\sqrt{2}}{2}\\right)^2 = \\dfrac{1}{2}\\)\n解得 \\(2(m-4) = m\\)，即 \\(m = 8\\)。\n验证：\\(a^2 = 8 > b^2 = 4\\)，符合条件。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "椭圆 \\(\\dfrac{x^2}{25} + \\dfrac{y^2}{9} = 1\\) 的焦点在 \\(x\\) 轴上。",
+          answer: "**正确。**\\(x^2\\) 分母 25 大于 \\(y^2\\) 分母 9，焦点在 \\(x\\) 轴上（分母较大者对应焦点所在轴）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "椭圆上任意一点到两个焦点的距离之和都相等。",
+          answer: "**正确。**这是椭圆的定义：到两焦点距离之和等于常数 \\(2a\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "椭圆 \\(\\dfrac{x^2}{16} + \\dfrac{y^2}{9} = 1\\) 中 \\(c = \\)（　）",
+          options: ["A. 5", "B. \\(\\sqrt{7}\\)", "C. 7", "D. \\(\\sqrt{5}\\)"],
+          correctIndex: 1,
+          answer: "答案：B。\\(a^2 = 16\\)，\\(b^2 = 9\\)，\\(c^2 = a^2 - b^2 = 7\\)，故 \\(c = \\sqrt{7}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：椭圆上任意一点到两个焦点的距离之和为常数。",
+          answer: "**正确。**该常数等于 \\(2a\\)，也是椭圆的定义。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：椭圆 \\(\\frac{x^2}{9} + \\frac{y^2}{4} = 1\\) 的焦点在 y 轴上。",
+          answer: "**错误。**\\(a^2 = 9\\) 对应 x 轴，故焦点在 x 轴上。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "椭圆 \\(\\frac{x^2}{25} + \\frac{y^2}{9} = 1\\) 的长半轴长为（　）",
+          options: ["A. 3", "B. 4", "C. 5", "D. 25"],
+          correctIndex: 2,
+          answer: "**C**。\\(a^2 = 25\\)，故 \\(a = 5\\)。"
+        }
+      ]
     }
   ]
 }

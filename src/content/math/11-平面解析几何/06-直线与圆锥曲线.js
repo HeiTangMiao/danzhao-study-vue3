@@ -126,6 +126,61 @@ export default {
           answer: "解：\\(x_1+x_2=\\dfrac{6}{2}=3\\)，\\(x_1 x_2=\\dfrac{1}{2}\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "直线与圆锥曲线方程联立消元后，若所得一元二次方程的判别式 \\(\\Delta > 0\\)，则直线与曲线有两个公共点。",
+          answer: "**正确。**判别式大于零对应两个不同的交点，是联立法的核心判定依据。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "直线与椭圆相交所得弦的长度可用 \\(|AB| = \\sqrt{1+k^2}\\,|x_1 - x_2|\\) 计算（\\(k\\) 为直线斜率）。",
+          answer: "**正确。**这是弦长公式：\\(|AB| = \\sqrt{1+k^2}\\,|x_1-x_2|\\)，也可写为 \\(\\sqrt{1+\\dfrac{1}{k^2}}\\,|y_1-y_2|\\)。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "直线 \\(y = x + 1\\) 与抛物线 \\(y^2 = 4x\\) 的公共点个数是（　）",
+          options: ["A. 0", "B. 1", "C. 2", "D. 无法确定"],
+          correctIndex: 1,
+          answer: "答案：B。联立得 \\((x+1)^2 = 4x\\)，即 \\(x^2 - 2x + 1 = 0\\)，\\(\\Delta = 0\\)，直线与抛物线相切，只有 1 个公共点。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：直线与圆的位置关系可用圆心到直线的距离与半径的大小比较来判断。",
+          answer: "**正确。**\\(d < r\\) 相交、\\(d = r\\) 相切、\\(d > r\\) 相离。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：直线与抛物线只有一个公共点时一定相切。",
+          answer: "**错误。**与对称轴平行的直线与抛物线也只有一个交点，但不是相切。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "直线 \\(y = x + 1\\) 与圆 \\(x^2 + y^2 = 1\\) 的位置关系是（　）",
+          options: ["A. 相交", "B. 相切", "C. 相离", "D. 无法判断"],
+          correctIndex: 0,
+          answer: "**A**。圆心到直线距离 \\(d = \\frac{|0 - 0 + 1|}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2} < 1 = r\\)，故相交。"
+        }
+      ]
     }
   ]
 }

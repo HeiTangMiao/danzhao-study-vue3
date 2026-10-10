@@ -218,6 +218,33 @@ export default {
           answer: "答案：\\(f(-3) > f(2)\\)。因为 \\(f(x)\\) 是偶函数，\\(f(-3) = f(3)\\)。又因为 \\(f(x)\\) 在 \\([0,+\\infty)\\) 上是增函数，且 \\(3 > 2\\)，所以 \\(f(3) > f(2)\\)，即 \\(f(-3) > f(2)\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：函数的定义域可以是空集。",
+          answer: "**错误。**函数要求定义域非空（对定义域内每一个 x 都有唯一 y 对应），空集不构成函数。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若两个函数的定义域和对应关系都相同，则它们是同一个函数。",
+          answer: "**正确。**函数的三要素是定义域、对应关系、值域；前两者相同则两函数相同。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "下列函数中，与 \\(y = x\\) 表示同一函数的是（　）",
+          options: ["A. \\(y = \\sqrt{x^2}\\)", "B. \\(y = \\frac{x^2}{x}\\)", "C. \\(y = (\\sqrt{x})^2\\)", "D. \\(y = \\sqrt[3]{x^3}\\)"],
+          correctIndex: 3,
+          answer: "**D**。A 为 \\(|x|\\)；B 定义域为 \\(x \\neq 0\\)；C 定义域为 \\(x \\ge 0\\)；只有 D 定义域为 \\(\\mathbb{R}\\) 且值为 \\(x\\)。"
+        }
+      ]
     }
   ]
 }

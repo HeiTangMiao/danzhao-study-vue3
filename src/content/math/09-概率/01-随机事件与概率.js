@@ -126,6 +126,61 @@ export default {
           answer: "解：用对立事件。两人都没击中概率 \\(= (1-0.6)(1-0.7) = 0.4 \\times 0.3 = 0.12\\)。至少一人击中 \\(= 1 - 0.12 = 0.88\\)。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "必然事件的概率为 1，不可能事件的概率为 0。",
+          answer: "**正确。**这是概率的基本性质，也是事件分类的基准。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "若事件 \\(A\\) 与事件 \\(B\\) 互斥，则它们一定是对立事件。",
+          answer: "**错误。**互斥只要求不能同时发生；对立还要求二者必有一个发生。互斥不一定对立，对立一定互斥。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          question: "掷一枚均匀骰子，出现偶数点的概率是（　）",
+          options: ["A. \\(\\dfrac{1}{6}\\)", "B. \\(\\dfrac{1}{3}\\)", "C. \\(\\dfrac{1}{2}\\)", "D. \\(\\dfrac{2}{3}\\)"],
+          correctIndex: 2,
+          answer: "答案：C。偶数点有 2、4、6 共 3 个，概率为 \\(\\dfrac{3}{6} = \\dfrac{1}{2}\\)。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：必然事件的概率为 1，不可能事件的概率为 0。",
+          answer: "**正确。**这是概率的基本性质，常用于检验计算结果是否合理。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：某事件发生的概率为 0.6，则该事件一定发生。",
+          answer: "**错误。**概率只描述发生的可能性大小，随机事件单次试验中不一定发生。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "掷一枚均匀的骰子，出现点数大于 4 的概率是（　）",
+          options: ["A. \\(\\frac{1}{2}\\)", "B. \\(\\frac{1}{3}\\)", "C. \\(\\frac{1}{6}\\)", "D. \\(\\frac{2}{3}\\)"],
+          correctIndex: 1,
+          answer: "**B**。点数大于 4 为 5、6 两种情况，\\(P = \\frac{2}{6} = \\frac{1}{3}\\)。"
+        }
+      ]
     }
   ]
 }

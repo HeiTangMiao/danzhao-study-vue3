@@ -151,6 +151,61 @@ export default {
           answer: "解：\\(5.2 > 3.841\\)，有 95% 以上的把握认为两个变量有关。"
         }
       ]
+    },
+
+    // ---------- 快速检测（客观题 · 可判分） ----------
+    {
+      type: "quiz",
+      title: "快速检测（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "根据散点图，若数据点从左下方向右上方分布，说明两个变量正相关。",
+          answer: "**正确。**散点从左下到右上表明一个变量增大时另一个也整体增大，为正相关。"
+        },
+        {
+          difficulty: "medium",
+          type: "judge",
+          question: "线性回归直线一定经过样本点的中心 \\((\\bar{x}, \\bar{y})\\)。",
+          answer: "**正确。**回归直线方程 \\(\\hat{y} = \\hat{b}x + \\hat{a}\\) 的求法保证了它必经过样本中心点。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "独立性检验中，计算得到的卡方统计量 \\(\\chi^2\\) 的值越大，说明（　）",
+          options: ["A. 两个变量有关系的把握越小", "B. 两个变量有关系的把握越大", "C. 两个变量一定无关", "D. 两个变量一定有关"],
+          correctIndex: 1,
+          answer: "答案：B。\\(\\chi^2\\) 越大，说明实际数据与「无关」假设的偏离越大，认为两变量有关系的把握越大（需对照临界值判断）。"
+        }
+      ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：回归直线一定经过样本中心点 \\((\\bar{x}, \\bar{y})\\)。",
+          answer: "**正确。**最小二乘法求得的回归直线必过样本中心点。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：相关系数 r 的绝对值越接近 1，两个变量的线性相关越强。",
+          answer: "**正确。**\\(|r| \\le 1\\)，越接近 1 线性相关性越强，越接近 0 越弱。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在回归分析中，相关系数 \\(r = -0.9\\) 表示两变量（　）",
+          options: ["A. 正相关且相关性很强", "B. 负相关且相关性很强", "C. 几乎不相关", "D. 无法判断"],
+          correctIndex: 1,
+          answer: "**B**。\\(r < 0\\) 为负相关，\\(|r| = 0.9\\) 接近 1，相关性强。"
+        }
+      ]
     }
   ]
 }
