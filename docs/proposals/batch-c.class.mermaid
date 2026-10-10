@@ -1,0 +1,88 @@
+classDiagram
+    direction TB
+
+    class SpacedReview {
+        <<纯函数 · H7 · due/掌握唯一真相源>>
+        +GRADES : AGAIN0/HARD3/GOOD4/EASY5
+        +GRADE_META : [{grade,key,label,tone}]
+        +REVIEW_SESSION_LIMIT = 25
+        +CARD_KINDS : error|stuck
+        +calculateSM2(error, grade) SM2
+        +isMastered(e) boolean
+        +hasReviewed(e) boolean
+        +isDue(e, today) boolean
+        +countDue(list, today) int
+        +pickDue(list, opts) Row[]
+        +gradeCard(db, error, grade) Next
+        +removeMastered() int
+    }
+    class SM2 {
+        +interval : int
+        +repetitions : int
+        +easeFactor : number
+        +nextReviewDate : YYYY-MM-DD
+    }
+    class ErrorBookRow {
+        <<IDB error_book · v7 零升版>>
+        +question / correctAnswer / userAnswer
+        +easeFactor / interval / repetitions
+        +nextReviewDate / lastReviewedAt
+        +reviewCount / wrongCount
+        +reviewed : 退役(只读历史)
+        +legacyMastered? : bool(迁移固化)
+        +reason? / kp? : 批A归因
+        +source? : 'cloze'(批B)
+        +kind? / module? : 'stuck'(C-2)
+    }
+    class ReviewStore {
+        <<Pinia src/stores/review.js>>
+        +queue : Row[]
+        +index : int
+        +phase : idle|loading|session|cleared|done
+        +flipped : bool
+        +kindFilter : null|error|stuck
+        +progress : {total,done,again}
+        +startSession(opts)
+        +flip()
+        +grade(g)
+        +quit()
+    }
+    class ReviewView {
+        <<src/views/ReviewView.vue · 单卡会话>>
+        +顶栏进度 / 退出二次确认
+        +phase=cleared → 今日已清零 + 引导
+        +phase=done → 结算 + 清理已掌握
+    }
+    class GradeButtons {
+        <<四档 + 间隔预览>>
+        +props.error / emits.pick(grade)
+        +预览 = calculateSM2(error,g).interval（零副作用）
+    }
+    class StuckCard {
+        <<操作名/路径 默写形态>>
+        +props.card / props.revealed
+        +正面=操作名+模块 / 背面=路径或快捷键
+    }
+    class StuckCardComposer {
+        <<录入：模块+操作名+路径/快捷键>>
+        +三者非空校验
+        +移动端输入约定(批B共享知识5)
+    }
+    class StudyDb {
+        <<零升版 · 行内加字段>>
+        +recordError(...,extra)
+        +recordStuck(module,action,path,opts)
+        +migrateLegacyMastered() int
+        +updateError(row)
+    }
+
+    SpacedReview --> SM2 : 产出
+    SpacedReview ..> ErrorBookRow : isDue/isMastered 判据
+    StudyDb --> ErrorBookRow : CRUD（含 recordStuck/迁移）
+    ReviewStore ..> SpacedReview : pickDue/gradeCard
+    ReviewStore --> ErrorBookRow : 队列持有
+    ReviewView --> ReviewStore : 会话编排
+    ReviewView --> GradeButtons : 四档评分
+    ReviewView --> StuckCard : kind==='stuck' 分支
+    StuckCardComposer ..> StudyDb : recordStuck
+    GradeButtons ..> SpacedReview : 间隔预览（纯求值）
