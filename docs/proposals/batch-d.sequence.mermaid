@@ -1,0 +1,56 @@
+sequenceDiagram
+    autonumber
+    participant Author as 内容侧内容文件
+    participant Build as build-practice-bank.mjs
+    participant PB as practiceBank.js
+    participant CP as composePaper.js
+    participant PS as practice store
+    participant PH as PracticeHome.vue
+    participant PSess as PracticeSession.vue
+    participant PR as PracticeResult.vue
+    participant CB as ClozeBlock.vue
+    participant AN as answerNorm.answerMatches
+    participant ST as studyPlan store
+    participant PV as PlanView.vue
+    participant DB as studyDb(error_book)
+
+    Note over Author,AN: ① D-0 句级 strict：误判对红线修复
+    Author->>CB: clozeItem { text:'辗转{{反}}侧', strict:true }
+    CB->>CB: items/blanks 携带 strict（句级）
+    CB->>AN: blankMatches(typed='返', blank{strict:true})
+    AN-->>CB: answerMatches(t, main, undefined) → matched:false（不传 variantMap）
+    Note over CB: strict 句禁用全局「反→返」→「返」判错（红线修复）；<br/>无 strict 句仍传 variantMap（既有行为回归锚）
+
+    Note over Build,PB: ② D-3 kp 构建期派生（A 档）
+    Build->>PB: entry.kp = fileKey（产物增扁平键 kp）
+    PB->>PB: normalizeBankItem 展开 kp（缺省回落 fk）
+
+    Note over PS,PR: ③ D-1 限时仿真三档
+    PH->>PS: startTimed('t150')
+    PS->>PS: TIMED_PRESETS 取档位（150/60min, includeExam:true）
+    PS->>CP: composePaper(allSubjectsItems, {count:150, includeExam:true, maxPerPage:5, weightDimension})
+    CP-->>PS: 全科混卷 150 题（页级上限生效）
+    PS->>PS: startSession({timed:true, durationSec:3600, deadline})
+    PSess->>PSess: setInterval 按 deadline-Date.now() 校准倒计时
+    alt 倒计时到 0
+        PSess->>PS: finishSession()（自动交卷）
+    else 中途提前交卷
+        PSess->>PS: 二次确认 → finishSession()
+    end
+    PS->>DB: addAttempts（question_attempt，source:'practice'，含 elapsedMs）
+    PS-->>PR: phase='result'
+    PR->>PR: 复用既有「平均单题耗时 + 超时题数 + 两行正确率」面板（A-2）
+    PR->>PR: session.timed → 「距上次仿真 N 天（建议 ≥14 天）」（读 localStorage sim_last_at）
+
+    Note over ST,PV: ④ D-2 学习计划三件套（localStorage study_plan_v1）
+    PV->>ST: load()
+    ST-->>PV: budget / milestones / tasks
+    PV->>ST: setBudget/addTask/toggleTask → save()
+    ST->>ST: todayList = 未完成 && dueDate <= 今天（顺延=计算，不写惩罚字段）
+    PV->>PV: 预算合计≠32h → 温和提示（不阻断）
+
+    Note over PS,CP: ⑤ D-3 kp 权重维度（消费面）
+    PS->>DB: getAllErrors()
+    PS->>CP: weakWeightsFromErrors(errors, 5, 'kp')（按 error.fileKey 聚合！非 e.kp）
+    CP-->>PS: { 'math|math_11_03-椭圆': 7, ... }
+    PS->>CP: composePaper(items, { weightDimension:'kp', unitWeights })

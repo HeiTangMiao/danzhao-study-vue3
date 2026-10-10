@@ -1,0 +1,96 @@
+classDiagram
+    direction TB
+
+    class ClozeItem {
+        <<schema · clozeItem · D-0 句级 strict>>
+        +text : string
+        +alts? : string[]
+        +strict? : boolean(句级：true 禁用全局通假映射)
+    }
+    class ClozeBlock {
+        <<src/components/blocks/ClozeBlock.vue>>
+        +items : {文本,空位,alts,strict}
+        +blankMatches(typed, blank) boolean
+        +submitDictation()
+    }
+    class AnswerNorm {
+        <<src/content/answerNorm.js · 判分唯一入口>>
+        +answerMatches(user, expect, opts) {matched,mode}
+        +normalizeAnswer(raw, opts)
+        +extractCandidates(expect, opts)
+        +opts.variantMap 缺省 → 不应用通假映射(strict 分支靠此)
+    }
+    class ClozeVariants {
+        <<src/content/clozeVariants.js · 纯数据>>
+        +CLOZE_VARIANTS : 反→返 / 说→悦 / …
+    }
+
+    class BankItem {
+        <<public/practice-bank/{subject}.json>>
+        +k / s / u / ut / fi / fk
+        +kp : fileKey(=fk) · D-3 A 档构建期派生
+        +q / a / d / it / g / dv / vf / nz / sr
+    }
+    class PracticeBank {
+        <<src/content/practiceBank.js · 形状单一来源>>
+        +BANK_ITEM_KEYS : 含 kp
+        +normalizeBankItem(raw) : 展开 kp(缺省回落 fk)
+        +paperKeyOf(item)
+    }
+    class ComposePaper {
+        <<src/utils/composePaper.js · 纯函数>>
+        +WEIGHT_DIMENSIONS : unit|kp
+        +weightKeyOf(item, dim)
+        +weakWeightsFromErrors(errors, topN, dim)
+        +composePaper(items, opt) : 含 weightDimension/maxPerPage
+    }
+    class PracticeStore {
+        <<src/stores/practice.js>>
+        +TIMED_PRESETS : 25/10 · 50/20 · 150/60
+        +draft / session{timed,durationSec,deadline}
+        +startTimed(presetId, scope)
+        +finishSession()
+    }
+    class PracticeSession {
+        <<src/views/practice/PracticeSession.vue>>
+        +倒计时(deadline 校准)
+        +到点自动交卷 / 提前交卷
+    }
+    class PracticeResult {
+        <<src/views/practice/PracticeResult.vue>>
+        +两行正确率(自动判/自评)
+        +平均单题耗时 / 超时题数（既有 A-2）
+        +≤14 天提示(v-if timed)
+    }
+
+    class StudyPlanStore {
+        <<src/stores/studyPlan.js · localStorage study_plan_v1>>
+        +WEEKLY_BUDGET_HOURS = 32
+        +budget / budgetValid
+        +milestones / countdowns
+        +tasks / todayList(顺延=计算)
+        +addTask/toggleTask/setBudget/save/load
+    }
+    class PlanView {
+        <<src/views/PlanView.vue>>
+        +周预算表 / 里程碑倒计时 / 每日清单
+    }
+    class StudyDb {
+        <<src/stores/studyDb.js · v7>>
+        +getAllErrors()
+        +exportAllData() : localStorage 备份键
+    }
+
+    ClozeBlock ..> AnswerNorm : blankMatches 调用
+    ClozeBlock ..> ClozeVariants : 非 strict 句传 variantMap
+    AnswerNorm --> ClozeItem : 判分契约 {matched,mode}
+    PracticeBank ..> BankItem : 形状定义
+    ComposePaper ..> PracticeBank : paperKeyOf
+    PracticeStore --> ComposePaper : composePaper/weakWeightsFromErrors
+    PracticeStore ..> BankItem : 组卷条目（含 kp）
+    PracticeSession --> PracticeStore : 会话编排
+    PracticeResult --> PracticeStore : resultStats/attempts
+    PracticeStore ..> StudyDb : addAttempts / getAllErrors
+    ComposePaper ..> StudyDb : errors 按 fileKey 聚合（kp 维度）
+    PlanView --> StudyPlanStore : 三件套
+    StudyPlanStore ..> StudyDb : exportAllData 备份（localStorage）
