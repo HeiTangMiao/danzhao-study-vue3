@@ -9,7 +9,7 @@
    画板代码原先是内容数据里的 initCode 字符串，运行期用 new Function 编译。
    生产 CSP 的 script-src 'self' 不含 'unsafe-eval'，桌面端（WKWebView）必然抛
    EvalError → 20 张几何图全部渲染不出来。
-   现在 initCode 已一次性 codemod 成 20 个真实 ES 模块（见 scripts/codemod-initcode.mjs），
+   现在 initCode 已一次性 codemod 成 20 个真实 ES 模块（脚本已删除，不再保留），
    每个 boardId 一个文件、由 Vite 编译成独立惰性 chunk：
      - 零 eval，CSP 一字未改
      - 语法错误从此是构建错误，不再是运行时炸

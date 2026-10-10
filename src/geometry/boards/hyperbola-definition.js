@@ -1,7 +1,7 @@
 /**
  * 几何画板：hyperbola-definition
  *
- * 由 scripts/codemod-initcode.mjs 从内容页提取（来源：src/content/math/11-平面解析几何/04-双曲线.js）。
+ * 由一次性 codemod 从内容页提取（脚本已删除；来源：src/content/math/11-平面解析几何/04-双曲线.js）。
  * 原先这段是内容数据里的 initCode 字符串、运行期用 new Function 编译，
  * 会被生产 CSP 的 script-src 'self' 拦下；现在是真实 ES 模块，由 Vite 编译、按 boardId 惰性加载。
  *

@@ -1,7 +1,7 @@
 /**
  * 几何画板：vector-scalar-multiplication
  *
- * 由 scripts/codemod-initcode.mjs 从内容页提取（来源：src/content/math/07-平面向量/01-向量的概念与线性运算.js）。
+ * 由一次性 codemod 从内容页提取（脚本已删除；来源：src/content/math/07-平面向量/01-向量的概念与线性运算.js）。
  * 原先这段是内容数据里的 initCode 字符串、运行期用 new Function 编译，
  * 会被生产 CSP 的 script-src 'self' 拦下；现在是真实 ES 模块，由 Vite 编译、按 boardId 惰性加载。
  *
