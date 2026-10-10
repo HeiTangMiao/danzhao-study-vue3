@@ -95,6 +95,13 @@
           <span class="tool-desc">回顾与复习错题</span>
         </div>
       </router-link>
+      <router-link to="/plan" class="tool-card" style="border-top-color: #8da06f">
+        <span class="tool-icon"><AppIcon name="clipboard-list" :size="20" /></span>
+        <div class="tool-text">
+          <span class="tool-name">学习计划</span>
+          <span class="tool-desc">预算 · 倒计时 · 清单</span>
+        </div>
+      </router-link>
       <router-link v-if="sprintUnit" :to="mockRoute" class="tool-card" style="border-top-color: #a855f7">
         <span class="tool-icon"><AppIcon name="crosshair" :size="20" /></span>
         <div class="tool-text">

@@ -55,6 +55,12 @@ const routes = [
     component: () => import('@/views/DashboardView.vue')
   },
   {
+    // 学习计划（D-2 P0-7）：二级入口，无 meta.tab（进二级页隐藏底部 pill，与 /dashboard 同款）
+    path: '/plan',
+    name: 'plan',
+    component: () => import('@/views/PlanView.vue')
+  },
+  {
     // 错题本
     path: '/error-book',
     name: 'error-book',

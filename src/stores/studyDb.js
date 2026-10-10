@@ -859,7 +859,8 @@ export const useStudyDbStore = defineStore('studyDb', {
       ])
 
       // 收集 localStorage 中与应用相关的数据（仅仍实际写入的键，避免备份历史残留键）
-      const lsKeys = ['pomodoro_state', 'math_theme']
+      // study_plan_v1：D-2 学习计划三件套（缺失会导致「导出备份不含学习计划」）
+      const lsKeys = ['pomodoro_state', 'math_theme', 'study_plan_v1']
       const lsData = {}
       for (const k of lsKeys) {
         try {
