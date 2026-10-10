@@ -195,8 +195,8 @@ export default {
         {
           difficulty: "basic",
           type: "judge",
-          question: "操作系统是用户与计算机硬件之间的接口。",
-          answer: "**正确。**操作系统是最基本的系统软件，负责管理硬件资源并为用户提供操作界面。"
+          question: "CPU 可以直接访问硬盘、U 盘等外存储器中的数据，不需要先调入内存。",
+          answer: "**错误。**CPU 只能直接访问内存储器；硬盘、U 盘属于外存储器，其中的数据必须先调入内存后才能被 CPU 处理。"
         },
         {
           difficulty: "medium",

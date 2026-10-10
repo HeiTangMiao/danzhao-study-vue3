@@ -68,10 +68,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "执行以下代码，输出结果是（　）\n```\nx = 75\nif x >= 90:\n    print(\"A\")\nelif x >= 80:\n    print(\"B\")\nelif x >= 60:\n    print(\"C\")\nelse:\n    print(\"D\")\n```",
+          question: "执行以下代码，输出结果是（　）\n```\nx = 55\nif x >= 90:\n    print(\"A\")\nelif x >= 80:\n    print(\"B\")\nelif x >= 60:\n    print(\"C\")\nelse:\n    print(\"D\")\n```",
           options: ["A. A", "B. B", "C. C", "D. D"],
-          correctIndex: 2,
-          answer: "答案：C。75 满足 ≥60，输出 C。"
+          correctIndex: 3,
+          answer: "答案：D。55 不满足任何 if / elif 条件，执行 else 分支，输出 D。"
         },
         {
           difficulty: "medium",
@@ -104,10 +104,10 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "下列程序想求 1 到 100 中所有偶数的和，正确的是（　）",
-          options: ["A. `sum = 0` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "B. `sum = 0` `for i in range(1, 101, 2):` `sum += i`", "C. `sum = 1` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "D. A 和 B 都对"],
+          question: "下列程序想求 1 到 100 中所有能被 3 整除的数之和，正确的是（　）",
+          options: ["A. `sum = 0` `for i in range(1, 101):` `if i % 3 == 0:` `sum += i`", "B. `sum = 0` `for i in range(1, 101):` `if i / 3 == 0:` `sum += i`", "C. `sum = 0` `for i in range(1, 101):` `if i % 3 == 1:` `sum += i`", "D. `sum = 0` `for i in range(3, 100):` `sum += i`"],
           correctIndex: 0,
-          answer: "答案：A。A 判断偶数累加正确；B 取的是奇数；C 累加器初始化为 1 错误。"
+          answer: "答案：A。判断整除必须用取模 `%`，余数为 0 即能整除。B 用了除法 `/`，只有 i 为 0 时才成立；C 取的是除以 3 余 1 的数；D 未作判断，直接累加了 3～99 的所有整数。"
         },
         {
           difficulty: "basic",
@@ -167,10 +167,10 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "提示符为 `Switch(config)#` 时，当前处于（　）",
-          options: ["A. 用户模式", "B. 特权模式", "C. 全局配置模式", "D. 接口配置模式"],
-          correctIndex: 2,
-          answer: "答案：C。`(config)#` 是全局配置模式。"
+          question: "在特权模式下，查看交换机当前运行配置的命令是（　）",
+          options: ["A. `show running-config`", "B. `show ip route`", "C. `configure terminal`", "D. `enable`"],
+          correctIndex: 0,
+          answer: "答案：A。`show running-config` 查看当前生效的配置；B 查看路由表，C 进入全局配置模式，D 由用户模式进入特权模式。"
         },
         {
           difficulty: "medium",
@@ -343,10 +343,10 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "去除视频中白色背景应使用（　）特效",
-          options: ["A. 颜色键", "B. 亮度与对比度", "C. 模糊", "D. 锐化"],
+          question: "在 Premiere 中要让字幕从画面左侧飞入，应设置（　）属性的关键帧",
+          options: ["A. 位置", "B. 不透明度", "C. 缩放", "D. 旋转"],
           correctIndex: 0,
-          answer: "答案：A。颜色键去背景。"
+          answer: "答案：A。位移类动画由「位置」属性的关键帧产生（起点在画外、终点在画内）；不透明度控制淡入淡出，缩放控制大小，旋转控制角度。"
         },
         {
           difficulty: "advanced",
@@ -389,8 +389,8 @@ export default {
           difficulty: "advanced",
           type: "solve",
           score: 5,
-          question: "在 Premiere 中新建字幕，内容\"民间手艺 剪纸\"，隶书，字体大小 65，字距 -10，线性渐变 #FDFDC8 到 #FDC177，并添加阴影。请写出操作步骤。",
-          answer: "文件→新建→字幕 → 输入文字 → 设隶书 65、字距 -10 → 填充线性渐变 #FDFDC8→#FDC177 → 勾选阴影 → 保存为字幕.prtl。"
+          question: "在 Premiere 中新建字幕，内容\"匠心向党 技能报国\"，黑体，字体大小 72，字距 5，线性渐变 #FFFFFF 到 #C62828，并添加黑色描边。请写出操作步骤。",
+          answer: "文件→新建→字幕 → 输入文字\"匠心向党 技能报国\" → 设黑体、字号 72、字距 5 → 填充设为线性渐变 #FFFFFF→#C62828 → 勾选描边并设黑色、调整宽度 → 保存为字幕.prtl。"
         },
         {
           difficulty: "advanced",
