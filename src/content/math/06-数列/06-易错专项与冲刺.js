@@ -70,6 +70,19 @@ export default {
           answer: "**A**。\\(a_4 = a_1 q^3\\)，即 \\(8 = q^3\\)，\\(q = 2\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若数列 \\(\\{a_n\\}\\) 满足 \\(a_{n+1} - a_n = 2\\)（\\(n \\in \\mathbb{N}^*\\)），则它是等差数列。",
+          answer: "**正确。**相邻两项之差为常数 2，符合等差数列的定义，公差 \\(d = 2\\)。"
+        }
+      ]
     }
   ]
 }

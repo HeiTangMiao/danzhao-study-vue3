@@ -217,6 +217,12 @@ export default {
           options: ["A. 0 个", "B. 1 个", "C. 2 个", "D. 3 个"],
           correctIndex: 2,
           answer: "**C**。\\(\\Delta = (-2)^2 - 4 \\times 1 \\times (-3) = 16 > 0\\)，与 x 轴有两个交点。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：二次函数 \\(y = ax^2 + bx + c\\)（\\(a \\neq 0\\)）中，当 \\(a > 0\\) 时函数有最小值。",
+          answer: "**正确。**\\(a > 0\\) 时抛物线开口向上，顶点处取得最小值 \\(\\frac{4ac - b^2}{4a}\\)。"
         }
       ]
     }

@@ -82,6 +82,19 @@ export default {
           }
         ]
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：空集 \\(\\varnothing\\) 是任何集合的子集，也是任何非空集合的真子集。",
+          answer: "**正确。**空集是任何集合的子集；对任何非空集合 \\(A\\)，都有 \\(\\varnothing \\subsetneq A\\)，即空集是其真子集。"
+        }
+      ]
     }
   ]
 }

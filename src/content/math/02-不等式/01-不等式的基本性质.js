@@ -201,6 +201,12 @@ export default {
           options: ["A. \\(a^2 < b^2\\)", "B. \\(\\frac{1}{a} < \\frac{1}{b}\\)", "C. \\(a^2 > b^2\\)", "D. \\(|a| < |b|\\)"],
           correctIndex: 2,
           answer: "**C**。\\(a < b < 0\\) 说明 \\(|a| > |b|\\)，故 \\(a^2 > b^2\\)；取倒数后 \\(\\frac{1}{a} > \\frac{1}{b}\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(a > b\\)，则 \\(a - 5 > b - 5\\)。",
+          answer: "**正确。**不等式两边同减同一个数 5，不等号方向不变，故 \\(a - 5 > b - 5\\)。"
         }
       ]
     }

@@ -70,6 +70,19 @@ export default {
           answer: "**B**。用辅助角公式：\\(a = 1\\)，\\(b = \\sqrt{3}\\)，振幅 \\(A = \\sqrt{a^2 + b^2} = \\sqrt{1 + 3} = 2\\)，点 \\((1, \\sqrt{3})\\) 在第一象限，\\(\\tan\\varphi = \\sqrt{3}\\)，故 \\(\\varphi = \\frac{\\pi}{3}\\)，即 \\(f(x) = 2\\sin\\left(x + \\frac{\\pi}{3}\\right)\\)。因为 \\(\\sin\\left(x + \\frac{\\pi}{3}\\right) \\le 1\\)，所以最大值为 2。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(\\sin^2\\alpha + \\cos^2\\alpha = 1\\) 对任意角 \\(\\alpha\\) 都成立。",
+          answer: "**正确。**这是同角三角函数的基本平方关系，对任意角 \\(\\alpha\\) 都成立。"
+        }
+      ]
     }
   ]
 }

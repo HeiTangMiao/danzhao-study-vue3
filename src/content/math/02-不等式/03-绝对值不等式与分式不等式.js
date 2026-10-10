@@ -202,6 +202,12 @@ export default {
           options: ["A. \\([-1, 2]\\)", "B. \\((-\\infty, -1] \\cup [2, +\\infty)\\)", "C. \\((-\\infty, -2] \\cup [1, +\\infty)\\)", "D. \\([2, +\\infty)\\)"],
           correctIndex: 1,
           answer: "**B**。\\(2x - 1 \\ge 3\\) 或 \\(2x - 1 \\le -3\\)，解得 \\(x \\ge 2\\) 或 \\(x \\le -1\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：不等式 \\(|x - 1| \\le 3\\) 的解集是 \\([-2, 4]\\)。",
+          answer: "**正确。**由 \\(|x - 1| \\le 3\\) 得 \\(-3 \\le x - 1 \\le 3\\)，解得 \\(-2 \\le x \\le 4\\)，解集为 \\([-2, 4]\\)。"
         }
       ]
     }

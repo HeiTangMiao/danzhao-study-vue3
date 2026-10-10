@@ -200,6 +200,12 @@ export default {
           options: ["A. 2", "B. 3", "C. 4", "D. 8"],
           correctIndex: 1,
           answer: "**B**。\\(8 = 2^3\\)，故 \\(x = 3\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：指数函数 \\(y = a^x\\)（\\(a > 0\\)，\\(a \\neq 1\\)）的值域是 \\((0, +\\infty)\\)。",
+          answer: "**正确。**指数函数恒取正值，图像始终在 \\(x\\) 轴上方，值域为 \\((0, +\\infty)\\)。"
         }
       ]
     }

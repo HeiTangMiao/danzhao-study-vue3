@@ -70,6 +70,19 @@ export default {
           answer: "**B**。高 \\(h = \\sqrt{l^2 - r^2} = \\sqrt{5^2 - 3^2} = \\sqrt{25 - 9} = 4\\)。体积 \\(V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi \\times 9 \\times 4 = 12\\pi\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若一条直线垂直于平面内两条相交直线，则该直线垂直于这个平面。",
+          answer: "**正确。**这是线面垂直的判定定理：一条直线垂直于平面内两条相交直线，则它垂直于该平面。"
+        }
+      ]
     }
   ]
 }

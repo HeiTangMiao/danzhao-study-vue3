@@ -70,6 +70,19 @@ export default {
           answer: "**B**。恰有一人命中分两种情况：甲中乙不中 \\(0.8 \\times 0.1 = 0.08\\)，甲不中乙中 \\(0.2 \\times 0.9 = 0.18\\)。两情况互斥，故 \\(P = 0.08 + 0.18 = 0.26\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若事件 \\(A\\) 与 \\(B\\) 互斥，则 \\(P(A \\cup B) = P(A) + P(B)\\)。",
+          answer: "**正确。**互斥事件满足 \\(A \\cap B = \\varnothing\\)，由概率加法公式得 \\(P(A \\cup B) = P(A) + P(B)\\)。"
+        }
+      ]
     }
   ]
 }

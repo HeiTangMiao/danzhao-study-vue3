@@ -214,6 +214,12 @@ export default {
           options: ["A. \\(y = 2x^2\\)", "B. \\(y = x^2 + 1\\)", "C. \\(y = x^{-2}\\)", "D. \\(y = 2^x\\)"],
           correctIndex: 2,
           answer: "**C**。幂函数形如 \\(y = x^\\alpha\\)（系数为 1、只有一项）；A 系数不为 1，B 是多项式，D 是指数函数。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：幂函数 \\(y = x^{\\frac{1}{2}}\\) 的定义域是 \\([0, +\\infty)\\)。",
+          answer: "**正确。**\\(y = x^{\\frac{1}{2}} = \\sqrt{x}\\)，被开方数需非负，故定义域为 \\([0, +\\infty)\\)。"
         }
       ]
     }

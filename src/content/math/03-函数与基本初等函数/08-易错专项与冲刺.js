@@ -70,6 +70,19 @@ export default {
           answer: "**A**。\\(f(x) = (x-1)^2 + 2\\)，对称轴 \\(x = 1 \\in [0, 3]\\)，最小值 \\(f(1) = 2\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：函数 \\(y = x^0\\) 的定义域是 \\(\\mathbb{R}\\)。",
+          answer: "**错误。**\\(x^0 = 1\\) 要求底数 \\(x \\neq 0\\)，故定义域为 \\(\\{x \\mid x \\neq 0\\}\\)，不是 \\(\\mathbb{R}\\)。"
+        }
+      ]
     }
   ]
 }

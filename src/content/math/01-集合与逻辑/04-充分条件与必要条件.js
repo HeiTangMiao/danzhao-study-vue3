@@ -219,6 +219,12 @@ export default {
           options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
           correctIndex: 0,
           answer: "**A**。\\(x = 2 \\Rightarrow x^2 - 4 = 0\\) 成立；反过来 \\(x^2 - 4 = 0\\) 还可能是 \\(x = -2\\)，故充分不必要。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：\\(a = b\\) 是 \\(ac = bc\\) 的充分条件。",
+          answer: "**正确。**由 \\(a = b\\) 两边同乘 \\(c\\) 得 \\(ac = bc\\)，充分性成立；但 \\(c = 0\\) 时逆向不成立，故它是充分不必要条件。"
         }
       ]
     }

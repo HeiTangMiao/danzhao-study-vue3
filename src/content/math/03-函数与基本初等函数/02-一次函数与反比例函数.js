@@ -201,6 +201,12 @@ export default {
           options: ["A. 5", "B. 6", "C. \\(\\frac{2}{3}\\)", "D. \\(\\frac{3}{2}\\)"],
           correctIndex: 1,
           answer: "**B**。由 \\(3 = \\frac{k}{2}\\) 得 \\(k = 6\\)（反比例函数中 \\(k = xy\\)）。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：反比例函数 \\(y = \\frac{k}{x}\\)（\\(k \\neq 0\\)）的图像是两条不相交的曲线，且不与坐标轴相交。",
+          answer: "**正确。**反比例函数图像为双曲线的两支，分布在两个象限内，渐近线是坐标轴，因此与坐标轴无交点。"
         }
       ]
     }

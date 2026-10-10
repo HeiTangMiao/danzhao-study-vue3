@@ -70,6 +70,19 @@ export default {
           answer: "**A**。利用『1 的代换』：\\(\\frac{1}{x} + \\frac{2}{y} = (x + 2y)\\left(\\frac{1}{x} + \\frac{2}{y}\\right) = 1 + \\frac{2x}{y} + \\frac{2y}{x} + 4 = 5 + \\frac{2x}{y} + \\frac{2y}{x}\\)。因为 \\(x, y > 0\\)，由均值不等式 \\(\\frac{2x}{y} + \\frac{2y}{x} \\ge 2\\sqrt{\\frac{2x}{y} \\cdot \\frac{2y}{x}} = 4\\)，所以原式 \\(\\ge 5 + 4 = 9\\)。当 \\(\\frac{2x}{y} = \\frac{2y}{x}\\) 即 \\(x = y = \\frac{1}{3}\\) 时取等，最小值为 9。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(a > b\\)，则 \\(\\frac{1}{a} < \\frac{1}{b}\\)。",
+          answer: "**错误。**只有当 \\(a > b > 0\\)（同为正数）时才有 \\(\\frac{1}{a} < \\frac{1}{b}\\)。如 \\(a = 1, b = -2\\) 时 \\(a > b\\)，但 \\(\\frac{1}{a} = 1 > -\\frac{1}{2} = \\frac{1}{b}\\)。"
+        }
+      ]
     }
   ]
 }

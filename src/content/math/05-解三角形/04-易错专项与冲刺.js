@@ -70,6 +70,19 @@ export default {
           answer: "**A**。已知两边及夹角，用余弦定理：\\(a^2 = b^2 + c^2 - 2bc\\cos A = 2^2 + 3^2 - 2 \\times 2 \\times 3 \\times \\cos 60° = 4 + 9 - 12 \\times \\frac{1}{2} = 13 - 6 = 7\\)，故 \\(a = \\sqrt{7}\\)。易错点：若误用正弦定理或把夹角代入错误会得到 \\(\\sqrt{13}\\) 等错误结果。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：在 \\(\\triangle ABC\\) 中，若 \\(A > B\\)，则 \\(a > b\\)。",
+          answer: "**正确。**三角形中大角对大边，由 \\(A > B\\) 可得 \\(a > b\\)（边角对应）。"
+        }
+      ]
     }
   ]
 }

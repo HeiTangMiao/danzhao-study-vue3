@@ -70,6 +70,19 @@ export default {
           answer: "**A**。\\(|\\boldsymbol{a}| = \\sqrt{3^2 + 4^2} = 5\\)。\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = |\\boldsymbol{a}||\\boldsymbol{b}|\\cos\\theta = 5 \\times 1 \\times \\cos\\theta = 5\\)，得 \\(\\cos\\theta = 1\\)，即 \\(\\boldsymbol{b}\\) 与 \\(\\boldsymbol{a}\\) 同向，故 \\(\\boldsymbol{b} = \\dfrac{\\boldsymbol{a}}{|\\boldsymbol{a}|} = (\\frac{3}{5}, \\frac{4}{5})\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：若 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\)，则 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 中至少有一个是零向量。",
+          answer: "**错误。**\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\) 也可能是两个非零向量垂直（\\(\\boldsymbol{a} \\perp \\boldsymbol{b}\\)），不一定含零向量。"
+        }
+      ]
     }
   ]
 }

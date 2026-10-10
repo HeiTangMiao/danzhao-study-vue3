@@ -243,6 +243,12 @@ export default {
           options: ["A. \\(y = \\sqrt{x^2}\\)", "B. \\(y = \\frac{x^2}{x}\\)", "C. \\(y = (\\sqrt{x})^2\\)", "D. \\(y = \\sqrt[3]{x^3}\\)"],
           correctIndex: 3,
           answer: "**D**。A 为 \\(|x|\\)；B 定义域为 \\(x \\neq 0\\)；C 定义域为 \\(x \\ge 0\\)；只有 D 定义域为 \\(\\mathbb{R}\\) 且值为 \\(x\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：奇函数的图像一定经过原点。",
+          answer: "**错误。**奇函数满足 \\(f(-x) = -f(x)\\)，只有当 \\(0\\) 在定义域内时才有 \\(f(0) = 0\\)；如 \\(f(x) = \\frac{1}{x}\\) 是奇函数，但定义域不含 0，图像不过原点。"
         }
       ]
     }

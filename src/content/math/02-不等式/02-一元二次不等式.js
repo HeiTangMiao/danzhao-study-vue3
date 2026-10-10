@@ -199,6 +199,12 @@ export default {
           options: ["A. \\((-2, 3)\\)", "B. \\((-3, 2)\\)", "C. \\((-\\infty, -2) \\cup (3, +\\infty)\\)", "D. \\(\\mathbb{R}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(x^2 - x - 6 = (x-3)(x+2) < 0\\)，开口向上、小于 0 取两根之间，即 \\(-2 < x < 3\\)。"
+        },
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：不等式 \\(x^2 + 1 > 0\\) 的解集是 \\(\\mathbb{R}\\)。",
+          answer: "**正确。**因为 \\(x^2 \\ge 0\\)，所以 \\(x^2 + 1 \\ge 1 > 0\\) 对一切实数都成立，解集为 \\(\\mathbb{R}\\)。"
         }
       ]
     }

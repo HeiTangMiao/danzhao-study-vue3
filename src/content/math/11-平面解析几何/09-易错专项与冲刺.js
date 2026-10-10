@@ -70,6 +70,19 @@ export default {
           answer: "**A**。\\(2p = 8\\)，\\(p = 4\\)，焦点 \\((\\frac{p}{2}, 0) = (2, 0)\\)。"
         }
       ]
+    },
+
+    {
+      type: "quiz",
+      title: "快速检测二（客观题）",
+      items: [
+        {
+          difficulty: "basic",
+          type: "judge",
+          question: "判断：当 \\(D^2 + E^2 - 4F > 0\\) 时，方程 \\(x^2 + y^2 + Dx + Ey + F = 0\\) 表示一个圆。",
+          answer: "**正确。**配方得 \\((x + \\frac{D}{2})^2 + (y + \\frac{E}{2})^2 = \\frac{D^2 + E^2 - 4F}{4}\\)，右边大于 0 时表示圆。"
+        }
+      ]
     }
   ]
 }
