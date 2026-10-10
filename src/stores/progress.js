@@ -1,9 +1,11 @@
 /**
  * progressStore —— 学习进度 Store（多学科隔离，由 page_progress 推导）
  * 职责：
- *  - 提供「按学科 → 单元 → 页面是否已完成」的内存快照（completed）
+ *  - 提供「按学科 → 单元 → 页面是否已接触」的内存快照（completed）
  *  - 唯一数据源 = studyDb 的 page_progress（每页事实记录）
- *  - 完成语义（访问即完成）：内容页打开（visited）即完成；测验 / 模拟卷页需交卷（testScore 非空）
+ *  - 「已接触」语义（访问即接触，P1-11 文案口径）：内容页打开（visited）即算；
+ *    测验 / 模拟卷页需交卷（testScore 非空）—— 测验页以 testScore 为主口径
+ *  - 「已掌握」是**另一个概念**（页面级手动标注 masteredAt，见 masteredCount），与「已接触」有意分离
  *  - 本 Store 只读缓存：写入侧是 markPageVisited / recordTest，进度变化后调用 refresh() 重建快照
  *    （旧版手动勾选完成 / user_progress.completed 已完成迁移，不再使用）
  */
@@ -82,10 +84,10 @@ export const useProgressStore = defineStore('progress', {
   }),
   getters: {
     /**
-     * 获取某学科某单元已完成的页面数
+     * 获取某学科某单元「已接触」的页面数（completed 快照计数）
      * @param {string} subject - 学科 key
      * @param {string} unitNum - 单元编号
-     * @returns {number} 已完成页面数
+     * @returns {number} 已接触页面数
      */
     completedCount: (state) => (subject, unitNum) => {
       const subj = state.completed[subject]
@@ -94,7 +96,7 @@ export const useProgressStore = defineStore('progress', {
       return u ? Object.keys(u).filter((k) => u[k]).length : 0
     },
     /**
-     * 判断某学科某页面是否已完成
+     * 判断某学科某页面是否「已接触」（completed 快照；「访问即接触」语义）
      * @param {string} subject - 学科 key
      * @param {string} unitNum - 单元编号
      * @param {number} fileIndex - 文件索引
@@ -119,12 +121,34 @@ export const useProgressStore = defineStore('progress', {
       return !!(subj[unitNum] && subj[unitNum][fileIndex])
     },
     /**
-     * 获取某学科所有已完成页面总数
+     * 获取某学科所有「已接触」页面总数（completed 快照计数）
+     * 语义 = 「访问即接触」：内容页 visited；测验页 visited && testScore!=null。
+     * ⚠️ 与复习侧 isMastered()（error_book SM-2）**不是**同一概念，勿混（§0.2/P1-11）。
      * @param {string} subject - 学科 key
      * @returns {number}
      */
     subjectTotalCompleted: (state) => (subject) => {
       const subj = state.completed[subject]
+      if (!subj) return 0
+      let count = 0
+      for (const unitNum in subj) {
+        const unit = subj[unitNum]
+        for (const k in unit) {
+          if (unit[k]) count++
+        }
+      }
+      return count
+    },
+    /**
+     * 获取某学科「已掌握」页面数（页面级 masteredAt，v4 页脚主行动）。
+     * ⚠️ 与复习侧 isMastered()（error_book SM-2：reps>=3 && interval>=7 OR legacyMastered）
+     *   是**两个不同表、不同粒度、不同信号**的「掌握」，本批**有意保持分离**、不合并
+     *   （§0.2）：本 getter 数的是**页面**（progress.mastered 快照），不是**卡片**。
+     * @param {string} subject - 学科 key
+     * @returns {number}
+     */
+    masteredCount: (state) => (subject) => {
+      const subj = state.mastered[subject]
       if (!subj) return 0
       let count = 0
       for (const unitNum in subj) {

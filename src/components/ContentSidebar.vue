@@ -161,7 +161,7 @@
           <div class="sb-progress__track">
             <div class="sb-progress__fill" :style="{ width: unitDonePct + '%' }"></div>
           </div>
-          <span class="sb-progress__text">{{ doneCount }}/{{ unit.files.length }} 已完成</span>
+          <span class="sb-progress__text">{{ doneCount }}/{{ unit.files.length }} 已接触</span>
         </div>
 
         <!-- 快捷操作：原「更多操作」二级抽屉（6 项）拍平进本抽屉（用户裁定：不再多访问一层）。

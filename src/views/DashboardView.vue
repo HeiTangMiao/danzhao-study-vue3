@@ -1,9 +1,9 @@
 <!--
   DashboardView —— 学习仪表盘（纯学习进度页）
   职责：
-   - 展示核心学习数据（已学页面 / 答题总数 / 错题 / 今日待复习）
+   - 展示核心学习数据（已接触页面 / 答题总数 / 错题 / 今日待复习）
    - 展示今日学习统计（访问页面 / 答题 / 学习时长）
-   - 展示各学科进度（基于内容配置计算总页面数）
+   - 展示各学科进度双轨（已接触 vs 已掌握，基于内容配置计算总页面数）
    - 学情分析与复习建议（基于错题本聚合薄弱知识点）
   游戏化元素（等级/XP/连击/热力图/成就）已彻底移除。
   数据来自 studyDb.getLearningOverview()。
@@ -32,7 +32,7 @@
         <div class="card stat-card">
           <div class="stat-icon"><AppIcon name="book-open" :size="22" /></div>
           <div class="stat-val">{{ overview.totalVisited }}</div>
-          <div class="stat-label">已学页面</div>
+          <div class="stat-label">已接触页面</div>
         </div>
         <div class="card stat-card">
           <div class="stat-icon"><AppIcon name="pencil" :size="22" /></div>
@@ -70,7 +70,9 @@
         </div>
       </section>
 
-      <!-- 学科进度概览 -->
+      <!-- 学科进度双轨（P1-11）：已接触（访问即接触，主轨）vs 已掌握（页面级手动标注，次轨）。
+           两「掌握」有意分离（§0.2）：本页次轨 = page_progress.masteredAt（页面级）；
+           复习侧 isMastered()（error_book SM-2）是另一概念，勿在此读取。 -->
       <section class="card subject-progress-card">
         <h2>学科进度</h2>
         <div class="subject-progress-list">
@@ -78,13 +80,25 @@
             <div class="subject-progress-head">
               <span class="subject-progress-icon"><AppIcon :name="meta.icon" :size="18" /></span>
               <span class="subject-progress-name">{{ meta.name }}</span>
-              <span class="subject-progress-pct">{{ subjPct(key) }}%</span>
+              <span class="subject-progress-pct">{{ contactedPct(key) }}%</span>
             </div>
-            <div class="subject-progress-bar">
-              <div class="subject-progress-fill" :style="{ width: subjPct(key) + '%' }"></div>
+            <!-- 主轨：已接触（progress.completed 语义：内容页 visited；测验页 visited && testScore!=null） -->
+            <div class="spb-row">
+              <span class="spb-label">已接触</span>
+              <div class="subject-progress-bar">
+                <div class="subject-progress-fill" :style="{ width: contactedPct(key) + '%' }"></div>
+              </div>
+              <span class="spb-num">{{ progress.subjectTotalCompleted(key) }}/{{ subjectTotals[key] }}</span>
+            </div>
+            <!-- 次轨：已掌握（页面级手动标注 masteredAt，与复习侧 SM-2 是两个概念） -->
+            <div class="spb-row">
+              <span class="spb-label">已掌握</span>
+              <div class="subject-progress-bar spb-bar--mastered">
+                <div class="subject-progress-fill spb-fill--mastered" :style="{ width: masteredPct(key) + '%' }"></div>
+              </div>
+              <span class="spb-num">{{ progress.masteredCount(key) }}/{{ subjectTotals[key] }}</span>
             </div>
             <div class="subject-progress-stats">
-              <span>{{ overview.subjects[key].visited }}/{{ subjectTotals[key] }} 页面</span>
               <span>答题 {{ overview.subjects[key].questions }} 题</span>
             </div>
           </div>
@@ -121,11 +135,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
+import { useProgressStore } from '@/stores/progress'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
 import { countDue } from '@/composables/useSpacedReview'
 import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
+// 学科进度的聚合真相源（已接触 / 已掌握）—— 视图只渲染，不内联重算（H7）
+const progress = useProgressStore()
 
 // 仪表盘数据
 const overview = ref(null)
@@ -133,12 +150,18 @@ const loading = ref(true)
 // 加载失败提示
 const error = ref('')
 
-// 学科完成百分比
-function subjPct(key) {
+// 「已接触」百分比（completed 快照 / 学科总页数）；测验页以 testScore 为主口径（由 store 聚合）
+function contactedPct(key) {
   const total = subjectTotals.value[key]
-  const visited = overview.value.subjects[key].visited || 0
   if (!total) return 0
-  return Math.round((visited / total) * 100)
+  return Math.round((progress.subjectTotalCompleted(key) / total) * 100)
+}
+
+// 「已掌握」百分比（页面级 masteredAt 快照 / 学科总页数）
+function masteredPct(key) {
+  const total = subjectTotals.value[key]
+  if (!total) return 0
+  return Math.round((progress.masteredCount(key) / total) * 100)
 }
 
 // 各学科页面总数（由内容配置计算）
@@ -195,6 +218,8 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
+    // 双轨进度读 progress 快照：先刷新，保证「已接触 / 已掌握」是最新事实（与首页/内容页同源）
+    await progress.refresh().catch((e) => console.warn('[Dashboard] 刷新进度快照失败:', e))
     overview.value = await db.getLearningOverview()
   } catch (e) {
     console.error('[Dashboard] 加载失败:', e)
@@ -237,15 +262,22 @@ onMounted(load)
 .today-val { display: block; font-size: 1.3rem; font-weight: 600; }
 .today-label { font-size: 0.8rem; color: var(--text-muted); }
 
-/* 学科进度 */
+/* 学科进度（双轨：已接触 / 已掌握） */
 .subject-progress-list { display: flex; flex-direction: column; gap: var(--spacer-16); margin-top: var(--spacer-12); }
-.subject-progress-item { display: flex; flex-direction: column; gap: var(--spacer-4); }
+.subject-progress-item { display: flex; flex-direction: column; gap: var(--spacer-6); }
 .subject-progress-head { display: flex; align-items: center; gap: var(--spacer-8); }
 .subject-progress-icon { display: inline-flex; color: var(--text-muted); }
 .subject-progress-name { font-weight: 600; flex: 1; }
 .subject-progress-pct { font-weight: 700; color: var(--primary); }
-.subject-progress-bar { height: 8px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
+/* 双轨行：标签 + 轨道 + 计数 */
+.spb-row { display: flex; align-items: center; gap: var(--spacer-8); }
+.spb-label { flex: 0 0 auto; width: 3.2em; font-size: 0.75rem; color: var(--text-muted); }
+.spb-num { flex: 0 0 auto; font-size: 0.75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.subject-progress-bar { flex: 1; height: 8px; background: var(--surface-muted); border-radius: var(--radius-full); overflow: hidden; }
 .subject-progress-fill { height: 100%; background: var(--primary); border-radius: var(--radius-full); transition: width 0.5s ease; }
+/* 次轨（已掌握）细一档 + 弱化配色，与主轨（已接触）区分层级 */
+.spb-bar--mastered { height: 6px; }
+.spb-fill--mastered { background: var(--success); }
 .subject-progress-stats { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
 
 /* 学情分析与复习建议 */

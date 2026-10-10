@@ -233,12 +233,13 @@ function selectSubject(key) {
   localStorage.setItem('current_subject', key)
 }
 
-// 某单元已完成页面数（按学科隔离）
+// 某单元「已接触」页面数（按学科隔离）—— 「已接触」= 访问即接触（内容页 visited；
+// 测验页 visited && testScore!=null，以 testScore 为主口径），口径见 stores/progress.js
 function progressCount(unit) {
   return progress.completedCount(currentSubject.value, unit.num)
 }
 
-// 某单元完成百分比
+// 某单元「已接触」百分比
 function progressPct(unit) {
   const total = unit.files.length
   if (!total) return 0
