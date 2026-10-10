@@ -186,6 +186,37 @@ describe('题库覆盖与形状（验收 5.7-1 + A-1 派生）', () => {
   )
 })
 
+describe('D-3 kp 构建期派生（A 档，P1-14）', () => {
+  it(
+    'kp 覆盖率 100%：每题 kp === fk 且非空（结构不变量 + 宽区间范式，不新增硬锚点）',
+    async () => {
+      const { shards } = await getBank()
+      const all = flat(shards)
+      // 只锚「内容只增不减」的原始下限，不锚精确题量（内容侧并行维护，硬锚会被顶破）
+      expect(all.length).toBeGreaterThanOrEqual(MIN_TOTAL)
+      for (const it of all) {
+        expect(it.kp, `条目 ${it.k} 缺 kp`).toBeTruthy()
+        expect(it.kp).toBe(it.fk)
+      }
+    },
+    60000
+  )
+
+  it(
+    'kp 数 === 唯一 fk 数（A 档 kp 是一页一个，不与题目一一对应）',
+    async () => {
+      const { shards } = await getBank()
+      const all = flat(shards)
+      const kpSet = new Set(all.map((it) => it.kp))
+      const fkSet = new Set(all.map((it) => it.fk))
+      expect(kpSet.size).toBe(fkSet.size)
+      // 页数规模合理（内容侧预演：171 页；下限只防「派生整体失效」）
+      expect(kpSet.size).toBeGreaterThan(100)
+    },
+    60000
+  )
+})
+
 describe('题库产物与归一化（A-4 同权口径）', () => {
   it('index.json 分列 derivedTotal / verifiedDerived；verifiedDerived ≤ derivedTotal', () => {
     const idx = JSON.parse(readFileSync(BANK_INDEX_PATH, 'utf-8'))

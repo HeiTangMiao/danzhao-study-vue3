@@ -73,6 +73,27 @@
       </div>
     </section>
 
+    <!-- 加权维度（D-3，P1-14）：决定「哪里弱练哪里」按单元还是按考点聚合错题 -->
+    <section class="card cfg-section">
+      <h2>加权<span class="cfg-hint">弱项优先口径</span></h2>
+      <div class="chip-row">
+        <button
+          class="chip"
+          :class="{ 'chip--on': draft.weightDimension === WEIGHT_DIMENSIONS.KP }"
+          @click="draft.weightDimension = WEIGHT_DIMENSIONS.KP"
+        >
+          考点
+        </button>
+        <button
+          class="chip"
+          :class="{ 'chip--on': draft.weightDimension === WEIGHT_DIMENSIONS.UNIT }"
+          @click="draft.weightDimension = WEIGHT_DIMENSIONS.UNIT"
+        >
+          单元
+        </button>
+      </div>
+    </section>
+
     <section class="card cfg-section cfg-row">
       <div class="cfg-switch-text">
         <h2>含真题卷题目</h2>
@@ -104,6 +125,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import { usePracticeStore } from '@/stores/practice'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
 import { diffLabel } from '@/utils/blockMeta'
+import { WEIGHT_DIMENSIONS } from '@/utils/composePaper'
 
 const store = usePracticeStore()
 const draft = computed(() => store.draft)

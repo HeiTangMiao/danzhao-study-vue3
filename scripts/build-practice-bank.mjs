@@ -229,6 +229,10 @@ export async function collectBank() {
           ut: info.unitTitle,
           fi: info.fileIndex,
           fk: fileKey,
+          // D-3（A 档，P1-14）：kp := fileKey，构建期派生（零 schema、零内容改动）。
+          // 显式加键而非运行时从 fk 派生 —— 为 B 档（页内考点）前向兼容：届时只改这一行写入，
+          // 产物形状 / normalizeBankItem / composePaper 的 kp 维度都不用动。
+          kp: fileKey,
           ft: info.title,
           bt: block.title || '',
           q: qCap.text,

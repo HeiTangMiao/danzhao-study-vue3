@@ -63,6 +63,7 @@ export const BANK_ITEM_KEYS = {
   ut: 'unitTitle',
   fi: 'fileIndex', // 回看知识点路由参数 /study/:subject/:unitNum/:fileIndex
   fk: 'fileKey', // recordError 去重键 + recordAnswered 页面累计（必须传）
+  kp: 'kp', // D-3：考点标签（A 档 = fileKey；B 档落地时改为「页内考点」，产物形状不变）
   ft: 'fileTitle',
   bt: 'blockTitle',
   q: 'question',
@@ -97,5 +98,8 @@ export function normalizeBankItem(raw) {
   item.derived = raw.dv === true
   item.verified = raw.vf === true
   item.normalizable = raw.nz === true
+  // kp（D-3，A 档）：产物优先；旧产物 / 手写 mock 缺 kp 时回落 fk。
+  // 回落保证「kp 覆盖率 100%」不被旧格式破坏（normalizeBankItem 是形状的兜底真相源）。
+  item.kp = typeof raw.kp === 'string' && raw.kp ? raw.kp : (raw.fk || '')
   return item
 }

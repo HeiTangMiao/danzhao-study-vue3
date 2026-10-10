@@ -18,7 +18,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useStudyDbStore } from './studyDb'
 import { loadBankIndex, loadSubjectBank } from '@/utils/practiceBankClient'
-import { composePaper, weakAreasOf, weakWeightsFromErrors } from '@/utils/composePaper'
+import { composePaper, weakAreasOf, weakWeightsFromErrors, WEIGHT_DIMENSIONS } from '@/utils/composePaper'
 import { paperKeyOf } from '@/content/practiceBank'
 import { isFillItem, answerMatches } from '@/content/answerNorm'
 import { TIMEOUT_MS } from '@/utils/practiceMetrics'
@@ -49,7 +49,9 @@ export const usePracticeStore = defineStore('practice', () => {
     unitNums: [], // 空 = 全科（该学科全部单元）
     count: 10, // unit/weak：5/10/20 默认 10；custom：10/20/30/50 默认 20
     difficulty: '', // '' = 不限
-    includeExam: false // 含真题卷题目，默认关闭（prd-mobile §5.6 去重规则 2）
+    includeExam: false, // 含真题卷题目，默认关闭（prd-mobile §5.6 去重规则 2）
+    // 加权维度（D-3，P1-14）：缺省 'kp' 让考点级加权生效（P-D2 裁决）；纯函数 composePaper 缺省仍 'unit'
+    weightDimension: WEIGHT_DIMENSIONS.KP
   })
 
   /** 打开组卷配置（L1 三入口 / 薄弱专项预填都走这里） */
@@ -61,6 +63,7 @@ export const usePracticeStore = defineStore('practice', () => {
       count: patch.mode === 'custom' ? 20 : 10,
       difficulty: '',
       includeExam: false,
+      weightDimension: WEIGHT_DIMENSIONS.KP,
       ...patch
     }
     phase.value = 'config'
@@ -144,7 +147,9 @@ export const usePracticeStore = defineStore('practice', () => {
       seed: (Date.now() % 2147483647) || 1,
       difficulty: cfg.difficulty,
       includeExam: cfg.includeExam,
-      unitWeights: weakWeightsFromErrors(errors)
+      // D-3：权重维度与权重表必须同维度 —— 用 cfg.weightDimension 决定两者口径
+      weightDimension: cfg.weightDimension,
+      unitWeights: weakWeightsFromErrors(errors, 5, cfg.weightDimension)
     })
     if (!questions.length) throw new Error('该范围内没有可用题目，请调整筛选条件')
     const unitLabel = cfg.unitNums.length ? `${cfg.unitNums.length} 个单元` : '全科'
@@ -465,12 +470,15 @@ export const usePracticeStore = defineStore('practice', () => {
     const items = await ensureBank(cfg.subject)
     const errors = await db.getAllErrors()
     const seed = (Date.now() % 2147483647) || 1
+    // 沿用本组卷的加权维度（D-3）：权重维度与权重表同口径
+    const dimension = cfg.weightDimension || WEIGHT_DIMENSIONS.KP
     const { questions } = composePaper(items, {
       count: cfg.count,
       seed,
       difficulty: cfg.difficulty,
       includeExam: cfg.includeExam,
-      unitWeights: weakWeightsFromErrors(errors)
+      weightDimension: dimension,
+      unitWeights: weakWeightsFromErrors(errors, 5, dimension)
     })
     if (!questions.length) return
     startSession({
