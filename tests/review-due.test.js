@@ -25,6 +25,7 @@ import {
   countDue,
   pickDue,
   gradeCard,
+  calculateSM2,
   useSpacedReview
 } from '@/composables/useSpacedReview'
 import { useStudyDbStore } from '@/stores/studyDb'
@@ -222,5 +223,41 @@ describe('⑨ gradeCard —— 统一写库入口', () => {
     expect(row2.legacyMastered).toBe(true) // 已固化
     expect(isMastered(row2)).toBe(true)
     expect(await db.migrateLegacyMastered()).toBe(0) // 幂等
+  })
+})
+
+describe('⑫ uniform 前提 —— 新卡四档预估间隔必须相同（R3 防漂移）', () => {
+  it('{repetitions:0} 的行，四档 calculateSM2(...).interval 全部相等', () => {
+    // GradeButtons 的 uniform 分支会渲染那行「首次复习四档间隔相同」文案。
+    // 它成立的前提，就是这里断言的事实：新卡四档预估间隔确实相同。
+    // 若将来有人改 calculateSM2，让新卡四档产生不同间隔，那行文案会无声地说谎 —— 本断言即警报器。
+    const fresh = { repetitions: 0, interval: 0, easeFactor: 2.5 }
+    const set = new Set(GRADE_META.map((m) => calculateSM2(fresh, m.grade).interval))
+    expect(set.size).toBe(1)
+  })
+})
+
+describe('⑬ EF 保留的后果锚点 —— 高难度因子卡恢复复习的间隔序列（R3 防漂移）', () => {
+  /** 从 repetitions:0 起连续评 GOOD 三次，返回 interval 序列（模拟一张卡恢复复习的推进） */
+  function goodSequence(ef0) {
+    let e = { repetitions: 0, interval: 0, easeFactor: ef0 }
+    const seq = []
+    for (let i = 0; i < 3; i++) {
+      const { interval, repetitions, easeFactor } = calculateSM2(e, GRADES.GOOD)
+      seq.push(interval)
+      e = { ...e, repetitions, interval, easeFactor }
+    }
+    return seq
+  }
+
+  it('easeFactor=3.0 连续 GOOD 三次 → 1 → 6 → 18', () => {
+    // 这是「F3 保留 easeFactor、不归零」裁决的后果锚点：EF 要到第 3 次连续答对才起作用
+    // （前两个间隔 1/6 是硬编码的，与 EF 无关）。若把 easeFactor 改回归零（2.5），
+    // 该序列会塌成 1→6→15，本断言即失败 —— 锚住「难度记忆被保留」这一行为。
+    expect(goodSequence(3.0)).toEqual([1, 6, 18])
+  })
+
+  it('easeFactor=2.5（默认）连续 GOOD 三次 → 1 → 6 → 15', () => {
+    expect(goodSequence(2.5)).toEqual([1, 6, 15])
   })
 })
