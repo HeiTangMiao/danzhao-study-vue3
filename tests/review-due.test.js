@@ -24,7 +24,8 @@ import {
   isDue,
   countDue,
   pickDue,
-  gradeCard
+  gradeCard,
+  useSpacedReview
 } from '@/composables/useSpacedReview'
 import { useStudyDbStore } from '@/stores/studyDb'
 
@@ -188,5 +189,38 @@ describe('⑨ gradeCard —— 统一写库入口', () => {
     const today = new Date()
     const ds = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
     expect(countDue(errors, ds)).toBe(pickDue(errors, { today: ds }).length)
+  })
+
+  it('(a) 防退化：reviewCard（@deprecated 旧名）也不得写 reviewed', async () => {
+    // 它是当前全库零调用的死代码，但保留着旧写库路径的入口 —— 锚住它，防后人把缺陷从这个口子放回来。
+    const r = await db.recordError('math', '01', 'q-rc', 'A', 'B', 'exp', { fileKey: 'math_01_rc' })
+    const err = (await db.getAllErrors()).find((e) => e.id === r.id)
+    const review = useSpacedReview()
+    await review.reviewCard(err, GRADES.GOOD)
+    const back = (await db.getAllErrors()).find((e) => e.id === r.id)
+    expect(back.reviewed).toBe(false) // 关键：旧名路径同样不写 reviewed
+    expect(back.lastReviewedAt).toBeTruthy()
+    expect(back.reviewCount).toBe(1)
+  })
+
+  it('(b) 防退化：迁移的常态对齐（markMastered 的 reviewed 会被下次迁移固化为 legacyMastered）', async () => {
+    // 设计意图：幂等迁移兼作「常态对齐」—— 手动标注(reviewed:true)下一次挂载即被固化为 legacyMastered。
+    const r = await db.recordError('math', '01', 'q-mm', 'A', 'B', 'exp', { fileKey: 'math_01_mm' })
+    const err = (await db.getAllErrors()).find((e) => e.id === r.id)
+    // 模拟 markMastered 的落库效果：reviewed:true（走 gradeCard 单次写库）
+    await gradeCard(db, { ...err, reviewed: true }, GRADES.GOOD)
+    const row = (await db.getAllErrors()).find((e) => e.id === r.id)
+    expect(isMastered(row)).toBe(true)
+    expect(row.legacyMastered).toBeUndefined() // 尚未固化
+
+    const before = (await db.getAllErrors()).filter(isMastered).length
+    const n = await db.migrateLegacyMastered()
+    expect(n).toBe(1)
+    const after = (await db.getAllErrors()).filter(isMastered).length
+    expect(after).toBe(before) // 计数不变（用户可见数字零变化）
+    const row2 = (await db.getAllErrors()).find((e) => e.id === r.id)
+    expect(row2.legacyMastered).toBe(true) // 已固化
+    expect(isMastered(row2)).toBe(true)
+    expect(await db.migrateLegacyMastered()).toBe(0) // 幂等
   })
 })

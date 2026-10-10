@@ -303,16 +303,16 @@ function sourceRoute(err) {
   return { name: 'unit', params: { subject, unitNum, fileIndex } }
 }
 
-// 标记为已掌握（统一评分入口 gradeCard，仅换入口不改行为）
+// 标记为已掌握（用户手动标注；单次写库）
 async function markMastered(err) {
   try {
-    // gradeCard 是唯一 SM-2 写库入口（**不写 reviewed**）；「已掌握」按钮的语义是用户手动标注，
-    // 故在此基础上显式补写 reviewed:true —— 行为与改造前一致，只是评分路径统一了
-    const { next } = await gradeCard(db, err, GRADES.GOOD)
-    const updated = { ...next, reviewed: true }
-    await db.updateError(updated)
+    // 「已掌握」= 评一次 GOOD + 打 reviewed 标记。把 reviewed:true 预置进传入对象：
+    // gradeCard 自身不写 reviewed，但会**原样保留入参的 reviewed**（展开赋值），故只需一次写库，
+    // 避免「gradeCard 写一次 + 再补写 reviewed」造成的两次 updatedAt 抖动与无谓同步上行。
+    const marked = { ...err, reviewed: true }
+    const { next } = await gradeCard(db, marked, GRADES.GOOD)
     const idx = errors.value.findIndex((e) => e.id === err.id)
-    if (idx >= 0) errors.value[idx] = updated
+    if (idx >= 0) errors.value[idx] = next
   } catch (e) {
     console.error('[ErrorBook] 标记已掌握失败:', e)
   }

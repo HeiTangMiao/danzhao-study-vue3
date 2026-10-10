@@ -111,6 +111,41 @@ export interface ReviewItem {
   repetitions: number
   nextReviewDate: string
   reviewed: boolean
+  // ===== 批 C 新增/补全（行内加字段，零升版）=====
+  /** 学科（error_book 行） */
+  subject?: string
+  /** 单元号 */
+  unitNum?: string
+  /** 所属内容页 fileKey（卡点用虚拟键 'stuck:<module>'） */
+  fileKey?: string
+  /** 来源页面标题 */
+  fileTitle?: string
+  /** 单元标题 */
+  unitTitle?: string
+  /** 入本时间戳 */
+  createdAt?: number
+  /** 入本日期 YYYY-MM-DD */
+  createdAtDate?: string
+  /** 最近复习时间戳（=「已复习过」判据 hasReviewed） */
+  lastReviewedAt?: number | null
+  /** 复习次数 */
+  reviewCount?: number
+  /** 入本（重复答错）次数 */
+  wrongCount?: number
+  /** 存量手动标注的「已掌握」固化副本（迁移写入） */
+  legacyMastered?: boolean
+  /** 卡片种类：'stuck' = 卡点（错题行无此字段）。注意与 blockTypes.kind 同名不同义 */
+  kind?: 'stuck'
+  /** 卡点所属模块/作品名（仅 kind='stuck'） */
+  module?: string
+  /** 来源：'cloze' = 默写专项，'stuck' = 卡点（其余来源无此字段） */
+  source?: string
+  /** 归因（A-3，六选一） */
+  reason?: string
+  /** 知识点关键词（A-3） */
+  kp?: string
+  /** 软删墓碑（读接口已过滤） */
+  deleted?: boolean
 }
 
 export interface ReviewStats {
@@ -154,8 +189,11 @@ export function countDue(list: Array<Partial<ReviewItem>>, today?: string): numb
 /** 复习页队列：筛选到期 → 排期升序 → 截断（不改入参） */
 export function pickDue(
   list: Array<Partial<ReviewItem>>,
-  opts?: { limit?: number; today?: string }
+  opts?: { limit?: number; kind?: 'error' | 'stuck' | null; today?: string }
 ): Array<Partial<ReviewItem>>
+
+/** 卡片种类取值域（error_book.kind） */
+export const CARD_KINDS: { ERROR: 'error'; STUCK: 'stuck' }
 
 /** 统一评分入口（唯一写库点；不写 reviewed） */
 export function gradeCard(

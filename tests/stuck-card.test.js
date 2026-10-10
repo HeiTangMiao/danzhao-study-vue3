@@ -176,6 +176,34 @@ describe('stuck-card —— 存储与队列（C-2-1）', () => {
     const dbSrc = fs.readFileSync(path.join(process.cwd(), 'src/stores/studyDb.js'), 'utf8')
     expect(dbSrc).toContain('const DB_VERSION = 7')
   })
+
+  // 防退化：kind 过滤必须发生在 limit 截断之前。若顺序颠倒（先 slice 再 filter），
+  // 当「最早到期的几张都是错题」时，会取到空集或错题 —— 复习页表现为「选了卡点却空手而出」。
+  it('⑧ pickDue 的 kind × limit 交互：limit 作用在 kind 过滤之后', async () => {
+    // 混合列表：最早到期的两张是错题，其后才是卡点
+    await seedError(db, { question: 'eA', nextReviewDate: '2025-01-01' })
+    await seedError(db, { question: 'eB', nextReviewDate: '2025-01-02' })
+    await seedError(db, {
+      kind: CARD_KINDS.STUCK, question: 'sA', correctAnswer: 'pathA',
+      nextReviewDate: '2025-01-05', fileKey: 'stuck:modA'
+    })
+    await seedError(db, {
+      kind: CARD_KINDS.STUCK, question: 'sB', correctAnswer: 'pathB',
+      nextReviewDate: '2025-01-06', fileKey: 'stuck:modB'
+    })
+    const list = await db.getAllErrors()
+    const today = '2025-01-20'
+
+    // 不过滤：最早两张就是错题
+    expect(pickDue(list, { limit: 2, today }).map((e) => e.question)).toEqual(['eA', 'eB'])
+    // 只要卡点：两张都拿到，不受更早的错题影响
+    expect(pickDue(list, { kind: CARD_KINDS.STUCK, today }).map((e) => e.question)).toEqual(['sA', 'sB'])
+    // kind × limit：先按 kind 过滤再截断 → 取到「最早的卡点」，而非空集/错题
+    const one = pickDue(list, { kind: CARD_KINDS.STUCK, limit: 1, today })
+    expect(one).toHaveLength(1)
+    expect(one[0].question).toBe('sA')
+    expect(one.every((e) => e.kind === CARD_KINDS.STUCK)).toBe(true)
+  })
 })
 
 // ===================== C-2-2 卡面形态 / 渲染分支 / 错题本区分 =====================
