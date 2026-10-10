@@ -25,17 +25,22 @@ import { composePaper } from '@/utils/composePaper'
 import { normalizeBankItem, paperKeyOf } from '@/content/practiceBank'
 import { deriveJudge, isJudgeItem } from '@/content/judgeDerive'
 
-// 人类可读的参考基线（内容冻结于 HEAD 44d087a：156 页 + A-1）：
-//   total 1624 / gradable 592 / derived 163（chinese 2 / computer 158 / math 3）/ 例外 0。
-//   A-1 例外已在内容侧 44d087a 修正为 0（原 2 条：chinese 01/0/0/2、01/6/1/7）。
-//   注：任务卡的 1393/363/77 是「仅 06 单元前」的 HEAD 口径；内容侧上线 06/07/08 后不再适用。
+// 人类可读的参考基线（内容冻结于 2026-10-10 内容侧入库：179 个内容文件）：
+//   total 2102（数学 1052 / 计算机 674 / 语文 376）/ gradable 1251 / derived 404 / normalizable 144。
+//   历史基线（已过期，仅留档）：1624/592/163（内容冻结于 44d087a）；1393/363/77（仅 06 单元前口径）。
 // 参考值仅作人工核对，**不作为硬断言**（内容侧并行维护内容时避免假红）。
-const REFERENCE_BASELINE = { total: 1624, gradable: 592, derived: 163 }
-// 内容只增不减的原始下限（低于此值说明内容被误删）
-const MIN_TOTAL = 1393
-// gradable 占比宽区间（原始 20.5% → 派生后约 36%）
+const REFERENCE_BASELINE = { total: 2102, gradable: 1251, derived: 404 }
+// 内容只增不减的原始下限（低于此值说明内容被误删）。
+// 2026-10-10 重设：1393 → 2000（内容侧一批把总量从 1624 推到 2102，原下限已离实际太远、失去绊线意义）
+const MIN_TOTAL = 2000
+// gradable 占比宽区间：20.5%（结构化前）→ 36%（判断题派生后）→ 59.5%（内容侧结构化与模拟卷扩容后）
+// 上界用途是捕捉「派生/结构化标注**失控**」（例如错误地把大量主观题标成可判分 → 占比冲向 100%），
+// 而不是限制内容侧正常扩充可判分题。
+// 2026-10-10 重设：0.55 → 0.70。原因：内容侧本批（三科模拟卷补齐 + 全单元快速检测二 + 结构化）
+// 把占比推到 0.5951，属正常增长，却顶破了原上界 → 该测试变红但**不是回归**（已用 git archive
+// 导出已提交版本验证：旧提交 20/20 通过、当前树失败，差异纯来自内容侧在制内容）。
 const RATIO_MIN = 0.25
-const RATIO_MAX = 0.55
+const RATIO_MAX = 0.7
 // A-1 例外上限：命中判断题形态但答案非加粗「正确。/错误。」开头者应极少（内容侧会持续修正）
 const MAX_JUDGE_EXCEPTIONS = 5
 
