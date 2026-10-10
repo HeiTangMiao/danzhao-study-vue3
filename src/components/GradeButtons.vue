@@ -3,7 +3,9 @@
   职责：渲染 GRADE_META 四档（忘了/困难/良好/简单），每档下方展示「N 天后再见」预览。
   契约：纯展示 + 回传；**间隔预览只调 calculateSM2 求值、零副作用**（绝不写库）——
        四个按钮显示不同间隔，是「四档真实驱动 SM-2」最直观的可视化证据（QA 一眼可验）。
-       特例：新卡四档预估间隔相同（SM-2 算法本就如此）→ 不逐档渲染徽标，改一行统一说明。
+       新卡（repetitions===0）四档预估间隔必然相同（经典 SM-2 如此）→ 不逐档渲染徽标，
+       改一行统一说明。判据**直接用 repetitions===0**，不再比较四档间隔：外部导入的破坏行
+       （如 reps:2, interval:1, ef:1.3）四档间隔也可能恰好相同，按间隔比较会让「首次复习」文案说谎。
   移动端：横向四等分、触控目标 ≥44px（沿用批 B 共享知识 5 的按钮约定）。
   props: { error: Object, disabled?: boolean }
   emits: 'pick'(grade: number)
@@ -12,7 +14,7 @@
   <div class="grade-group" data-no-swipe>
     <div class="grade-buttons">
       <button
-        v-for="m in meta"
+        v-for="(m, i) in meta"
         :key="m.key"
         class="grade-btn"
         :class="'grade-btn--' + m.tone"
@@ -20,11 +22,11 @@
         @click="$emit('pick', m.grade)"
       >
         <span class="grade-label">{{ m.label }}</span>
-        <span v-if="!uniform" class="grade-preview">{{ preview(m.grade) }}</span>
+        <span v-if="!uniform" class="grade-preview">{{ preview(i) }}</span>
       </button>
     </div>
-    <!-- 新卡时四档预估间隔相同（SM-2 算法本就如此），逐个显示相同的「明天再见」是噪音 →
-         收成一行诚实说明，避免误导 -->
+    <!-- 新卡（repetitions===0）时四档预估间隔必然相同（经典 SM-2 如此），逐个显示相同的「明天再见」
+         是噪音 → 收成一行诚实说明，避免误导 -->
     <p v-if="uniform" class="grade-note">首次复习四档间隔相同，先按记忆情况自评，下一次起间隔会拉开</p>
   </div>
 </template>
@@ -45,20 +47,23 @@ defineEmits(['pick'])
 // 四档常量与 GRADES 同源（H7 单一真相源）
 const meta = GRADE_META
 
-/** 四档预估间隔（仅纯函数求值，不落库） */
+/** 四档预估间隔（仅纯函数求值，不落库；供 preview 取用，避免逐按钮重算） */
 const intervals = computed(() =>
   meta.map((m) => (props.error ? calculateSM2(props.error, m.grade).interval : null))
 )
-/** 四档间隔是否完全相同（新卡常见：全为 1 天）——相同时不逐档渲染间隔徽标 */
+/**
+ * 是否「新卡」：直接判 repetitions===0（新卡四档间隔必然相同 → 不逐档渲染徽标）。
+ * 不再用「四档间隔比较」推断新卡：外部导入的破坏行（reps>0 但四档间隔恰好相同）会让判定说谎。
+ */
 const uniform = computed(() => {
   if (!props.error) return false
-  return new Set(intervals.value).size <= 1
+  return (props.error.repetitions || 0) === 0
 })
 
-/** 间隔预览文案：interval<=1 → 明天；否则 N 天后再见。仅纯函数求值，不落库。 */
-function preview(grade) {
-  if (!props.error) return ''
-  const { interval } = calculateSM2(props.error, grade)
+/** 间隔预览文案：interval<=1 → 明天；否则 N 天后再见。取自已求值的 intervals，不落库。 */
+function preview(i) {
+  const interval = intervals.value[i]
+  if (interval == null) return ''
   return interval <= 1 ? '明天再见' : `${interval} 天后再见`
 }
 </script>

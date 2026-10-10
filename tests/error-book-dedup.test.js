@@ -38,13 +38,14 @@ describe('F3 recordError 去重分支 —— 重复答错清除「已掌握」�
       legacyMastered: true,
       repetitions: 3,
       interval: 7,
+      easeFactor: 2.36, // 累积的难度记忆，去重后应保留（R2-F2：不重置为 2.5）
       nextReviewDate: '2025-12-31',
       lastReviewedAt: 1700000000000 // 历史事实，去重后应保留
     })
     return r.id
   }
 
-  it('两个掌握字段都清、SM-2 归零到今日、wrongCount 自增、lastReviewedAt 保留、updatedAt 刷新', async () => {
+  it('两个掌握字段都清、reps/interval 归零、easeFactor 保留、wrongCount 自增、lastReviewedAt 保留、updatedAt 刷新', async () => {
     const id = await seedMastered('math_01_f3')
     const mastered = (await db.getAllErrors()).find((e) => e.id === id)
     expect(isMastered(mastered)).toBe(true)
@@ -61,10 +62,11 @@ describe('F3 recordError 去重分支 —— 重复答错清除「已掌握」�
     expect(row.reviewed).toBe(false)
     expect(row.legacyMastered).toBe(false)
     expect(isMastered(row)).toBe(false)
-    // SM-2 归零到「今日到期」→ 立刻重回队列
+    // reps/interval 归零 → 立刻重回队列（真掌握口径 reps>=3&&interval>=7 也已失效）
     expect(row.repetitions).toBe(0)
     expect(row.interval).toBe(0)
-    expect(row.easeFactor).toBe(2.5)
+    // easeFactor 保留：R2-F2 —— 它是对这张卡的累积难度记忆，不重置为默认 2.5
+    expect(row.easeFactor).toBe(2.36)
     expect(row.nextReviewDate).toBe(todayStr())
     expect(isDue(row, todayStr())).toBe(true)
     expect(countDue([row], todayStr())).toBe(1)
@@ -74,6 +76,24 @@ describe('F3 recordError 去重分支 —— 重复答错清除「已掌握」�
     expect(row.lastReviewedAt).toBe(1700000000000)
     // updatedAt 刷新（ISO 字符串，随同步上行）
     expect(row.updatedAt > updatedAtBefore).toBe(true)
+  })
+
+  it('仅靠 SM-2 口径（reps/interval）判掌握、无任何手动标注的卡：再答错也清得掉', async () => {
+    // 该卡 reviewed/legacyMastered 均为 false，仅因 reps>=3 && interval>=7 被判已掌握。
+    // 若去重分支只清两个标注字段而不归零 reps/interval，这张卡仍会 isMastered=true ——
+    // 用户又答错了却永远不进队列。本用例是「必须归零 reps/interval」的回归锚点。
+    const r = await db.recordError('math', '01', 'qF3c', 'A', 'B', 'exp', { fileKey: 'math_01_f3c' })
+    const err = (await db.getAllErrors()).find((e) => e.id === r.id)
+    await db.updateError({ ...err, reviewed: false, repetitions: 3, interval: 15, easeFactor: 2.36 })
+    const before = (await db.getAllErrors()).find((e) => e.id === r.id)
+    expect(isMastered(before)).toBe(true) // 真掌握口径生效
+
+    await db.recordError('math', '01', 'qF3c', 'A', 'C', 'exp', { fileKey: 'math_01_f3c' })
+    const row = (await db.getAllErrors()).find((e) => e.id === r.id)
+    expect(row.repetitions).toBe(0)
+    expect(row.interval).toBe(0)
+    expect(isMastered(row)).toBe(false)
+    expect(row.easeFactor).toBe(2.36) // 难度记忆仍保留
   })
 
   it('已掌握行去重后不再计为已掌握（用户可见的「已掌握」数字随之下降）', async () => {

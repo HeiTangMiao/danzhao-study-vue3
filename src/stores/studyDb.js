@@ -752,8 +752,10 @@ export const useStudyDbStore = defineStore('studyDb', {
         // 重复答错 = 用户又把这张卡忘了 → 它必须重新回到复习队列，不能继续躺在「已掌握」里。
         // 「已掌握」是 OR 判据（legacyMastered 或 reviewed 任一为真即成立），所以两个字段都要清；
         // 只清一个会留下哑键 —— 卡片在错题本显示为待复习，却因另一字段为真而永远不进队列。
-        // 同时把 SM-2 归零到「今日到期」，让它立刻重新出现（wrongCount 自增 = 唯一自增点）。
-        // lastReviewedAt 刻意保持不动：那是「已复习过」的历史事实，与「已掌握」无关，保留才不破坏 hasReviewed 语义。
+        // repetitions/interval 必须归零：isMastered 还有一条「reps>=3 且 interval>=7」的真掌握口径，
+        // 不归零的话一张 reps:3/interval:15 的卡清完标记仍被判为已掌握（等于没修）。
+        // wrongCount 自增 = 唯一自增点；lastReviewedAt 刻意保持不动：那是「已复习过」的历史事实，
+        // 与「已掌握」无关，保留才不破坏 hasReviewed 语义。
         await dbPut('error_book', {
           ...dup,
           wrongCount: (dup.wrongCount || 1) + 1,
@@ -761,7 +763,9 @@ export const useStudyDbStore = defineStore('studyDb', {
           reviewed: false,
           repetitions: 0,
           interval: 0,
-          easeFactor: 2.5,
+          // easeFactor 刻意保持不动（不重置为 2.5）：它是这张卡**累积的难度记忆**，
+          // 与「连续答对几次」无关；归零会把一张反复答错的卡打回默认难度，
+          // 后续算出的间隔偏长 → 违反项目「漏卡从严」取向。
           nextReviewDate: getDateStr()
         })
         return { id: dup.id, success: true, duplicated: true }

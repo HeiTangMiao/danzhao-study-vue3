@@ -256,4 +256,19 @@ describe('review-session —— 组件层（ReviewView / GradeButtons）', () =>
     // 四档标签与 GRADE_META 同源
     expect(w.findAll('.grade-label').map((el) => el.text())).toEqual(['忘了', '困难', '良好', '简单'])
   })
+
+  it('⑪ GradeButtons uniform 判据 = repetitions===0（R2-F1：破坏行不得显示「首次复习」文案）', () => {
+    // 真新卡：repetitions===0 → 收成一行统一说明、不逐档渲染徽标
+    const fresh = mount(GradeButtons, { props: { error: { repetitions: 0, interval: 0, easeFactor: 2.5 } } })
+    expect(fresh.find('.grade-note').exists()).toBe(true)
+    expect(fresh.findAll('.grade-preview')).toHaveLength(0)
+    fresh.unmount()
+
+    // 破坏行（外部导入）：reps>0 但四档预估间隔恰好都为 1 → 旧判据（比较间隔）会误显示「首次复习」。
+    // 新判据直接看 repetitions → 不显示文案、正常逐档渲染徽标。
+    const broken = mount(GradeButtons, { props: { error: { repetitions: 2, interval: 1, easeFactor: 1.3 } } })
+    expect(broken.find('.grade-note').exists()).toBe(false)
+    expect(broken.findAll('.grade-preview')).toHaveLength(4)
+    broken.unmount()
+  })
 })
