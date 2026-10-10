@@ -1,5 +1,13 @@
 # 组件文档
 
+> ⚠️ **状态：部分过时（2026-10-10 标注）——以源码为准。**
+> 本文档写于 Vue3 重构期，此后组件有增删。**已知已过时之处**：文中提到的 `FormulaEditor.vue`
+> 及编辑器相关组件**已在 P2-T4 删除**（`docs/archive/architecture-audit.md` 的发现项，已处置）；
+> 区块组件与 layouts 原语族（`src/components/layouts/`）在本文档之后新增。
+> 保留本文件是因为 **`src/components/LayoutRenderer.vue` / `src/components/blocks/registry.js` /
+> `tests/validate-layout.test.js` 的注释引用了它**——挪动会打断引用链。
+> 查组件现状：读源码，或看 `docs/system_design.md` 的架构章节。文档地图见 `docs/README.md`。
+
 > 本文档描述 Vue3 重构版的所有组件、composables 和 stores 的用法。
 
 ---

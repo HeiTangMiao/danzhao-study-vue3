@@ -159,7 +159,7 @@ danzhao-study-vue3/
 ├── tests/                      # 前端 Vitest 用例
 ├── src-tauri/                  # Tauri 配置与 Rust 后端
 ├── .github/workflows/          # CI 与 Release 工作流
-├── docs/                       # 组件清单与重构交接文档
+├── docs/                       # 文档地图见 docs/README.md（指南 / 系统设计 / 方案 / 归档）
 └── CLAUDE.md / MIGRATION-README.md
 ```
 

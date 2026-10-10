@@ -1,5 +1,14 @@
 # CSP 通用护栏方案（含测试骨架）
 
+> ⚠️ **状态：方案有效，任务未落地（2026-10-10 复核）**
+> 本方案对应的落地任务 = `docs/system_design.md` §10 的 **P1-T5**（新增 `tests/csp-guard.test.js`
+> 的 L1–L4 层 + `tests/helpers/csp-lock.js` 的 L5 `withCspLocked`）。**2026-10-10 实测：这两个文件
+> 目前均不存在**，即护栏尚未建成。
+> 现有相关守卫只有 `tests/jsxgraph-eval-guard.test.js`（仅覆盖画板代码的 eval 路径，**不代表**本方案的
+> 5 层不变量已实现）。
+> **保留本文件**：它是 P1-T5 的设计依据，且被 `docs/system_design.md` §13 引用。**待 P1-T5 落地后再评估归档。**
+> 文档地图见 `docs/README.md`。
+
 > 设计：高见远（架构师）　提出人：software-engineer
 > 定位：**防复发**。B1′（initCode → 真实模块）已消除本次的失败点；本护栏防的是「将来再抄错模式」。
 > 状态：方案 + 可落地骨架。落地任务 = `docs/system_design.md` §10 的 **P1-T5**。
