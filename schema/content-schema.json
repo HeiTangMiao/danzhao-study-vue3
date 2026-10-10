@@ -139,7 +139,8 @@
       "required": ["text"],
       "properties": {
         "text": { "type": "string", "description": "挖空文本：用 {{答案}} 标出空位，如\"海内存知己，{{天涯若比邻}}。\"" },
-        "alts": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "该句空位的其他可接受答案（与 {{}} 内主答案并列判对；禁空串、禁嵌套 {{}}；通假/异体字走 clozeVariants 映射表，勿写这里）" }
+        "alts": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "该句空位的其他可接受答案（与 {{}} 内主答案并列判对；禁空串、禁嵌套 {{}}；通假/异体字走 clozeVariants 映射表，勿写这里）" },
+        "strict": { "type": "boolean", "description": "句级开关：true = 该句禁用全局通假映射（只按正解 + 本句 alts 比对）。用于「反/返」这类全局表会误判对的句子（如「辗转反侧」）。缺省/false = 既有行为（应用 clozeVariants）。" }
       }
     },
     "errorFocusItem": {

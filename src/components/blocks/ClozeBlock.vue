@@ -108,7 +108,9 @@ const items = computed(() =>
       text: String(it.text ?? ''),
       segments: parseCloze(String(it.text ?? '')),
       // 该句空位的其他可接受答案（与主答案并列判对；通假/异体字走 clozeVariants，勿写这里）
-      alts: Array.isArray(it.alts) ? it.alts.filter((a) => typeof a === 'string' && a) : []
+      alts: Array.isArray(it.alts) ? it.alts.filter((a) => typeof a === 'string' && a) : [],
+      // 句级 strict（D-0）：true → 该句禁用全局通假映射（红线句专用，见 blankMatches 注释）
+      strict: it.strict === true
     }))
 )
 
@@ -124,12 +126,12 @@ function toggle(i, si) {
 }
 
 // ===== input 模式（B-3）：空位平铺（跨句连续编号） =====
-/** 全局空位表：gi 全局序号；main 主答案；alts 该句可接受别名 */
+/** 全局空位表：gi 全局序号；main 主答案；alts 该句可接受别名；strict 该句是否禁通假映射（D-0） */
 const blanks = computed(() => {
   const list = []
   items.value.forEach((it, i) => {
     it.segments.forEach((seg, si) => {
-      if (seg.blank) list.push({ gi: list.length, i, si, main: seg.answer, alts: it.alts })
+      if (seg.blank) list.push({ gi: list.length, i, si, main: seg.answer, alts: it.alts, strict: it.strict })
     })
   })
   return list
@@ -161,11 +163,20 @@ watch(
   { immediate: true }
 )
 
-/** 单空比对：主答案命中或任一 alts 命中即算对（判分唯一入口 answerMatches，H7） */
+/**
+ * 单空比对：主答案命中或任一 alts 命中即算对（判分唯一入口 answerMatches，H7）。
+ *
+ * strict 句（D-0）：**不传 variantMap** → 只按正解 + 本句 alts 比对。
+ * 为什么：全局通假表把「反→返」当作等价组，会把红线句「辗转反侧」里用户写的「返」
+ * 折成「反」而误判对；strict 句绕开这张表即可判错。
+ * 为什么不干脆删掉全局「反→返」键：该键是「寒暑易节，始一反焉」的合法通假，
+ * 由 tests/cloze-variants.test.js 键锚定，删键会连带破坏合法通假 → 只能用句级开关解决。
+ * 返回契约不变（仍返回布尔，内部读 answerMatches(...).matched）。
+ */
 function blankMatches(typed, blank) {
   const t = typeof typed === 'string' ? typed : ''
   if (!t.trim()) return false
-  const opts = { variantMap: CLOZE_VARIANTS }
+  const opts = blank.strict ? undefined : { variantMap: CLOZE_VARIANTS }
   if (answerMatches(t, blank.main, opts).matched) return true
   return blank.alts.some((a) => answerMatches(t, a, opts).matched)
 }

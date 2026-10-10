@@ -332,6 +332,12 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
                 })
               }
             }
+            // 句级 strict（D-0）：schema 已拦类型，这里补 human-readable 文案（与 block.mode 同款）。
+            // 防「字符串 'true'」这类 truthy 误传 —— 内容侧手写内容时常见，
+            // 而 truthy 的非布尔会被判分支 `it.strict === true` 静默忽略 → 红线句仍误判对，故必须显式拦下。
+            if (it.strict !== undefined && typeof it.strict !== 'boolean') {
+              errors.push(`挖空[${ii}] strict 应为布尔（true 禁用该句通假映射）`)
+            }
           })
         }
         break
