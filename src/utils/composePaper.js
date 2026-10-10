@@ -64,7 +64,11 @@ export function unitWeightKeyOf(item) {
  *   （= 题目 kp 同源），**不是** error.kp —— error.kp 是 A-3 用户自由文本归因标签
  *   （如「一元二次」），与题目 kp（fileKey，如 'math_11_03-椭圆'）永不匹配，
  *   用错这一列会让权重恒 1、组卷静默退化为均匀抽取（不报错，最难发现）。
- * @param {Array<{subject:string, unitNum?:string, fileKey?:string}>} errors 错题记录
+ *
+ * P1-9 中间态减半：selfTier==='seen'（看答案才会）的错题按 0.5 计入聚合。
+ * ⚠️ 减半**只在聚合层生效**：weightedPick 的 `Math.max(1, w)` 地板会把 <1 的权重抬回 1，
+ *   故单卡减半对抽取无影响；真正被影响的是 Top5 的**分组计数与排序**（4×seen == 2×unknown）。
+ * @param {Array<{subject:string, unitNum?:string, fileKey?:string, selfTier?:string}>} errors 错题记录
  * @param {number} [topN=5]
  * @param {'unit'|'kp'} [dimension=WEIGHT_DIMENSIONS.UNIT]
  * @returns {Record<string, number>} 形如 { 'math|02': 7 } 或 { 'math|math_11_03-椭圆': 7 }
@@ -78,7 +82,9 @@ export function weakWeightsFromErrors(errors, topN = 5, dimension = WEIGHT_DIMEN
   for (const e of errors || []) {
     if (!e || !e.subject) continue
     const key = keyOf(e)
-    counts.set(key, (counts.get(key) || 0) + 1)
+    // 中间态（seen）权重减半（0.5）；其余（unknown / 无档位）权重 1
+    const w = e.selfTier === 'seen' ? 0.5 : 1
+    counts.set(key, (counts.get(key) || 0) + w)
   }
   const weights = {}
   for (const [key, count] of counts) weights[key] = count

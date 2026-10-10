@@ -128,6 +128,21 @@
           </div>
         </div>
       </section>
+      <!-- 自评校准率（P1-9「用复习再测正确率反推」）——仅作相对排序，不构成成绩预测 -->
+      <section v-if="calibration.some((r) => r.n > 0)" class="card calib-card">
+        <h2>自评校准率</h2>
+        <p class="calib-note">
+          用复习再测的召回率反推自评的可靠性 —— 仅作两档之间的<b>相对比较</b>，不代表得分预测。
+        </p>
+        <div class="calib-list">
+          <div v-for="row in calibration" :key="row.tier" class="calib-item">
+            <span class="calib-name">{{ row.label }}</span>
+            <span class="calib-rate">{{ row.rate === null ? '暂无可比数据' : row.rate + '%' }}</span>
+            <span class="calib-sub">已复测 {{ row.reviewed }}/{{ row.n }} 题</span>
+          </div>
+        </div>
+        <p v-if="calibHint" class="calib-hint">{{ calibHint }}</p>
+      </section>
     </template>
   </div>
 </template>
@@ -136,8 +151,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useProgressStore } from '@/stores/progress'
+import { SELF_TIERS } from '@/stores/practice'
 import { SUBJECT_META, getSubjectConfig } from '@/content/index'
 import { countDue } from '@/composables/useSpacedReview'
+import { selfCalibrationOf } from '@/utils/practiceMetrics'
 import AppIcon from '@/components/AppIcon.vue'
 
 const db = useStudyDbStore()
@@ -212,6 +229,31 @@ const weakAreas = computed(() => {
 
 // 最高频薄弱点（供建议文案）
 const weakest = computed(() => weakAreas.value[0] || null)
+
+// ===== 自评校准率（P1-9）=====
+/**
+ * 相对排序口径见 utils/practiceMetrics.js 的 selfCalibrationOf（单一真相源，H7）：
+ *   复测召回率 = 该档 repetitions>=1 的行数 / 该档 reviewCount>0 的行数。
+ * ⚠️ 本面板**不出绝对分数、不写「你预计能得 X 分」**（项目「不构成成绩承诺」口径）。
+ */
+const TIER_LABELS = { [SELF_TIERS.SEEN]: '看答案才会', [SELF_TIERS.UNKNOWN]: '不会' }
+const calibration = computed(() =>
+  selfCalibrationOf(overview.value?.allErrors, [SELF_TIERS.SEEN, SELF_TIERS.UNKNOWN]).map((r) => ({
+    ...r,
+    label: TIER_LABELS[r.tier] || r.tier
+  }))
+)
+
+// 相对提示（两端都有数据才给）：只描述强弱，不下结论
+const calibHint = computed(() => {
+  const seen = calibration.value.find((r) => r.tier === SELF_TIERS.SEEN)
+  const unknown = calibration.value.find((r) => r.tier === SELF_TIERS.UNKNOWN)
+  if (!seen || !unknown || seen.rate === null || unknown.rate === null) return ''
+  if (seen.rate > unknown.rate) {
+    return '「看答案才会」的复测召回率高于「不会」—— 你的「中间态」与「不会」区分得开。'
+  }
+  return '「看答案才会」与「不会」的复测召回率接近 —— 自评的中间态暂时没有明显区分度。'
+})
 
 // 加载仪表盘数据
 async function load() {
@@ -321,6 +363,20 @@ onMounted(load)
   padding: 1px 10px; border-radius: var(--radius-full); background: var(--surface);
 }
 .count-warn { color: var(--danger); font-weight: 700; }
+
+/* 自评校准率（P1-9）：只做相对排序，视觉上克制、不显成绩感 */
+.calib-card h2 { margin-bottom: var(--spacer-6); }
+.calib-note { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: var(--spacer-10); }
+.calib-list { display: flex; flex-direction: column; gap: var(--spacer-8); }
+.calib-item {
+  display: flex; align-items: baseline; gap: var(--spacer-8);
+  padding: var(--spacer-8) var(--spacer-10);
+  background: var(--surface-muted); border-radius: var(--radius-md);
+}
+.calib-name { flex: 1; font-size: 0.88rem; }
+.calib-rate { font-size: 1rem; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+.calib-sub { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.calib-hint { margin-top: var(--spacer-10); font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
 
 @media (max-width: 600px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }

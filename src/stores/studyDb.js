@@ -756,9 +756,15 @@ export const useStudyDbStore = defineStore('studyDb', {
         // 不归零的话一张 reps:3/interval:15 的卡清完标记仍被判为已掌握（等于没修）。
         // wrongCount 自增 = 唯一自增点；lastReviewedAt 刻意保持不动：那是「已复习过」的历史事实，
         // 与「已掌握」无关，保留才不破坏 hasReviewed 语义。
+        // P1-9：重复入本时档位「只升不降」——本次更严重（unknown > seen）才覆盖既有档位。
+        // 例：先 seen 后 unknown → selfTier 变 'unknown'（更严重的信息优先保留）；反向不降级。
+        const worse = (a, b) =>
+          (a === 'unknown' ? 2 : a === 'seen' ? 1 : 0) > (b === 'unknown' ? 2 : b === 'seen' ? 1 : 0)
         await dbPut('error_book', {
           ...dup,
           wrongCount: (dup.wrongCount || 1) + 1,
+          // selfTier：行内加字段（零迁移，随 engine 整行 LWW 同步）；本次更差才升级，永不降级
+          selfTier: extra?.selfTier && worse(extra.selfTier, dup.selfTier) ? extra.selfTier : dup.selfTier,
           legacyMastered: false,
           reviewed: false,
           repetitions: 0,

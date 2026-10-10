@@ -1,7 +1,7 @@
 <!--
   PracticeSession —— L3 做题会话（单题一屏，P6 核心，prd-mobile §5.3 L3）
   流程（§5.2 D2）：读题（参考答案默认折叠）→ 结构化题点选即判 / 自由文本脑内作答
-  → 底部滑出参考答案卡 → 强制自评（我会了 / 我还不会）→ 下一题。
+  → 底部滑出参考答案卡 → 强制自评（不看答案也能做对 / 看答案后能理解 / 看答案也不懂，P1-9 三档）→ 下一题。
   心流保护：无倒计时；非阻断式答案卡；完成后可回看（结算页逐题解析）。
   离开保护（复用 ExamBlock 三层思路）：beforeunload + 路由守卫 + 退出二次确认；
   退出保留未完成会话（已答题数已逐题落库，不丢）。
@@ -97,22 +97,34 @@
       </button>
       <button v-if="!rec.revealed" class="ps-btn ps-btn--primary" @click="store.revealAnswer()">看答案</button>
       <template v-else>
-        <button
-          class="ps-btn ps-btn--no"
-          :class="{ 'ps-btn--active-no': rec.assess === 'unknown' }"
-          :disabled="!!rec.assess"
-          @click="assess('unknown')"
-        >
-          我还不会
-        </button>
-        <button
-          class="ps-btn ps-btn--ok"
-          :class="{ 'ps-btn--active-ok': rec.assess === 'known' }"
-          :disabled="!!rec.assess"
-          @click="assess('known')"
-        >
-          我会了
-        </button>
+        <!-- 题干行为化（P1-9）：把「你会了吗」换成可自检的行为化表述 -->
+        <p class="ps-assess-hint">不看答案，你能独立、在合理时间内做对吗？</p>
+        <div class="ps-assess-row">
+          <button
+            class="ps-btn ps-btn--ok"
+            :class="{ 'ps-btn--active-ok': rec.assess === SELF_TIERS.KNOWN }"
+            :disabled="!!rec.assess"
+            @click="assess(SELF_TIERS.KNOWN)"
+          >
+            不看答案也能做对
+          </button>
+          <button
+            class="ps-btn ps-btn--mid"
+            :class="{ 'ps-btn--active-mid': rec.assess === SELF_TIERS.SEEN }"
+            :disabled="!!rec.assess"
+            @click="assess(SELF_TIERS.SEEN)"
+          >
+            看答案后能理解
+          </button>
+          <button
+            class="ps-btn ps-btn--no"
+            :class="{ 'ps-btn--active-no': rec.assess === SELF_TIERS.UNKNOWN }"
+            :disabled="!!rec.assess"
+            @click="assess(SELF_TIERS.UNKNOWN)"
+          >
+            看答案也不懂
+          </button>
+        </div>
         <button class="ps-btn ps-btn--next" :disabled="!store.canNext" @click="store.next()">
           {{ store.isLast ? '完成结算' : '下一题' }}
         </button>
@@ -169,7 +181,7 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import ReasonChips from '@/components/ReasonChips.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { isFillItem } from '@/content/answerNorm'
-import { usePracticeStore } from '@/stores/practice'
+import { usePracticeStore, SELF_TIERS } from '@/stores/practice'
 import { warmKatex } from '@/composables/useKatex'
 import { useRouter } from 'vue-router'
 
@@ -464,10 +476,14 @@ onBeforeUnmount(() => {
 /* 底部动作条：常驻拇指区，sticky 兜住长题干 */
 .ps-actions {
   position: sticky; bottom: 0; z-index: 5;
-  display: flex; gap: var(--space-2);
+  display: flex; flex-wrap: wrap; gap: var(--space-2);
   padding: var(--space-3) 0 calc(var(--space-3) + var(--sab));
   background: var(--bg);
 }
+/* 自评区（P1-9 三档）：行为化提示独占一行，三档按钮横排一行 */
+.ps-assess-hint { flex: 1 0 100%; margin: 0; text-align: center; font-size: var(--fs-sm); color: var(--text-muted); }
+.ps-assess-row { flex: 1 0 100%; display: flex; gap: var(--space-2); }
+.ps-assess-row .ps-btn { font-size: var(--fs-sm); padding: 0 var(--space-2); }
 .ps-btn {
   min-height: 48px; border-radius: var(--radius-full);
   font-size: var(--fs-base); font-weight: var(--fw-semibold);
@@ -477,10 +493,11 @@ onBeforeUnmount(() => {
 .ps-btn:active:not(:disabled) { transform: scale(0.97); }
 .ps-btn:disabled { opacity: 0.45; }
 .ps-btn--primary { flex: 1; background: var(--primary); color: #fff; }
-.ps-btn--no, .ps-btn--ok { flex: 1; border: 1.5px solid var(--border); background: var(--surface); }
+.ps-btn--no, .ps-btn--ok, .ps-btn--mid { flex: 1; border: 1.5px solid var(--border); background: var(--surface); }
 .ps-btn--active-no { border-color: var(--danger); color: var(--danger); background: rgba(var(--danger-rgb), 0.08); }
 .ps-btn--active-ok { border-color: var(--success); color: var(--success); background: rgba(var(--success-rgb), 0.1); }
-.ps-btn--next { flex: 1.2; background: var(--primary); color: #fff; }
+.ps-btn--active-mid { border-color: var(--warning); color: var(--warning); background: rgba(var(--warning-rgb), 0.1); }
+.ps-btn--next { flex: 1 0 100%; background: var(--primary); color: #fff; }
 .ps-btn--next:disabled { background: var(--surface-muted); color: var(--text-muted); }
 .ps-btn--submit {
   flex: 0 0 auto; padding: 0 var(--space-4);

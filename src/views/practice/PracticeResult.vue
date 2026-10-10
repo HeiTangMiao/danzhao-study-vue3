@@ -11,7 +11,11 @@
       <h1>{{ store.session?.title || '练习' }} · 完成</h1>
       <div class="presult-lines">
         <p class="presult-line"><span class="line-tag line-tag--auto">自动判</span>{{ st.autoCount }} 题，正确 {{ st.autoCorrect }}</p>
-        <p class="presult-line"><span class="line-tag line-tag--self">自评</span>{{ st.selfCount }} 题，会 {{ st.selfKnown }}</p>
+        <p class="presult-line">
+          <span class="line-tag line-tag--self">自评</span>{{ st.selfCount }} 题，会 {{ st.selfKnown }}
+          <!-- P1-9 中间态：仅在存在「看答案才会」时追加展示（不改 auto 行、不改 auto/self 二分口径） -->
+          <span v-if="st.selfSeen" class="presult-mid">· 看答案才会 {{ st.selfSeen }}</span>
+        </p>
       </div>
       <p class="presult-meta">共 {{ st.total }} 题 · 用时 {{ fmtTime(st.durationSec) }}</p>
     </div>
@@ -102,14 +106,14 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
-import { usePracticeStore } from '@/stores/practice'
+import { usePracticeStore, SELF_TIERS } from '@/stores/practice'
 import { paperKeyOf } from '@/content/practiceBank'
 import { topSlowest, timeoutCount, avgElapsedMs, TIMEOUT_MS } from '@/utils/practiceMetrics'
 
 const store = usePracticeStore()
 const router = useRouter()
 
-const st = computed(() => store.resultStats || { total: 0, autoCount: 0, autoCorrect: 0, selfCount: 0, selfKnown: 0, newErrors: 0, durationSec: 0 })
+const st = computed(() => store.resultStats || { total: 0, autoCount: 0, autoCorrect: 0, selfCount: 0, selfKnown: 0, selfSeen: 0, newErrors: 0, durationSec: 0 })
 
 const showReview = ref(false)
 
@@ -165,13 +169,17 @@ function summaryOf(a) {
   return text.length > 40 ? text.slice(0, 40) + '…' : text
 }
 
-/** 本次是否有错题（重做错题按钮禁用口径） */
+/** 本次是否有错题（重做错题按钮禁用口径）—— seen/unknown/答错 都算错题（与 store.redoErrors 同判据） */
 const hasWrong = computed(() => {
   const s = store.session
   if (!s) return false
   return s.questions.some((q, i) => {
     const r = s.records[i]
-    return r.assess === 'unknown' || (r.picked !== null && r.picked !== q.correctIndex)
+    return (
+      r.assess === SELF_TIERS.UNKNOWN ||
+      r.assess === SELF_TIERS.SEEN ||
+      (r.picked !== null && r.picked !== q.correctIndex)
+    )
   })
 })
 
@@ -180,7 +188,7 @@ function isCorrect(i) {
   const q = s.questions[i]
   const r = s.records[i]
   if (r.picked !== null) return r.picked === q.correctIndex
-  return r.assess === 'known'
+  return r.assess === SELF_TIERS.KNOWN
 }
 
 function reviewClass(i) {
@@ -194,7 +202,9 @@ function userAnswer(i) {
   if (r.picked !== null) {
     return `选项 ${'ABCDEFGH'[r.picked]}（${r.picked === q.correctIndex ? '答对' : '答错'}）`
   }
-  return r.assess === 'known' ? '自评：我会了' : '自评：我还不会'
+  if (r.assess === SELF_TIERS.KNOWN) return '自评：不看答案也能做对'
+  if (r.assess === SELF_TIERS.SEEN) return '自评：看答案后能理解'
+  return '自评：看答案也不懂'
 }
 
 function fmtTime(sec) {
@@ -229,6 +239,8 @@ async function again() {
 }
 .line-tag--auto { background: var(--primary-soft); color: var(--primary); }
 .line-tag--self { background: var(--surface-muted); color: var(--text-muted); }
+/* 中间态（看答案才会）追加文案：弱化展示，不喧宾夺主（P1-9） */
+.presult-mid { margin-left: 6px; color: var(--warning); font-size: var(--fs-md); }
 .presult-meta { margin-top: var(--space-3); color: var(--text-muted); font-size: var(--fs-md); }
 
 /* 限时仿真间隔提示（D-1）：温和提示卡，非阻断 */

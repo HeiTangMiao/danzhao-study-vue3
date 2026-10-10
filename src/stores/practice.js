@@ -41,6 +41,18 @@ const SIM_LAST_AT_KEY = 'sim_last_at'
 /** 全科混卷的学科清单（150 档全科混卷口径：单科语文可判分仅 200，独卷 150 占比过高） */
 const ALL_SUBJECTS = ['math', 'chinese', 'computer']
 
+/**
+ * 自评档位（P1-9 三档）—— **唯一取值来源**，禁止视图内联 'known'/'seen'/'unknown' 字符串。
+ *  - known   会：只记答题数，**不入错题本**
+ *  - seen    看答案才会：入错题本，组卷权重 ×0.5（中间态）
+ *  - unknown 不会：入错题本，权重 ×1
+ * ⚠️ resultStats 的 auto/self **二分口径不变**：三档均属「自评」侧，selfKnown 只计 known（H3）。
+ * ⚠️ 适用边界（有意不一致，勿当缺陷修）：三档**只**作用于本 practice 链路（PracticeSession）。
+ *   `ExamBlock.vue`（布尔答对/答错）与 `QuizBlock.vue`（页内自评）是**另一语义来源**，
+ *   本批有意**不**三档化（P-E3）；勿在别处顺手合并或「补齐」。
+ */
+export const SELF_TIERS = { KNOWN: 'known', SEEN: 'seen', UNKNOWN: 'unknown' }
+
 export const usePracticeStore = defineStore('practice', () => {
   const db = useStudyDbStore()
 
@@ -321,10 +333,12 @@ export const usePracticeStore = defineStore('practice', () => {
   }
 
   /**
-   * 自评（强制规则的唯一出口）：
-   *  - 「我会了」→ 只记答题数，不入错题本
-   *  - 「我还不会」→ recordError 入错题本（SM-2 初始字段由 studyDb 负责）
-   * 每题自评时逐题调 recordAnswered(1, {fileKey})——中途退出（验收 5.7-6）答题数也已计入
+   * 自评（强制规则的唯一出口，P1-9 三档）：
+   *  - 会（known）→ 只记答题数，不入错题本
+   *  - 看答案才会（seen）→ 入错题本（中间态），selfTier='seen' → 组卷权重减半
+   *  - 不会（unknown）→ 入错题本，selfTier='unknown'
+   * seen/unknown 都要弹归因层（都需要开处方）。每题自评时逐题调 recordAnswered(1, {fileKey})——
+   * 中途退出（验收 5.7-6）答题数也已计入。
    */
   async function assess(kind) {
     const s = session.value
@@ -335,14 +349,17 @@ export const usePracticeStore = defineStore('practice', () => {
     rec.assess = kind
     try {
       await db.recordAnswered(1, { fileKey: q.fileKey })
-      if (kind === 'unknown') {
+      // 中间态（seen）同样入本 —— 只有「会」不入本
+      if (kind === SELF_TIERS.SEEN || kind === SELF_TIERS.UNKNOWN) {
         // fill 且有输入时，错题本记真实输入（B-2）；其余沿用既有口径
         const userAnswer =
           q.gradable && rec.picked !== null
             ? `选项 ${'ABCDEFGH'[rec.picked]}`
             : isFillItem(q) && rec.typed
               ? rec.typed
-              : '自评：我还不会'
+              : kind === SELF_TIERS.SEEN
+                ? '自评：看答案才会'
+                : '自评：我还不会'
         // fileKey 必须传：去重键是 subject+question+fileKey，缺了退化为单元粒度（§5.4 注意点 1）
         const r = await db.recordError(
           q.subject,
@@ -351,11 +368,18 @@ export const usePracticeStore = defineStore('practice', () => {
           q.answer,
           userAnswer,
           `练习解析：${q.answer}`,
-          { fileKey: q.fileKey, fileTitle: q.fileTitle, unitTitle: q.unitTitle, difficulty: q.difficulty || '' }
+          {
+            fileKey: q.fileKey,
+            fileTitle: q.fileTitle,
+            unitTitle: q.unitTitle,
+            difficulty: q.difficulty || '',
+            // selfTier：行内加字段（零迁移，随 engine 整行 LWW 同步），供组卷权重减半与校准率面板消费
+            selfTier: kind
+          }
         )
         rec.errorId = r.id // 供归因回写（新入本与被去重命中都指向同一行）
         if (!r.duplicated) s.newErrorIds.push(r.id)
-        // 置待归因：视图弹二级归因层（可跳过，不阻塞继续答题）
+        // 置待归因：视图弹二级归因层（可跳过，不阻塞继续答题）—— seen/unknown 都弹
         pendingAttribution.value = { index: s.index }
       }
     } catch (e) {
@@ -509,7 +533,9 @@ export const usePracticeStore = defineStore('practice', () => {
   /**
    * 结算统计——判分口径必须二分（prd-mobile §5.2 D3，H3，B-2 扩展）：
    * 「自动判」（选择/判断点选 picked≠null ∪ fill 判对 autoMatched===true）与
-   * 「自评」（其余，含 fill 未命中回落自评）分开统计，禁止合并
+   * 「自评」（其余，含 fill 未命中回落自评）分开统计，禁止合并。
+   * P1-9 三档化**不破二分**：三档均落「自评」侧；selfKnown 只计 known（seen/unknown 不计「会」）。
+   * selfSeen 是自评侧的**细分计数**（供结算页追加展示），非独立百分比、不与自动判合并。
    */
   const resultStats = computed(() => {
     const s = session.value
@@ -518,6 +544,7 @@ export const usePracticeStore = defineStore('practice', () => {
     let autoCorrect = 0
     let selfCount = 0
     let selfKnown = 0
+    let selfSeen = 0
     s.questions.forEach((q, i) => {
       const r = s.records[i]
       if (!r.assess) return
@@ -528,7 +555,8 @@ export const usePracticeStore = defineStore('practice', () => {
         }
       } else {
         selfCount++
-        if (r.assess === 'known') selfKnown++
+        if (r.assess === SELF_TIERS.KNOWN) selfKnown++
+        else if (r.assess === SELF_TIERS.SEEN) selfSeen++
       }
     })
     return {
@@ -538,6 +566,7 @@ export const usePracticeStore = defineStore('practice', () => {
       autoCorrect,
       selfCount,
       selfKnown,
+      selfSeen,
       newErrors: s.newErrorIds.length,
       durationSec: Math.max(0, Math.round(((s.finishedAt || Date.now()) - s.startedAt) / 1000))
     }
@@ -554,7 +583,12 @@ export const usePracticeStore = defineStore('practice', () => {
     if (!s) return
     const wrong = s.questions.filter((q, i) => {
       const r = s.records[i]
-      return r.assess === 'unknown' || (r.picked !== null && r.picked !== q.correctIndex)
+      // 三档化后「看答案才会」（seen）也计入错题动作（否则中间态题不进「重做错题」）
+      return (
+        r.assess === SELF_TIERS.UNKNOWN ||
+        r.assess === SELF_TIERS.SEEN ||
+        (r.picked !== null && r.picked !== q.correctIndex)
+      )
     })
     if (!wrong.length) return
     startSession({
@@ -607,7 +641,12 @@ export const usePracticeStore = defineStore('practice', () => {
     if (!s) return null
     const wrongIdx = s.records.findIndex((r, i) => {
       const q = s.questions[i]
-      return r.assess === 'unknown' || (r.picked !== null && r.picked !== q.correctIndex)
+      // 与 redoErrors 同判据：seen/unknown/答错都算错题（H7：错题口径单一来源）
+      return (
+        r.assess === SELF_TIERS.UNKNOWN ||
+        r.assess === SELF_TIERS.SEEN ||
+        (r.picked !== null && r.picked !== q.correctIndex)
+      )
     })
     const q = s.questions[wrongIdx >= 0 ? wrongIdx : 0]
     if (!q) return null
