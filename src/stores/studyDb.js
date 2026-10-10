@@ -769,6 +769,33 @@ export const useStudyDbStore = defineStore('studyDb', {
     },
 
     /**
+     * 记录一个卡点（P1-10，「想不起来的操作」）—— 复用 error_book，零迁移、零升版。
+     * 为什么复用 error_book：SM-2 队列的物理存储就是 error_book（loadDueReviews 只读它），
+     * 入 error_book 即零接线打通 SM-2；去重 / wrongCount 自增 / extra 透传全部现成。
+     * 去重键沿用 recordError 的 subject + question + fileKey：同模块同操作名只存一条，
+     * 重复录入走 wrongCount 自增（同「反复想不起来」的证据，与批 A 同款设计）。
+     * fileKey 用虚拟键 `stuck:<module>`：让去重落在「模块 + 操作名」粒度，
+     * 且不与真实内容页 fileKey（形如 math_01_xxx）撞车。
+     * @param {string} module 模块/作品名（如「PS 图层面板」）
+     * @param {string} action 操作名（卡片正面，如「自由变换」）
+     * @param {string} pathOrKey 路径或快捷键（卡片背面，如「Ctrl+T」或「编辑 → 自由变换」）
+     * @param {{unitNum?: string, unitTitle?: string, note?: string}} [opts]
+     * @returns {Promise<{ id, success, duplicated? }>}
+     */
+    async recordStuck(module, action, pathOrKey, { unitNum = '', unitTitle = '', note = '' } = {}) {
+      await this.init()
+      return this.recordError(
+        'computer', // 卡点当前只服务计算机操作类（PS/PR）
+        unitNum,
+        action, // question = 操作名（正面）
+        pathOrKey, // correctAnswer = 路径/快捷键（背面）
+        '', // userAnswer
+        `模块：${module}${note ? '；备注：' + note : ''}`,
+        { kind: 'stuck', source: 'stuck', module, fileKey: `stuck:${module}`, fileTitle: module, unitTitle }
+      )
+    },
+
+    /**
      * 学习概况（无游戏化）：各学科已学/答题 + 今日统计 + 错题数
      * 各学科 total（页面总数）由视图用 getSubjectConfig 结合计算
      */

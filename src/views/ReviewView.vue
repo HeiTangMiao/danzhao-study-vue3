@@ -11,6 +11,14 @@
 -->
 <template>
   <div class="review">
+    <!-- 卡点录入（P1-10）：入口放在复习现场 —— 卡点常在复习时才发现「这个操作想不起来」 -->
+    <div class="rv-tools">
+      <button class="rv-tool-btn" @click="composerOpen = true">
+        <AppIcon name="square-pen" :size="15" /> 记一个卡点
+      </button>
+    </div>
+    <StuckCardComposer :open="composerOpen" @saved="onStuckSaved" @close="composerOpen = false" />
+
     <!-- 顶栏：退出 + 进度条 + 计数 -->
     <header v-if="phase === 'session' || phase === 'done'" class="rv-top">
       <button class="rv-exit" aria-label="退出复习" @click="askExit"><AppIcon name="x" :size="18" /></button>
@@ -47,17 +55,21 @@
           <span v-if="current.source === 'cloze'" class="rv-tag rv-tag--cloze">默写</span>
         </div>
 
-        <div class="rv-question"><MathJaxRender :text="current.question" /></div>
+        <!-- 按 kind 分支渲染：卡点卡（操作名/路径 默写形态）vs 错题卡（题面 + 答案） -->
+        <StuckCard v-if="isStuck" :card="current" :revealed="flipped" @flip="store.flip()" />
+        <div v-else class="error-card">
+          <div class="rv-question"><MathJaxRender :text="current.question" /></div>
 
-        <!-- 翻面前严禁渲染答案（见文件头纪律） -->
-        <transition name="rv-fade">
-          <div v-if="flipped" class="rv-answer">
-            <div class="rv-answer-label"><AppIcon name="lightbulb" :size="15" /> 正确答案 / 解析</div>
-            <div class="rv-answer-correct"><MathJaxRender :text="current.correctAnswer" /></div>
-            <div v-if="current.userAnswer" class="rv-answer-user">我的作答：<MathJaxRender :text="current.userAnswer" /></div>
-            <div v-if="current.explanation" class="rv-answer-expl"><MathJaxRender :text="current.explanation" /></div>
-          </div>
-        </transition>
+          <!-- 翻面前严禁渲染答案（见文件头纪律） -->
+          <transition name="rv-fade">
+            <div v-if="flipped" class="rv-answer">
+              <div class="rv-answer-label"><AppIcon name="lightbulb" :size="15" /> 正确答案 / 解析</div>
+              <div class="rv-answer-correct"><MathJaxRender :text="current.correctAnswer" /></div>
+              <div v-if="current.userAnswer" class="rv-answer-user">我的作答：<MathJaxRender :text="current.userAnswer" /></div>
+              <div v-if="current.explanation" class="rv-answer-expl"><MathJaxRender :text="current.explanation" /></div>
+            </div>
+          </transition>
+        </div>
       </main>
 
       <footer class="rv-actions" data-no-swipe>
@@ -99,9 +111,11 @@ import { useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
 import GradeButtons from '@/components/GradeButtons.vue'
+import StuckCard from '@/components/StuckCard.vue'
+import StuckCardComposer from '@/components/StuckCardComposer.vue'
 import { useReviewStore } from '@/stores/review'
 import { useStudyDbStore } from '@/stores/studyDb'
-import { useSpacedReview, isMastered, countDue } from '@/composables/useSpacedReview'
+import { useSpacedReview, isMastered, countDue, CARD_KINDS } from '@/composables/useSpacedReview'
 import { SUBJECT_META } from '@/content/index'
 import { warmKatex } from '@/composables/useKatex'
 
@@ -128,6 +142,19 @@ const countLabel = computed(() => {
 /** 学科中文名（唯一来源 SUBJECT_META；未学科目兜底原文） */
 function subjectName(sub) {
   return SUBJECT_META[sub]?.name || sub || ''
+}
+
+/** 当前卡是否卡点（判据用 CARD_KINDS 常量，禁止内联 'stuck'） */
+const isStuck = computed(() => current.value?.kind === CARD_KINDS.STUCK)
+
+// ===== 卡点录入（P1-10）=====
+const composerOpen = ref(false)
+async function onStuckSaved() {
+  composerOpen.value = false
+  // 空态/未开始时，录入后立即重取队列，让新卡点直接进入本轮复习
+  if (phase.value === 'cleared' || phase.value === 'idle') {
+    await store.startSession({ kind: store.kindFilter })
+  }
 }
 
 // ===== 评分（唯一写库动作；落库失败提示可重试，不静默跳过）=====
@@ -197,6 +224,16 @@ onMounted(async () => {
 <style scoped>
 .review { display: flex; flex-direction: column; min-height: calc(100vh - var(--tabbar-h) - var(--space-6)); }
 .rv-loading { text-align: center; padding: var(--spacer-48); color: var(--text-muted); }
+
+/* 卡点录入入口行 */
+.rv-tools { display: flex; justify-content: flex-end; }
+.rv-tool-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  min-height: 40px; padding: 0 var(--space-4);
+  border-radius: var(--radius-full); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-muted); font-size: var(--fs-sm); cursor: pointer;
+}
+.rv-tool-btn:hover { border-color: var(--primary); color: var(--primary); }
 
 /* 顶栏 */
 .rv-top { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-1) 0; }

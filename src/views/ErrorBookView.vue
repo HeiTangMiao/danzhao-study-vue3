@@ -70,6 +70,16 @@
           >{{ f.label }}</button>
         </div>
         <div class="filter-group">
+          <span class="filter-label">类型：</span>
+          <button
+            v-for="f in kindFilters"
+            :key="f.key"
+            class="filter-btn"
+            :class="{ active: kindFilter === f.key }"
+            @click="kindFilter = f.key"
+          >{{ f.label }}</button>
+        </div>
+        <div class="filter-group">
           <span class="filter-label">归因：</span>
           <button
             class="filter-btn"
@@ -89,8 +99,12 @@
             @click="reasonFilter = 'none'"
           >未归因</button>
         </div>
+        <button class="add-stuck-btn" @click="composerOpen = true"><AppIcon name="square-pen" :size="15" /> + 卡点</button>
         <button v-if="filtered.length > 0" class="clear-btn" @click="clearAll"><AppIcon name="trash-2" :size="15" /> 清空全部</button>
       </section>
+
+      <!-- 卡点录入（同一组件，与 /review 顶部共用） -->
+      <StuckCardComposer :open="composerOpen" @saved="onStuckSaved" @close="composerOpen = false" />
 
       <!-- 归因分布（H3：归因是用户自评数据，与自动判分分别统计、不合并） -->
       <section v-if="errors.length" class="card dist-card">
@@ -132,6 +146,8 @@
             <span v-if="err.reason" class="reason-tag">{{ err.reason }}</span>
             <!-- 来源角标（B-4）：'cloze' = 默写专项错句入队（练习/考试入队无此字段） -->
             <span v-if="err.source === 'cloze'" class="cloze-tag">默写</span>
+            <!-- 卡点角标（P1-10）：kind='stuck' = 操作类卡点（错题行无此字段） -->
+            <span v-if="err.kind === CARD_KINDS.STUCK" class="stuck-tag">卡点</span>
             <span v-if="err.wrongCount > 1" class="wrongcount-tag">错 {{ err.wrongCount }} 次</span>
             <span v-if="err.unitTitle" class="source-tag">{{ err.unitTitle }}</span>
             <span class="error-date">{{ fmtDate(err.createdAt) }}</span>
@@ -170,8 +186,9 @@
               class="act-btn act-relearn"
               @click="markRelearn(err)"
             ><AppIcon name="rotate-ccw" :size="14" /> 仍需复习</button>
+            <!-- 卡点的 fileKey 是虚拟键 'stuck:<module>'，会被 sourceRoute() 按 '_' 切成坏路由 → 必须挡 -->
             <router-link
-              v-if="err.fileKey"
+              v-if="err.fileKey && err.kind !== CARD_KINDS.STUCK"
               :to="sourceRoute(err)"
               class="act-btn act-source"
             ><AppIcon name="book-open" :size="14" /> 查看原题</router-link>
@@ -189,9 +206,10 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import { diffLabel, diffClass } from '@/utils/blockMeta'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { getSubjectConfig, SUBJECT_META } from '@/content/index'
-import { GRADES, gradeCard, isMastered, countDue } from '@/composables/useSpacedReview'
+import { GRADES, gradeCard, isMastered, countDue, CARD_KINDS } from '@/composables/useSpacedReview'
 import { REASONS, reasonDistribution } from '@/utils/practiceMetrics'
 import AppIcon from '@/components/AppIcon.vue'
+import StuckCardComposer from '@/components/StuckCardComposer.vue'
 
 const db = useStudyDbStore()
 
@@ -208,6 +226,10 @@ const loading = ref(true)
 const subjectFilter = ref('all')
 const statusFilter = ref('all')
 const reasonFilter = ref('all')
+// 卡片种类筛选（P1-10：全部 / 错题 / 卡点）
+const kindFilter = ref('all')
+// 卡点录入（P1-10）
+const composerOpen = ref(false)
 
 const subjectFilters = [
   { key: 'all', label: '全部' },
@@ -217,6 +239,12 @@ const statusFilters = [
   { key: 'all', label: '全部' },
   { key: 'unreviewed', label: '待复习' },
   { key: 'reviewed', label: '已掌握' }
+]
+// 卡片种类筛选（P1-10）：判据用 CARD_KINDS 常量，禁止内联 'stuck'
+const kindFilters = [
+  { key: 'all', label: '全部' },
+  { key: CARD_KINDS.ERROR, label: '错题' },
+  { key: CARD_KINDS.STUCK, label: '卡点' }
 ]
 
 // 统计（判据唯一真相源 isMastered，H7）——
@@ -242,6 +270,8 @@ const filtered = computed(() => {
   // key 保持 'unreviewed'/'reviewed' 不动（防 statusFilter 默认值漂移），只换判据为 isMastered
   if (statusFilter.value === 'unreviewed') list = list.filter((e) => !isMastered(e))
   if (statusFilter.value === 'reviewed') list = list.filter(isMastered)
+  if (kindFilter.value === CARD_KINDS.STUCK) list = list.filter((e) => e.kind === CARD_KINDS.STUCK)
+  else if (kindFilter.value === CARD_KINDS.ERROR) list = list.filter((e) => e.kind !== CARD_KINDS.STUCK)
   if (reasonFilter.value === 'none') list = list.filter((e) => !e.reason)
   else if (reasonFilter.value !== 'all') list = list.filter((e) => e.reason === reasonFilter.value)
   return [...list].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
@@ -320,6 +350,16 @@ async function clearAll() {
   errors.value = []
 }
 
+// 卡点保存后重取列表（新卡点入本，「待复习」计数随之更新）
+async function onStuckSaved() {
+  composerOpen.value = false
+  try {
+    errors.value = await db.getAllErrors()
+  } catch (e) {
+    console.error('[ErrorBook] 刷新失败:', e)
+  }
+}
+
 // 加载错题
 onMounted(async () => {
   try {
@@ -381,6 +421,12 @@ onMounted(async () => {
   font-size: 0.82rem; cursor: pointer;
 }
 .clear-btn:hover { background: var(--danger); color: #fff; }
+.add-stuck-btn {
+  padding: 4px 14px; border-radius: var(--radius-full);
+  border: 1px solid var(--primary); background: transparent; color: var(--primary);
+  font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+}
+.add-stuck-btn:hover { background: var(--primary); color: #fff; }
 
 /* 归因分布（P0-4）：六选一 + 未归因 */
 .dist-card { display: flex; flex-direction: column; gap: var(--spacer-8); }
@@ -424,6 +470,7 @@ onMounted(async () => {
 .reason-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: var(--primary-soft); color: var(--primary); }
 .wrongcount-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--danger-rgb), 0.1); color: var(--danger); }
 .cloze-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
+.stuck-tag { font-size: 0.72rem; padding: 1px 10px; border-radius: var(--radius-full); background: rgba(var(--warning-rgb), 0.15); color: var(--warning); }
 .error-date { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); }
 
 .error-question { margin-bottom: var(--spacer-10); }
@@ -456,7 +503,7 @@ onMounted(async () => {
 @media (max-width: 600px) {
   .stats-card { grid-template-columns: repeat(2, 1fr); }
   /* 触控目标 ≥44px */
-  .filter-btn, .clear-btn, .act-btn {
+  .filter-btn, .clear-btn, .act-btn, .add-stuck-btn {
     min-height: 44px;
     display: inline-flex; align-items: center; justify-content: center;
   }

@@ -46,6 +46,13 @@ export const GRADE_META = [
  */
 export const REVIEW_SESSION_LIMIT = 25
 
+/**
+ * 卡片种类（error_book.kind 的取值域，P1-10）—— 唯一来源，禁止在视图里内联 'stuck'。
+ * ⚠️ 与 src/components/blocks/blockTypes.js 的 `kind`（**内容角色** concept/point/…，作用于区块渲染）
+ *    **同名不同义**，两处勿合并：这里的是「卡片种类」，作用于复习队列/卡点区分。
+ */
+export const CARD_KINDS = { ERROR: 'error', STUCK: 'stuck' }
+
 /** 获取日期字符串 YYYY-MM-DD */
 function getDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -152,19 +159,26 @@ export function countDue(list, today = getDateStr()) {
 }
 
 /**
- * 复习页队列：筛选到期 → 排序 → 截断。
+ * 复习页队列：筛选到期 → （可选）按 kind 过滤 → 排序 → 截断。
  * 排序口径（可解释性要求，用户问「为什么先出这张」时要有答案）：
  * 排期最早（= 逾期最久）的先复习；同排期按入本时间（createdAt）升序。
  * 不改入参（先复制再排序，与 practiceMetrics.topSlowest 同款约定）。
  * @param {Array<Object>} list error_book 行数组
- * @param {{limit?: number, today?: string}} [opts]
+ * @param {{limit?: number, kind?: (string|null), today?: string}} [opts]
+ *   kind：null/undefined=全部（混合队列）；'stuck'=只卡点；'error'=只错题（无 kind 字段）
  * @returns {Array<Object>} 新数组
  */
 export function pickDue(list, opts = {}) {
-  const { limit = REVIEW_SESSION_LIMIT, today = getDateStr() } = opts
+  const { limit = REVIEW_SESSION_LIMIT, kind = null, today = getDateStr() } = opts
   const src = Array.isArray(list) ? list : []
   return [...src]
     .filter((e) => isDue(e, today))
+    .filter((e) => {
+      if (kind === null || kind === undefined) return true
+      if (kind === CARD_KINDS.STUCK) return e.kind === CARD_KINDS.STUCK
+      if (kind === CARD_KINDS.ERROR) return e.kind !== CARD_KINDS.STUCK
+      return true
+    })
     .sort((a, b) => {
       const na = a.nextReviewDate || ''
       const nb = b.nextReviewDate || ''
