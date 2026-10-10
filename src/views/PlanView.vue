@@ -263,7 +263,11 @@ onMounted(async () => {
   border: 1.5px solid var(--border); color: transparent; background: var(--surface);
   display: inline-flex; align-items: center; justify-content: center;
 }
-/* 触控目标 ≥44px（F1）：视觉保持 28px 圆点，用伪元素把命中区撑到 44×44，不改布局 */
+/* 触控目标 ≥44px（F1）：视觉保持 28px 圆点，用伪元素把命中区撑到 44×44，不改布局。
+   ⚠️ 该命中区靠伪元素**向外撑开**，因而**依赖祖先链上没有 `overflow:hidden`**（QA R2 实测：
+   当前 `.card` 与 main.css 均无裁剪，44×44 命中区确达）。日后若给 `.card` 或列表容器加
+   `overflow:hidden`（很常见的一次改动），命中区会被**重新裁掉** —— 且只在真机触摸时才暴露，
+   代码审查与单测都看不出来；届时必须回来复核命中区是否仍 ≥44×44。 */
 .plan-item__check::after {
   content: ''; position: absolute; top: 50%; left: 50%;
   width: 44px; height: 44px; transform: translate(-50%, -50%);
@@ -283,7 +287,8 @@ onMounted(async () => {
   color: var(--text-muted); background: var(--surface-muted);
   display: inline-flex; align-items: center; justify-content: center;
 }
-/* 触控目标 ≥44px（F1）：同上，视觉 32px 圆点 + 44×44 命中区 */
+/* 触碰目标 ≥44px（F1）：同上，视觉 32px 圆点 + 44×44 命中区。
+   同 `.plan-item__check::after`：命中区依赖祖先无 `overflow:hidden`，改动容器裁剪前先复核命中区。 */
 .plan-item__del::after {
   content: ''; position: absolute; top: 50%; left: 50%;
   width: 44px; height: 44px; transform: translate(-50%, -50%);
