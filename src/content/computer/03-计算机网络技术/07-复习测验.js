@@ -36,8 +36,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "不同 VLAN 之间默认可以直接通信。",
-          answer: "**错误。**不同 VLAN 默认不能直接通信，需要三层设备配合。"
+          question: "同一 VLAN 内的主机可以直接通信，无需经过三层设备。",
+          answer: "**正确。**同一 VLAN 属同一广播域，二层即可互通；跨 VLAN 通信才需要三层设备。"
         },
         {
           difficulty: "medium",
@@ -48,8 +48,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "RIP 协议以跳数作为度量值，最大跳数为 15。",
-          answer: "**正确。**RIP 最大跳数 15，16 视为不可达。"
+          question: "RIP 属于距离矢量路由协议，以跳数作为度量值。",
+          answer: "**正确。**RIP 用跳数衡量路径优劣，最大有效跳数为 15，16 表示不可达。"
         },
         {
           difficulty: "medium",
@@ -85,10 +85,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "提示符为 `Switch(config)#` 时，当前处于（　）",
+          question: "提示符为 `Switch(config-if)#` 时，当前处于（　）",
           options: ["A. 用户模式", "B. 特权模式", "C. 全局配置模式", "D. 接口配置模式"],
-          correctIndex: 2,
-          answer: "答案：C。`(config)#` 是全局配置模式。"
+          correctIndex: 3,
+          answer: "答案：D。`(config-if)#` 表示已进入某个具体接口的配置模式。"
         },
         {
           difficulty: "basic",
@@ -109,34 +109,34 @@ export default {
         {
           difficulty: "medium",
           type: "single",
-          question: "连接两台交换机并传输多个 VLAN 数据的端口应设为（　）",
-          options: ["A. access", "B. trunk", "C. console", "D. vlan"],
+          question: "交换机上用于连接普通 PC 的端口通常应配置为（　）",
+          options: ["A. trunk 模式", "B. access 模式", "C. 路由模式", "D. 混杂模式"],
           correctIndex: 1,
-          answer: "答案：B。trunk 端口承载多个 VLAN。"
+          answer: "答案：B。连接终端设备的端口设为 access 模式并划入相应 VLAN；trunk 用于交换机之间的多 VLAN 互联。"
         },
         {
           difficulty: "medium",
           type: "single",
-          question: "配置默认路由的命令是（　）",
-          options: ["A. `ip route 0.0.0.0 0.0.0.0 下一跳`", "B. `ip route 192.168.1.0 255.255.255.0 下一跳`", "C. `default route`", "D. `route default`"],
-          correctIndex: 0,
-          answer: "答案：A。默认路由目标网络和掩码均为 0.0.0.0。"
+          question: "静态路由配置中，目标网络与掩码都写成 0.0.0.0 表示（　）",
+          options: ["A. 直连路由", "B. 默认路由", "C. 主机路由", "D. 动态路由"],
+          correctIndex: 1,
+          answer: "答案：B。目标网络和掩码均为 0.0.0.0 即默认路由，匹配所有目的地址。"
         },
         {
           difficulty: "medium",
           type: "single",
-          question: "进入 RIP 路由配置模式的命令是（　）",
-          options: ["A. `router rip`", "B. `rip enable`", "C. `configure rip`", "D. `ip rip`"],
+          question: "查看路由器路由表的命令是（　）",
+          options: ["A. show ip route", "B. show vlan brief", "C. show running-config", "D. show version"],
           correctIndex: 0,
-          answer: "答案：A。`router rip` 进入 RIP 配置模式。"
+          answer: "答案：A。`show ip route` 显示路由表；`show vlan brief` 看 VLAN 与端口归属。"
         },
         {
           difficulty: "advanced",
           type: "single",
-          question: "三层交换机开启路由功能的命令是（　）",
-          options: ["A. `router rip`", "B. `ip routing`", "C. `no switchport`", "D. `ip route`"],
+          question: "三层交换机上创建 VLAN 后，若要实现 VLAN 间通信，还需（　）",
+          options: ["A. 仅创建 VLAN 即可自动互通", "B. 执行 ip routing 并配置 VLAN 接口地址", "C. 把所有端口设为 trunk", "D. 重启交换机"],
           correctIndex: 1,
-          answer: "答案：B。`ip routing` 开启三层交换路由功能。"
+          answer: "答案：B。需开启 ip routing 并给各 VLAN 配置接口地址，VLAN 间才可路由互通。"
         },
         {
           difficulty: "advanced",

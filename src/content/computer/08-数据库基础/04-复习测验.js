@@ -19,10 +19,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "数据库系统的核心是（　）",
-          options: ["A. 数据库", "B. 数据库管理系统（DBMS）", "C. 数据表", "D. 操作系统"],
+          question: "在数据表中，用于唯一标识每条记录的字段（或字段组合）称为（　）",
+          options: ["A. 外键", "B. 主键", "C. 索引", "D. 视图"],
           correctIndex: 1,
-          answer: "答案：B。DBMS 是数据库系统的核心，负责数据库的建立、使用与维护。"
+          answer: "答案：B。主键用于唯一标识记录，且不允许重复与为空。"
         },
         {
           difficulty: "basic",
@@ -35,10 +35,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "下列属于关系型数据库管理系统的是（　）",
-          options: ["A. Windows", "B. MySQL", "C. WPS", "D. Photoshop"],
+          question: "下列软件中，属于数据库管理系统的是（　）",
+          options: ["A. WPS 文字", "B. Access", "C. Photoshop", "D. 浏览器"],
           correctIndex: 1,
-          answer: "答案：B。MySQL 是关系型数据库管理系统；其余均非数据库软件。"
+          answer: "答案：B。Access 是关系型数据库管理系统；其余三项均非数据库软件。"
         },
         {
           difficulty: "medium",
@@ -147,8 +147,8 @@ export default {
         {
           difficulty: "basic",
           type: "judge",
-          question: "数据库是长期存储在计算机内、有组织且可共享的数据集合。",
-          answer: "**正确。**这是数据库（DB）的基本定义。"
+          question: "一个数据库中可以包含多张数据表，表与表之间可以通过主键与外键建立联系。",
+          answer: "**正确。**数据库可含多表，主外键用于建立表间关联，减少数据冗余。"
         },
         {
           difficulty: "basic",
@@ -183,8 +183,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "SQL 语句中，字符串类型的值需要用单引号括起来。",
-          answer: "**正确。**字符与日期值用单引号；数值不需要。"
+          question: "SQL 的 SELECT 语句用于查询数据，WHERE 子句用于指定查询条件。",
+          answer: "**正确。**SELECT 负责查询，WHERE 用于筛选满足条件的记录。"
         },
         {
           difficulty: "medium",

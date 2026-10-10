@@ -125,14 +125,18 @@ export default {
         {
           title: "例题1：拓扑结构判断",
           difficulty: "basic",
-          question: "某机房所有 PC 都连接到一台中心交换机上，这种拓扑结构是（　）\nA. 总线型　B. 星型　C. 环型　D. 网状",
+          question: "某机房所有 PC 都连接到一台中心交换机上，这种拓扑结构是（　）",
+          options: ["A. 总线型", "B. 星型", "C. 环型", "D. 网状"],
+          correctIndex: 1,
           solution: "**解：**\n所有设备连接到中心交换机，属于星型拓扑。中心交换机是核心节点，PC 之间的通信都经过它。",
           answer: "答案：B。星型拓扑。"
         },
         {
           title: "例题2：连线方式判断",
           difficulty: "medium",
-          question: "在 PacketTracer 中，下列设备之间应使用直通线连接的是（　）\nA. PC 与 PC　B. 交换机与交换机　C. PC 与交换机　D. 路由器与路由器",
+          question: "在 PacketTracer 中，下列设备之间应使用直通线连接的是（　）",
+          options: ["A. PC 与 PC", "B. 交换机与交换机", "C. PC 与交换机", "D. 路由器与路由器"],
+          correctIndex: 2,
           solution: "**解：**\n直通线连接不同类型设备：PC 与交换机属于不同类型，用直通线。\nPC 与 PC、交换机与交换机、路由器与路由器属于同类型设备，一般用交叉线。",
           answer: "答案：C。PC 与交换机用直通线。"
         },

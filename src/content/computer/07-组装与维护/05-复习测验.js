@@ -48,10 +48,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "BIOS 的本质是（　）",
-          options: ["A. 一块存储参数的芯片", "B. 固化在 ROM 中的程序", "C. 一种文件系统格式", "D. 操作系统内核"],
+          question: "在 BIOS 设置中，用于调整系统启动顺序的是（　）",
+          options: ["A. Main", "B. Boot", "C. Security", "D. Exit"],
           correctIndex: 1,
-          answer: "答案：B。BIOS 是固化在主板 ROM 芯片上的程序，负责自检、初始化与引导系统。"
+          answer: "答案：B。Boot（启动）选项卡用于设置第一启动设备等启动顺序。"
         },
         {
           difficulty: "medium",
@@ -177,8 +177,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "处理计算机故障应遵循\"先软后硬、先外后内\"的原则。",
-          answer: "**正确。**先排查软件与连接等外部因素，最后再考虑拆机检查硬件。"
+          question: "硬盘出现异常时，应先用系统自带工具检测与修复，再考虑更换硬件。",
+          answer: "**正确。**这符合\"先软后硬\"的排查原则：先排除软件与设置问题，最后才动硬件。"
         },
         {
           difficulty: "medium",

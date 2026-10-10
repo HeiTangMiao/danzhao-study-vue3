@@ -55,8 +55,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "帧速率 25 表示每秒播放 25 张画面。",
-          answer: "**正确。**帧速率是每秒画面数。"
+          question: "视频帧速率越高，画面越流畅，但同等时长下文件通常也越大。",
+          answer: "**正确。**帧速率决定每秒画面张数：越高越流畅，数据量也相应增加。"
         },
         {
           difficulty: "advanced",
@@ -94,10 +94,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "选择图像中颜色相近区域的工具是（　）",
-          options: ["A. 矩形选框", "B. 魔棒工具", "C. 画笔工具", "D. 橡皮擦"],
+          question: "在 Photoshop 中要将当前选区反选，应执行（　）",
+          options: ["A. 选择 → 全选", "B. 选择 → 反选", "C. 选择 → 取消选择", "D. 选择 → 修改 → 羽化"],
           correctIndex: 1,
-          answer: "答案：B。魔棒工具按颜色选取。"
+          answer: "答案：B。「选择 → 反选」（Ctrl+Shift+I）用于选中原选区之外的部分。"
         },
         {
           difficulty: "medium",
@@ -110,18 +110,18 @@ export default {
         {
           difficulty: "medium",
           type: "single",
-          question: "文字竖排显示应使用（　）",
-          options: ["A. 横排文字工具", "B. 直排文字工具", "C. 段落文字", "D. 钢笔工具"],
+          question: "要让文字以选区形式出现（而非新建文字图层），应使用（　）",
+          options: ["A. 横排文字工具", "B. 文字蒙版工具", "C. 直排文字工具", "D. 油漆桶工具"],
           correctIndex: 1,
-          answer: "答案：B。直排文字工具。"
+          answer: "答案：B。文字蒙版工具输入的文字直接成为选区，可用于填充或剪裁。"
         },
         {
           difficulty: "medium",
           type: "single",
-          question: "自由变换的快捷键是（　）",
-          options: ["A. Ctrl+T", "B. Ctrl+D", "C. Ctrl+Z", "D. Ctrl+S"],
+          question: "在 Photoshop 中「通过拷贝的图层」的快捷键是（　）",
+          options: ["A. Ctrl+J", "B. Ctrl+E", "C. Ctrl+D", "D. Ctrl+T"],
           correctIndex: 0,
-          answer: "答案：A。Ctrl+T 自由变换。"
+          answer: "答案：A。Ctrl+J 复制当前图层；Ctrl+E 向下合并；Ctrl+D 取消选择；Ctrl+T 自由变换。"
         },
         {
           difficulty: "medium",
@@ -142,26 +142,26 @@ export default {
         {
           difficulty: "advanced",
           type: "single",
-          question: "去除视频中白色背景应使用（　）特效",
-          options: ["A. 颜色键", "B. 亮度与对比度", "C. 模糊", "D. 锐化"],
+          question: "要让两个相邻视频片段之间平滑过渡，应添加（　）",
+          options: ["A. 视频过渡（如交叉溶解）", "B. 视频效果（如颜色键）", "C. 音频过渡", "D. 字幕"],
           correctIndex: 0,
-          answer: "答案：A。颜色键去背景。"
+          answer: "答案：A。片段之间的切换用视频过渡；颜色键属于抠像效果，不改变片段衔接。"
         },
         {
           difficulty: "advanced",
           type: "single",
-          question: "带状擦除属于（　）效果",
-          options: ["A. 视频过渡", "B. 视频效果", "C. 音频效果", "D. 字幕效果"],
-          correctIndex: 0,
-          answer: "答案：A。带状擦除是转场效果。"
+          question: "下列属于 Premiere「视频效果」（而非转场）的是（　）",
+          options: ["A. 交叉溶解", "B. 带状擦除", "C. 颜色键", "D. 黑场过渡"],
+          correctIndex: 2,
+          answer: "答案：C。颜色键是抠像类的视频效果；交叉溶解、带状擦除、黑场过渡都是转场。"
         },
         {
           difficulty: "advanced",
           type: "single",
-          question: "实现音频淡入淡出的效果是（　）",
-          options: ["A. 恒定增益", "B. 颜色键", "C. 带状擦除", "D. 亮度调整"],
+          question: "在 Premiere 中整体调整片段音量（如统一降低 6 dB），应使用（　）",
+          options: ["A. 音频增益", "B. 恒定增益", "C. 交叉溶解", "D. 降噪"],
           correctIndex: 0,
-          answer: "答案：A。恒定增益实现音量渐变。"
+          answer: "答案：A。音频增益用于整体加减分贝；恒定增益是音频过渡，用于淡入淡出。"
         }
       ]
     },

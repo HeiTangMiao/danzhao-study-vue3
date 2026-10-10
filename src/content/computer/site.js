@@ -47,7 +47,8 @@ export const COMPUTER_CONFIG = {
         // ↓↓↓ 理论考「网络及网页设计」模块补充页（末尾追加，未插入、未重排）
         { name: "08-网页设计基础", title: "网页设计基础（HTML）", subtitle: "网页概念、开发流程与 HTML 常用标签" },
         { name: "09-CSS样式与布局基础", title: "CSS 样式与布局基础", subtitle: "CSS 引入方式、选择器、盒子模型与 DIV+CSS 布局" },
-        { name: "10-OSI参考模型与TCPIP协议", title: "OSI 参考模型与 TCP/IP 协议", subtitle: "分层思想、七层模型、TCP/IP 与 TCP/UDP" }
+        { name: "10-OSI参考模型与TCPIP协议", title: "OSI 参考模型与 TCP/IP 协议", subtitle: "分层思想、七层模型、TCP/IP 与 TCP/UDP" },
+        { name: "11-网络操作卡点清单", title: "网络操作卡点清单", subtitle: "PT 操作 · 交换机路由命令 · Windows 命令 · 排查三步法" }
       ]
     },
     {
@@ -58,14 +59,19 @@ export const COMPUTER_CONFIG = {
         { name: "03-Photoshop综合案例", title: "Photoshop 综合案例", subtitle: "海报设计、图案填充与印章效果" },
         { name: "04-Premiere基础与视频编辑", title: "Premiere 基础与视频编辑", subtitle: "项目创建、素材导入、剪辑与关键帧" },
         { name: "05-Premiere特效字幕与音频", title: "Premiere 特效字幕与音频", subtitle: "视频特效、字幕制作、转场与音频" },
-        { name: "06-复习测验", title: "数字媒体技术 · 复习测验", subtitle: "本单元知识综合检测", isTest: true }
+        { name: "06-复习测验", title: "数字媒体技术 · 复习测验", subtitle: "本单元知识综合检测", isTest: true },
+        // ↓↓↓ 操作考冲刺补充页（末尾追加，未插入、未重排）
+        { name: "07-操作考速查与易错清单", title: "数媒操作考 · 考前速查与易错清单", subtitle: "PS/PR 高频操作速查 + 考场流程 + 易错 Top 10" },
+        { name: "08-操作考卡点清单（PS-PR）", title: "操作考卡点清单（PS / PR）", subtitle: "操作名 → 菜单路径 / 快捷键，可直接录入卡点本" }
       ]
     },
     {
       num: "05", title: "模拟冲刺", folder: "05-模拟冲刺", phase: 3, color: "#a855f7", icon: "🚀", sprint: true,
       files: [
         { name: "01-考试技巧", title: "考试技巧与得分策略（计算机）", subtitle: "考场流程、时间分配与抢分技巧" },
-        { name: "02-真题模拟卷", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 90 分钟 · 满分 150 分", isTest: true }
+        { name: "02-真题模拟卷", title: "真题模拟卷（一）", subtitle: "全真模拟 · 限时 90 分钟 · 满分 150 分", isTest: true },
+        { name: "03-真题模拟卷二", title: "真题模拟卷（二）", subtitle: "全真模拟 · 限时 90 分钟 · 满分 150 分", isTest: true },
+        { name: "04-错因诊断与纠正手册", title: "错因诊断与纠正手册（计算机）", subtitle: "六类错因对照表 + 理论/操作分线纠正" }
       ]
     },
     // ↓↓↓ 新增单元：理论基础（面向「职业技能理论考试」，与操作考试内容互为补充）

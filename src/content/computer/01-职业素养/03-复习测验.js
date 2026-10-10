@@ -18,8 +18,8 @@ export default {
         {
           difficulty: "basic",
           type: "judge",
-          question: "开机时应先开主机，再开显示器。",
-          answer: "**错误。**开机应先开显示器等外设，再开主机；关机顺序相反。"
+          question: "关机时应先关闭主机，再关闭显示器等外设。",
+          answer: "**正确。**关机顺序与开机相反：先关主机，再关显示器等外设。"
         },
         {
           difficulty: "basic",
@@ -42,8 +42,8 @@ export default {
         {
           difficulty: "medium",
           type: "judge",
-          question: "考试中保存文件时，扩展名可以随意更改。",
-          answer: "**错误。**扩展名决定文件类型，随意更改会导致文件无法打开或程序无法运行。"
+          question: "在 Windows 中使用中文文件名是可以的，只要不含非法字符。",
+          answer: "**正确。**Windows 支持中文文件名；关键是不得包含 \\ / : * ? 等非法字符。"
         },
         {
           difficulty: "medium",
@@ -85,10 +85,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "下列文件名中，最规范的是（　）",
-          options: ["A. 新建文档1.docx", "B. 111111.txt", "C. 期末成绩统计.xlsx", "D. a b c.docx"],
+          question: "下列文件名中，不符合命名规范的是（　）",
+          options: ["A. 期末成绩统计", "B. 2026单招复习计划", "C. 我的文件*最终版", "D. 网络实验报告1"],
           correctIndex: 2,
-          answer: "答案：C。\"期末成绩统计\"见名知意，能反映文件内容。"
+          answer: "答案：C。文件名中不能包含 `*` 等特殊字符；其余三项均规范且能反映文件内容。"
         },
         {
           difficulty: "basic",
@@ -117,10 +117,10 @@ export default {
         {
           difficulty: "medium",
           type: "single",
-          question: "下列行为中，符合计算机操作职业道德的是（　）",
-          options: ["A. 盗用他人账号", "B. 使用正版软件并遵守授权协议", "C. 传播盗版软件", "D. 随意删除他人文件"],
+          question: "下列做法中，不符合计算机操作职业道德的是（　）",
+          options: ["A. 使用正版软件并遵守授权协议", "B. 未经允许查看他人文件夹中的资料", "C. 定期备份重要数据", "D. 保持机房整洁、爱护设备"],
           correctIndex: 1,
-          answer: "答案：B。尊重知识产权、使用正版软件符合职业道德。"
+          answer: "答案：B。未经允许查看他人资料侵犯隐私，不符合职业道德；其余三项均为规范做法。"
         },
         {
           difficulty: "medium",

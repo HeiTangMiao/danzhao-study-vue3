@@ -66,8 +66,8 @@ export default {
         {
           difficulty: "advanced",
           type: "judge",
-          question: "冒泡排序 n 个元素需要 n-1 轮。",
-          answer: "**正确。**每轮确定一个元素位置，n 个元素需要 n-1 轮。"
+          question: "冒泡排序中，若某一轮没有发生任何交换，可以判断序列已经有序并提前结束。",
+          answer: "**正确。**这是冒泡排序的提前终止优化：无交换即已有序。"
         },
         {
           difficulty: "advanced",
@@ -85,10 +85,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "下列变量名中，合法的是（　）",
-          options: ["A. 2num", "B. my-name", "C. student_name", "D. for"],
+          question: "下列变量名中，不合法的是（　）",
+          options: ["A. score_1", "B. _total", "C. 3rd_num", "D. name2"],
           correctIndex: 2,
-          answer: "答案：C。student_name 合法；`for` 是关键字，`2num` 以数字开头，`my-name` 含非法字符。"
+          answer: "答案：C。变量名不能以数字开头；其余三项均为合法变量名。"
         },
         {
           difficulty: "basic",

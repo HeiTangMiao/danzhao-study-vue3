@@ -27,10 +27,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "1 GB 的存储容量等于（　）",
-          options: ["A. 1000 MB", "B. 1024 MB", "C. 1024 KB", "D. 1000 KB"],
+          question: "1 TB 的存储容量等于（　）",
+          options: ["A. 1000 GB", "B. 1024 GB", "C. 1024 MB", "D. 1000 MB"],
           correctIndex: 1,
-          answer: "答案：B。存储单位进率为 1024：1 GB = 1024 MB = 1024 × 1024 KB。"
+          answer: "答案：B。存储单位以 1024 进位：1 TB = 1024 GB = 1024 × 1024 MB。"
         },
         {
           difficulty: "basic",
@@ -127,8 +127,8 @@ export default {
         {
           difficulty: "basic",
           type: "judge",
-          question: "个人计算机（PC）按规模分类属于微型机。",
-          answer: "**正确。**按规模分为巨型机、大型机、中型机、小型机、微型机，PC 属于微型机。"
+          question: "按计算机的规模分类，平板电脑属于微型机。",
+          answer: "**正确。**按规模可分为巨型机、大型机、小型机、微型机等，平板电脑与 PC 同属微型机范畴。"
         },
         {
           difficulty: "basic",
@@ -145,8 +145,8 @@ export default {
         {
           difficulty: "basic",
           type: "judge",
-          question: "操作系统是用户与计算机硬件之间的接口。",
-          answer: "**正确。**操作系统屏蔽硬件细节，并为用户提供操作界面。"
+          question: "操作系统是最基本的系统软件，负责管理计算机的硬件与软件资源。",
+          answer: "**正确。**操作系统是系统软件的核心，管理处理器、存储、设备与文件等资源。"
         },
         {
           difficulty: "basic",
@@ -202,10 +202,10 @@ export default {
         {
           difficulty: "advanced",
           type: "single",
-          question: "二进制数 \\((11101101)_2\\) 转换为十六进制是（　）",
-          options: ["A. ED", "B. DE", "C. EF", "D. FE"],
+          question: "二进制数 \\((10110110)_2\\) 转换为十六进制是（　）",
+          options: ["A. \\(B6\\)", "B. \\(6B\\)", "C. \\(D6\\)", "D. \\(166\\)"],
           correctIndex: 0,
-          answer: "答案：A。从右往左四位分组：1110 | 1101 → E | D，结果为 ED。"
+          answer: "答案：A。从右往左四位分组：1011 | 0110 → B | 6，结果为 B6。"
         },
         {
           difficulty: "sprint",

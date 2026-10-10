@@ -32,10 +32,10 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "表达式 `7 // 2` 的结果是（　）",
-          options: ["A. 3.5", "B. 3", "C. 1", "D. 4"],
-          correctIndex: 1,
-          answer: "答案：B。`//` 是整除，结果是 3。"
+          question: "表达式 `10 % 3` 的结果是（　）",
+          options: ["A. 1", "B. 3", "C. 3.33", "D. 0"],
+          correctIndex: 0,
+          answer: "答案：A。`%` 是求余运算，10 除以 3 余 1。"
         },
         {
           difficulty: "basic",
@@ -50,10 +50,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "执行以下代码，输出结果是（　）\n```\nsum = 0\nfor i in range(1, 6):\n    sum += i\nprint(sum)\n```",
-          options: ["A. 15", "B. 10", "C. 21", "D. 14"],
+          question: "执行以下代码，输出结果是（　）\n```\nsum = 0\nfor i in range(1, 5):\n    sum += i\nprint(sum)\n```",
+          options: ["A. 10", "B. 15", "C. 6", "D. 4"],
           correctIndex: 0,
-          answer: "答案：A。1+2+3+4+5 = 15。"
+          answer: "答案：A。range(1, 5) 生成 1、2、3、4，累加得 10。"
         },
         {
           difficulty: "medium",
@@ -95,10 +95,10 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i % 2 == 0:\n        continue\n    print(i, end=\" \")\n```",
-          options: ["A. 1 2 3 4 5", "B. 1 3 5", "C. 2 4", "D. 1 2 3"],
-          correctIndex: 1,
-          answer: "答案：B。i 为偶数时 continue 跳过，只输出奇数。"
+          question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i % 2 == 1:\n        continue\n    print(i, end=\" \")\n```",
+          options: ["A. 2 4", "B. 1 3 5", "C. 1 2 3 4 5", "D. 2 4 6"],
+          correctIndex: 0,
+          answer: "答案：A。`continue` 跳过奇数，只打印偶数 2、4。"
         },
         {
           difficulty: "advanced",
@@ -158,10 +158,10 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "连接同一局域网内多台 PC 的设备是（　）",
-          options: ["A. 路由器", "B. 交换机", "C. 调制解调器", "D. 集线器"],
-          correctIndex: 1,
-          answer: "答案：B。交换机连接局域网设备。"
+          question: "用于连接不同网络、实现网段间数据转发的设备是（　）",
+          options: ["A. 交换机", "B. 集线器", "C. 路由器", "D. 中继器"],
+          correctIndex: 2,
+          answer: "答案：C。路由器工作在网络层，负责不同网络之间的转发与路径选择。"
         },
         {
           difficulty: "basic",
@@ -176,10 +176,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "将端口 Fa0/1-10 划入 VLAN 10，正确的命令序列是（　）",
-          options: ["A. `interface range f0/1-10` → `switchport mode access` → `switchport access vlan 10`", "B. `vlan 10` → `interface f0/1`", "C. `switchport mode trunk` → `switchport access vlan 10`", "D. `hostname SWA` → `vlan 10`"],
+          question: "查看交换机上 VLAN 编号与端口归属的命令是（　）",
+          options: ["A. `show vlan brief`", "B. `show ip route`", "C. `show version`", "D. `show interface fa0/1`"],
           correctIndex: 0,
-          answer: "答案：A。进入端口范围 → 设 access → 划入 VLAN 10。"
+          answer: "答案：A。`show vlan brief` 列出各 VLAN 及所属端口。"
         },
         {
           difficulty: "medium",
@@ -212,54 +212,54 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "查看本机 IP 详细配置（含 DNS）的命令是（　）",
-          options: ["A. ipconfig", "B. ipconfig /all", "C. ping", "D. tracert"],
+          question: "跟踪数据包到目标主机所经过路径的命令是（　）",
+          options: ["A. ping", "B. tracert", "C. ipconfig", "D. netstat"],
           correctIndex: 1,
-          answer: "答案：B。`ipconfig /all` 查看详细信息。"
+          answer: "答案：B。`tracert` 显示沿途各跳点，用于判断在哪一段不通。"
         },
         {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "自动为客户机分配 IP 地址的服务是（　）",
-          options: ["A. WWW", "B. FTP", "C. DHCP", "D. DNS"],
+          question: "将域名解析为 IP 地址的服务是（　）",
+          options: ["A. DHCP", "B. FTP", "C. DNS", "D. HTTP"],
           correctIndex: 2,
-          answer: "答案：C。DHCP 自动分配 IP 等参数。"
+          answer: "答案：C。DNS 负责域名与 IP 地址的相互解析。"
         },
         {
           difficulty: "medium",
           type: "fill",
           score: 5,
-          question: "完成 SWA 配置命令填空：\n`Switch>______`（进入特权模式）\n`Switch#______`（进入全局模式）\n`Switch(config)#______`（更改设备名称为 SWA）",
-          answer: "enable → configure terminal → hostname SWA。"
+          question: "完成命令填空：\n`SWA(config)#______`（创建 VLAN 20）\n`SWA#______`（查看 VLAN 信息）",
+          answer: "`vlan 20`；`show vlan brief`。创建 VLAN 用 `vlan 编号`；查看用 `show vlan brief`。"
         },
         {
           difficulty: "medium",
           type: "fill",
           score: 5,
-          question: "完成 SWA 配置命令填空：\n`SWA(config)#______`（建立 VLAN 10）\n`SWA(config)#______`（进入端口 F0/1-10）\n`SWA(config-if-range)#______`（将端口 F0/1-10 划入 VLAN 10）",
-          answer: "vlan 10 → interface range f0/1-10 → switchport access vlan 10。"
+          question: "完成命令填空：\n`RA(config)#______`（进入接口 F0/0）\n`RA(config-if)#______`（配置地址 192.168.2.1/24）",
+          answer: "`interface f0/0`；`ip address 192.168.2.1 255.255.255.0`。注意接口配完还需 `no shutdown`。"
         },
         {
           difficulty: "advanced",
           type: "fill",
           score: 5,
-          question: "完成 SWD 配置命令填空：\n`SWD(config)#______`（开启路由功能）\n`SWD(config)#______`（启用动态路由协议）\n`SWD(config-router)#______`（宣告版本号为 2）",
-          answer: "ip routing → router rip → version 2。"
+          question: "完成命令填空：\n`SWD(config)#______`（进入 VLAN 10 的接口）\n`SWD(config-if)#______`（配置地址 192.168.10.1/24）",
+          answer: "`interface vlan 10`；`ip address 192.168.10.1 255.255.255.0`。三层交换机通过 SVI 实现 VLAN 间路由。"
         },
         {
           difficulty: "advanced",
           type: "fill",
           score: 5,
-          question: "完成 RA 配置命令填空：\n`RA(config-router)#______`（取消自动汇总功能）\n`RA(config-router)#______`（宣告直连网络号 192.168.1.0）\n`RA(config-router)#______`（重发布默认路由）",
-          answer: "no auto-summary → network 192.168.1.0 → redistribute static。"
+          question: "完成命令填空：\n`RA(config)#______`（进入 RIP 配置模式）\n`RA(config-router)#______`（宣告网络 192.168.1.0）",
+          answer: "`router rip`；`network 192.168.1.0`。进入协议配置模式后用 network 宣告直连网段。"
         },
         {
           difficulty: "advanced",
           type: "fill",
           score: 5,
-          question: "完成 RB 配置命令填空：\n`RB(config)#______`（配置默认路由，出口为 F0/1，下一跳 202.101.172.1）",
-          answer: "ip route 0.0.0.0 0.0.0.0 202.101.172.1。"
+          question: "完成命令填空：\n`RB(config)#______`（进入 RIP 配置模式）\n`RB(config-router)#______`（取消自动汇总）",
+          answer: "`router rip`；`no auto-summary`。取消自动汇总可避免不连续子网的路由汇总问题。"
         },
         {
           difficulty: "medium",
@@ -289,37 +289,37 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "屏幕显示用的图像分辨率一般为（　）",
-          options: ["A. 72", "B. 300", "C. 1000", "D. 24"],
-          correctIndex: 0,
-          answer: "答案：A。屏幕显示用 72 像素/英寸。"
-        },
-        {
-          difficulty: "basic",
-          type: "single",
-          score: 5,
-          question: "使用椭圆选框工具绘制正圆，需要按住（　）键",
-          options: ["A. Ctrl", "B. Alt", "C. Shift", "D. Tab"],
+          question: "用于印刷的图像，其分辨率通常不低于（　）",
+          options: ["A. 72 像素/英寸", "B. 150 像素/英寸", "C. 300 像素/英寸", "D. 30 像素/英寸"],
           correctIndex: 2,
-          answer: "答案：C。Shift 键绘制正圆。"
+          answer: "答案：C。印刷通常要求 300 像素/英寸以上；72 像素/英寸用于屏幕显示。"
         },
         {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "Photoshop 中新建图层的快捷键是（　）",
-          options: ["A. Ctrl+N", "B. Ctrl+Shift+N", "C. Ctrl+J", "D. Ctrl+T"],
+          question: "在 Photoshop 中绘制正方形选区，应使用的工具是（　）",
+          options: ["A. 椭圆选框工具", "B. 矩形选框工具", "C. 套索工具", "D. 魔棒工具"],
           correctIndex: 1,
-          answer: "答案：B。Ctrl+Shift+N 新建图层。"
+          answer: "答案：B。矩形选框工具绘制矩形/正方形；椭圆选框工具按住 Shift 得到正圆。"
+        },
+        {
+          difficulty: "basic",
+          type: "single",
+          score: 5,
+          question: "在 Photoshop 中取消当前选区的快捷键是（　）",
+          options: ["A. Ctrl+A", "B. Ctrl+D", "C. Ctrl+Shift+I", "D. Ctrl+J"],
+          correctIndex: 1,
+          answer: "答案：B。Ctrl+D 取消选择；Ctrl+Shift+I 反选；Ctrl+J 复制图层。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "将图片定义为图案，应使用（　）",
-          options: ["A. 编辑→定义图案", "B. 滤镜→模糊", "C. 图像→调整", "D. 图层→复制"],
+          question: "在 Photoshop 中把当前图层与下方图层合并，应使用（　）",
+          options: ["A. Ctrl+E", "B. Ctrl+J", "C. Ctrl+G", "D. Ctrl+Shift+E"],
           correctIndex: 0,
-          answer: "答案：A。编辑→定义图案。"
+          answer: "答案：A。Ctrl+E 向下合并；Ctrl+Shift+E 合并可见图层；Ctrl+G 编组。"
         },
         {
           difficulty: "medium",
@@ -334,10 +334,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "Premiere 中分割视频片段的工具是（　）",
-          options: ["A. 选择工具", "B. 剃刀工具", "C. 钢笔工具", "D. 抓手工具"],
-          correctIndex: 1,
-          answer: "答案：B。剃刀工具（C）。"
+          question: "在 Premiere 中应用默认视频过渡（交叉溶解）的快捷键是（　）",
+          options: ["A. Ctrl+D", "B. Ctrl+Shift+D", "C. Ctrl+M", "D. Ctrl+T"],
+          correctIndex: 0,
+          answer: "答案：A。Ctrl+D 应用默认视频过渡；Ctrl+Shift+D 应用默认音频过渡。"
         },
         {
           difficulty: "advanced",
@@ -352,10 +352,10 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "实现音频淡入淡出的效果是（　）",
-          options: ["A. 恒定增益", "B. 颜色键", "C. 带状擦除", "D. 亮度调整"],
+          question: "在 Premiere 中把某个片段的速度改为 2 倍，应使用（　）",
+          options: ["A. 速度/持续时间", "B. 音频增益", "C. 交叉溶解", "D. 导出媒体"],
           correctIndex: 0,
-          answer: "答案：A。恒定增益实现音量渐变。"
+          answer: "答案：A。右键片段 → 速度/持续时间（Ctrl+R）可调整快慢放。"
         },
         {
           difficulty: "medium",
