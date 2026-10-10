@@ -543,7 +543,12 @@ export const usePracticeStore = defineStore('practice', () => {
     }
   })
 
-  /** 结算页「重做错题」：本次答错/自评不会的题重开一组 */
+  /**
+   * 结算页「重做错题」：本次答错/自评不会的题重开一组。
+   * 重做恒为**非限时精练**（不传 timed → startSession 缺省 false）：故 mode/title 也必须用
+   * 非限时口径，否则会出现「标题写『限时仿真 · N 分钟』、实则无倒计时」的自相矛盾（F2）。
+   * session.mode 目前无消费者（仅此处写入），timed 源改用语义自洽的 'redo' 零功能副作用。
+   */
   function redoErrors() {
     const s = session.value
     if (!s) return
@@ -553,8 +558,8 @@ export const usePracticeStore = defineStore('practice', () => {
     })
     if (!wrong.length) return
     startSession({
-      mode: s.mode,
-      title: `${s.title} · 错题重做`,
+      mode: s.timed ? 'redo' : s.mode, // 限时源 → 'redo'；非限时源沿用原非限时 mode
+      title: s.timed ? `错题重做 · ${wrong.length} 题` : `${s.title} · 错题重做`,
       subject: s.subject,
       unitNums: s.unitNums,
       questions: wrong.map((q) => ({ ...q })),

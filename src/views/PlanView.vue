@@ -211,7 +211,7 @@ onMounted(async () => {
 }
 .plan-ms.is-past { opacity: 0.7; }
 .plan-ms__date {
-  flex: 0 0 auto; min-height: 36px; padding: 0 var(--space-2); font-size: 16px; font-family: inherit;
+  flex: 0 0 auto; min-height: 44px; padding: 0 var(--space-2); font-size: 16px; font-family: inherit;
   border: 1px solid var(--border); border-radius: var(--radius-md);
   background: var(--surface); color: var(--text);
 }
@@ -258,9 +258,15 @@ onMounted(async () => {
 .plan-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
 .plan-item { display: flex; align-items: center; gap: var(--space-2); }
 .plan-item__check {
+  position: relative;
   flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
   border: 1.5px solid var(--border); color: transparent; background: var(--surface);
   display: inline-flex; align-items: center; justify-content: center;
+}
+/* 触控目标 ≥44px（F1）：视觉保持 28px 圆点，用伪元素把命中区撑到 44×44，不改布局 */
+.plan-item__check::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 44px; height: 44px; transform: translate(-50%, -50%);
 }
 .plan-item__check.is-on { background: var(--success); border-color: var(--success); color: #fff; }
 .plan-item__title { flex: 1; font-size: var(--fs-base); }
@@ -272,11 +278,18 @@ onMounted(async () => {
 }
 .plan-item__date { flex: 0 0 auto; font-size: var(--fs-xs); color: var(--text-muted); }
 .plan-item__del {
+  position: relative;
   flex: 0 0 auto; width: 32px; height: 32px; border-radius: var(--radius-full);
   color: var(--text-muted); background: var(--surface-muted);
   display: inline-flex; align-items: center; justify-content: center;
 }
+/* 触控目标 ≥44px（F1）：同上，视觉 32px 圆点 + 44×44 命中区 */
+.plan-item__del::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  width: 44px; height: 44px; transform: translate(-50%, -50%);
+}
 .plan-done { margin-top: var(--space-3); }
-.plan-done summary { color: var(--text-muted); font-size: var(--fs-md); cursor: pointer; }
+/* 触控目标 ≥44px（F1）：撑高可点区（保留 list-item 的原生展开三角） */
+.plan-done summary { color: var(--text-muted); font-size: var(--fs-md); cursor: pointer; min-height: 44px; padding: var(--space-2) 0; }
 .plan-list--done { margin-top: var(--space-2); opacity: 0.85; }
 </style>
