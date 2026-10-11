@@ -150,10 +150,10 @@ export default {
           type: "single",
           question: "安装内存条时，正确的做法是（　）",
           options: [
-            "A. 对准防呆缺口垂直插入，听到卡扣声即到位",
-            "B. 用力按压直到插进去",
-            "C. 任意方向插入均可",
-            "D. 不需要卡扣固定"
+            "对准防呆缺口垂直插入，听到卡扣声即到位",
+            "用力按压直到插进去",
+            "任意方向插入均可",
+            "不需要卡扣固定"
           ],
           correctIndex: 0,
           answer: "答案：A。内存有防呆缺口，应对准后垂直插入，卡扣自动扣紧；不能蛮力按压。"
@@ -162,7 +162,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "BIOS 的本质是（　）",
-          options: ["A. 一块存储芯片", "B. 固化在 ROM 中的程序", "C. 操作系统的一部分", "D. 一种硬盘分区格式"],
+          options: ["一块存储芯片", "固化在 ROM 中的程序", "操作系统的一部分", "一种硬盘分区格式"],
           correctIndex: 1,
           answer: "答案：B。BIOS 是固化在主板 ROM 芯片上的程序，负责自检、初始化与引导。"
         },
@@ -170,7 +170,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "用 U 盘安装操作系统前，通常需要在 BIOS 中调整（　）",
-          options: ["A. 屏幕亮度", "B. 启动顺序（Boot）", "C. 键盘灵敏度", "D. 硬盘容量"],
+          options: ["屏幕亮度", "启动顺序（Boot）", "键盘灵敏度", "硬盘容量"],
           correctIndex: 1,
           answer: "答案：B。需要把 U 盘设为第一启动项，即调整启动顺序。"
         }
@@ -198,10 +198,10 @@ export default {
           type: "single",
           question: "下列组装步骤中，顺序正确的是（　）",
           options: [
-            "A. 先装硬盘，再装 CPU",
-            "B. 先装 CPU 与散热器，再装内存，然后固定主板",
-            "C. 先固定主板，再装 CPU",
-            "D. 先接线缆，再装电源"
+            "先装硬盘，再装 CPU",
+            "先装 CPU 与散热器，再装内存，然后固定主板",
+            "先固定主板，再装 CPU",
+            "先接线缆，再装电源"
           ],
           correctIndex: 1,
           answer: "答案：B。通常先在机箱外装好 CPU、散热器与内存，再将主板固定到机箱，然后装电源、硬盘与显卡并接线。"
@@ -210,7 +210,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "开机自检（POST）是由哪个部分完成的（　）",
-          options: ["A. 操作系统", "B. BIOS", "C. 硬盘分区表", "D. 显卡驱动"],
+          options: ["操作系统", "BIOS", "硬盘分区表", "显卡驱动"],
           correctIndex: 1,
           answer: "答案：B。BIOS 负责开机自检、硬件初始化并引导操作系统。"
         },
@@ -219,10 +219,10 @@ export default {
           type: "single",
           question: "BIOS 设置错误导致计算机无法正常启动，最快捷的恢复方法是（　）",
           options: [
-            "A. 更换 CPU",
-            "B. 重新分区硬盘",
-            "C. 在 BIOS 中选择恢复默认设置",
-            "D. 重新安装操作系统"
+            "更换 CPU",
+            "重新分区硬盘",
+            "在 BIOS 中选择恢复默认设置",
+            "重新安装操作系统"
           ],
           correctIndex: 2,
           answer: "答案：C。选择 Load Default Settings 恢复出厂默认值，可快速解决因设置错误导致的启动问题。"
@@ -232,10 +232,10 @@ export default {
           type: "single",
           question: "关于 BIOS 与 CMOS 的关系，正确的是（　）",
           options: [
-            "A. CMOS 是程序，BIOS 是存储芯片",
-            "B. BIOS 是程序，CMOS 存放 BIOS 的设置参数",
-            "C. 二者完全相同",
-            "D. BIOS 由电池供电，CMOS 不需供电"
+            "CMOS 是程序，BIOS 是存储芯片",
+            "BIOS 是程序，CMOS 存放 BIOS 的设置参数",
+            "二者完全相同",
+            "BIOS 由电池供电，CMOS 不需供电"
           ],
           correctIndex: 1,
           answer: "答案：B。BIOS 是程序（在 ROM 中），CMOS 是用来保存 BIOS 设置参数的芯片（需电池维持）。"

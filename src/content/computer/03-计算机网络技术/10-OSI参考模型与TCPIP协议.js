@@ -149,7 +149,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "OSI 七层模型中，负责端到端数据传输（如 TCP、UDP）的层次是（　）",
-          options: ["A. 网络层", "B. 传输层", "C. 会话层", "D. 应用层"],
+          options: ["网络层", "传输层", "会话层", "应用层"],
           correctIndex: 1,
           answer: "答案：B。传输层提供端到端的传输服务，核心协议是 TCP 与 UDP。"
         },
@@ -157,7 +157,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "HTTP 协议属于 OSI 模型的（　）",
-          options: ["A. 传输层", "B. 网络层", "C. 应用层", "D. 表示层"],
+          options: ["传输层", "网络层", "应用层", "表示层"],
           correctIndex: 2,
           answer: "答案：C。HTTP、FTP、SMTP、DNS 都属于应用层协议。"
         }
@@ -184,7 +184,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "OSI 七层模型自下而上的第三层是（　）",
-          options: ["A. 数据链路层", "B. 网络层", "C. 传输层", "D. 会话层"],
+          options: ["数据链路层", "网络层", "传输层", "会话层"],
           correctIndex: 1,
           answer: "答案：B。自下而上：物理（1）→ 数据链路（2）→ **网络（3）**→ 传输（4）→ 会话（5）→ 表示（6）→ 应用（7）。"
         },
@@ -192,7 +192,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列协议中，属于网络层的是（　）",
-          options: ["A. TCP", "B. IP", "C. HTTP", "D. FTP"],
+          options: ["TCP", "IP", "HTTP", "FTP"],
           correctIndex: 1,
           answer: "答案：B。IP 是网络层协议；TCP 在传输层，HTTP、FTP 在应用层。"
         },
@@ -200,7 +200,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "TCP/IP 模型中的\"网际层\"对应 OSI 七层中的（　）",
-          options: ["A. 网络层", "B. 传输层", "C. 会话层", "D. 数据链路层"],
+          options: ["网络层", "传输层", "会话层", "数据链路层"],
           correctIndex: 0,
           answer: "答案：A。TCP/IP 的网际层（IP 层）对应 OSI 的网络层，功能都是寻址与路由。"
         },
@@ -208,7 +208,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "发送电子邮件所使用的 SMTP 协议属于（　）",
-          options: ["A. 应用层", "B. 传输层", "C. 网络层", "D. 数据链路层"],
+          options: ["应用层", "传输层", "网络层", "数据链路层"],
           correctIndex: 0,
           answer: "答案：A。SMTP 用于发送电子邮件，与 HTTP、FTP、DNS 同属应用层。"
         },
@@ -217,10 +217,10 @@ export default {
           type: "single",
           question: "关于 TCP 与 UDP，说法正确的是（　）",
           options: [
-            "A. TCP 无连接、传输速度快",
-            "B. UDP 面向连接、传输更可靠",
-            "C. TCP 面向连接、可靠但开销较大",
-            "D. 二者都保证数据可靠到达"
+            "TCP 无连接、传输速度快",
+            "UDP 面向连接、传输更可靠",
+            "TCP 面向连接、可靠但开销较大",
+            "二者都保证数据可靠到达"
           ],
           correctIndex: 2,
           answer: "答案：C。TCP 面向连接、可靠（确认与重传）但开销大；UDP 无连接、快但不保证可靠。"

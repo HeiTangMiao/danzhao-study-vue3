@@ -232,7 +232,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "命题「2 是偶数且 3 是偶数」的真假是（　）",
-          options: ["A. 真命题", "B. 假命题", "C. 不是命题", "D. 无法判断"],
+          options: ["真命题", "假命题", "不是命题", "无法判断"],
           correctIndex: 1,
           answer: "答案：B。「且」联结的复合命题要求两个都真；「3 是偶数」为假，故整个命题为假。"
         }
@@ -259,7 +259,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知 p：2 是偶数（真），q：3 是偶数（假），则下列命题为真的是（　）",
-          options: ["A. p 且 q", "B. p 或 q", "C. 非 p", "D. 非 p 且 q"],
+          options: ["p 且 q", "p 或 q", "非 p", "非 p 且 q"],
           correctIndex: 1,
           answer: "**B**。p 真 q 假：p 且 q 为假，p 或 q 为真，非 p 为假，非 p 且 q 为假。"
         }

@@ -209,7 +209,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "命题「\\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 \\geq 0\\)」的否定是（　）",
-          options: ["A. \\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "B. \\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "C. \\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 \\geq 0\\)", "D. \\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 > 0\\)"],
+          options: ["\\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "\\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 < 0\\)", "\\(\\exists x \\in \\mathbb{R}\\)，\\(x^2 \\geq 0\\)", "\\(\\forall x \\in \\mathbb{R}\\)，\\(x^2 > 0\\)"],
           correctIndex: 1,
           answer: "答案：B。全称命题的否定是特称命题：量词「\\(\\forall\\)」换「\\(\\exists\\)」，结论「\\(\\geq\\)」否定为「\\(<\\)」。"
         }
@@ -236,7 +236,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "命题「存在一个实数 \\(x\\)，使 \\(x^2 + 1 = 0\\)」的否定是（　）",
-          options: ["A. 对任意实数 \\(x\\)，都有 \\(x^2 + 1 \\neq 0\\)", "B. 存在实数 \\(x\\)，使 \\(x^2 + 1 \\neq 0\\)", "C. 对任意实数 \\(x\\)，都有 \\(x^2 + 1 = 0\\)", "D. 存在实数 \\(x\\)，使 \\(x^2 + 1 > 0\\)"],
+          options: ["对任意实数 \\(x\\)，都有 \\(x^2 + 1 \\neq 0\\)", "存在实数 \\(x\\)，使 \\(x^2 + 1 \\neq 0\\)", "对任意实数 \\(x\\)，都有 \\(x^2 + 1 = 0\\)", "存在实数 \\(x\\)，使 \\(x^2 + 1 > 0\\)"],
           correctIndex: 0,
           answer: "**A**。特称命题的否定：量词「存在」换「任意」，结论取否定（=0 变 ≠0）。"
         }

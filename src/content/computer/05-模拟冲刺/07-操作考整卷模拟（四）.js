@@ -31,54 +31,54 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中要沿人物边缘精确抠出主体，希望轮廓平滑、可反复微调后再转为选区，最适合使用的工具是（　）",
-          options: ["A. 矩形选框工具", "B. 钢笔工具", "C. 魔棒工具", "D. 裁剪工具"],
+          options: ["矩形选框工具", "钢笔工具", "魔棒工具", "裁剪工具"],
           correctIndex: 1,
-          answer: "**B。**钢笔工具绘制的是矢量路径，可用锚点与控制柄反复微调轮廓，闭合后按 `Ctrl+回车` 转为选区；魔棒适合纯色背景的快速选取，矩形选框只适合规则形状，裁剪工具用于裁切画布。"
+          answer: "**B**。钢笔工具绘制的是矢量路径，可用锚点与控制柄反复微调轮廓，闭合后按 `Ctrl+回车` 转为选区；魔棒适合纯色背景的快速选取，矩形选框只适合规则形状，裁剪工具用于裁切画布。"
         },
         {
           difficulty: "basic",
           type: "single",
           score: 5,
           question: "在 Photoshop 中为选区设置「羽化」参数，其作用是（　）",
-          options: ["A. 让选区边缘产生柔和过渡，避免边界生硬", "B. 把选区整体放大", "C. 把当前选区反选", "D. 把选区保存为通道"],
+          options: ["让选区边缘产生柔和过渡，避免边界生硬", "把选区整体放大", "把当前选区反选", "把选区保存为通道"],
           correctIndex: 0,
-          answer: "**A。**羽化值越大，选区边缘的过渡带越宽，填充或抠图后边界越柔和；羽化不改变选区范围大小，也不具备反选或存储选区的功能。"
+          answer: "**A**。羽化值越大，选区边缘的过渡带越宽，填充或抠图后边界越柔和；羽化不改变选区范围大小，也不具备反选或存储选区的功能。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "素材 `photo.jpg` 整体偏暗、对比不足，要求在不破坏原图像素的前提下提亮并增强对比，最佳做法是（　）",
-          options: ["A. 直接执行「图像 → 调整 → 亮度/对比度」菜单命令", "B. 添加「曲线」调整图层并在其中拖动曲线", "C. 用橡皮擦擦掉画面暗部", "D. 先合并所有图层再执行调整命令"],
+          options: ["直接执行「图像 → 调整 → 亮度/对比度」菜单命令", "添加「曲线」调整图层并在其中拖动曲线", "用橡皮擦擦掉画面暗部", "先合并所有图层再执行调整命令"],
           correctIndex: 1,
-          answer: "**B。**调整图层属于非破坏性编辑，参数可随时改回、图层可单独删除；直接使用「图像 → 调整」下的菜单命令会直接改写当前图层的像素，关闭文件后无法还原。"
+          answer: "**B**。调整图层属于非破坏性编辑，参数可随时改回、图层可单独删除；直接使用「图像 → 调整」下的菜单命令会直接改写当前图层的像素，关闭文件后无法还原。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "在 Photoshop 中要对文字图层应用「模糊」类滤镜，必须先做的操作是（　）",
-          options: ["A. 栅格化文字图层", "B. 复制一份图层", "C. 添加图层蒙版", "D. 合并可见图层"],
+          options: ["栅格化文字图层", "复制一份图层", "添加图层蒙版", "合并可见图层"],
           correctIndex: 0,
-          answer: "**A。**文字图层属于矢量图层，滤镜只能作用于像素，必须先「栅格化」转为普通像素图层才能加滤镜；注意栅格化后不能再直接修改文字内容与字体，因此建议先复制一份文字图层作备份。"
+          answer: "**A**。文字图层属于矢量图层，滤镜只能作用于像素，必须先「栅格化」转为普通像素图层才能加滤镜；注意栅格化后不能再直接修改文字内容与字体，因此建议先复制一份文字图层作备份。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "在「图像大小」对话框中勾选「约束比例」（锁链图标），其作用是（　）",
-          options: ["A. 改动宽度时高度按原比例同步变化，图像不变形", "B. 锁定像素总数不变", "C. 锁定分辨率不变", "D. 同时改变画布大小"],
+          options: ["改动宽度时高度按原比例同步变化，图像不变形", "锁定像素总数不变", "锁定分辨率不变", "同时改变画布大小"],
           correctIndex: 0,
-          answer: "**A。**约束比例保持宽高比，只改一边时另一边自动换算；取消勾选后可分别设定宽高，但画面会被拉伸变形，是「图被拉扁/拉长」类失分的典型原因。"
+          answer: "**A**。约束比例保持宽高比，只改一边时另一边自动换算；取消勾选后可分别设定宽高，但画面会被拉伸变形，是「图被拉扁/拉长」类失分的典型原因。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "要在图像四周各增加 100 像素的白色留白，且不缩放画面内容，应使用（　）",
-          options: ["A. 图像 → 图像大小", "B. 图像 → 画布大小", "C. Ctrl+T 自由变换", "D. 裁剪工具"],
+          options: ["图像 → 图像大小", "图像 → 画布大小", "Ctrl+T 自由变换", "裁剪工具"],
           correctIndex: 1,
-          answer: "**B。**「画布大小」只改变画布范围，原有图像内容尺寸不变，新增区域按背景色填充；「图像大小」会重采样并整体缩放画面内容，自由变换只作用于当前图层。"
+          answer: "**B**。「画布大小」只改变画布范围，原有图像内容尺寸不变，新增区域按背景色填充；「图像大小」会重采样并整体缩放画面内容，自由变换只作用于当前图层。"
         },
         {
           difficulty: "medium",
@@ -137,54 +137,54 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 时间线上以「插入」方式把一段素材放到播放头位置，结果是（　）",
-          options: ["A. 覆盖掉该位置原有的画面", "B. 该位置及其之后的所有片段整体向后移动，让出空位", "C. 该位置原有的片段被删除", "D. 素材只能加在序列末尾，不影响其他片段"],
+          options: ["覆盖掉该位置原有的画面", "该位置及其之后的所有片段整体向后移动，让出空位", "该位置原有的片段被删除", "素材只能加在序列末尾，不影响其他片段"],
           correctIndex: 1,
-          answer: "**B。**插入（Insert）会把播放头之后的所有片段整体后移为新素材让位；覆盖（Overwrite）才是直接盖掉该位置的原有画面。两种方式都不会删除素材本身。"
+          answer: "**B**。插入（Insert）会把播放头之后的所有片段整体后移为新素材让位；覆盖（Overwrite）才是直接盖掉该位置的原有画面。两种方式都不会删除素材本身。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "在 Premiere 时间线上要删除某段片段，并让后面的片段自动前移填补空隙，应使用（　）",
-          options: ["A. 选中片段后按 Delete", "B. 选中片段后按 Shift+Delete（波纹删除）", "C. 选中片段后按 Ctrl+X", "D. 使用「提升（Lift）」命令"],
+          options: ["选中片段后按 Delete", "选中片段后按 Shift+Delete（波纹删除）", "选中片段后按 Ctrl+X", "使用「提升（Lift）」命令"],
           correctIndex: 1,
-          answer: "**B。**波纹删除在删除片段的同时把后续片段整体前移、闭合空隙；普通 Delete 与「提升」都只删除内容并留下一段黑场空隙。"
+          answer: "**B**。波纹删除在删除片段的同时把后续片段整体前移、闭合空隙；普通 Delete 与「提升」都只删除内容并留下一段黑场空隙。"
         },
         {
           difficulty: "basic",
           type: "single",
           score: 5,
           question: "Premiere 中「节目监视器」的作用是（　）",
-          options: ["A. 预览时间线上各轨道合成后的最终画面", "B. 预览项目面板中单个素材的原始内容", "C. 显示项目文件的保存路径", "D. 调整素材的音量电平"],
+          options: ["预览时间线上各轨道合成后的最终画面", "预览项目面板中单个素材的原始内容", "显示项目文件的保存路径", "调整素材的音量电平"],
           correctIndex: 0,
-          answer: "**A。**节目监视器显示时间线的合成结果，用于预览成片；源监视器才是用来预览和打点裁剪单个素材的，两者的分工是操作考的常考区分点。"
+          answer: "**A**。节目监视器显示时间线的合成结果，用于预览成片；源监视器才是用来预览和打点裁剪单个素材的，两者的分工是操作考的常考区分点。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "新建序列时把「帧大小」设为 1920×1080，而素材实际分辨率只有 1280×720，直接拖入时间线最可能出现（　）",
-          options: ["A. 画面被放大后出现黑边或被裁切，且清晰度下降", "B. 音频轨道丢失", "C. 无法导出任何文件", "D. 素材时长自动变短"],
+          options: ["画面被放大后出现黑边或被裁切，且清晰度下降", "音频轨道丢失", "无法导出任何文件", "素材时长自动变短"],
           correctIndex: 0,
-          answer: "**A。**序列帧大小决定画布尺寸：素材分辨率低于序列时会被放大而变虚，宽高比不一致时会出现黑边或被裁切；可右键素材选「缩放为帧大小」快速适配。"
+          answer: "**A**。序列帧大小决定画布尺寸：素材分辨率低于序列时会被放大而变虚，宽高比不一致时会出现黑边或被裁切；可右键素材选「缩放为帧大小」快速适配。"
         },
         {
           difficulty: "basic",
           type: "single",
           score: 5,
           question: "Premiere 保存的项目（工程）文件，其扩展名是（　）",
-          options: ["A. `.mp4`", "B. `.prproj`", "C. `.prtl`", "D. `.psd`"],
+          options: ["`.mp4`", "`.prproj`", "`.prtl`", "`.psd`"],
           correctIndex: 1,
-          answer: "**B。**工程文件为 `.prproj`，只记录素材引用与编辑信息，不含媒体数据本身；`.prtl` 是字幕文件，`.mp4` 是导出成品，`.psd` 是 Photoshop 源文件。"
+          answer: "**B**。工程文件为 `.prproj`，只记录素材引用与编辑信息，不含媒体数据本身；`.prtl` 是字幕文件，`.mp4` 是导出成品，`.psd` 是 Photoshop 源文件。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "在 Premiere 中希望把多个片段组合成一个整体，以便统一添加同一个效果或统一移动位置，应使用（　）",
-          options: ["A. 把相关片段全部锁定", "B. 选中后右键「嵌套」生成嵌套序列", "C. 全部放到同一轨道并删掉空隙", "D. 对每个片段分别添加相同效果"],
+          options: ["把相关片段全部锁定", "选中后右键「嵌套」生成嵌套序列", "全部放到同一轨道并删掉空隙", "对每个片段分别添加相同效果"],
           correctIndex: 1,
-          answer: "**B。**执行「嵌套」后生成一段嵌套序列，对它添加效果等于对内部所有片段生效，且可整体移动；双击嵌套序列可随时进入修改内部内容。"
+          answer: "**B**。执行「嵌套」后生成一段嵌套序列，对它添加效果等于对内部所有片段生效，且可整体移动；双击嵌套序列可随时进入修改内部内容。"
         },
         {
           difficulty: "medium",
@@ -243,54 +243,54 @@ export default {
           type: "single",
           score: 5,
           question: "在交换机特权模式下，查看 MAC 地址表（端口与 MAC 地址对应关系）的命令是（　）",
-          options: ["A. `show mac address-table`", "B. `show ip route`", "C. `show vlan brief`", "D. `show running-config`"],
+          options: ["`show mac address-table`", "`show ip route`", "`show vlan brief`", "`show running-config`"],
           correctIndex: 0,
-          answer: "**A。**`show mac address-table` 查看交换机学习到的 MAC 地址与端口的对应关系；`show ip route` 是路由表，`show vlan brief` 是 VLAN 与端口归属，`show running-config` 是当前运行配置。"
+          answer: "**A**。`show mac address-table` 查看交换机学习到的 MAC 地址与端口的对应关系；`show ip route` 是路由表，`show vlan brief` 是 VLAN 与端口归属，`show running-config` 是当前运行配置。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "交换机端口 Fa0/24 已配置为 trunk，若要只允许 VLAN 10 和 VLAN 20 的数据通过该 trunk，应执行的命令是（　）",
-          options: ["A. `switchport mode access`", "B. `switchport trunk allowed vlan 10,20`", "C. `switchport access vlan 10`", "D. `switchport trunk encapsulation dot1q`"],
+          options: ["`switchport mode access`", "`switchport trunk allowed vlan 10,20`", "`switchport access vlan 10`", "`switchport trunk encapsulation dot1q`"],
           correctIndex: 1,
-          answer: "**B。**`switchport trunk allowed vlan 10,20` 用于限制 trunk 上允许通过的 VLAN（默认允许全部）；`switchport mode access` 会把端口改回接入模式，`switchport access vlan` 是给接入端口划分 VLAN 的命令。"
+          answer: "**B**。`switchport trunk allowed vlan 10,20` 用于限制 trunk 上允许通过的 VLAN（默认允许全部）；`switchport mode access` 会把端口改回接入模式，`switchport access vlan` 是给接入端口划分 VLAN 的命令。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "某主机 IP 地址为 172.16.8.20，子网掩码为 255.255.0.0，它所在网络的网络地址是（　）",
-          options: ["A. 172.16.0.0", "B. 172.0.0.0", "C. 172.16.8.0", "D. 172.16.255.255"],
+          options: ["172.16.0.0", "172.0.0.0", "172.16.8.0", "172.16.255.255"],
           correctIndex: 0,
-          answer: "**A。**掩码 255.255.0.0 表示前 16 位为网络位，把主机位（后 16 位）全部置 0 得网络地址 172.16.0.0；172.16.255.255 是该网络的广播地址，不能分配给主机。"
+          answer: "**A**。掩码 255.255.0.0 表示前 16 位为网络位，把主机位（后 16 位）全部置 0 得网络地址 172.16.0.0；172.16.255.255 是该网络的广播地址，不能分配给主机。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "客户机设置为「自动获得 IP 地址」后，若想立刻释放当前租约并重新向 DHCP 服务器申请地址，应执行的命令是（　）",
-          options: ["A. `ipconfig /all`", "B. `ipconfig /release` 后再执行 `ipconfig /renew`", "C. `ping 192.168.1.1`", "D. `tracert 192.168.1.1`"],
+          options: ["`ipconfig /all`", "`ipconfig /release` 后再执行 `ipconfig /renew`", "`ping 192.168.1.1`", "`tracert 192.168.1.1`"],
           correctIndex: 1,
-          answer: "**B。**`/release` 释放当前租约，`/renew` 重新向 DHCP 服务器申请；`ipconfig /all` 只用于查看配置，`ping` 测连通性，`tracert` 跟踪数据包经过的路径。"
+          answer: "**B**。`/release` 释放当前租约，`/renew` 重新向 DHCP 服务器申请；`ipconfig /all` 只用于查看配置，`ping` 测连通性，`tracert` 跟踪数据包经过的路径。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "子网前缀长度 /28 对应的点分十进制子网掩码是（　）",
-          options: ["A. 255.255.255.0", "B. 255.255.255.192", "C. 255.255.255.240", "D. 255.255.255.248"],
+          options: ["255.255.255.0", "255.255.255.192", "255.255.255.240", "255.255.255.248"],
           correctIndex: 2,
-          answer: "**C。**/28 表示前 28 位为网络位，最后一段为 11110000 = 240，即 255.255.255.240；主机位剩 4 位，每个子网可用主机数为 2^4−2 = 14 台。"
+          answer: "**C**。/28 表示前 28 位为网络位，最后一段为 11110000 = 240，即 255.255.255.240；主机位剩 4 位，每个子网可用主机数为 2^4−2 = 14 台。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
           question: "在路由器特权模式下，想快速查看所有接口的 IP 地址与物理/协议状态摘要，应使用的命令是（　）",
-          options: ["A. `show ip interface brief`", "B. `show ip route`", "C. `show version`", "D. `show cdp neighbors`"],
+          options: ["`show ip interface brief`", "`show ip route`", "`show version`", "`show cdp neighbors`"],
           correctIndex: 0,
-          answer: "**A。**`show ip interface brief` 以表格列出各接口的 IP 地址与 up/down 状态，是配置完接口后的首选自检命令；`show ip route` 看路由表，`show version` 看 IOS 版本与寄存器值。"
+          answer: "**A**。`show ip interface brief` 以表格列出各接口的 IP 地址与 up/down 状态，是配置完接口后的首选自检命令；`show ip route` 看路由表，`show version` 看 IOS 版本与寄存器值。"
         },
         {
           difficulty: "advanced",

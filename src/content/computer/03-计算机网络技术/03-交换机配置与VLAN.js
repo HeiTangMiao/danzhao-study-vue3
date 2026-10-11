@@ -145,7 +145,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "将端口设为接入模式并划入 VLAN 10，正确的命令是（　）",
-          options: ["A. `switchport mode trunk`", "B. `switchport mode access` 和 `switchport access vlan 10`", "C. `vlan 10`", "D. `hostname SWA`"],
+          options: ["`switchport mode trunk`", "`switchport mode access` 和 `switchport access vlan 10`", "`vlan 10`", "`hostname SWA`"],
           correctIndex: 1,
           answer: "答案：B。先 `switchport mode access` 设接入模式，再 `switchport access vlan 10` 划入 VLAN。"
         },
@@ -153,7 +153,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "连接两台交换机并传输多个 VLAN 数据的端口应设为（　）",
-          options: ["A. access", "B. trunk", "C. console", "D. aux"],
+          options: ["access", "trunk", "console", "aux"],
           correctIndex: 1,
           answer: "答案：B。trunk 端口可承载多个 VLAN 的数据。"
         },
@@ -161,7 +161,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "更改交换机设备名称的命令是（　）",
-          options: ["A. `name SWA`", "B. `hostname SWA`", "C. `rename SWA`", "D. `setname SWA`"],
+          options: ["`name SWA`", "`hostname SWA`", "`rename SWA`", "`setname SWA`"],
           correctIndex: 1,
           answer: "答案：B。全局模式下用 `hostname` 修改设备名称。"
         },
@@ -182,7 +182,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "创建 VLAN 10 的命令是（　）",
-          options: ["A. `vlan 10`", "B. `create vlan 10`", "C. `switchport vlan 10`", "D. `interface vlan 10`"],
+          options: ["`vlan 10`", "`create vlan 10`", "`switchport vlan 10`", "`interface vlan 10`"],
           correctIndex: 0,
           answer: "答案：A。全局模式下输入 `vlan 10` 进入 VLAN 配置模式。"
         },
@@ -190,7 +190,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "进入端口范围 Fa0/1-10 的命令是（　）",
-          options: ["A. `interface f0/1`", "B. `interface range f0/1-10`", "C. `interface f0/1-10`", "D. `range f0/1-10`"],
+          options: ["`interface f0/1`", "`interface range f0/1-10`", "`interface f0/1-10`", "`range f0/1-10`"],
           correctIndex: 1,
           answer: "答案：B。批量进入端口范围用 `interface range`。"
         },
@@ -198,7 +198,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "将 Fa0/23-24 配置为端口聚合，正确的命令是（　）",
-          options: ["A. `channel-group 1 mode on`", "B. `switchport mode trunk`", "C. `interface f0/23`", "D. `vlan 1`"],
+          options: ["`channel-group 1 mode on`", "`switchport mode trunk`", "`interface f0/23`", "`vlan 1`"],
           correctIndex: 0,
           answer: "答案：A。端口聚合用 `channel-group 1 mode on`，进入端口范围后执行。"
         },
@@ -206,7 +206,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "保存交换机配置到启动配置文件的命令是（　）",
-          options: ["A. `save`", "B. `write memory`", "C. `copy running-config startup-config`", "D. B 和 C 都对"],
+          options: ["`save`", "`write memory`", "`copy running-config startup-config`", "B 和 C 都对"],
           correctIndex: 3,
           answer: "答案：D。`copy running-config startup-config` 和 `write memory` 都可以保存配置。"
         }

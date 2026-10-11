@@ -202,7 +202,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "去除视频中白色背景应使用（　）特效",
-          options: ["A. 颜色键", "B. 亮度与对比度", "C. 模糊", "D. 锐化"],
+          options: ["颜色键", "亮度与对比度", "模糊", "锐化"],
           correctIndex: 0,
           answer: "答案：A。颜色键（Color Key）通过抠除指定颜色实现去背，本题抠除白色。亮度与对比度只调整明暗反差，模糊用于柔化画面，锐化增强边缘清晰度，都不能去背景。"
         },
@@ -210,7 +210,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "新建字幕的入口是（　）",
-          options: ["A. 文件→新建→字幕", "B. 文件→导入", "C. 编辑→复制", "D. 序列→渲染"],
+          options: ["文件→新建→字幕", "文件→导入", "编辑→复制", "序列→渲染"],
           correctIndex: 0,
           answer: "答案：A。执行\"文件→新建→字幕\"打开字幕设计窗口，输入文字并设置字体、字号、字距、填充与描边后保存为 .prtl 字幕文件，再拖到时间轴上使用。"
         },
@@ -218,7 +218,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "实现音频淡入淡出的效果是（　）",
-          options: ["A. 恒定增益", "B. 颜色键", "C. 带状擦除", "D. 亮度调整"],
+          options: ["恒定增益", "颜色键", "带状擦除", "亮度调整"],
           correctIndex: 0,
           answer: "答案：A。恒定增益（Constant Gain）配合关键帧可实现音量由小到大或由大到小的渐变，即淡入淡出。颜色键用于抠像，带状擦除是转场效果，亮度调整只改明暗，都与音量无关。"
         },
@@ -239,7 +239,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "带状擦除属于（　）效果",
-          options: ["A. 视频过渡", "B. 视频效果", "C. 音频效果", "D. 字幕效果"],
+          options: ["视频过渡", "视频效果", "音频效果", "字幕效果"],
           correctIndex: 0,
           answer: "答案：A。带状擦除是视频过渡（转场）效果。"
         },
@@ -247,7 +247,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "将图片亮度调整为 -100，效果是（　）",
-          options: ["A. 变亮", "B. 变暗", "C. 变模糊", "D. 变色"],
+          options: ["变亮", "变暗", "变模糊", "变色"],
           correctIndex: 1,
           answer: "答案：B。亮度取负值会使图像变暗，-100 是较大的负向调整，画面会明显压暗（正值才是变亮）。亮度不改变清晰度，也不改变色相。"
         },
@@ -255,7 +255,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "字幕文件保存的扩展名是（　）",
-          options: ["A. .prproj", "B. .prtl", "C. .mp4", "D. .psd"],
+          options: [".prproj", ".prtl", ".mp4", ".psd"],
           correctIndex: 1,
           answer: "答案：B。Premiere 字幕文件扩展名为 .prtl。"
         },

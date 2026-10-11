@@ -21,7 +21,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "数列 \\(2, 6, 12, 20, 30, \\ldots\\) 的一个通项公式是（　）",
-          options: ["A. \\(a_n = n(n-1)\\)", "B. \\(a_n = (n+1)^2\\)", "C. \\(a_n = n(n+1)\\)", "D. \\(a_n = n^2 + 1\\)"],
+          options: ["\\(a_n = n(n-1)\\)", "\\(a_n = (n+1)^2\\)", "\\(a_n = n(n+1)\\)", "\\(a_n = n^2 + 1\\)"],
           correctIndex: 2,
           answer: "**C**。\\(2 = 1\\times 2\\)，\\(6 = 2\\times 3\\)，\\(12 = 3\\times 4\\)，\\(20 = 4\\times 5\\)，\\(30 = 5\\times 6\\)，所以 \\(a_n = n(n+1)\\)。"
         },
@@ -29,7 +29,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "已知数列 \\(\\{a_n\\}\\) 的前 \\(n\\) 项和 \\(S_n = n^2\\)，则 \\(a_5 =\\)（　）",
-          options: ["A. 9", "B. 25", "C. 16", "D. 11"],
+          options: ["9", "25", "16", "11"],
           correctIndex: 0,
           answer: "**A**。\\(a_5 = S_5 - S_4 = 25 - 16 = 9\\)。"
         },
@@ -37,7 +37,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在等差数列 \\(\\{a_n\\}\\) 中，\\(a_2 + a_8 = 10\\)，则 \\(a_5 =\\)（　）",
-          options: ["A. 4", "B. 5", "C. 6", "D. 20"],
+          options: ["4", "5", "6", "20"],
           correctIndex: 1,
           answer: "**B**。由等差中项性质 \\(a_2 + a_8 = 2a_5\\)，故 \\(a_5 = 5\\)。"
         },
@@ -45,7 +45,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在等比数列 \\(\\{a_n\\}\\) 中，\\(a_1 = 1\\)，\\(a_4 = 8\\)，则公比 \\(q =\\)（　）",
-          options: ["A. 3", "B. 4", "C. 8", "D. 2"],
+          options: ["3", "4", "8", "2"],
           correctIndex: 3,
           answer: "**D**。\\(a_4 = a_1 q^3\\)，即 \\(8 = q^3\\)，解得 \\(q = 2\\)。"
         },
@@ -53,7 +53,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在等差数列 \\(\\{a_n\\}\\) 中，\\(a_3 = 9\\)，\\(a_9 = -3\\)，则公差 \\(d =\\)（　）",
-          options: ["A. 2", "B. -2", "C. -6", "D. 6"],
+          options: ["2", "-2", "-6", "6"],
           correctIndex: 1,
           answer: "**B**。\\(a_9 - a_3 = 6d = -3 - 9 = -12\\)，解得 \\(d = -2\\)。"
         },
@@ -61,7 +61,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在等比数列 \\(\\{a_n\\}\\) 中，\\(a_2 = 6\\)，\\(a_5 = 162\\)，则公比 \\(q =\\)（　）",
-          options: ["A. 27", "B. 9", "C. 3", "D. 6"],
+          options: ["27", "9", "3", "6"],
           correctIndex: 2,
           answer: "**C**。\\(\\frac{a_5}{a_2} = q^3 = \\frac{162}{6} = 27\\)，解得 \\(q = 3\\)。"
         },
@@ -69,7 +69,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "数列 \\(\\frac{1}{1\\times 2}, \\frac{1}{2\\times 3}, \\ldots, \\frac{1}{n(n+1)}\\) 的前 \\(n\\) 项和 \\(S_n =\\)（　）",
-          options: ["A. \\(\\frac{n-1}{n}\\)", "B. \\(\\frac{1}{n+1}\\)", "C. \\(\\frac{n}{n+1}\\)", "D. \\(n\\)"],
+          options: ["\\(\\frac{n-1}{n}\\)", "\\(\\frac{1}{n+1}\\)", "\\(\\frac{n}{n+1}\\)", "\\(n\\)"],
           correctIndex: 2,
           answer: "**C**。裂项：\\(\\frac{1}{k(k+1)} = \\frac{1}{k} - \\frac{1}{k+1}\\)，\\(S_n = 1 - \\frac{1}{n+1} = \\frac{n}{n+1}\\)。"
         },
@@ -77,7 +77,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "已知数列 \\(\\{a_n\\}\\) 满足 \\(a_1 = 1\\)，且 \\(a_{n+1} = 2a_n + 1\\)（\\(n \\in \\mathbb{N}^*\\)），则 \\(a_4 =\\)（　）",
-          options: ["A. 7", "B. 15", "C. 23", "D. 31"],
+          options: ["7", "15", "23", "31"],
           correctIndex: 1,
           answer: "**B**。\\(a_2 = 2\\times 1 + 1 = 3\\)，\\(a_3 = 2\\times 3 + 1 = 7\\)，\\(a_4 = 2\\times 7 + 1 = 15\\)。"
         }

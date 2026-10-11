@@ -177,7 +177,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "到两定点 \\(F_1(-2, 0)\\)、\\(F_2(2, 0)\\) 的距离之和等于 6 的动点轨迹是（　）",
-          options: ["A. 椭圆", "B. 双曲线", "C. 抛物线", "D. 圆"],
+          options: ["椭圆", "双曲线", "抛物线", "圆"],
           correctIndex: 0,
           answer: "答案：A。\\(|F_1 F_2| = 4\\)，距离之和 6 > 4 且为常数，符合椭圆定义（以 \\(F_1\\)、\\(F_2\\) 为焦点）。"
         }
@@ -204,7 +204,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "到两定点 \\(A(-1, 0)\\)、\\(B(1, 0)\\) 距离相等的点的轨迹是（　）",
-          options: ["A. 以 AB 为直径的圆", "B. 线段 AB 的垂直平分线（y 轴）", "C. x 轴", "D. 抛物线"],
+          options: ["以 AB 为直径的圆", "线段 AB 的垂直平分线（y 轴）", "x 轴", "抛物线"],
           correctIndex: 1,
           answer: "**B**。到两定点距离相等的点在两点连线的垂直平分线上，此处即 y 轴。"
         }

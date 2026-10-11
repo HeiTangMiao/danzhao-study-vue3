@@ -154,7 +154,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "表达式 `7 // 2` 的结果是（　）",
-          options: ["A. 3.5", "B. 3", "C. 1", "D. 4"],
+          options: ["3.5", "3", "1", "4"],
           correctIndex: 1,
           answer: "答案：B。`//` 是整除，`7 // 2` 取整数部分 3。"
         },
@@ -162,7 +162,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "表达式 `7 % 2` 的结果是（　）",
-          options: ["A. 3.5", "B. 3", "C. 1", "D. 0"],
+          options: ["3.5", "3", "1", "0"],
           correctIndex: 2,
           answer: "答案：C。`%` 是取余，`7 % 2` 的余数是 1。"
         },
@@ -170,7 +170,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行 `n = 5` 后，再执行 `n += 3`，此时 n 的值是（　）",
-          options: ["A. 5", "B. 3", "C. 8", "D. 15"],
+          options: ["5", "3", "8", "15"],
           correctIndex: 2,
           answer: "答案：C。`n += 3` 等价于 `n = n + 3`，即 `5 + 3 = 8`。"
         },
@@ -178,7 +178,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "表达式 `2 + 3 * 4` 的结果是（　）",
-          options: ["A. 20", "B. 14", "C. 24", "D. 12"],
+          options: ["20", "14", "24", "12"],
           correctIndex: 1,
           answer: "答案：B。先乘后加，`3 * 4 = 12`，`2 + 12 = 14`。"
         }
@@ -193,7 +193,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列运算符中，表示幂运算的是（　）",
-          options: ["A. ^", "B. **", "C. //", "D. %"],
+          options: ["^", "**", "//", "%"],
           correctIndex: 1,
           answer: "答案：B。Python 中幂运算用 `**`，如 `2 ** 3 = 8`。"
         },
@@ -201,7 +201,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "表达式 `(2 + 3) * 4 - 6 // 2` 的结果是（　）",
-          options: ["A. 17", "B. 18", "C. 16", "D. 20"],
+          options: ["17", "18", "16", "20"],
           correctIndex: 0,
           answer: "答案：A。先算括号 `2+3=5`，再乘 `5*4=20`，再整除 `6//2=3`，最后 `20-3=17`。"
         },
@@ -209,7 +209,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "执行以下代码后，输出结果是（　）\n```\na = 10\nb = 3\nprint(a // b, a % b)\n```",
-          options: ["A. 3 1", "B. 3.3 1", "C. 3 0", "D. 3 3"],
+          options: ["3 1", "3.3 1", "3 0", "3 3"],
           correctIndex: 0,
           answer: "答案：A。`10 // 3 = 3`（整除），`10 % 3 = 1`（余数）。"
         },
@@ -217,7 +217,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码中，能正确计算并输出长方形面积的是（　）",
-          options: ["A. `a = input(\"宽：\")` `b = input(\"高：\")` `print(a * b)`", "B. `a = int(input(\"宽：\"))` `b = int(input(\"高：\"))` `print(a * b)`", "C. `a = int(input(\"宽：\"))` `b = int(input(\"高：\"))` `print(a + b)`", "D. `a = input(\"宽：\")` `b = input(\"高：\")` `print(a + b)`"],
+          options: ["`a = input(\"宽：\")` `b = input(\"高：\")` `print(a * b)`", "`a = int(input(\"宽：\"))` `b = int(input(\"高：\"))` `print(a * b)`", "`a = int(input(\"宽：\"))` `b = int(input(\"高：\"))` `print(a + b)`", "`a = input(\"宽：\")` `b = input(\"高：\")` `print(a + b)`"],
           correctIndex: 1,
           answer: "答案：B。先 int() 转换再相乘；A 中字符串不能相乘，C 是求和不是面积。"
         }

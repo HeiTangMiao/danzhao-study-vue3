@@ -154,7 +154,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列不属于操作系统五大管理功能的是（　）",
-          options: ["A. 处理器管理", "B. 存储管理", "C. 文件管理", "D. 程序设计管理"],
+          options: ["处理器管理", "存储管理", "文件管理", "程序设计管理"],
           correctIndex: 3,
           answer: "答案：D。五大管理功能是处理器管理、存储管理、设备管理、文件管理、作业管理。"
         },
@@ -162,7 +162,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "工业控制、导弹制导这类对响应时间要求严格的场景，应选用（　）",
-          options: ["A. 批处理系统", "B. 分时系统", "C. 实时系统", "D. 嵌入式系统（通用表述）"],
+          options: ["批处理系统", "分时系统", "实时系统", "嵌入式系统（通用表述）"],
           correctIndex: 2,
           answer: "答案：C。实时系统强调在规定时限内响应并完成，可靠性要求高。"
         },
@@ -170,7 +170,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Windows 中，打开任务管理器的快捷键是（　）",
-          options: ["A. Ctrl+Alt+Del", "B. Ctrl+Shift+Esc", "C. Alt+F4", "D. Win+E"],
+          options: ["Ctrl+Alt+Del", "Ctrl+Shift+Esc", "Alt+F4", "Win+E"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+Shift+Esc 可直接打开任务管理器；Ctrl+Alt+Del 是打开安全选项界面。"
         }
@@ -198,10 +198,10 @@ export default {
           type: "single",
           question: "操作系统的四个基本特征是（　）",
           options: [
-            "A. 并发、共享、虚拟、异步",
-            "B. 快速、稳定、安全、兼容",
-            "C. 输入、处理、输出、存储",
-            "D. 硬件、软件、数据、用户"
+            "并发、共享、虚拟、异步",
+            "快速、稳定、安全、兼容",
+            "输入、处理、输出、存储",
+            "硬件、软件、数据、用户"
           ],
           correctIndex: 0,
           answer: "答案：A。并发、共享、虚拟、异步是操作系统的四个基本特征。"
@@ -210,7 +210,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "Android 操作系统主要基于（　）内核开发",
-          options: ["A. Windows NT", "B. Linux", "C. macOS", "D. UNIX System V"],
+          options: ["Windows NT", "Linux", "macOS", "UNIX System V"],
           correctIndex: 1,
           answer: "答案：B。Android 基于 Linux 内核，主要用于智能手机等移动设备。"
         },
@@ -218,7 +218,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "某系统需要让多名用户同时通过终端使用一台主机并都能得到及时交互响应，最合适的类型是（　）",
-          options: ["A. 批处理系统", "B. 分时系统", "C. 实时系统", "D. 分布式系统"],
+          options: ["批处理系统", "分时系统", "实时系统", "分布式系统"],
           correctIndex: 1,
           answer: "答案：B。分时系统允许多个用户通过终端轮流使用主机，每个用户都能获得交互式响应。"
         },
@@ -227,10 +227,10 @@ export default {
           type: "single",
           question: "关于操作系统的地位，下列说法正确的是（　）",
           options: [
-            "A. 操作系统属于应用软件",
-            "B. 没有操作系统，应用软件仍能直接控制硬件运行",
-            "C. 操作系统是最基本的系统软件，是其他软件运行的基础",
-            "D. 操作系统与硬件无关，可任意移植"
+            "操作系统属于应用软件",
+            "没有操作系统，应用软件仍能直接控制硬件运行",
+            "操作系统是最基本的系统软件，是其他软件运行的基础",
+            "操作系统与硬件无关，可任意移植"
           ],
           correctIndex: 2,
           answer: "答案：C。操作系统是最基本、最重要的系统软件，为其他软件提供运行平台。"

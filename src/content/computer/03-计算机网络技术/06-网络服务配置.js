@@ -170,7 +170,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "自动为客户机分配 IP 地址的服务是（　）",
-          options: ["A. WWW", "B. FTP", "C. DHCP", "D. DNS"],
+          options: ["WWW", "FTP", "DHCP", "DNS"],
           correctIndex: 2,
           answer: "答案：C。DHCP 自动分配 IP 等网络参数。"
         },
@@ -178,7 +178,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "将域名解析为 IP 地址的服务是（　）",
-          options: ["A. DNS", "B. DHCP", "C. FTP", "D. WWW"],
+          options: ["DNS", "DHCP", "FTP", "WWW"],
           correctIndex: 0,
           answer: "答案：A。DNS（域名系统）负责把域名解析为 IP 地址。B DHCP 用于自动分配 IP 地址等参数；C FTP 是文件传输协议；D WWW 是万维网信息服务，都不做域名解析。"
         },
@@ -186,7 +186,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "DHCP 作用域中\"排除地址\"的作用是（　）",
-          options: ["A. 删除地址池", "B. 指定不自动分配的地址", "C. 增加地址池", "D. 设置网关"],
+          options: ["删除地址池", "指定不自动分配的地址", "增加地址池", "设置网关"],
           correctIndex: 1,
           answer: "答案：B。排除地址是从地址池中划出不自动分配的地址。"
         },
@@ -207,7 +207,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "提供文件上传下载的服务是（　）",
-          options: ["A. WWW", "B. FTP", "C. DHCP", "D. DNS"],
+          options: ["WWW", "FTP", "DHCP", "DNS"],
           correctIndex: 1,
           answer: "答案：B。FTP 提供文件传输服务。"
         },
@@ -215,7 +215,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "DHCP 作用域选项中的\"路由器\"选项用于配置（　）",
-          options: ["A. DNS 地址", "B. 默认网关", "C. 子网掩码", "D. 主机名"],
+          options: ["DNS 地址", "默认网关", "子网掩码", "主机名"],
           correctIndex: 1,
           answer: "答案：B。路由器选项配置默认网关地址。"
         },
@@ -223,7 +223,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "创建用户时勾选\"用户不能更改密码\"，其作用是（　）",
-          options: ["A. 用户无法登录", "B. 用户不能修改自己的密码", "C. 密码永不过期", "D. 管理员不能改密码"],
+          options: ["用户无法登录", "用户不能修改自己的密码", "密码永不过期", "管理员不能改密码"],
           correctIndex: 1,
           answer: "答案：B。该选项禁止用户自行修改密码。"
         },

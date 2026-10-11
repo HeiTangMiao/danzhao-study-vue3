@@ -242,7 +242,7 @@ p {
           difficulty: "basic",
           type: "single",
           question: "类选择器的符号是（　）",
-          options: ["A. `.`", "B. `#`", "C. `*`", "D. `@`"],
+          options: ["`.`", "`#`", "`*`", "`@`"],
           correctIndex: 0,
           answer: "答案：A。类选择器以点号开头（如 `.note`）；`#` 是 ID 选择器，`*` 是通配符。"
         },
@@ -250,7 +250,7 @@ p {
           difficulty: "medium",
           type: "single",
           question: "设置元素内边距（内容与边框之间的距离）应使用（　）",
-          options: ["A. margin", "B. padding", "C. border", "D. spacing"],
+          options: ["margin", "padding", "border", "spacing"],
           correctIndex: 1,
           answer: "答案：B。padding 是内边距（盒内），margin 是外边距（盒外）。"
         }
@@ -277,7 +277,7 @@ p {
           difficulty: "basic",
           type: "single",
           question: "设置文字颜色的 CSS 属性是（　）",
-          options: ["A. font-size", "B. color", "C. background", "D. text-align"],
+          options: ["font-size", "color", "background", "text-align"],
           correctIndex: 1,
           answer: "答案：B。`color` 设置文字颜色；`font-size` 是字号，`background` 是背景，`text-align` 是对齐。"
         },
@@ -285,7 +285,7 @@ p {
           difficulty: "medium",
           type: "single",
           question: "让块级元素向左浮动、实现并排布局的 CSS 写法是（　）",
-          options: ["A. `float: left;`", "B. `clear: left;`", "C. `display: left;`", "D. `left: float;`"],
+          options: ["`float: left;`", "`clear: left;`", "`display: left;`", "`left: float;`"],
           correctIndex: 0,
           answer: "答案：A。`float: left` 左浮动；`clear: left` 是清除浮动，不用于实现并排。"
         },
@@ -293,7 +293,7 @@ p {
           difficulty: "advanced",
           type: "single",
           question: "某盒子 width 为 200px、左右内边距各 10px、左右边框各 2px，其边框盒的实际宽度是（　）",
-          options: ["A. 200px", "B. 210px", "C. 224px", "D. 244px"],
+          options: ["200px", "210px", "224px", "244px"],
           correctIndex: 2,
           answer: "答案：C。实际宽度 = width + padding×2 + border×2 = 200 + 20 + 4 = 224px。"
         },
@@ -301,7 +301,7 @@ p {
           difficulty: "medium",
           type: "single",
           question: "按屏幕宽度条件性地套用不同样式（响应式）使用的写法是（　）",
-          options: ["A. `@media`", "B. `@import`", "C. `@charset`", "D. `@screen`"],
+          options: ["`@media`", "`@import`", "`@charset`", "`@screen`"],
           correctIndex: 0,
           answer: "答案：A。`@media (max-width: 600px) { }` 即媒体查询，是响应式设计的关键方法。"
         },
@@ -310,10 +310,10 @@ p {
           type: "single",
           question: "关于响应式网页设计，说法正确的是（　）",
           options: [
-            "A. 需要为每种设备单独编写一套页面",
-            "B. 一套代码可在不同尺寸设备上自适应显示",
-            "C. 只能在手机浏览器中使用",
-            "D. 与视口（viewport）设置无关"
+            "需要为每种设备单独编写一套页面",
+            "一套代码可在不同尺寸设备上自适应显示",
+            "只能在手机浏览器中使用",
+            "与视口（viewport）设置无关"
           ],
           correctIndex: 1,
           answer: "答案：B。响应式即\"一套代码、多种屏幕\"，关键是 viewport 设置与媒体查询。"

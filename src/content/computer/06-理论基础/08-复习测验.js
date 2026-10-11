@@ -20,7 +20,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "世界上第一台电子计算机 ENIAC 所采用的核心器件是（　）",
-          options: ["A. 晶体管", "B. 电子管", "C. 集成电路", "D. 大规模集成电路"],
+          options: ["晶体管", "电子管", "集成电路", "大规模集成电路"],
           correctIndex: 1,
           answer: "答案：B。ENIAC（1946 年）属于第一代计算机，核心器件为电子管。"
         },
@@ -28,7 +28,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "1 TB 的存储容量等于（　）",
-          options: ["A. 1000 GB", "B. 1024 GB", "C. 1024 MB", "D. 1000 MB"],
+          options: ["1000 GB", "1024 GB", "1024 MB", "1000 MB"],
           correctIndex: 1,
           answer: "答案：B。存储单位以 1024 进位：1 TB = 1024 GB = 1024 × 1024 MB。"
         },
@@ -36,7 +36,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "二进制数 \\((1011)_2\\) 转换为十进制是（　）",
-          options: ["A. 9", "B. 10", "C. 11", "D. 12"],
+          options: ["9", "10", "11", "12"],
           correctIndex: 2,
           answer: "答案：C。\\(1\\times2^3+0\\times2^2+1\\times2^1+1\\times2^0 = 8+0+2+1 = 11\\)。"
         },
@@ -44,7 +44,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "十进制数 25 转换为二进制是（　）",
-          options: ["A. 11001", "B. 11011", "C. 11101", "D. 10011"],
+          options: ["11001", "11011", "11101", "10011"],
           correctIndex: 0,
           answer: "答案：A。除 2 取余倒序排列：25→12余1、12→6余0、6→3余0、3→1余1、1→0余1，得 11001。"
         },
@@ -52,7 +52,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在计算机中，一个汉字通常占用的字节数是（　）",
-          options: ["A. 1 B", "B. 2 B", "C. 4 B", "D. 8 B"],
+          options: ["1 B", "2 B", "4 B", "8 B"],
           correctIndex: 1,
           answer: "答案：B。一个汉字通常占 2 个字节；一个 ASCII 字符占 1 个字节。"
         },
@@ -60,7 +60,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "运算器和控制器合称为（　）",
-          options: ["A. 主机", "B. 中央处理器（CPU）", "C. 内存", "D. 外部设备"],
+          options: ["主机", "中央处理器（CPU）", "内存", "外部设备"],
           correctIndex: 1,
           answer: "答案：B。CPU = 运算器 + 控制器；主机 = CPU + 内存。"
         },
@@ -68,7 +68,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "断电后信息不会丢失的存储器是（　）",
-          options: ["A. RAM", "B. Cache", "C. ROM", "D. 寄存器"],
+          options: ["RAM", "Cache", "ROM", "寄存器"],
           correctIndex: 2,
           answer: "答案：C。ROM（只读存储器）断电后信息保留；RAM、Cache、寄存器断电后信息丢失。"
         },
@@ -76,7 +76,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "计算机病毒最本质的特征是（　）",
-          options: ["A. 破坏性", "B. 潜伏性", "C. 传染性（自我复制）", "D. 隐蔽性"],
+          options: ["破坏性", "潜伏性", "传染性（自我复制）", "隐蔽性"],
           correctIndex: 2,
           answer: "答案：C。传染性（自我复制）是病毒区别于其他恶意程序的最本质特征。"
         },
@@ -84,7 +84,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列软件中属于系统软件的是（　）",
-          options: ["A. WPS 文字", "B. Photoshop", "C. Windows 操作系统", "D. 微信"],
+          options: ["WPS 文字", "Photoshop", "Windows 操作系统", "微信"],
           correctIndex: 2,
           answer: "答案：C。操作系统是最基本的系统软件；其余均为应用软件。"
         },
@@ -93,10 +93,10 @@ export default {
           type: "single",
           question: "机器语言的特点是（　）",
           options: [
-            "A. 可读性好，便于记忆",
-            "B. 是计算机唯一能直接识别和执行的语言",
-            "C. 不依赖具体机型",
-            "D. 需要经过编译才能执行"
+            "可读性好，便于记忆",
+            "是计算机唯一能直接识别和执行的语言",
+            "不依赖具体机型",
+            "需要经过编译才能执行"
           ],
           correctIndex: 1,
           answer: "答案：B。机器语言由二进制构成，是唯一可直接执行的语言；它依赖机型，且不可读。"
@@ -105,7 +105,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "栈这种数据结构的特点是（　）",
-          options: ["A. 先进先出", "B. 后进先出", "C. 随机访问", "D. 只能顺序插入"],
+          options: ["先进先出", "后进先出", "随机访问", "只能顺序插入"],
           correctIndex: 1,
           answer: "答案：B。栈是后进先出（LIFO）；队列才是先进先出（FIFO）。"
         },
@@ -113,7 +113,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "云计算中直接提供可使用的应用软件的服务模式是（　）",
-          options: ["A. IaaS", "B. PaaS", "C. SaaS", "D. DaaS"],
+          options: ["IaaS", "PaaS", "SaaS", "DaaS"],
           correctIndex: 2,
           answer: "答案：C。SaaS（软件即服务）直接提供可用软件，用户无需管理底层设施。"
         }
@@ -195,7 +195,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "某存储区存放了 3 个汉字和 6 个 ASCII 字符，共占用的字节数是（　）",
-          options: ["A. 9 B", "B. 12 B", "C. 15 B", "D. 18 B"],
+          options: ["9 B", "12 B", "15 B", "18 B"],
           correctIndex: 1,
           answer: "答案：B。3 × 2 B = 6 B（汉字），6 × 1 B = 6 B（ASCII 字符），合计 12 B。"
         },
@@ -203,7 +203,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "二进制数 \\((10110110)_2\\) 转换为十六进制是（　）",
-          options: ["A. \\(B6\\)", "B. \\(6B\\)", "C. \\(D6\\)", "D. \\(166\\)"],
+          options: ["\\(B6\\)", "\\(6B\\)", "\\(D6\\)", "\\(166\\)"],
           correctIndex: 0,
           answer: "答案：A。从右往左四位分组：1011 | 0110 → B | 6，结果为 B6。"
         },
@@ -212,10 +212,10 @@ export default {
           type: "single",
           question: "某同学收到\"银行账户异常，请点击链接核实\"的邮件，最恰当的做法是（　）",
           options: [
-            "A. 立即点击链接并输入账号密码",
-            "B. 通过官方 App 或客服电话自行核实，不点击邮件链接",
-            "C. 转发给好友",
-            "D. 直接忽略不做任何处理"
+            "立即点击链接并输入账号密码",
+            "通过官方 App 或客服电话自行核实，不点击邮件链接",
+            "转发给好友",
+            "直接忽略不做任何处理"
           ],
           correctIndex: 1,
           answer: "答案：B。这是典型的网络钓鱼，应通过官方渠道自行核实，绝不点击可疑链接。"

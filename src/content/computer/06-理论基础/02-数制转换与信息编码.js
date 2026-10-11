@@ -211,7 +211,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "二进制数 \\((1101)_2\\) 转换为十进制是（　）",
-          options: ["A. 11", "B. 12", "C. 13", "D. 14"],
+          options: ["11", "12", "13", "14"],
           correctIndex: 2,
           answer: "答案：C。\\(1\\times2^3+1\\times2^2+0\\times2^1+1\\times2^0 = 8+4+0+1 = 13\\)。"
         },
@@ -219,7 +219,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "将十进制数 25 转换为二进制，结果是（　）",
-          options: ["A. 11001", "B. 11011", "C. 11101", "D. 10011"],
+          options: ["11001", "11011", "11101", "10011"],
           correctIndex: 0,
           answer: "答案：A。25÷2=12余1，12÷2=6余0，6÷2=3余0，3÷2=1余1，1÷2=0余1，倒序得 11001。"
         },
@@ -227,7 +227,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "二进制数 \\((101101)_2\\) 转换为十六进制是（　）",
-          options: ["A. 2B", "B. 2D", "C. 3B", "D. 5B"],
+          options: ["2B", "2D", "3B", "5B"],
           correctIndex: 1,
           answer: "答案：B。从右往左四位分组：0010 | 1101，即 2 与 D，结果为 2D。（注意 1101 = 13 = D）"
         }
@@ -254,7 +254,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "十进制数 200 转换为十六进制是（　）",
-          options: ["A. C8", "B. 8C", "C. B8", "D. C9"],
+          options: ["C8", "8C", "B8", "C9"],
           correctIndex: 0,
           answer: "答案：A。200÷16=12余8，12÷16=0余12（记作 C），倒序排列得 C8。"
         },
@@ -262,7 +262,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 ASCII 编码中，字符 'A' 的十进制编码值是（　）",
-          options: ["A. 48", "B. 65", "C. 97", "D. 128"],
+          options: ["48", "65", "97", "128"],
           correctIndex: 1,
           answer: "答案：B。'A' = 65，'a' = 97，'0' = 48，这三个值建议记牢。"
         },
@@ -270,7 +270,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "二进制数 \\((11101101)_2\\) 转换为十六进制是（　）",
-          options: ["A. ED", "B. DE", "C. EF", "D. FE"],
+          options: ["ED", "DE", "EF", "FE"],
           correctIndex: 0,
           answer: "答案：A。从右往左四位分组：1110 | 1101，1110 = 14 = E，1101 = 13 = D，结果为 ED。"
         },
@@ -278,7 +278,7 @@ export default {
           difficulty: "sprint",
           type: "single",
           question: "一个存储单元中存放了 2 个汉字和 4 个 ASCII 字符，共占用的字节数是（　）",
-          options: ["A. 6", "B. 8", "C. 10", "D. 12"],
+          options: ["6", "8", "10", "12"],
           correctIndex: 1,
           answer: "答案：B。2 个汉字 × 2 B = 4 B，4 个 ASCII 字符 × 1 B = 4 B，合计 8 B。"
         }

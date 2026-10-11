@@ -125,7 +125,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列设备中，属于输出设备的是（　）",
-          options: ["A. 键盘", "B. 鼠标", "C. 显示器", "D. 扫描仪"],
+          options: ["键盘", "鼠标", "显示器", "扫描仪"],
           correctIndex: 2,
           answer: "答案：C。显示器是典型的输出设备；键盘、鼠标、扫描仪均为输入设备。"
         },
@@ -133,7 +133,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "主要用于长期保存数据、断电后信息不丢失的部件是（　）",
-          options: ["A. 内存", "B. CPU", "C. 硬盘", "D. 显卡"],
+          options: ["内存", "CPU", "硬盘", "显卡"],
           correctIndex: 2,
           answer: "答案：C。硬盘是外存储器，断电后信息保留；内存断电丢失。"
         },
@@ -141,7 +141,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "某用户主要用于图形设计与视频剪辑，选购时应重点加强（　）",
-          options: ["A. 机箱体积", "B. 显卡与内存", "C. 键盘手感", "D. 显示器尺寸"],
+          options: ["机箱体积", "显卡与内存", "键盘手感", "显示器尺寸"],
           correctIndex: 1,
           answer: "答案：B。图形设计与视频剪辑对显卡性能和内存容量要求高。"
         }
@@ -169,10 +169,10 @@ export default {
           type: "single",
           question: "下列全部属于输入设备的一组是（　）",
           options: [
-            "A. 键盘、鼠标、扫描仪",
-            "B. 显示器、打印机、音箱",
-            "C. 硬盘、U 盘、光盘",
-            "D. 主板、CPU、内存"
+            "键盘、鼠标、扫描仪",
+            "显示器、打印机、音箱",
+            "硬盘、U 盘、光盘",
+            "主板、CPU、内存"
           ],
           correctIndex: 0,
           answer: "答案：A。键盘、鼠标、扫描仪用于把信息送入计算机；B 是输出设备，C 是外存，D 是主机内部部件。"
@@ -181,7 +181,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "固态硬盘（SSD）相比传统机械硬盘（HDD）的突出优势是（　）",
-          options: ["A. 容量一定更大", "B. 价格一定更低", "C. 读写速度更快、抗震性更好", "D. 断电后信息会丢失"],
+          options: ["容量一定更大", "价格一定更低", "读写速度更快、抗震性更好", "断电后信息会丢失"],
           correctIndex: 2,
           answer: "答案：C。SSD 无机械结构，读写速度与抗震性优于 HDD；容量与价格取决于具体型号，且二者断电后信息均不丢失。"
         },
@@ -189,7 +189,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "某计算机运行大型软件时频繁卡顿，最可能的原因是（　）",
-          options: ["A. 显示器分辨率过低", "B. 内存容量不足", "C. 键盘按键失灵", "D. 机箱颜色不合适"],
+          options: ["显示器分辨率过低", "内存容量不足", "键盘按键失灵", "机箱颜色不合适"],
           correctIndex: 1,
           answer: "答案：B。运行大型软件需要大量内存，内存不足会导致频繁卡顿（与硬盘交换数据）。"
         },
@@ -198,10 +198,10 @@ export default {
           type: "single",
           question: "关于主板的作用，正确的是（　）",
           options: [
-            "A. 负责长期存储数据",
-            "B. 负责图形运算",
-            "C. 连接各部件并提供通信通道",
-            "D. 负责给 CPU 散热"
+            "负责长期存储数据",
+            "负责图形运算",
+            "连接各部件并提供通信通道",
+            "负责给 CPU 散热"
           ],
           correctIndex: 2,
           answer: "答案：C。主板是连接 CPU、内存、硬盘等部件的枢纽；存储靠硬盘，图形靠显卡，散热靠散热器。"

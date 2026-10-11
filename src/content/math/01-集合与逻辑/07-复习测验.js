@@ -27,7 +27,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列各组对象中，不能构成集合的是（　）",
-          options: ["A. 某班全体共青团员", "B. 方程 \\(x^2 = 4\\) 的所有实数解", "C. 一切很大的正数", "D. 2026 年参加职业技能考试的学生"],
+          options: ["某班全体共青团员", "方程 \\(x^2 = 4\\) 的所有实数解", "一切很大的正数", "2026 年参加职业技能考试的学生"],
           correctIndex: 2,
           answer: "**C**。「很大」没有明确标准，不满足确定性；A、B、D 的对象都能被明确判断，可构成集合。"
         },
@@ -35,7 +35,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "已知集合 \\(A = \\{1, 2, 3\\}\\)，则集合 \\(A\\) 的非空真子集个数为（　）",
-          options: ["A. 4", "B. 6", "C. 8", "D. 7"],
+          options: ["4", "6", "8", "7"],
           correctIndex: 1,
           answer: "**B**。\\(n=3\\)，非空真子集个数 \\(= 2^3 - 2 = 6\\) 个。"
         },
@@ -43,7 +43,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "设全集 \\(U = \\{1, 2, 3, 4, 5\\}\\)，\\(A = \\{1, 3, 5\\}\\)，\\(B = \\{3, 4\\}\\)，则 \\(\\complement_U(A \\cup B) =\\)（　）",
-          options: ["A. \\(\\{2\\}\\)", "B. \\(\\{1, 2, 5\\}\\)", "C. \\(\\{2, 5\\}\\)", "D. \\(\\{1, 2\\}\\)"],
+          options: ["\\(\\{2\\}\\)", "\\(\\{1, 2, 5\\}\\)", "\\(\\{2, 5\\}\\)", "\\(\\{1, 2\\}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(A \\cup B = \\{1,3,4,5\\}\\)，\\(\\complement_U(A\\cup B) = \\{2\\}\\)。"
         },
@@ -51,7 +51,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "设集合 \\(A = \\{x \\mid -1 < x < 3\\}\\)，\\(B = \\{x \\mid x \\ge 0\\}\\)，则 \\(A \\cap B =\\)（　）",
-          options: ["A. \\(\\{x \\mid 0 \\le x < 3\\}\\)", "B. \\(\\{x \\mid x < 3\\}\\)", "C. \\(\\{x \\mid x \\ge 0\\}\\)", "D. \\(\\{x \\mid -1 < x < 0\\}\\)"],
+          options: ["\\(\\{x \\mid 0 \\le x < 3\\}\\)", "\\(\\{x \\mid x < 3\\}\\)", "\\(\\{x \\mid x \\ge 0\\}\\)", "\\(\\{x \\mid -1 < x < 0\\}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(A = (-1,3)\\)，\\(B = [0,+\\infty)\\)，\\(A\\cap B = [0,3)\\)。"
         },
@@ -59,7 +59,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "设 \\(A = \\{x \\mid x^2 - 2x - 3 = 0\\}\\)，\\(B = \\{x \\mid x+1=0\\}\\)，则 \\(A \\cup B =\\)（　）",
-          options: ["A. \\(\\{-1\\}\\)", "B. \\(\\{3\\}\\)", "C. \\(\\{-1, 3\\}\\)", "D. \\(\\{-1, -1, 3\\}\\)"],
+          options: ["\\(\\{-1\\}\\)", "\\(\\{3\\}\\)", "\\(\\{-1, 3\\}\\)", "\\(\\{-1, -1, 3\\}\\)"],
           correctIndex: 2,
           answer: "**C**。\\(A = \\{3, -1\\}\\)（由 \\((x-3)(x+1)=0\\)），\\(B = \\{-1\\}\\)，\\(A\\cup B = \\{-1, 3\\}\\)。"
         },
@@ -67,7 +67,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\"\\(x = 2\\)\" 是 \"\\(x^2 - 3x + 2 = 0\\)\" 的（　）",
-          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          options: ["充分不必要条件", "必要不充分条件", "充要条件", "既不充分也不必要条件"],
           correctIndex: 0,
           answer: "**A**。\\(x=2 \\Rightarrow x^2-3x+2=0\\) 成立，但反方向 \\(x^2-3x+2=0\\) 时 \\(x=1\\) 或 \\(x=2\\)，不一定 \\(x=2\\)。"
         },
@@ -75,7 +75,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知集合 \\(A = \\{a, 2\\}\\)，\\(B = \\{1, 2, a\\}\\)，若 \\(A \\subseteq B\\)，则实数 \\(a\\) 的值为（　）",
-          options: ["A. 1", "B. 0", "C. 1或0", "D. 任意实数"],
+          options: ["1", "0", "1或0", "任意实数"],
           correctIndex: 2,
           answer: "**C**。当 \\(a=1\\) 时 \\(A=\\{1,2\\}\\subseteq B\\) 满足；当 \\(a=0\\ne 1,2\\) 时 \\(0\\in B\\) 满足。所以 \\(a=1\\) 或 \\(a=0\\)。"
         },
@@ -83,7 +83,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "设 \\(p: x < 1\\)，\\(q: x < 2\\)，则 \\(p\\) 是 \\(q\\) 的（　）",
-          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          options: ["充分不必要条件", "必要不充分条件", "充要条件", "既不充分也不必要条件"],
           correctIndex: 0,
           answer: "**A**。\\(x<1 \\Rightarrow x<2\\)（充分），但 \\(x<2\\) 时 \\(x\\) 不一定 \\(<1\\)（如 \\(x=1.5\\)）。集合 \\((-\\infty,1) \\subsetneq (-\\infty,2)\\)，小充分。"
         }

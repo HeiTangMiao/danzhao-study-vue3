@@ -186,7 +186,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "新建图层的快捷键是（　）",
-          options: ["A. Ctrl+N", "B. Ctrl+Shift+N", "C. Ctrl+J", "D. Ctrl+T"],
+          options: ["Ctrl+N", "Ctrl+Shift+N", "Ctrl+J", "Ctrl+T"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+Shift+N 新建图层。"
         },
@@ -194,7 +194,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "文字竖排显示应使用（　）",
-          options: ["A. 横排文字工具", "B. 直排文字工具", "C. 段落文字", "D. 画笔工具"],
+          options: ["横排文字工具", "直排文字工具", "段落文字", "画笔工具"],
           correctIndex: 1,
           answer: "答案：B。直排文字工具使文字自上而下竖排排列；横排文字工具才是常规横排。段落文字指在文本框内按段落排版，画笔工具不能输入文字。"
         },
@@ -202,7 +202,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "将图片保存为可重复使用的图案，应使用（　）",
-          options: ["A. 编辑→定义图案", "B. 滤镜→模糊", "C. 图层→复制", "D. 图像→调整"],
+          options: ["编辑→定义图案", "滤镜→模糊", "图层→复制", "图像→调整"],
           correctIndex: 0,
           answer: "答案：A。先用选框选中要作为图案的区域，再执行\"编辑→定义图案\"，之后即可用油漆桶或填充命令把该图案平铺填充到任意区域。"
         },
@@ -223,7 +223,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "复制图层的方法是（　）",
-          options: ["A. 右键图层→复制图层", "B. 删除图层", "C. 合并图层", "D. 隐藏图层"],
+          options: ["右键图层→复制图层", "删除图层", "合并图层", "隐藏图层"],
           correctIndex: 0,
           answer: "答案：A。在图层面板右键图层选择\"复制图层\"即可生成副本（快捷键 Ctrl+J 也可）。删除图层会移除图层，合并图层会把多层压为一层，隐藏图层只是不显示，都不会产生副本。"
         },
@@ -231,7 +231,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "调整图层\"渐变映射\"的作用是（　）",
-          options: ["A. 模糊图像", "B. 将图像灰度映射为渐变色", "C. 裁剪图像", "D. 旋转图像"],
+          options: ["模糊图像", "将图像灰度映射为渐变色", "裁剪图像", "旋转图像"],
           correctIndex: 1,
           answer: "答案：B。渐变映射将灰度映射为指定渐变色。"
         },
@@ -239,7 +239,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "设置文字间距（字距）应在（　）面板中操作",
-          options: ["A. 图层面板", "B. 字符面板", "C. 历史记录", "D. 通道面板"],
+          options: ["图层面板", "字符面板", "历史记录", "通道面板"],
           correctIndex: 1,
           answer: "答案：B。字符面板设置字距、字号、行距等。"
         },

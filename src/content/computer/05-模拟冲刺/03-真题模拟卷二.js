@@ -25,7 +25,7 @@ export default {
           type: "single",
           score: 5,
           question: "Python 中用于求余数的运算符是（　）",
-          options: ["A. /", "B. //", "C. %", "D. **"],
+          options: ["/", "//", "%", "**"],
           correctIndex: 2,
           answer: "答案：C。`%` 是求余运算符；`//` 是整除，`**` 是幂运算。"
         },
@@ -34,7 +34,7 @@ export default {
           type: "single",
           score: 5,
           question: "表达式 `3 + 4 * 2` 的值是（　）",
-          options: ["A. 14", "B. 11", "C. 10", "D. 9"],
+          options: ["14", "11", "10", "9"],
           correctIndex: 1,
           answer: "答案：B。乘法优先于加法，先算 `4 * 2 = 8`，再算 `3 + 8 = 11`。"
         },
@@ -43,7 +43,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列 Python 数据类型中，属于序列类型的是（　）",
-          options: ["A. int", "B. str", "C. bool", "D. float"],
+          options: ["int", "str", "bool", "float"],
           correctIndex: 1,
           answer: "答案：B。字符串（str）是序列，可按下标取字符；int、bool、float 都是数值型。"
         },
@@ -52,7 +52,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行 `print(\"5\" + \"3\")` 的输出结果是（　）",
-          options: ["A. 8", "B. 53", "C. 5 3", "D. 程序报错"],
+          options: ["8", "53", "5 3", "程序报错"],
           correctIndex: 1,
           answer: "答案：B。两个字符串相加是拼接，结果为 `53`（不是数值相加）。"
         },
@@ -61,7 +61,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列变量名中，在 Python 中**不合法**的是（　）",
-          options: ["A. _count", "B. num1", "C. 1num", "D. total_sum"],
+          options: ["_count", "num1", "1num", "total_sum"],
           correctIndex: 2,
           answer: "答案：C。变量名不能以数字开头；其余三个均合法。"
         },
@@ -70,7 +70,7 @@ export default {
           type: "single",
           score: 5,
           question: "`range(1, 5)` 可以生成的整数共有（　）",
-          options: ["A. 3 个", "B. 4 个", "C. 5 个", "D. 6 个"],
+          options: ["3 个", "4 个", "5 个", "6 个"],
           correctIndex: 1,
           answer: "答案：B。range 含头不含尾，生成 1、2、3、4 共 4 个。"
         },
@@ -79,7 +79,7 @@ export default {
           type: "single",
           score: 5,
           question: "`if x = 5:` 这一行的错误原因是（　）",
-          options: ["A. 缺少冒号", "B. 条件中误用了赋值运算符", "C. 变量 x 未定义", "D. 缩进不正确"],
+          options: ["缺少冒号", "条件中误用了赋值运算符", "变量 x 未定义", "缩进不正确"],
           correctIndex: 1,
           answer: "答案：B。判断相等应写 `==`，`=` 是赋值运算符，不能出现在 if 条件中。"
         },
@@ -88,7 +88,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行 `for i in range(3): print(i, end=\"\")`，输出结果是（　）",
-          options: ["A. 012", "B. 123", "C. 0123", "D. 1234"],
+          options: ["012", "123", "0123", "1234"],
           correctIndex: 0,
           answer: "答案：A。range(3) 生成 0、1、2，`end=\"\"` 表示不换行，故输出 `012`。"
         },
@@ -135,7 +135,7 @@ export default {
           type: "single",
           score: 5,
           question: "双绞线按 T568B 标准制作时，第 1 脚的颜色是（　）",
-          options: ["A. 白橙", "B. 橙", "C. 白绿", "D. 绿"],
+          options: ["白橙", "橙", "白绿", "绿"],
           correctIndex: 0,
           answer: "答案：A。T568B 线序：白橙、橙、白绿、蓝、白蓝、绿、白棕、棕。"
         },
@@ -144,7 +144,7 @@ export default {
           type: "single",
           score: 5,
           question: "交换机工作在 OSI 参考模型的（　）",
-          options: ["A. 物理层", "B. 数据链路层", "C. 网络层", "D. 传输层"],
+          options: ["物理层", "数据链路层", "网络层", "传输层"],
           correctIndex: 1,
           answer: "答案：B。交换机依据 MAC 地址转发，属于数据链路层设备。"
         },
@@ -153,7 +153,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列 IP 地址中属于私有地址的是（　）",
-          options: ["A. 8.8.8.8", "B. 192.168.1.1", "C. 202.96.1.1", "D. 114.114.114.114"],
+          options: ["8.8.8.8", "192.168.1.1", "202.96.1.1", "114.114.114.114"],
           correctIndex: 1,
           answer: "答案：B。私有地址段为 10.0.0.0/8、172.16.0.0/12、192.168.0.0/16。"
         },
@@ -162,7 +162,7 @@ export default {
           type: "single",
           score: 5,
           question: "路由器的主要功能是（　）",
-          options: ["A. 放大信号延长传输距离", "B. 连接不同网络并选择转发路径", "C. 为终端分配带宽", "D. 把光信号转换为电信号"],
+          options: ["放大信号延长传输距离", "连接不同网络并选择转发路径", "为终端分配带宽", "把光信号转换为电信号"],
           correctIndex: 1,
           answer: "答案：B。路由器工作在网络层，负责跨网段转发并选择路径。"
         },
@@ -171,7 +171,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 PacketTracer 中为 PC 配置 IP 地址，应打开（　）",
-          options: ["A. Physical 选项卡", "B. Desktop → IP Configuration", "C. CLI 选项卡", "D. Services 选项卡"],
+          options: ["Physical 选项卡", "Desktop → IP Configuration", "CLI 选项卡", "Services 选项卡"],
           correctIndex: 1,
           answer: "答案：B。PC 的 IP 配置入口是 Desktop 选项卡下的 IP Configuration。"
         },
@@ -180,7 +180,7 @@ export default {
           type: "single",
           score: 5,
           question: "用于测试与目标主机连通性的命令是（　）",
-          options: ["A. ipconfig", "B. ping", "C. netstat", "D. dir"],
+          options: ["ipconfig", "ping", "netstat", "dir"],
           correctIndex: 1,
           answer: "答案：B。`ping` 发送 ICMP 报文测试连通性；`ipconfig` 查看本机 IP 配置。"
         },
@@ -189,7 +189,7 @@ export default {
           type: "single",
           score: 5,
           question: "划分 VLAN 的主要作用是（　）",
-          options: ["A. 提高网速", "B. 隔离广播域、增强安全性与管理灵活性", "C. 对数据加密", "D. 自动分配 IP 地址"],
+          options: ["提高网速", "隔离广播域、增强安全性与管理灵活性", "对数据加密", "自动分配 IP 地址"],
           correctIndex: 1,
           answer: "答案：B。VLAN 把一个物理网络划分为多个逻辑网络，隔离广播域。"
         },
@@ -243,7 +243,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列图片格式中支持透明背景且适合网页使用的是（　）",
-          options: ["A. PSD", "B. PNG", "C. BMP", "D. TIFF"],
+          options: ["PSD", "PNG", "BMP", "TIFF"],
           correctIndex: 1,
           answer: "答案：B。PNG 支持透明通道、体积适中，适合网页；PSD 是工程文件，BMP/TIFF 体积大。"
         },
@@ -252,7 +252,7 @@ export default {
           type: "single",
           score: 5,
           question: "位图图像放大后出现锯齿或马赛克，主要原因是（　）",
-          options: ["A. 分辨率过高", "B. 图像由像素点构成", "C. 色彩模式错误", "D. 压缩过度"],
+          options: ["分辨率过高", "图像由像素点构成", "色彩模式错误", "压缩过度"],
           correctIndex: 1,
           answer: "答案：B。位图由固定数量的像素构成，放大时像素被拉伸故出现锯齿。"
         },
@@ -261,7 +261,7 @@ export default {
           type: "single",
           score: 5,
           question: "用于印刷输出的图像通常采用的色彩模式是（　）",
-          options: ["A. RGB", "B. CMYK", "C. 灰度", "D. 索引颜色"],
+          options: ["RGB", "CMYK", "灰度", "索引颜色"],
           correctIndex: 1,
           answer: "答案：B。印刷用青、品红、黄、黑四色油墨，故用 CMYK；RGB 用于屏幕显示。"
         },
@@ -270,7 +270,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中处理图片后，若希望保留图层以便下次继续编辑，应保存为（　）",
-          options: ["A. JPG", "B. PSD", "C. GIF", "D. PNG"],
+          options: ["JPG", "PSD", "GIF", "PNG"],
           correctIndex: 1,
           answer: "答案：B。PSD 是 Photoshop 的工程格式，可完整保留图层、蒙版等信息。"
         },
@@ -279,7 +279,7 @@ export default {
           type: "single",
           score: 5,
           question: "Premiere 中序列帧率 25fps 表示（　）",
-          options: ["A. 每秒播放 25 帧画面", "B. 每帧持续 25 秒", "C. 视频总时长 25 秒", "D. 视频码率为 25 Mbps"],
+          options: ["每秒播放 25 帧画面", "每帧持续 25 秒", "视频总时长 25 秒", "视频码率为 25 Mbps"],
           correctIndex: 0,
           answer: "答案：A。fps 即每秒帧数，25fps 表示每秒 25 帧。"
         },
@@ -288,7 +288,7 @@ export default {
           type: "single",
           score: 5,
           question: "从纯色背景的产品图中快速抠出主体，最合适的工具是（　）",
-          options: ["A. 魔棒工具 / 快速选择工具", "B. 画笔工具", "C. 横排文字工具", "D. 渐变工具"],
+          options: ["魔棒工具 / 快速选择工具", "画笔工具", "横排文字工具", "渐变工具"],
           correctIndex: 0,
           answer: "答案：A。纯色背景与主体颜色差异明显，用魔棒或快速选择可快速选中背景并删除。"
         },
@@ -297,7 +297,7 @@ export default {
           type: "single",
           score: 5,
           question: "视频导出为 mp4 文件时，最常用的视频编码格式是（　）",
-          options: ["A. H.264", "B. PSD", "C. WAV", "D. RAW"],
+          options: ["H.264", "PSD", "WAV", "RAW"],
           correctIndex: 0,
           answer: "答案：A。H.264 是 mp4 容器中最常用的视频编码，兼顾画质与体积。"
         },

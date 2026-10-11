@@ -148,7 +148,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "查看本机 IP 配置的命令是（　）",
-          options: ["A. ping", "B. ipconfig", "C. tracert", "D. netstat"],
+          options: ["ping", "ipconfig", "tracert", "netstat"],
           correctIndex: 1,
           answer: "答案：B。ipconfig 查看本机 IP 配置。"
         },
@@ -156,7 +156,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "测试网络连通性的命令是（　）",
-          options: ["A. ipconfig", "B. ping", "C. nslookup", "D. arp"],
+          options: ["ipconfig", "ping", "nslookup", "arp"],
           correctIndex: 1,
           answer: "答案：B。ping 用于测试网络连通性。"
         },
@@ -164,7 +164,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "ping 127.0.0.1 用于测试（　）",
-          options: ["A. 互联网连通性", "B. 本机 TCP/IP 协议栈", "C. 网关连通性", "D. DNS 解析"],
+          options: ["互联网连通性", "本机 TCP/IP 协议栈", "网关连通性", "DNS 解析"],
           correctIndex: 1,
           answer: "答案：B。127.0.0.1 是回环地址，测试本机协议栈。"
         },
@@ -185,7 +185,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "查看本机 IP 详细配置信息（含 DNS）的命令是（　）",
-          options: ["A. ipconfig", "B. ipconfig /all", "C. ipconfig /renew", "D. ipconfig /release"],
+          options: ["ipconfig", "ipconfig /all", "ipconfig /renew", "ipconfig /release"],
           correctIndex: 1,
           answer: "答案：B。`ipconfig /all` 查看详细信息。"
         },
@@ -193,7 +193,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "跟踪数据包到达目标所经过路径的命令是（　）",
-          options: ["A. ping", "B. tracert", "C. ipconfig", "D. netstat"],
+          options: ["ping", "tracert", "ipconfig", "netstat"],
           correctIndex: 1,
           answer: "答案：B。tracert 跟踪路由路径。"
         },
@@ -201,7 +201,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "PC 无法访问互联网，排查顺序最合理的是（　）",
-          options: ["A. 直接重装系统", "B. ipconfig 查看配置 → ping 127.0.0.1 → ping 网关 → ping 外网", "C. 直接更换网线", "D. 重启路由器"],
+          options: ["直接重装系统", "ipconfig 查看配置 → ping 127.0.0.1 → ping 网关 → ping 外网", "直接更换网线", "重启路由器"],
           correctIndex: 1,
           answer: "答案：B。按\"配置→本机→网关→外网\"逐级排查，定位故障点。"
         },

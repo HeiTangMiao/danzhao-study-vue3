@@ -136,7 +136,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "技能操作考试满分 150 分，选考模块占（　）分",
-          options: ["A. 50", "B. 75", "C. 100", "D. 45"],
+          options: ["50", "75", "100", "45"],
           correctIndex: 1,
           answer: "答案：B。必考 75 分 + 选考 75 分 = 150 分。"
         },
@@ -144,7 +144,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "程序设计技能合格线是（　）分",
-          options: ["A. 30", "B. 45", "C. 60", "D. 75"],
+          options: ["30", "45", "60", "75"],
           correctIndex: 1,
           answer: "答案：B。程序设计技能 45 分及以上为合格。"
         }

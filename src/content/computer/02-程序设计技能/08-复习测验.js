@@ -86,7 +86,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列变量名中，不合法的是（　）",
-          options: ["A. score_1", "B. _total", "C. 3rd_num", "D. name2"],
+          options: ["score_1", "_total", "3rd_num", "name2"],
           correctIndex: 2,
           answer: "答案：C。变量名不能以数字开头；其余三项均为合法变量名。"
         },
@@ -94,7 +94,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "表达式 `10 % 3` 的结果是（　）",
-          options: ["A. 3", "B. 3.3", "C. 1", "D. 0"],
+          options: ["3", "3.3", "1", "0"],
           correctIndex: 2,
           answer: "答案：C。`10 % 3` 的余数是 1。"
         },
@@ -102,7 +102,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行 `n = 10` 后执行 `n //= 3`，此时 n 的值是（　）",
-          options: ["A. 3", "B. 3.3", "C. 1", "D. 10"],
+          options: ["3", "3.3", "1", "10"],
           correctIndex: 0,
           answer: "答案：A。`n //= 3` 等价于 `n = n // 3 = 10 // 3 = 3`。"
         },
@@ -110,7 +110,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nsum = 0\nfor i in range(1, 6):\n    sum += i\nprint(sum)\n```",
-          options: ["A. 15", "B. 10", "C. 21", "D. 14"],
+          options: ["15", "10", "21", "14"],
           correctIndex: 0,
           answer: "答案：A。1+2+3+4+5 = 15。"
         },
@@ -118,7 +118,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "数字 789 的百位数字是（　）",
-          options: ["A. 7", "B. 8", "C. 9", "D. 78"],
+          options: ["7", "8", "9", "78"],
           correctIndex: 0,
           answer: "答案：A。`789 // 100 = 7`。"
         },
@@ -126,7 +126,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nx = 75\nif x >= 90:\n    print(\"A\")\nelif x >= 80:\n    print(\"B\")\nelif x >= 60:\n    print(\"C\")\nelse:\n    print(\"D\")\n```",
-          options: ["A. A", "B. B", "C. C", "D. D"],
+          options: ["A", "B", "C", "D"],
           correctIndex: 2,
           answer: "答案：C。75 不满足 ≥90、≥80，满足 ≥60，输出 C。"
         },
@@ -134,7 +134,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "`\"hello\"[0:3]` 的结果是（　）",
-          options: ["A. \"hel\"", "B. \"ell\"", "C. \"hello\"", "D. \"he\""],
+          options: ["\"hel\"", "\"ell\"", "\"hello\"", "\"he\""],
           correctIndex: 0,
           answer: "答案：A。切片左闭右开，取下标 0、1、2 的字符 \"hel\"。"
         },
@@ -142,7 +142,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码中，能正确判断 n 是偶数的条件是（　）",
-          options: ["A. `n % 2 == 1`", "B. `n % 2 == 0`", "C. `n // 2 == 0`", "D. `n / 2 == 0`"],
+          options: ["`n % 2 == 1`", "`n % 2 == 0`", "`n // 2 == 0`", "`n / 2 == 0`"],
           correctIndex: 1,
           answer: "答案：B。能被 2 整除（余数为 0）是偶数。"
         },
@@ -150,7 +150,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i % 2 == 0:\n        continue\n    print(i, end=\" \")\n```",
-          options: ["A. 1 2 3 4 5", "B. 1 3 5", "C. 2 4", "D. 1 2 3"],
+          options: ["1 2 3 4 5", "1 3 5", "2 4", "1 2 3"],
           correctIndex: 1,
           answer: "答案：B。i 为偶数时 continue 跳过，只输出奇数 1 3 5。"
         },
@@ -158,7 +158,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列程序想求 1 到 100 中所有偶数的和，正确的是（　）",
-          options: ["A. `sum = 0` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "B. `sum = 0` `for i in range(1, 101, 2):` `sum += i`", "C. `sum = 1` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "D. A 和 B 都对"],
+          options: ["`sum = 0` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "`sum = 0` `for i in range(1, 101, 2):` `sum += i`", "`sum = 1` `for i in range(1, 101):` `if i % 2 == 0:` `sum += i`", "A 和 B 都对"],
           correctIndex: 0,
           answer: "答案：A。A 用 `i % 2 == 0` 判断偶数累加，正确；B 用 `range(1, 101, 2)` 取的是奇数（1、3、5…），求的是奇数和；C 累加器初始化为 1 错误。"
         }
@@ -173,7 +173,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "阅读下列程序，输出结果是（　）\n```\na = 5\nb = 3\na, b = b, a\nprint(a, b)\n```",
-          options: ["A. 5 3", "B. 3 5", "C. 3 3", "D. 5 5"],
+          options: ["5 3", "3 5", "3 3", "5 5"],
           correctIndex: 1,
           answer: "答案：B。`a, b = b, a` 交换两个变量的值，a 变为 3，b 变为 5。"
         },
@@ -181,7 +181,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "阅读下列程序，输出结果是（　）\n```\nproduct = 1\nfor i in range(1, 5):\n    product *= i\nprint(product)\n```",
-          options: ["A. 10", "B. 24", "C. 120", "D. 15"],
+          options: ["10", "24", "120", "15"],
           correctIndex: 1,
           answer: "答案：B。1×2×3×4 = 24。"
         },
@@ -189,7 +189,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "阅读下列程序，输出结果是（　）\n```\nnum = 246\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\nprint(bai + shi + ge)\n```",
-          options: ["A. 246", "B. 12", "C. 24", "D. 6"],
+          options: ["246", "12", "24", "6"],
           correctIndex: 1,
           answer: "答案：B。百位 2 + 十位 4 + 个位 6 = 12。"
         }
@@ -204,7 +204,7 @@ export default {
           title: "编程题：累加求和",
           difficulty: "medium",
           question: "编写程序：输入一个正整数 n，计算 1 到 n 的所有整数之和并输出。要求：输入输出有提示文字，代码有详细注释。",
-          solution: "**解：**\n```\n# 计算 1 到 n 的和\nn = int(input(\"请输入一个正整数 n：\"))\n# 初始化累加器\nsum = 0\n# 循环累加\nfor i in range(1, n + 1):\n    sum += i\n# 输出结果\nprint(\"1 到\", n, \"的和是：\", sum)\n```\n运行示例：\n请输入一个正整数 n：10\n1 到 10 的和是： 55",
+          solution: "**解：**\n```\n# 计算 1 到 n 的和\nn = int(input(\"请输入一个正整数 n：\"))\n# 初始化累加器\nsum = 0\n# 循环累加\nfor i in range(1, n + 1):\nsum += i\n# 输出结果\nprint(\"1 到\", n, \"的和是：\", sum)\n```\n运行示例：\n请输入一个正整数 n：10\n1 到 10 的和是： 55",
           answer: "`sum = 0` 初始化，`for i in range(1, n + 1)` 循环，`sum += i` 累加后输出。"
         }
       ]

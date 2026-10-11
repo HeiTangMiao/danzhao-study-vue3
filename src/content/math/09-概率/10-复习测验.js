@@ -26,7 +26,7 @@ export default {
               difficulty: "basic",
               type: "single",
               question: "掷一枚均匀的骰子，掷出偶数点的概率为（　）",
-              options: ["A. \\(\\dfrac{1}{2}\\)", "B. \\(\\dfrac{1}{3}\\)", "C. \\(\\dfrac{2}{3}\\)", "D. \\(\\dfrac{1}{6}\\)"],
+              options: ["\\(\\dfrac{1}{2}\\)", "\\(\\dfrac{1}{3}\\)", "\\(\\dfrac{2}{3}\\)", "\\(\\dfrac{1}{6}\\)"],
               correctIndex: 0,
               answer: "**A**。骰子 6 个面，偶数点为 2, 4, 6 共 3 个，\\(P = \\dfrac{3}{6} = \\dfrac{1}{2}\\)。"
             },
@@ -34,7 +34,7 @@ export default {
               difficulty: "basic",
               type: "single",
               question: "袋中有 3 个红球和 2 个白球（除颜色外完全相同），从中任取 2 个球，取到的 2 个球都是红球的概率为（　）",
-              options: ["A. \\(\\dfrac{1}{5}\\)", "B. \\(\\dfrac{1}{10}\\)", "C. \\(\\dfrac{3}{5}\\)", "D. \\(\\dfrac{3}{10}\\)"],
+              options: ["\\(\\dfrac{1}{5}\\)", "\\(\\dfrac{1}{10}\\)", "\\(\\dfrac{3}{5}\\)", "\\(\\dfrac{3}{10}\\)"],
               correctIndex: 3,
               answer: "**D**。总数 \\(C_5^2 = 10\\)，两个红球 \\(C_3^2 = 3\\)，\\(P = \\dfrac{3}{10}\\)。"
             },
@@ -42,7 +42,7 @@ export default {
               difficulty: "basic",
               type: "single",
               question: "事件 A 与 B 互斥，且 \\(P(A) = 0.2\\)，\\(P(B) = 0.5\\)，则 \\(P(A \\cup B)\\) 等于（　）",
-              options: ["A. 0.3", "B. 0.1", "C. 0.7", "D. 0.58"],
+              options: ["0.3", "0.1", "0.7", "0.58"],
               correctIndex: 2,
               answer: "**C**。互斥事件加法公式：\\(P(A \\cup B) = P(A) + P(B) = 0.2 + 0.5 = 0.7\\)。"
             },
@@ -50,7 +50,7 @@ export default {
               difficulty: "medium",
               type: "single",
               question: "在区间 \\([0, 5]\\) 上随机取一个数 \\(x\\)，则 \\(x\\) 落在区间 \\([1, 3]\\) 内的概率为（　）",
-              options: ["A. \\(\\dfrac{3}{5}\\)", "B. \\(\\dfrac{2}{5}\\)", "C. \\(\\dfrac{1}{2}\\)", "D. \\(\\dfrac{1}{5}\\)"],
+              options: ["\\(\\dfrac{3}{5}\\)", "\\(\\dfrac{2}{5}\\)", "\\(\\dfrac{1}{2}\\)", "\\(\\dfrac{1}{5}\\)"],
               correctIndex: 1,
               answer: "**B**。长度型几何概型：\\(P = \\dfrac{3 - 1}{5 - 0} = \\dfrac{2}{5}\\)。"
             },
@@ -58,7 +58,7 @@ export default {
               difficulty: "medium",
               type: "single",
               question: "甲、乙两人独立射击同一目标，甲命中概率为 0.6，乙命中概率为 0.5，则目标被击中的概率为（　）",
-              options: ["A. 0.9", "B. 0.5", "C. 0.3", "D. 0.8"],
+              options: ["0.9", "0.5", "0.3", "0.8"],
               correctIndex: 3,
               answer: "**D**。用对立事件，两人都没命中概率 \\((1 - 0.6)(1 - 0.5) = 0.4 \\times 0.5 = 0.2\\)，目标被击中 \\(= 1 - 0.2 = 0.8\\)。"
             },
@@ -66,7 +66,7 @@ export default {
               difficulty: "medium",
               type: "single",
               question: "某射手每次射击命中概率为 0.6，各次射击相互独立，独立射击 5 次，命中次数的期望为（　）",
-              options: ["A. 0.6", "B. 5", "C. 3", "D. 1.2"],
+              options: ["0.6", "5", "3", "1.2"],
               correctIndex: 2,
               answer: "**C**。命中次数 \\(X \\sim B(5, 0.6)\\)，\\(E(X) = np = 5 \\times 0.6 = 3\\)。"
             },
@@ -74,7 +74,7 @@ export default {
               difficulty: "medium",
               type: "single",
               question: "数据 1, 2, 3, 4, 5 的平均数为（　）",
-              options: ["A. 2", "B. 4", "C. 5", "D. 3"],
+              options: ["2", "4", "5", "3"],
               correctIndex: 3,
               answer: "**D**。\\(\\bar{x} = \\dfrac{1 + 2 + 3 + 4 + 5}{5} = 3\\)。"
             },
@@ -82,7 +82,7 @@ export default {
               difficulty: "medium",
               type: "single",
               question: "某学校共有学生 1200 人，其中高一 400 人，采用分层抽样抽取 60 名进行调查，则高一年级应抽取（　）",
-              options: ["A. 15 人", "B. 10 人", "C. 20 人", "D. 30 人"],
+              options: ["15 人", "10 人", "20 人", "30 人"],
               correctIndex: 2,
               answer: "**C**。抽样比 \\(\\dfrac{60}{1200} = \\dfrac{1}{20}\\)，高一年级应抽取 \\(400 \\times \\dfrac{1}{20} = 20\\) 人。"
             }

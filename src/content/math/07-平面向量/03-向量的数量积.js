@@ -111,19 +111,19 @@ export default {
         {
           title: "例题1：求数量积",
           question: "已知 \\(\\boldsymbol{a} = (2, 1)\\)，\\(\\boldsymbol{b} = (3, -4)\\)，求 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b}\\) 和 \\(|\\boldsymbol{a}|\\)、\\(|\\boldsymbol{b}|\\)。",
-          solution: "解：\n\n        \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 2 \\times 3 + 1 \\times (-4) = 6 - 4 = 2\\)\n\n        \\(|\\boldsymbol{a}| = \\sqrt{2^2 + 1^2} = \\sqrt{5}\\)\n\n        \\(|\\boldsymbol{b}| = \\sqrt{3^2 + (-4)^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5\\)",
+          solution: "解：\n\n\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 2 \\times 3 + 1 \\times (-4) = 6 - 4 = 2\\)\n\n\\(|\\boldsymbol{a}| = \\sqrt{2^2 + 1^2} = \\sqrt{5}\\)\n\n\\(|\\boldsymbol{b}| = \\sqrt{3^2 + (-4)^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5\\)",
           answer: "\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 2\\)，\\(|\\boldsymbol{a}| = \\sqrt{5}\\)，\\(|\\boldsymbol{b}| = 5\\)"
         },
         {
           title: "例题2：判断垂直",
           question: "已知 \\(\\boldsymbol{a} = (1, 2)\\)，\\(\\boldsymbol{b} = (m, -1)\\)，若 \\(\\boldsymbol{a} \\perp \\boldsymbol{b}\\)，求 \\(m\\) 的值。",
-          solution: "解：\n\n        由垂直条件 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\)：\n\n        \\(1 \\times m + 2 \\times (-1) = 0\\)\n\n        \\(m - 2 = 0\\)\n\n        \\(m = 2\\)",
+          solution: "解：\n\n由垂直条件 \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 0\\)：\n\n\\(1 \\times m + 2 \\times (-1) = 0\\)\n\n\\(m - 2 = 0\\)\n\n\\(m = 2\\)",
           answer: "\\(m = 2\\)"
         },
         {
           title: "例题3：求夹角",
           question: "已知 \\(\\boldsymbol{a} = (1, \\sqrt{3})\\)，\\(\\boldsymbol{b} = (\\sqrt{3}, 1)\\)，求 \\(\\boldsymbol{a}\\) 与 \\(\\boldsymbol{b}\\) 的夹角 \\(\\theta\\)。",
-          solution: "解：\n\n        \\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 1 \\times \\sqrt{3} + \\sqrt{3} \\times 1 = 2\\sqrt{3}\\)\n\n        \\(|\\boldsymbol{a}| = \\sqrt{1 + 3} = 2\\)\n\n        \\(|\\boldsymbol{b}| = \\sqrt{3 + 1} = 2\\)\n\n        \\(\\cos\\theta = \\frac{\\boldsymbol{a} \\cdot \\boldsymbol{b}}{|\\boldsymbol{a}||\\boldsymbol{b}|} = \\frac{2\\sqrt{3}}{2 \\times 2} = \\frac{2\\sqrt{3}}{4} = \\frac{\\sqrt{3}}{2}\\)\n\n        因为 \\(0 \\leq \\theta \\leq \\pi\\)，所以 \\(\\theta = \\frac{\\pi}{6}\\)（即 \\(30°\\)）",
+          solution: "解：\n\n\\(\\boldsymbol{a} \\cdot \\boldsymbol{b} = 1 \\times \\sqrt{3} + \\sqrt{3} \\times 1 = 2\\sqrt{3}\\)\n\n\\(|\\boldsymbol{a}| = \\sqrt{1 + 3} = 2\\)\n\n\\(|\\boldsymbol{b}| = \\sqrt{3 + 1} = 2\\)\n\n\\(\\cos\\theta = \\frac{\\boldsymbol{a} \\cdot \\boldsymbol{b}}{|\\boldsymbol{a}||\\boldsymbol{b}|} = \\frac{2\\sqrt{3}}{2 \\times 2} = \\frac{2\\sqrt{3}}{4} = \\frac{\\sqrt{3}}{2}\\)\n\n因为 \\(0 \\leq \\theta \\leq \\pi\\)，所以 \\(\\theta = \\frac{\\pi}{6}\\)（即 \\(30°\\)）",
           answer: "\\(\\theta = \\frac{\\pi}{6}\\)（\\(30°\\)）"
         }
       ]
@@ -182,7 +182,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "已知 \\(\\vec{a} = (1, 1)\\)，\\(\\vec{b} = (1, -1)\\)，则 \\(\\vec{a} \\cdot \\vec{b} = \\)（　）",
-          options: ["A. 2", "B. 0", "C. -2", "D. 1"],
+          options: ["2", "0", "-2", "1"],
           correctIndex: 1,
           answer: "答案：B。\\(\\vec{a} \\cdot \\vec{b} = 1 \\times 1 + 1 \\times (-1) = 0\\)（两向量垂直）。"
         }
@@ -209,7 +209,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知 \\(|\\vec{a}| = 3\\)，\\(|\\vec{b}| = 4\\)，夹角为 \\(60^\\circ\\)，则 \\(\\vec{a} \\cdot \\vec{b}\\) 等于（　）",
-          options: ["A. 6", "B. 12", "C. \\(6\\sqrt{3}\\)", "D. \\(12\\sqrt{3}\\)"],
+          options: ["6", "12", "\\(6\\sqrt{3}\\)", "\\(12\\sqrt{3}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(3 \\times 4 \\times \\cos 60^\\circ = 12 \\times \\frac{1}{2} = 6\\)。"
         }

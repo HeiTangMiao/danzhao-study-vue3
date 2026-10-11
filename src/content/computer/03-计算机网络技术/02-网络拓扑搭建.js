@@ -126,7 +126,7 @@ export default {
           title: "例题1：拓扑结构判断",
           difficulty: "basic",
           question: "某机房所有 PC 都连接到一台中心交换机上，这种拓扑结构是（　）",
-          options: ["A. 总线型", "B. 星型", "C. 环型", "D. 网状"],
+          options: ["总线型", "星型", "环型", "网状"],
           correctIndex: 1,
           solution: "**解：**\n所有设备连接到中心交换机，属于星型拓扑。中心交换机是核心节点，PC 之间的通信都经过它。",
           answer: "答案：B。所有节点都连到一台中心交换机上，是星型拓扑。总线型所有节点共用一条主干，环型首尾相连成环，网状任意两节点间有多条路径。星型的优点是单个节点故障不影响他人，缺点是中心交换机故障会导致全网瘫痪。"
@@ -135,7 +135,7 @@ export default {
           title: "例题2：连线方式判断",
           difficulty: "medium",
           question: "在 PacketTracer 中，下列设备之间应使用直通线连接的是（　）",
-          options: ["A. PC 与 PC", "B. 交换机与交换机", "C. PC 与交换机", "D. 路由器与路由器"],
+          options: ["PC 与 PC", "交换机与交换机", "PC 与交换机", "路由器与路由器"],
           correctIndex: 2,
           solution: "**解：**\n直通线连接不同类型设备：PC 与交换机属于不同类型，用直通线。\nPC 与 PC、交换机与交换机、路由器与路由器属于同类型设备，一般用交叉线。",
           answer: "答案：C。直通线用于连接\"不同类\"设备，如 PC↔交换机、路由器↔交换机；同类设备（PC↔PC、交换机↔交换机、路由器↔路由器）要用交叉线。记忆口诀：同交异直。"
@@ -158,7 +158,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "目前局域网最常用的拓扑结构是（　）",
-          options: ["A. 总线型", "B. 星型", "C. 环型", "D. 网状"],
+          options: ["总线型", "星型", "环型", "网状"],
           correctIndex: 1,
           answer: "答案：B。星型拓扑是局域网最常用的结构。"
         },
@@ -166,7 +166,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "PC 与交换机之间应使用（　）连接",
-          options: ["A. 交叉线", "B. 直通线", "C. 同轴电缆", "D. 光纤"],
+          options: ["交叉线", "直通线", "同轴电缆", "光纤"],
           correctIndex: 1,
           answer: "答案：B。PC 与交换机属于不同类型设备，用直通线；只有同类设备互联才用交叉线。同轴电缆与光纤不用于这种常规以太网接入场景。"
         },
@@ -174,7 +174,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "星型拓扑中，中心设备故障会导致（　）",
-          options: ["A. 部分设备无法通信", "B. 全网瘫痪", "C. 不影响通信", "D. 只有中心设备无法通信"],
+          options: ["部分设备无法通信", "全网瘫痪", "不影响通信", "只有中心设备无法通信"],
           correctIndex: 1,
           answer: "答案：B。星型拓扑中心设备故障，全网瘫痪。"
         },
@@ -195,7 +195,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "可靠性最高但成本也最高的拓扑结构是（　）",
-          options: ["A. 星型", "B. 总线型", "C. 环型", "D. 网状"],
+          options: ["星型", "总线型", "环型", "网状"],
           correctIndex: 3,
           answer: "答案：D。网状拓扑可靠性高但成本高。"
         },
@@ -203,7 +203,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列设备之间应使用交叉线连接的是（　）",
-          options: ["A. PC 与交换机", "B. 交换机与路由器", "C. PC 与 PC", "D. PC 与服务器"],
+          options: ["PC 与交换机", "交换机与路由器", "PC 与 PC", "PC 与服务器"],
           correctIndex: 2,
           answer: "答案：C。PC 与 PC 是同类型设备，用交叉线。"
         },
@@ -211,7 +211,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "考试中搭建拓扑，工程文件应保存为（　）格式",
-          options: ["A. .docx", "B. .pkt", "C. .txt", "D. .png"],
+          options: [".docx", ".pkt", ".txt", ".png"],
           correctIndex: 1,
           answer: "答案：B。PacketTracer 工程文件扩展名为 .pkt。"
         },

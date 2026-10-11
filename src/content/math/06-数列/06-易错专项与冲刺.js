@@ -43,17 +43,17 @@ export default {
       items: [
         {
           type: "single", difficulty: "sprint",
-          question: "已知数列 \\(\\{a_n\\}\\) 的前 \\(n\\) 项和 \\(S_n = n^2\\)，则 \\(a_5 =\\)（　）",
-          options: ["9", "25", "16", "11"],
-          correctIndex: 0,
-          answer: "**A**。\\(a_5 = S_5 - S_4 = 25 - 16 = 9\\)。"
+          question: "已知数列 \\(\\{a_n\\}\\) 的前 \\(n\\) 项和 \\(S_n = n^2 + 1\\)，则 \\(a_1 =\\)（　）",
+          options: ["1", "2", "3", "0"],
+          correctIndex: 1,
+          answer: "**B**。\\(a_1 = S_1 = 1^2 + 1 = 2\\)。易错点：\\(a_n = S_n - S_{n-1}\\) 只对 \\(n \\ge 2\\) 成立，求 \\(a_1\\) 必须用 \\(a_1 = S_1\\)；本数列由该式得 \\(a_n = 2n - 1\\)，代入 \\(n = 1\\) 得 1，与真实 \\(a_1 = 2\\) 不符，故首项必须单独检验。"
         },
         {
           type: "single", difficulty: "sprint",
-          question: "在等差数列 \\(\\{a_n\\}\\) 中，\\(a_2 + a_8 = 10\\)，则 \\(a_5 =\\)（　）",
-          options: ["5", "10", "4", "6"],
+          question: "在等差数列 \\(\\{a_n\\}\\) 中，\\(a_3 + a_9 = 12\\)，则 \\(a_6 =\\)（　）",
+          options: ["6", "12", "4", "8"],
           correctIndex: 0,
-          answer: "**A**。等差中项性质：\\(a_2 + a_8 = 2a_5\\)，故 \\(a_5 = 5\\)。"
+          answer: "**A**。等差中项性质：\\(a_3 + a_9 = 2a_6\\)，故 \\(a_6 = 6\\)。"
         },
         {
           type: "single", difficulty: "sprint",

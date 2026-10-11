@@ -179,7 +179,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "已知集合 \\(A = \\{a, b\\}\\)，则集合 \\(A\\) 的非空真子集个数为（　）",
-          options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+          options: ["1", "2", "3", "4"],
           correctIndex: 1,
           answer: "答案：B。\\(n=2\\)，非空真子集个数为 \\(2^2-2 = 2\\) 个，分别是 \\(\\{a\\}\\) 和 \\(\\{b\\}\\)。"
         },
@@ -187,7 +187,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知集合 \\(M = \\{0, 1\\}\\)，\\(N = \\{x \\mid x^2 + x = 0\\}\\)，则（　）",
-          options: ["A. \\(M \\subsetneq N\\)", "B. \\(N \\subsetneq M\\)", "C. \\(M = N\\)", "D. 互不包含"],
+          options: ["\\(M \\subsetneq N\\)", "\\(N \\subsetneq M\\)", "\\(M = N\\)", "互不包含"],
           correctIndex: 3,
           answer: "答案：D。\\(N = \\{x \\mid x(x+1)=0\\} = \\{0, -1\\}\\)，而 \\(M=\\{0,1\\}\\)，两集合不相等，互不包含。"
         },
@@ -224,7 +224,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知集合 \\(A = \\{1, 2\\}\\)，则满足 \\(A \\subseteq B \\subseteq \\{1, 2, 3, 4\\}\\) 的集合 \\(B\\) 共有（　）",
-          options: ["A. 2 个", "B. 3 个", "C. 4 个", "D. 6 个"],
+          options: ["2 个", "3 个", "4 个", "6 个"],
           correctIndex: 2,
           answer: "**C**。\\(B\\) 必须含 1、2，再从 \\(\\{3, 4\\}\\) 中任选元素，共 \\(2^2 = 4\\) 个。"
         }

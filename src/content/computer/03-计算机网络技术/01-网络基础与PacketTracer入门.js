@@ -157,7 +157,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "连接同一局域网内多台 PC 的设备是（　）",
-          options: ["A. 路由器", "B. 交换机", "C. 调制解调器", "D. 集线器"],
+          options: ["路由器", "交换机", "调制解调器", "集线器"],
           correctIndex: 1,
           answer: "答案：B。交换机用于连接同一局域网内的设备。"
         },
@@ -165,7 +165,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "连接不同网络、选择路径转发数据的设备是（　）",
-          options: ["A. 交换机", "B. 路由器", "C. 网卡", "D. 服务器"],
+          options: ["交换机", "路由器", "网卡", "服务器"],
           correctIndex: 1,
           answer: "答案：B。路由器工作在网络层，负责不同网络之间的路径选择与转发。"
         },
@@ -173,7 +173,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "提示符为 `Switch(config)#` 时，当前处于（　）",
-          options: ["A. 用户模式", "B. 特权模式", "C. 全局配置模式", "D. 接口配置模式"],
+          options: ["用户模式", "特权模式", "全局配置模式", "接口配置模式"],
           correctIndex: 2,
           answer: "答案：C。`(config)#` 表示全局配置模式。"
         },
@@ -181,7 +181,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "子网掩码 255.255.255.0 表示网络位占（　）位",
-          options: ["A. 8", "B. 16", "C. 24", "D. 32"],
+          options: ["8", "16", "24", "32"],
           correctIndex: 2,
           answer: "答案：C。255.255.255.0 前三个 255 共 24 位是网络位，即 /24。"
         }
@@ -196,7 +196,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "IPv4 地址由几组数字组成（　）",
-          options: ["A. 2", "B. 3", "C. 4", "D. 6"],
+          options: ["2", "3", "4", "6"],
           correctIndex: 2,
           answer: "答案：C。IPv4 地址由 4 组 0~255 的数字组成。"
         },
@@ -204,7 +204,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "PC 访问其他网段时，数据首先发送给（　）",
-          options: ["A. 交换机", "B. 默认网关", "C. DNS 服务器", "D. 本机网卡"],
+          options: ["交换机", "默认网关", "DNS 服务器", "本机网卡"],
           correctIndex: 1,
           answer: "答案：B。PC 访问其他网段时，数据先发送给默认网关。"
         },
@@ -212,7 +212,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列 IP 地址中，合法的是（　）",
-          options: ["A. 192.168.1.256", "B. 192.168.1.1", "C. 192.168.1", "D. 256.1.1.1"],
+          options: ["192.168.1.256", "192.168.1.1", "192.168.1", "256.1.1.1"],
           correctIndex: 1,
           answer: "答案：B。每段范围是 0~255，256 超出范围，且必须有 4 段。"
         },

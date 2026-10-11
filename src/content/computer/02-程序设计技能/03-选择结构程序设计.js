@@ -130,21 +130,21 @@ export default {
           title: "例题1：判断奇偶数（考试样题二）",
           difficulty: "basic",
           question: "请输入一个整数，判断它是奇数还是偶数并输出结果。要求：输入输出有提示文字，代码有注释。",
-          solution: "**解：**\n```\n# 试题二：判断奇偶数\n# 输入一个整数\nnum = int(input(\"请输入一个整数：\"))\n# 判断奇偶：能被 2 整除是偶数\nif num % 2 == 0:\n    print(num, \"是偶数\")\nelse:\n    print(num, \"是奇数\")\n```\n运行示例：\n请输入一个整数：7\n7 是奇数",
+          solution: "**解：**\n```\n# 试题二：判断奇偶数\n# 输入一个整数\nnum = int(input(\"请输入一个整数：\"))\n# 判断奇偶：能被 2 整除是偶数\nif num % 2 == 0:\nprint(num, \"是偶数\")\nelse:\nprint(num, \"是奇数\")\n```\n运行示例：\n请输入一个整数：7\n7 是奇数",
           answer: "用 `num % 2 == 0` 判断：余数为 0 是偶数，否则是奇数。"
         },
         {
           title: "例题2：成绩等级判断器（考试样题五）",
           difficulty: "medium",
           question: "请输入一个学生的成绩（0~100 之间），判断其等级并输出：90 分及以上为\"A\"，80~89 为\"B\"，60~79 为\"C\"，60 分以下为\"D\"。",
-          solution: "**解：**\n```\n# 试题五：成绩等级判断器\nscore = int(input(\"请输入成绩（0~100）：\"))\n# 多分支判断等级\nif score >= 90:\n    print(\"等级：A\")\nelif score >= 80:\n    print(\"等级：B\")\nelif score >= 60:\n    print(\"等级：C\")\nelse:\n    print(\"等级：D\")\n```\n运行示例：\n请输入成绩（0~100）：85\n等级：B",
+          solution: "**解：**\n```\n# 试题五：成绩等级判断器\nscore = int(input(\"请输入成绩（0~100）：\"))\n# 多分支判断等级\nif score >= 90:\nprint(\"等级：A\")\nelif score >= 80:\nprint(\"等级：B\")\nelif score >= 60:\nprint(\"等级：C\")\nelse:\nprint(\"等级：D\")\n```\n运行示例：\n请输入成绩（0~100）：85\n等级：B",
           answer: "用 if-elif-else 从高到低依次判断：≥90 为 A，≥80 为 B，≥60 为 C，否则 D。"
         },
         {
           title: "例题3：求三个数的最大值",
           difficulty: "advanced",
           question: "输入三个整数，输出其中的最大值。",
-          solution: "**解：**\n```\n# 求三个数的最大值\n# 输入三个整数\na = int(input(\"请输入第一个数：\"))\nb = int(input(\"请输入第二个数：\"))\nc = int(input(\"请输入第三个数：\"))\n# 先假设 a 最大\nmax_num = a\n# 依次比较\nif b > max_num:\n    max_num = b\nif c > max_num:\n    max_num = c\n# 输出最大值\nprint(\"最大值为：\", max_num)\n```\n运行示例：\n请输入第一个数：5\n请输入第二个数：9\n请输入第三个数：3\n最大值为： 9",
+          solution: "**解：**\n```\n# 求三个数的最大值\n# 输入三个整数\na = int(input(\"请输入第一个数：\"))\nb = int(input(\"请输入第二个数：\"))\nc = int(input(\"请输入第三个数：\"))\n# 先假设 a 最大\nmax_num = a\n# 依次比较\nif b > max_num:\nmax_num = b\nif c > max_num:\nmax_num = c\n# 输出最大值\nprint(\"最大值为：\", max_num)\n```\n运行示例：\n请输入第一个数：5\n请输入第二个数：9\n请输入第三个数：3\n最大值为： 9",
           answer: "先假设 a 最大，再与 b、c 依次比较，较大的赋给 max_num。"
         }
       ]
@@ -158,7 +158,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "判断两个数是否相等，应使用的运算符是（　）",
-          options: ["A. =", "B. ==", "C. !=", "D. <="],
+          options: ["=", "==", "!=", "<="],
           correctIndex: 1,
           answer: "答案：B。`==` 判断相等，`=` 是赋值。"
         },
@@ -166,7 +166,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "表达式 `5 > 3 and 2 > 4` 的结果是（　）",
-          options: ["A. True", "B. False", "C. 报错", "D. 5"],
+          options: ["True", "False", "报错", "5"],
           correctIndex: 1,
           answer: "答案：B。and 要求两边都真才为真，`2 > 4` 为假，所以整体为 False。"
         },
@@ -174,7 +174,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nx = 85\nif x >= 90:\n    print(\"A\")\nelif x >= 80:\n    print(\"B\")\nelif x >= 60:\n    print(\"C\")\nelse:\n    print(\"D\")\n```",
-          options: ["A. A", "B. B", "C. C", "D. D"],
+          options: ["A", "B", "C", "D"],
           correctIndex: 1,
           answer: "答案：B。85 不满足 ≥90，满足 ≥80，输出 B。"
         },
@@ -195,7 +195,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列代码中，能正确判断\"x 是正数\"的是（　）",
-          options: ["A. `if x > 0:`", "B. `if x >= 0:`", "C. `if x = 0:`", "D. `if x != 0:`"],
+          options: ["`if x > 0:`", "`if x >= 0:`", "`if x = 0:`", "`if x != 0:`"],
           correctIndex: 0,
           answer: "答案：A。正数即大于 0，用 `x > 0`。"
         },
@@ -203,7 +203,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\na = 10\nb = 20\nif a > b:\n    print(\"a大\")\nelse:\n    print(\"b大\")\n```",
-          options: ["A. a大", "B. b大", "C. 一样大", "D. 报错"],
+          options: ["a大", "b大", "一样大", "报错"],
           correctIndex: 1,
           answer: "答案：B。10 > 20 为假，执行 else 输出\"b大\"。"
         },
@@ -211,7 +211,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "判断一个年份是否为闰年：能被 4 整除且不能被 100 整除，或能被 400 整除。正确的条件是（　）",
-          options: ["A. `year % 4 == 0`", "B. `(year % 4 == 0 and year % 100 != 0) or year % 400 == 0`", "C. `year % 4 == 0 or year % 400 == 0`", "D. `year % 100 == 0`"],
+          options: ["`year % 4 == 0`", "`(year % 4 == 0 and year % 100 != 0) or year % 400 == 0`", "`year % 4 == 0 or year % 400 == 0`", "`year % 100 == 0`"],
           correctIndex: 1,
           answer: "答案：B。闰年条件：(能被4整除且不能被100整除) 或 能被400整除，用 and 和 or 组合。"
         },
@@ -219,7 +219,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nscore = 95\nif score >= 60:\n    print(\"及格\")\n    if score >= 90:\n        print(\"优秀\")\nelse:\n    print(\"不及格\")\n```",
-          options: ["A. 及格", "B. 及格\\n优秀", "C. 优秀", "D. 不及格"],
+          options: ["及格", "及格\\n优秀", "优秀", "不及格"],
           correctIndex: 1,
           answer: "答案：B。95 ≥ 60 输出\"及格\"，嵌套判断 95 ≥ 90 再输出\"优秀\"。"
         }

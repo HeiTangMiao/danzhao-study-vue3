@@ -151,14 +151,14 @@ export default {
           title: "例题1：找错误并修改",
           difficulty: "medium",
           question: "下列程序想计算 1 到 10 的累加和，但结果不对，请找出错误并修改。\n```\nsum = 1\nfor i in range(1, 11):\n    sum += i\nprint(sum)\n```",
-          solution: "**解：**\n错误：累加器初始化为 1，导致结果多加了 1。\n正确代码：\n```\nsum = 0\nfor i in range(1, 11):\n    sum += i\nprint(sum)   # 输出 55\n```",
+          solution: "**解：**\n错误：累加器初始化为 1，导致结果多加了 1。\n正确代码：\n```\nsum = 0\nfor i in range(1, 11):\nsum += i\nprint(sum)   # 输出 55\n```",
           answer: "累加器应初始化为 0，修改为 `sum = 0`。"
         },
         {
           title: "例题2：找错误并修改",
           difficulty: "advanced",
           question: "下列程序想判断一个数是否为素数，但结果错误，请找出错误并修改。\n```\nn = int(input(\"请输入：\"))\nfor i in range(2, n):\n    if n % i == 0:\n        print(n, \"不是素数\")\n    else:\n        print(n, \"是素数\")\n```",
-          solution: "**解：**\n错误：在循环内直接输出结论，只要有一个 i 不能整除就输出\"是素数\"，判断不完整。\n正确代码：\n```\nn = int(input(\"请输入：\"))\nis_prime = True\nfor i in range(2, n):\n    if n % i == 0:\n        is_prime = False\n        break\nif is_prime and n > 1:\n    print(n, \"是素数\")\nelse:\n    print(n, \"不是素数\")\n```",
+          solution: "**解：**\n错误：在循环内直接输出结论，只要有一个 i 不能整除就输出\"是素数\"，判断不完整。\n正确代码：\n```\nn = int(input(\"请输入：\"))\nis_prime = True\nfor i in range(2, n):\nif n % i == 0:\nis_prime = False\nbreak\nif is_prime and n > 1:\nprint(n, \"是素数\")\nelse:\nprint(n, \"不是素数\")\n```",
           answer: "用标志变量 is_prime 记录，循环结束后统一判断，而不是在循环内直接输出。"
         }
       ]
@@ -172,7 +172,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列错误中，属于语法错误的是（　）",
-          options: ["A. 结果不对", "B. 缺少冒号", "C. 除数为 0", "D. 变量未定义"],
+          options: ["结果不对", "缺少冒号", "除数为 0", "变量未定义"],
           correctIndex: 1,
           answer: "答案：B。缺少冒号导致程序无法运行，是语法错误；结果不对是逻辑错误，除数为 0 是运行错误。"
         },
@@ -180,7 +180,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "程序能运行但不报错，结果却不对，这属于（　）",
-          options: ["A. 语法错误", "B. 运行错误", "C. 逻辑错误", "D. 编译错误"],
+          options: ["语法错误", "运行错误", "逻辑错误", "编译错误"],
           correctIndex: 2,
           answer: "答案：C。逻辑错误是程序能运行但结果不符合预期。"
         },
@@ -188,7 +188,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列代码中，有错误的是（　）\n```\na = int(input(\"请输入：\"))\nif a % 2 == 0:\n    print(\"偶数\")\nelse\n    print(\"奇数\")\n```",
-          options: ["A. 没有错误", "B. else 后面缺少冒号", "C. if 条件错误", "D. input 用法错误"],
+          options: ["没有错误", "else 后面缺少冒号", "if 条件错误", "input 用法错误"],
           correctIndex: 1,
           answer: "答案：B。else 后面必须加冒号，缺少冒号是语法错误。"
         },
@@ -209,7 +209,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列代码中，能正确输出 1 到 5 的是（　）",
-          options: ["A. `for i in range(1, 5):` `print(i)`", "B. `for i in range(1, 6):` `print(i)`", "C. `for i in range(5):` `print(i)`", "D. `for i in range(0, 5):` `print(i)`"],
+          options: ["`for i in range(1, 5):` `print(i)`", "`for i in range(1, 6):` `print(i)`", "`for i in range(5):` `print(i)`", "`for i in range(0, 5):` `print(i)`"],
           correctIndex: 1,
           answer: "答案：B。range(1, 6) 生成 1 到 5。"
         },
@@ -217,7 +217,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列程序想求 5 的阶乘，结果错误的是（　）",
-          options: ["A. `p = 1` `for i in range(1, 6):` `p *= i`", "B. `p = 1` `for i in range(1, 5):` `p *= i`", "C. `p = 1` `for i in range(1, 6):` `p = p * i`", "D. `p = 1` `for i in range(1, 6):` `p *= i` `print(p)`"],
+          options: ["`p = 1` `for i in range(1, 6):` `p *= i`", "`p = 1` `for i in range(1, 5):` `p *= i`", "`p = 1` `for i in range(1, 6):` `p = p * i`", "`p = 1` `for i in range(1, 6):` `p *= i` `print(p)`"],
           correctIndex: 1,
           answer: "答案：B。range(1, 5) 只乘到 4，结果是 24 而不是 120，边界写错。"
         },
@@ -225,7 +225,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码想求三个数的最大值，结果错误的是（　）",
-          options: ["A. `a,b,c = 5,9,3` `m = a` `if b > m:` `m = b` `if c > m:` `m = c` `print(m)`", "B. `a,b,c = 5,9,3` `m = 0` `if a > m:` `m = a` `if b > m:` `m = b` `if c > m:` `m = c` `print(m)`", "C. A 和 B 都对", "D. A 和 B 都错"],
+          options: ["`a,b,c = 5,9,3` `m = a` `if b > m:` `m = b` `if c > m:` `m = c` `print(m)`", "`a,b,c = 5,9,3` `m = 0` `if a > m:` `m = a` `if b > m:` `m = b` `if c > m:` `m = c` `print(m)`", "A 和 B 都对", "A 和 B 都错"],
           correctIndex: 1,
           answer: "答案：B。m 初始化为 0 时，如果三个数都是负数，结果错误（会输出 0 而不是最大负数）；A 假设第一个数为最大更稳妥。"
         },
@@ -233,7 +233,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "调试程序时，发现结果比预期大 1，最可能的原因是（　）",
-          options: ["A. 累加器初始化为 1", "B. range 结束值写小", "C. 条件判断写反", "D. 缺少注释"],
+          options: ["累加器初始化为 1", "range 结束值写小", "条件判断写反", "缺少注释"],
           correctIndex: 0,
           answer: "答案：A。累加器初始化为 1 会导致结果多 1，应初始化为 0。"
         }

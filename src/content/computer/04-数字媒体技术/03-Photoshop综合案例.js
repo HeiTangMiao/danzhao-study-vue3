@@ -188,7 +188,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "自由变换的快捷键是（　）",
-          options: ["A. Ctrl+T", "B. Ctrl+D", "C. Ctrl+J", "D. Ctrl+L"],
+          options: ["Ctrl+T", "Ctrl+D", "Ctrl+J", "Ctrl+L"],
           correctIndex: 0,
           answer: "答案：A。Ctrl+T 进入自由变换，可对图层或选区内容进行缩放、旋转、斜切。Ctrl+D 取消选区，Ctrl+J 复制图层，Ctrl+L 打开色阶调整。"
         },
@@ -196,7 +196,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "复制图层后实现镜像效果，应在自由变换中（　）",
-          options: ["A. 旋转", "B. 水平翻转", "C. 缩放", "D. 扭曲"],
+          options: ["旋转", "水平翻转", "缩放", "扭曲"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+T 右键选择水平翻转。"
         },
@@ -204,7 +204,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "保留图层信息的保存格式是（　）",
-          options: ["A. jpg", "B. png", "C. psd", "D. gif"],
+          options: ["jpg", "png", "psd", "gif"],
           correctIndex: 2,
           answer: "答案：C。psd 是 Photoshop 源文件格式，保留图层。"
         },
@@ -225,7 +225,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "移动图层内容的工具是（　）",
-          options: ["A. 画笔工具", "B. 移动工具", "C. 橡皮擦", "D. 套索工具"],
+          options: ["画笔工具", "移动工具", "橡皮擦", "套索工具"],
           correctIndex: 1,
           answer: "答案：B。移动工具（V）移动图层内容。"
         },
@@ -233,7 +233,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "绘制椭圆形状时，设置\"无描边\"应在（　）中操作",
-          options: ["A. 图层面板", "B. 选项栏的描边设置", "C. 字符面板", "D. 历史记录"],
+          options: ["图层面板", "选项栏的描边设置", "字符面板", "历史记录"],
           correctIndex: 1,
           answer: "答案：B。形状工具选项栏中设置描边为\"无\"。"
         },
@@ -241,7 +241,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "文字间距 600 表示（　）",
-          options: ["A. 文字缩小", "B. 文字间距加大", "C. 文字间距缩小", "D. 文字加粗"],
+          options: ["文字缩小", "文字间距加大", "文字间距缩小", "文字加粗"],
           correctIndex: 1,
           answer: "答案：B。正的字距值加大文字间距，负值缩小。"
         },

@@ -24,7 +24,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列变量名中，不符合 Python 命名规则的是（　）",
-          options: ["A. `name_1`", "B. `_count`", "C. `stu2`", "D. `2stu`"],
+          options: ["`name_1`", "`_count`", "`stu2`", "`2stu`"],
           correctIndex: 3,
           answer: "答案：D。变量名必须以字母或下划线开头，不能以数字开头。`name_1`、`_count`、`stu2` 均合法（下划线可开头，数字只要不在首位即可）。"
         },
@@ -32,17 +32,17 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "表达式 `10 % 3` 的结果是（　）",
-          options: ["A. 1", "B. 3", "C. 3.33", "D. 0"],
+          question: "表达式 `17 % 5` 的结果是（　）",
+          options: ["2", "3", "3.4", "5"],
           correctIndex: 0,
-          answer: "答案：A。`%` 是求余运算，10 除以 3 余 1。"
+          answer: "答案：A。`%` 是求余运算，17 除以 5 商 3 余 2。"
         },
         {
           difficulty: "basic",
           type: "single",
           score: 5,
           question: "执行 `n = 5` 后执行 `n += 3`，n 的值是（　）",
-          options: ["A. 5", "B. 3", "C. 8", "D. 15"],
+          options: ["5", "3", "8", "15"],
           correctIndex: 2,
           answer: "答案：C。`n += 3` 等价于 `n = n + 3 = 8`。"
         },
@@ -51,7 +51,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\ns = 0\ni = 1\nwhile i <= 5:\n    s += i\n    i += 1\nprint(s)\n```",
-          options: ["A. 10", "B. 15", "C. 21", "D. 6"],
+          options: ["10", "15", "21", "6"],
           correctIndex: 1,
           answer: "答案：B。while 循环依次累加 1+2+3+4+5 = 15。注意循环条件是 `i <= 5`，5 也被累加；若写成 `i < 5` 结果才是 10。"
         },
@@ -60,7 +60,7 @@ export default {
           type: "single",
           score: 5,
           question: "数字 789 的十位数字是（　）",
-          options: ["A. 7", "B. 8", "C. 9", "D. 78"],
+          options: ["7", "8", "9", "78"],
           correctIndex: 1,
           answer: "答案：B。`789 // 10 % 10 = 78 % 10 = 8`。"
         },
@@ -69,7 +69,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\nx = 55\nif x >= 90:\n    print(\"A\")\nelif x >= 80:\n    print(\"B\")\nelif x >= 60:\n    print(\"C\")\nelse:\n    print(\"D\")\n```",
-          options: ["A. A", "B. B", "C. C", "D. D"],
+          options: ["A", "B", "C", "D"],
           correctIndex: 3,
           answer: "答案：D。55 不满足任何 if / elif 条件，执行 else 分支，输出 D。"
         },
@@ -78,7 +78,7 @@ export default {
           type: "single",
           score: 5,
           question: "判断一个数是否为偶数，正确的条件是（　）",
-          options: ["A. `n % 2 == 1`", "B. `n % 2 == 0`", "C. `n // 2 == 0`", "D. `n / 2 == 0`"],
+          options: ["`n % 2 == 1`", "`n % 2 == 0`", "`n // 2 == 0`", "`n / 2 == 0`"],
           correctIndex: 1,
           answer: "答案：B。能被 2 整除（余数为 0）是偶数。"
         },
@@ -87,7 +87,7 @@ export default {
           type: "single",
           score: 5,
           question: "累乘器求阶乘时，初始值应为（　）",
-          options: ["A. 0", "B. 1", "C. 2", "D. 任意值"],
+          options: ["0", "1", "2", "任意值"],
           correctIndex: 1,
           answer: "答案：B。累乘器初始化为 1，初始化为 0 结果恒为 0。"
         },
@@ -96,7 +96,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i % 2 == 1:\n        continue\n    print(i, end=\" \")\n```",
-          options: ["A. 2 4", "B. 1 3 5", "C. 1 2 3 4 5", "D. 2 4 6"],
+          options: ["2 4", "1 3 5", "1 2 3 4 5", "2 4 6"],
           correctIndex: 0,
           answer: "答案：A。`continue` 跳过奇数，只打印偶数 2、4。"
         },
@@ -105,7 +105,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列程序想求 1 到 100 中所有能被 3 整除的数之和，正确的是（　）",
-          options: ["A. `sum = 0` `for i in range(1, 101):` `if i % 3 == 0:` `sum += i`", "B. `sum = 0` `for i in range(1, 101):` `if i / 3 == 0:` `sum += i`", "C. `sum = 0` `for i in range(1, 101):` `if i % 3 == 1:` `sum += i`", "D. `sum = 0` `for i in range(3, 100):` `sum += i`"],
+          options: ["`sum = 0` `for i in range(1, 101):` `if i % 3 == 0:` `sum += i`", "`sum = 0` `for i in range(1, 101):` `if i / 3 == 0:` `sum += i`", "`sum = 0` `for i in range(1, 101):` `if i % 3 == 1:` `sum += i`", "`sum = 0` `for i in range(3, 100):` `sum += i`"],
           correctIndex: 0,
           answer: "答案：A。判断整除必须用取模 `%`，余数为 0 即能整除。B 用了除法 `/`，只有 i 为 0 时才成立；C 取的是除以 3 余 1 的数；D 未作判断，直接累加了 3～99 的所有整数。"
         },
@@ -159,7 +159,7 @@ export default {
           type: "single",
           score: 5,
           question: "用于连接不同网络、实现网段间数据转发的设备是（　）",
-          options: ["A. 交换机", "B. 集线器", "C. 路由器", "D. 中继器"],
+          options: ["交换机", "集线器", "路由器", "中继器"],
           correctIndex: 2,
           answer: "答案：C。路由器工作在网络层，负责不同网络之间的转发与路径选择。"
         },
@@ -168,7 +168,7 @@ export default {
           type: "single",
           score: 5,
           question: "在特权模式下，查看交换机当前运行配置的命令是（　）",
-          options: ["A. `show running-config`", "B. `show ip route`", "C. `configure terminal`", "D. `enable`"],
+          options: ["`show running-config`", "`show ip route`", "`configure terminal`", "`enable`"],
           correctIndex: 0,
           answer: "答案：A。`show running-config` 查看当前生效的配置；B 查看路由表，C 进入全局配置模式，D 由用户模式进入特权模式。"
         },
@@ -177,7 +177,7 @@ export default {
           type: "single",
           score: 5,
           question: "查看交换机上 VLAN 编号与端口归属的命令是（　）",
-          options: ["A. `show vlan brief`", "B. `show ip route`", "C. `show version`", "D. `show interface fa0/1`"],
+          options: ["`show vlan brief`", "`show ip route`", "`show version`", "`show interface fa0/1`"],
           correctIndex: 0,
           answer: "答案：A。`show vlan brief` 列出各 VLAN 及所属端口。"
         },
@@ -186,7 +186,7 @@ export default {
           type: "single",
           score: 5,
           question: "关于交换机 access 端口与 trunk 端口的区别，下列说法正确的是（　）",
-          options: ["A. access 端口只能属于一个 VLAN，trunk 端口可承载多个 VLAN", "B. access 端口的传输速率比 trunk 端口更高", "C. trunk 端口只能用于连接 PC 等终端设备", "D. 两种端口在功能上没有区别"],
+          options: ["access 端口只能属于一个 VLAN，trunk 端口可承载多个 VLAN", "access 端口的传输速率比 trunk 端口更高", "trunk 端口只能用于连接 PC 等终端设备", "两种端口在功能上没有区别"],
           correctIndex: 0,
           answer: "答案：A。access 端口用于接入终端，只属于一个 VLAN；trunk 端口用于交换机之间互联，可同时承载多个 VLAN 的数据。速率与端口模式无关。"
         },
@@ -195,7 +195,7 @@ export default {
           type: "single",
           score: 5,
           question: "配置静态路由时，命令末尾填写的\"下一跳\"指的是（　）",
-          options: ["A. 本路由器出口接口的 IP 地址", "B. 相邻路由器与本路由器直连的那个接口的 IP 地址", "C. 目标网络里某台主机的 IP 地址", "D. 本网络的默认网关 MAC 地址"],
+          options: ["本路由器出口接口的 IP 地址", "相邻路由器与本路由器直连的那个接口的 IP 地址", "目标网络里某台主机的 IP 地址", "本网络的默认网关 MAC 地址"],
           correctIndex: 1,
           answer: "答案：B。\"下一跳\"是数据包要交给的下一台路由器、且与该路由器直连的那个接口的 IP 地址；不是本端接口 IP，也不是最终目标主机 IP。"
         },
@@ -204,7 +204,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 RIP 配置中输入 `network 192.168.1.0` 的作用是（　）",
-          options: ["A. 设置该路由器的默认网关", "B. 宣告与本路由器直连的网段，使其参与 RIP 通告", "C. 指定去往该网段的下一跳地址", "D. 设置该网段的子网掩码"],
+          options: ["设置该路由器的默认网关", "宣告与本路由器直连的网段，使其参与 RIP 通告", "指定去往该网段的下一跳地址", "设置该网段的子网掩码"],
           correctIndex: 1,
           answer: "答案：B。RIP 用 `network` 宣告本路由器直连的主类网段，宣告后该网段才会被通告给邻居；下一跳、掩码不在这里配置。"
         },
@@ -213,7 +213,7 @@ export default {
           type: "single",
           score: 5,
           question: "跟踪数据包到目标主机所经过路径的命令是（　）",
-          options: ["A. ping", "B. tracert", "C. ipconfig", "D. netstat"],
+          options: ["ping", "tracert", "ipconfig", "netstat"],
           correctIndex: 1,
           answer: "答案：B。`tracert` 显示沿途各跳点，用于判断在哪一段不通。"
         },
@@ -221,10 +221,10 @@ export default {
           difficulty: "advanced",
           type: "single",
           score: 5,
-          question: "将域名解析为 IP 地址的服务是（　）",
-          options: ["A. DHCP", "B. FTP", "C. DNS", "D. HTTP"],
-          correctIndex: 2,
-          answer: "答案：C。DNS 负责域名与 IP 地址的相互解析。"
+          question: "关于 HTTPS 与 HTTP 的区别，下列说法正确的是（　）",
+          options: ["HTTPS 的默认端口是 80", "HTTPS 通过 SSL/TLS 对传输内容加密", "HTTPS 不需要证书即可启用", "HTTPS 只能用于文件下载"],
+          correctIndex: 1,
+          answer: "答案：B。HTTPS = HTTP + SSL/TLS，对传输内容加密并用证书验证服务器身份，默认端口 443（HTTP 为 80）。A 错在端口；C 错在证书（必须有）；D 错在用途（浏览网页即常用）。"
         },
         {
           difficulty: "medium",
@@ -290,7 +290,7 @@ export default {
           type: "single",
           score: 5,
           question: "用于印刷的图像，其分辨率通常不低于（　）",
-          options: ["A. 72 像素/英寸", "B. 150 像素/英寸", "C. 300 像素/英寸", "D. 30 像素/英寸"],
+          options: ["72 像素/英寸", "150 像素/英寸", "300 像素/英寸", "30 像素/英寸"],
           correctIndex: 2,
           answer: "答案：C。印刷通常要求 300 像素/英寸以上；72 像素/英寸用于屏幕显示。"
         },
@@ -299,7 +299,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中绘制正方形选区，应使用的工具是（　）",
-          options: ["A. 椭圆选框工具", "B. 矩形选框工具", "C. 套索工具", "D. 魔棒工具"],
+          options: ["椭圆选框工具", "矩形选框工具", "套索工具", "魔棒工具"],
           correctIndex: 1,
           answer: "答案：B。矩形选框工具绘制矩形/正方形；椭圆选框工具按住 Shift 得到正圆。"
         },
@@ -308,7 +308,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中取消当前选区的快捷键是（　）",
-          options: ["A. Ctrl+A", "B. Ctrl+D", "C. Ctrl+Shift+I", "D. Ctrl+J"],
+          options: ["Ctrl+A", "Ctrl+D", "Ctrl+Shift+I", "Ctrl+J"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+D 取消选择；Ctrl+Shift+I 反选；Ctrl+J 复制图层。"
         },
@@ -317,7 +317,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中把当前图层与下方图层合并，应使用（　）",
-          options: ["A. Ctrl+E", "B. Ctrl+J", "C. Ctrl+G", "D. Ctrl+Shift+E"],
+          options: ["Ctrl+E", "Ctrl+J", "Ctrl+G", "Ctrl+Shift+E"],
           correctIndex: 0,
           answer: "答案：A。Ctrl+E 向下合并；Ctrl+Shift+E 合并可见图层；Ctrl+G 编组。"
         },
@@ -326,7 +326,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中，要使选区边缘过渡柔和、不生硬，应进行（　）操作",
-          options: ["A. 羽化", "B. 锐化", "C. 反相", "D. 去色"],
+          options: ["羽化", "锐化", "反相", "去色"],
           correctIndex: 0,
           answer: "答案：A。羽化（Feather）使选区边缘产生渐变过渡，抠图后边缘更自然；锐化增强清晰度，反相与去色只改变颜色。"
         },
@@ -335,7 +335,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 中应用默认视频过渡（交叉溶解）的快捷键是（　）",
-          options: ["A. Ctrl+D", "B. Ctrl+Shift+D", "C. Ctrl+M", "D. Ctrl+T"],
+          options: ["Ctrl+D", "Ctrl+Shift+D", "Ctrl+M", "Ctrl+T"],
           correctIndex: 0,
           answer: "答案：A。Ctrl+D 应用默认视频过渡；Ctrl+Shift+D 应用默认音频过渡。"
         },
@@ -344,7 +344,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 中要让字幕从画面左侧飞入，应设置（　）属性的关键帧",
-          options: ["A. 位置", "B. 不透明度", "C. 缩放", "D. 旋转"],
+          options: ["位置", "不透明度", "缩放", "旋转"],
           correctIndex: 0,
           answer: "答案：A。位移类动画由「位置」属性的关键帧产生（起点在画外、终点在画内）；不透明度控制淡入淡出，缩放控制大小，旋转控制角度。"
         },
@@ -353,7 +353,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 中把某个片段的速度改为 2 倍，应使用（　）",
-          options: ["A. 速度/持续时间", "B. 音频增益", "C. 交叉溶解", "D. 导出媒体"],
+          options: ["速度/持续时间", "音频增益", "交叉溶解", "导出媒体"],
           correctIndex: 0,
           answer: "答案：A。右键片段 → 速度/持续时间（Ctrl+R）可调整快慢放。"
         },

@@ -83,19 +83,19 @@ export default {
         {
           title: "例题1：求指定项",
           question: "求 \\((x + \\dfrac{1}{x})^6\\) 的展开式中含 \\(x^2\\) 的项。",
-          solution: "解：设展开式的通项为：\n\n        $$T_{k+1} = C_6^k \\, x^{6-k} \\cdot \\left(\\frac{1}{x}\\right)^k = C_6^k \\, x^{6-k} \\cdot x^{-k} = C_6^k \\, x^{6-2k}$$\n\n        令 \\(6 - 2k = 2\\)，解得 \\(k = 2\\)。\n\n        所以含 \\(x^2\\) 的项为：\\(T_3 = C_6^2 \\, x^2 = 15 x^2\\)。",
+          solution: "解：设展开式的通项为：\n\n$$T_{k+1} = C_6^k \\, x^{6-k} \\cdot \\left(\\frac{1}{x}\\right)^k = C_6^k \\, x^{6-k} \\cdot x^{-k} = C_6^k \\, x^{6-2k}$$\n\n令 \\(6 - 2k = 2\\)，解得 \\(k = 2\\)。\n\n所以含 \\(x^2\\) 的项为：\\(T_3 = C_6^2 \\, x^2 = 15 x^2\\)。",
           answer: "答：含 \\(x^2\\) 的项为 \\(15x^2\\)。"
         },
         {
           title: "例题2：求系数",
           question: "求 \\((2x - 1)^5\\) 展开式中 \\(x^3\\) 的系数。",
-          solution: "解：设通项为：\n\n        $$T_{k+1} = C_5^k \\, (2x)^{5-k} \\cdot (-1)^k = C_5^k \\cdot 2^{5-k} \\cdot (-1)^k \\cdot x^{5-k}$$\n\n        令 \\(5 - k = 3\\)，得 \\(k = 2\\)。\n\n        所以 \\(x^3\\) 的系数为：\n\n        \\(C_5^2 \\cdot 2^3 \\cdot (-1)^2 = 10 \\times 8 \\times 1 = 80\\)。",
+          solution: "解：设通项为：\n\n$$T_{k+1} = C_5^k \\, (2x)^{5-k} \\cdot (-1)^k = C_5^k \\cdot 2^{5-k} \\cdot (-1)^k \\cdot x^{5-k}$$\n\n令 \\(5 - k = 3\\)，得 \\(k = 2\\)。\n\n所以 \\(x^3\\) 的系数为：\n\n\\(C_5^2 \\cdot 2^3 \\cdot (-1)^2 = 10 \\times 8 \\times 1 = 80\\)。",
           answer: "答：\\(x^3\\) 的系数为 80。"
         },
         {
           title: "例题3：赋值法求系数和",
           question: "已知 \\((1 - 2x)^7 = a_0 + a_1 x + a_2 x^2 + \\cdots + a_7 x^7\\)，求 \\(a_0 + a_1 + a_2 + \\cdots + a_7\\) 的值。",
-          solution: "分析：令 \\(x = 1\\)，左边变成各项系数之和。\n\n        解：令 \\(x = 1\\)，代入等式两边：\n\n        $$(1 - 2 \\times 1)^7 = a_0 + a_1 + a_2 + \\cdots + a_7$$\n\n        $$(-1)^7 = a_0 + a_1 + a_2 + \\cdots + a_7$$\n\n        所以 \\(a_0 + a_1 + \\cdots + a_7 = -1\\)。",
+          solution: "分析：令 \\(x = 1\\)，左边变成各项系数之和。\n\n解：令 \\(x = 1\\)，代入等式两边：\n\n$$(1 - 2 \\times 1)^7 = a_0 + a_1 + a_2 + \\cdots + a_7$$\n\n$$(-1)^7 = a_0 + a_1 + a_2 + \\cdots + a_7$$\n\n所以 \\(a_0 + a_1 + \\cdots + a_7 = -1\\)。",
           answer: "答：\\(a_0 + a_1 + \\cdots + a_7 = -1\\)。"
         }
       ]
@@ -154,7 +154,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\((1 + x)^4\\) 的展开式中，\\(x^2\\) 项的系数是（　）",
-          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          options: ["4", "6", "8", "12"],
           correctIndex: 1,
           answer: "答案：B。\\(x^2\\) 项系数为二项式系数 \\(C_4^2 = \\dfrac{4 \\times 3}{2 \\times 1} = 6\\)。"
         }
@@ -181,7 +181,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\((x + 1)^4\\) 的展开式中，\\(x^2\\) 项的系数是（　）",
-          options: ["A. 4", "B. 6", "C. 8", "D. 12"],
+          options: ["4", "6", "8", "12"],
           correctIndex: 1,
           answer: "**B**。\\(x^2\\) 项系数为 \\(C_4^2 = \\frac{4 \\times 3}{2} = 6\\)。"
         }

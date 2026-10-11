@@ -159,7 +159,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "冯·诺依曼体系结构的五大组成部分不包括（　）",
-          options: ["A. 运算器", "B. 控制器", "C. 存储器", "D. 编译器"],
+          options: ["运算器", "控制器", "存储器", "编译器"],
           correctIndex: 3,
           answer: "答案：D。五大部件是运算器、控制器、存储器、输入设备、输出设备；编译器属于系统软件，不是硬件部件。"
         },
@@ -167,7 +167,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列软件中，属于系统软件的是（　）",
-          options: ["A. WPS 文字", "B. Photoshop", "C. Windows 操作系统", "D. 微信"],
+          options: ["WPS 文字", "Photoshop", "Windows 操作系统", "微信"],
           correctIndex: 2,
           answer: "答案：C。操作系统是最基本的系统软件；WPS、Photoshop、微信均为应用软件。"
         },
@@ -175,7 +175,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "断电后信息仍然保留的存储器是（　）",
-          options: ["A. RAM", "B. Cache", "C. ROM", "D. 寄存器"],
+          options: ["RAM", "Cache", "ROM", "寄存器"],
           correctIndex: 2,
           answer: "答案：C。ROM 是只读存储器，断电后信息不丢失；RAM、Cache、寄存器断电后信息均会丢失。"
         }
@@ -202,7 +202,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列设备中，既属于输入设备又属于输出设备的是（　）",
-          options: ["A. 显示器", "B. 键盘", "C. 触摸屏", "D. 打印机"],
+          options: ["显示器", "键盘", "触摸屏", "打印机"],
           correctIndex: 2,
           answer: "答案：C。触摸屏既能接收触摸输入，又能显示输出，兼具输入与输出功能。"
         },
@@ -210,7 +210,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "计算机能够自动连续地执行程序，其根本基础是（　）",
-          options: ["A. 采用二进制", "B. 存储程序原理", "C. 使用高速 CPU", "D. 配备大容量硬盘"],
+          options: ["采用二进制", "存储程序原理", "使用高速 CPU", "配备大容量硬盘"],
           correctIndex: 1,
           answer: "答案：B。存储程序原理使指令与数据一同存放于存储器，机器才能自动逐条取指执行。"
         },
@@ -219,10 +219,10 @@ export default {
           type: "single",
           question: "在计算机存储体系中，按访问速度由快到慢排列正确的是（　）",
           options: [
-            "A. Cache → 内存 → 硬盘",
-            "B. 内存 → Cache → 硬盘",
-            "C. 硬盘 → 内存 → Cache",
-            "D. Cache → 硬盘 → 内存"
+            "Cache → 内存 → 硬盘",
+            "内存 → Cache → 硬盘",
+            "硬盘 → 内存 → Cache",
+            "Cache → 硬盘 → 内存"
           ],
           correctIndex: 0,
           answer: "答案：A。Cache 最快、容量最小；内存次之；硬盘（外存）速度最慢但容量大、断电不丢。"
@@ -231,7 +231,7 @@ export default {
           difficulty: "sprint",
           type: "single",
           question: "一条指令通常由两部分组成，它们是（　）",
-          options: ["A. 程序与数据", "B. 操作码与操作数", "C. 输入码与输出码", "D. 源码与目标码"],
+          options: ["程序与数据", "操作码与操作数", "输入码与输出码", "源码与目标码"],
           correctIndex: 1,
           answer: "答案：B。指令由操作码（指明做什么操作）与操作数（指明操作对象）组成。"
         }

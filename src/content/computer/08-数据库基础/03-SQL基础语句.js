@@ -212,7 +212,7 @@ DELETE FROM student WHERE score < 60;`
           difficulty: "basic",
           type: "single",
           question: "用于从表中检索数据（查询）的 SQL 语句是（　）",
-          options: ["A. INSERT", "B. SELECT", "C. UPDATE", "D. DELETE"],
+          options: ["INSERT", "SELECT", "UPDATE", "DELETE"],
           correctIndex: 1,
           answer: "答案：B。SELECT 用于查询；INSERT 插入、UPDATE 修改、DELETE 删除。"
         },
@@ -221,10 +221,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "查询 student 表中成绩及格（≥60）的学生姓名，正确的语句是（　）",
           options: [
-            "A. SELECT name FROM student;",
-            "B. SELECT name FROM student WHERE score >= 60;",
-            "C. SELECT * FROM student WHERE name >= 60;",
-            "D. UPDATE student SET score >= 60;"
+            "SELECT name FROM student;",
+            "SELECT name FROM student WHERE score >= 60;",
+            "SELECT * FROM student WHERE name >= 60;",
+            "UPDATE student SET score >= 60;"
           ],
           correctIndex: 1,
           answer: "答案：B。用 WHERE 指定条件 score >= 60，并只查 name 字段。"
@@ -234,10 +234,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "将学号 1001 的成绩改为 90，正确的语句是（　）",
           options: [
-            "A. UPDATE student SET score = 90;",
-            "B. UPDATE student SET score = 90 WHERE id = 1001;",
-            "C. CHANGE student score = 90 WHERE id = 1001;",
-            "D. SELECT score = 90 FROM student WHERE id = 1001;"
+            "UPDATE student SET score = 90;",
+            "UPDATE student SET score = 90 WHERE id = 1001;",
+            "CHANGE student score = 90 WHERE id = 1001;",
+            "SELECT score = 90 FROM student WHERE id = 1001;"
           ],
           correctIndex: 1,
           answer: "答案：B。UPDATE ... SET ... WHERE ... 是修改指定记录的正确写法；A 会改全表。"
@@ -266,10 +266,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "向 student 表插入一条记录（学号 1005，姓名 王芳，成绩 76.5），正确的是（　）",
           options: [
-            "A. INSERT student VALUES (1005, 王芳, 76.5);",
-            "B. INSERT INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
-            "C. ADD INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
-            "D. SELECT INTO student VALUES (1005, '王芳', 76.5);"
+            "INSERT student VALUES (1005, 王芳, 76.5);",
+            "INSERT INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
+            "ADD INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
+            "SELECT INTO student VALUES (1005, '王芳', 76.5);"
           ],
           correctIndex: 1,
           answer: "答案：B。INSERT INTO ... VALUES ... 是标准写法，且字符串'王芳'需加单引号。"
@@ -279,10 +279,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "删除 student 表中学号为 1003 的记录，正确的是（　）",
           options: [
-            "A. DELETE student WHERE id = 1003;",
-            "B. DELETE FROM student WHERE id = 1003;",
-            "C. DROP FROM student WHERE id = 1003;",
-            "D. REMOVE FROM student WHERE id = 1003;"
+            "DELETE student WHERE id = 1003;",
+            "DELETE FROM student WHERE id = 1003;",
+            "DROP FROM student WHERE id = 1003;",
+            "REMOVE FROM student WHERE id = 1003;"
           ],
           correctIndex: 1,
           answer: "答案：B。DELETE FROM 表名 WHERE 条件 是删除记录的正确格式。"
@@ -292,10 +292,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "关于 UPDATE 与 DELETE 遗漏 WHERE 的后果，说法正确的是（　）",
           options: [
-            "A. 语句会报错无法执行",
-            "B. 会作用于整张表的所有记录",
-            "C. 只影响第一条记录",
-            "D. 不会有任何影响"
+            "语句会报错无法执行",
+            "会作用于整张表的所有记录",
+            "只影响第一条记录",
+            "不会有任何影响"
           ],
           correctIndex: 1,
           answer: "答案：B。遗漏 WHERE 时，UPDATE 会改全表、DELETE 会删全表，这是最需警惕的错误。"
@@ -305,10 +305,10 @@ DELETE FROM student WHERE score < 60;`
           type: "single",
           question: "查询 student 表中不重复的性别值，应使用的语句是（　）",
           options: [
-            "A. SELECT gender FROM student;",
-            "B. SELECT DISTINCT gender FROM student;",
-            "C. SELECT UNIQUE gender FROM student WHERE DISTINCT;",
-            "D. SELECT gender FROM student WHERE DISTINCT;"
+            "SELECT gender FROM student;",
+            "SELECT DISTINCT gender FROM student;",
+            "SELECT UNIQUE gender FROM student WHERE DISTINCT;",
+            "SELECT gender FROM student WHERE DISTINCT;"
           ],
           correctIndex: 1,
           answer: "答案：B。DISTINCT 用于去除查询结果中的重复值。"

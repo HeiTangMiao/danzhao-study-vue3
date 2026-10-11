@@ -174,7 +174,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "\"\\(x > 3\\)\" 是 \"\\(x > 2\\)\" 的（　）",
-          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          options: ["充分不必要条件", "必要不充分条件", "充要条件", "既不充分也不必要条件"],
           correctIndex: 0,
           answer: "答案：A。\\(x>3 \\Rightarrow x>2\\)（充分性成立），但 \\(x>2\\) 时 \\(x\\) 不一定 \\(>3\\)。集合 \\((3,+\\infty) \\subsetneq (2,+\\infty)\\)，小充分。"
         },
@@ -216,7 +216,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\(x = 2\\) 是 \\(x^2 - 4 = 0\\) 的（　）",
-          options: ["A. 充分不必要条件", "B. 必要不充分条件", "C. 充要条件", "D. 既不充分也不必要条件"],
+          options: ["充分不必要条件", "必要不充分条件", "充要条件", "既不充分也不必要条件"],
           correctIndex: 0,
           answer: "**A**。\\(x = 2 \\Rightarrow x^2 - 4 = 0\\) 成立；反过来 \\(x^2 - 4 = 0\\) 还可能是 \\(x = -2\\)，故充分不必要。"
         },

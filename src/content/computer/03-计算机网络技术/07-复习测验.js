@@ -86,7 +86,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "提示符为 `Switch(config-if)#` 时，当前处于（　）",
-          options: ["A. 用户模式", "B. 特权模式", "C. 全局配置模式", "D. 接口配置模式"],
+          options: ["用户模式", "特权模式", "全局配置模式", "接口配置模式"],
           correctIndex: 3,
           answer: "答案：D。`(config-if)#` 表示已进入某个具体接口的配置模式。"
         },
@@ -94,7 +94,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "进入特权模式的命令是（　）",
-          options: ["A. enable", "B. configure terminal", "C. interface", "D. hostname"],
+          options: ["enable", "configure terminal", "interface", "hostname"],
           correctIndex: 0,
           answer: "答案：A。`enable` 进入特权模式。"
         },
@@ -102,7 +102,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "将端口 Fa0/1-10 划入 VLAN 10，正确的命令序列是（　）",
-          options: ["A. `interface range f0/1-10` → `switchport mode access` → `switchport access vlan 10`", "B. `vlan 10` → `interface f0/1`", "C. `switchport mode trunk` → `switchport access vlan 10`", "D. `hostname SWA` → `vlan 10`"],
+          options: ["`interface range f0/1-10` → `switchport mode access` → `switchport access vlan 10`", "`vlan 10` → `interface f0/1`", "`switchport mode trunk` → `switchport access vlan 10`", "`hostname SWA` → `vlan 10`"],
           correctIndex: 0,
           answer: "答案：A。进入端口范围 → 设 access → 划入 VLAN 10。"
         },
@@ -110,7 +110,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "交换机上用于连接普通 PC 的端口通常应配置为（　）",
-          options: ["A. trunk 模式", "B. access 模式", "C. 路由模式", "D. 混杂模式"],
+          options: ["trunk 模式", "access 模式", "路由模式", "混杂模式"],
           correctIndex: 1,
           answer: "答案：B。连接终端设备的端口设为 access 模式并划入相应 VLAN；trunk 用于交换机之间的多 VLAN 互联。"
         },
@@ -118,7 +118,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "静态路由配置中，目标网络与掩码都写成 0.0.0.0 表示（　）",
-          options: ["A. 直连路由", "B. 默认路由", "C. 主机路由", "D. 动态路由"],
+          options: ["直连路由", "默认路由", "主机路由", "动态路由"],
           correctIndex: 1,
           answer: "答案：B。目标网络和掩码均为 0.0.0.0 即默认路由，匹配所有目的地址。"
         },
@@ -126,7 +126,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "查看路由器路由表的命令是（　）",
-          options: ["A. show ip route", "B. show vlan brief", "C. show running-config", "D. show version"],
+          options: ["show ip route", "show vlan brief", "show running-config", "show version"],
           correctIndex: 0,
           answer: "答案：A。`show ip route` 显示路由表；`show vlan brief` 看 VLAN 与端口归属。"
         },
@@ -134,7 +134,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "三层交换机上创建 VLAN 后，若要实现 VLAN 间通信，还需（　）",
-          options: ["A. 仅创建 VLAN 即可自动互通", "B. 执行 ip routing 并配置 VLAN 接口地址", "C. 把所有端口设为 trunk", "D. 重启交换机"],
+          options: ["仅创建 VLAN 即可自动互通", "执行 ip routing 并配置 VLAN 接口地址", "把所有端口设为 trunk", "重启交换机"],
           correctIndex: 1,
           answer: "答案：B。需开启 ip routing 并给各 VLAN 配置接口地址，VLAN 间才可路由互通。"
         },
@@ -142,7 +142,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "查看本机 IP 详细配置（含 DNS）的命令是（　）",
-          options: ["A. ipconfig", "B. ipconfig /all", "C. ping", "D. tracert"],
+          options: ["ipconfig", "ipconfig /all", "ping", "tracert"],
           correctIndex: 1,
           answer: "答案：B。`ipconfig /all` 查看详细信息。"
         },
@@ -150,7 +150,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "能 ping 通 IP 但打不开网页，最可能是（　）故障",
-          options: ["A. 网卡损坏", "B. DNS 故障", "C. 网线松动", "D. IP 冲突"],
+          options: ["网卡损坏", "DNS 故障", "网线松动", "IP 冲突"],
           correctIndex: 1,
           answer: "答案：B。IP 连通但域名无法解析，多为 DNS 故障。"
         },
@@ -158,7 +158,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "DHCP 作用域中设置\"排除地址 192.168.30.100-110\"的作用是（　）",
-          options: ["A. 增加地址池", "B. 指定不自动分配的地址", "C. 设置网关", "D. 设置 DNS"],
+          options: ["增加地址池", "指定不自动分配的地址", "设置网关", "设置 DNS"],
           correctIndex: 1,
           answer: "答案：B。排除地址段不会被 DHCP 自动分配给客户端，通常预留给服务器、打印机、网关等需要固定 IP 的设备。它既不增加地址池，也不是设置网关或 DNS 的地方。"
         }

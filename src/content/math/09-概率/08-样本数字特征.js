@@ -85,21 +85,21 @@ export default {
           title: "例题1：平均数与中位数",
           difficulty: "basic",
           question: "求数据 3, 5, 7, 9, 11 的平均数和中位数。",
-          solution: "解：平均数 \\(\\bar{x} = \\dfrac{3 + 5 + 7 + 9 + 11}{5} = \\dfrac{35}{5} = 7\\)。\n\n        数据已按从小到大排列，共 5 个（奇数），中位数为第 3 个数，即 7。",
+          solution: "解：平均数 \\(\\bar{x} = \\dfrac{3 + 5 + 7 + 9 + 11}{5} = \\dfrac{35}{5} = 7\\)。\n\n数据已按从小到大排列，共 5 个（奇数），中位数为第 3 个数，即 7。",
           answer: "答：平均数为 7，中位数为 7。"
         },
         {
           title: "例题2：方差与标准差",
           difficulty: "medium",
           question: "求数据 2, 4, 6, 8, 10 的方差和标准差。",
-          solution: "解：平均数 \\(\\bar{x} = \\dfrac{2 + 4 + 6 + 8 + 10}{5} = 6\\)。\n\n        方差 \\(s^2 = \\dfrac{(2-6)^2 + (4-6)^2 + (6-6)^2 + (8-6)^2 + (10-6)^2}{5}\\)\n\n        \\(= \\dfrac{16 + 4 + 0 + 4 + 16}{5} = \\dfrac{40}{5} = 8\\)。\n\n        标准差 \\(s = \\sqrt{8} = 2\\sqrt{2}\\)。",
+          solution: "解：平均数 \\(\\bar{x} = \\dfrac{2 + 4 + 6 + 8 + 10}{5} = 6\\)。\n\n方差 \\(s^2 = \\dfrac{(2-6)^2 + (4-6)^2 + (6-6)^2 + (8-6)^2 + (10-6)^2}{5}\\)\n\n\\(= \\dfrac{16 + 4 + 0 + 4 + 16}{5} = \\dfrac{40}{5} = 8\\)。\n\n标准差 \\(s = \\sqrt{8} = 2\\sqrt{2}\\)。",
           answer: "答：方差为 8，标准差为 \\(2\\sqrt{2}\\)。"
         },
         {
           title: "例题3：方差的性质",
           difficulty: "medium",
           question: "已知一组数据 \\(x_1, x_2, \\ldots, x_n\\) 的平均数为 5，方差为 4。求数据 \\(3x_1 + 2, 3x_2 + 2, \\ldots, 3x_n + 2\\) 的平均数和方差。",
-          solution: "解：设新数据为 \\(y_i = 3x_i + 2\\)。\n\n        平均数：\\(\\bar{y} = 3\\bar{x} + 2 = 3 \\times 5 + 2 = 17\\)。\n\n        方差：\\(s_y^2 = 3^2 s_x^2 = 9 \\times 4 = 36\\)。",
+          solution: "解：设新数据为 \\(y_i = 3x_i + 2\\)。\n\n平均数：\\(\\bar{y} = 3\\bar{x} + 2 = 3 \\times 5 + 2 = 17\\)。\n\n方差：\\(s_y^2 = 3^2 s_x^2 = 9 \\times 4 = 36\\)。",
           answer: "答：新数据的平均数为 17，方差为 36。"
         }
       ]
@@ -152,7 +152,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "数据 2、3、5、6 的平均数是（　）",
-          options: ["A. 3", "B. 4", "C. 4.5", "D. 5"],
+          options: ["3", "4", "4.5", "5"],
           correctIndex: 1,
           answer: "答案：B。平均数 = \\(\\dfrac{2+3+5+6}{4} = \\dfrac{16}{4} = 4\\)。"
         }
@@ -179,7 +179,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "数据 2, 4, 6, 8, 10 的平均数是（　）",
-          options: ["A. 5", "B. 6", "C. 7", "D. 8"],
+          options: ["5", "6", "7", "8"],
           correctIndex: 1,
           answer: "**B**。\\(\\frac{2+4+6+8+10}{5} = \\frac{30}{5} = 6\\)。"
         }

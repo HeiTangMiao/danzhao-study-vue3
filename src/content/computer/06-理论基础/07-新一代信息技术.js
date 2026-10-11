@@ -182,7 +182,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "直接为用户提供可使用的应用软件（如在线办公软件）的云计算服务模式是（　）",
-          options: ["A. IaaS", "B. PaaS", "C. SaaS", "D. DaaS"],
+          options: ["IaaS", "PaaS", "SaaS", "DaaS"],
           correctIndex: 2,
           answer: "答案：C。SaaS（软件即服务）直接提供可用软件，用户无需管理底层。"
         },
@@ -190,7 +190,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "物联网中用于自动识别目标对象并获取数据的关键技术是（　）",
-          options: ["A. RFID 射频识别", "B. 3D 打印", "C. 虚拟现实", "D. 光纤通信"],
+          options: ["RFID 射频识别", "3D 打印", "虚拟现实", "光纤通信"],
           correctIndex: 0,
           answer: "答案：A。RFID（射频识别）是物联网感知层的关键技术之一，与传感器并重。"
         },
@@ -198,7 +198,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "5G 的三大特点不包括（　）",
-          options: ["A. 高速率", "B. 低时延", "C. 大连接", "D. 低功耗广覆盖（物联网专用）"],
+          options: ["高速率", "低时延", "大连接", "低功耗广覆盖（物联网专用）"],
           correctIndex: 3,
           answer: "答案：D。5G 三大特点是高速率、低时延、大连接；低功耗广覆盖通常指 NB-IoT 等物联网技术。"
         }
@@ -226,10 +226,10 @@ export default {
           type: "single",
           question: "下列关于大数据\"价值密度低\"的理解，正确的是（　）",
           options: [
-            "A. 大数据没有价值",
-            "B. 海量数据中有价值信息占比小，需要挖掘提炼",
-            "C. 大数据只适合存储不适合分析",
-            "D. 数据量越大价值越低"
+            "大数据没有价值",
+            "海量数据中有价值信息占比小，需要挖掘提炼",
+            "大数据只适合存储不适合分析",
+            "数据量越大价值越低"
           ],
           correctIndex: 1,
           answer: "答案：B。价值密度低是指有用信息被海量数据稀释，需要专门技术挖掘才能得到价值。"
@@ -238,7 +238,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "某超市用区块链技术记录商品从产地到货架的全部流通信息，主要利用了区块链的（　）",
-          options: ["A. 高速计算能力", "B. 可追溯与不可篡改", "C. 大容量存储", "D. 无线传输"],
+          options: ["高速计算能力", "可追溯与不可篡改", "大容量存储", "无线传输"],
           correctIndex: 1,
           answer: "答案：B。供应链溯源正是利用区块链可追溯、不可篡改的特性来保证信息可信。"
         },
@@ -246,7 +246,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列应用场景中，最适合使用 5G\"低时延\"特性的是（　）",
-          options: ["A. 网页浏览", "B. 自动驾驶与远程手术", "C. 发送电子邮件", "D. 文件下载"],
+          options: ["网页浏览", "自动驾驶与远程手术", "发送电子邮件", "文件下载"],
           correctIndex: 1,
           answer: "答案：B。自动驾驶与远程医疗对时延极敏感，是 5G 低时延特性的典型应用。"
         },
@@ -255,10 +255,10 @@ export default {
           type: "single",
           question: "关于人工智能、机器学习与深度学习的关系，正确的是（　）",
           options: [
-            "A. 机器学习包含人工智能",
-            "B. 深度学习包含机器学习",
-            "C. 人工智能包含机器学习，机器学习包含深度学习",
-            "D. 三者互不相干"
+            "机器学习包含人工智能",
+            "深度学习包含机器学习",
+            "人工智能包含机器学习，机器学习包含深度学习",
+            "三者互不相干"
           ],
           correctIndex: 2,
           answer: "答案：C。层次关系为：人工智能 ⊃ 机器学习 ⊃ 深度学习。"

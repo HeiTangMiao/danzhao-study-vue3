@@ -95,19 +95,19 @@ export default {
         {
           title: "例题1：求直线方程",
           question: "求过点 \\(A(1, 2)\\) 且斜率为 \\(-1\\) 的直线方程，并化为一般式。",
-          solution: "解：用点斜式：\\(y - 2 = -1(x - 1)\\)，即 \\(y = -x + 3\\)。\n\n        化为一般式：\\(x + y - 3 = 0\\)。",
+          solution: "解：用点斜式：\\(y - 2 = -1(x - 1)\\)，即 \\(y = -x + 3\\)。\n\n化为一般式：\\(x + y - 3 = 0\\)。",
           answer: "答：直线方程为 \\(x + y - 3 = 0\\)。"
         },
         {
           title: "例题2：判断位置关系",
           question: "判断直线 \\(l_1: 2x - y + 1 = 0\\) 与 \\(l_2: 4x - 2y + 3 = 0\\) 的位置关系。",
-          solution: "解：化为斜截式：\\(l_1: y = 2x + 1\\)，\\(l_2: y = 2x + \\dfrac{3}{2}\\)。\n\n        斜率 \\(k_1 = k_2 = 2\\)，纵截距 \\(b_1 = 1 \\neq \\dfrac{3}{2} = b_2\\)。\n\n        所以 \\(l_1 \\parallel l_2\\)。",
+          solution: "解：化为斜截式：\\(l_1: y = 2x + 1\\)，\\(l_2: y = 2x + \\dfrac{3}{2}\\)。\n\n斜率 \\(k_1 = k_2 = 2\\)，纵截距 \\(b_1 = 1 \\neq \\dfrac{3}{2} = b_2\\)。\n\n所以 \\(l_1 \\parallel l_2\\)。",
           answer: "答：\\(l_1 \\parallel l_2\\)。"
         },
         {
           title: "例题3：求距离",
           question: "求点 \\(P(1, -1)\\) 到直线 \\(3x - 4y + 5 = 0\\) 的距离。",
-          solution: "解：由点到直线距离公式：\n\n        $$d = \\frac{|3 \\times 1 - 4 \\times (-1) + 5|}{\\sqrt{3^2 + (-4)^2}} = \\frac{|3 + 4 + 5|}{\\sqrt{9 + 16}} = \\frac{12}{5}$$",
+          solution: "解：由点到直线距离公式：\n\n$$d = \\frac{|3 \\times 1 - 4 \\times (-1) + 5|}{\\sqrt{3^2 + (-4)^2}} = \\frac{|3 + 4 + 5|}{\\sqrt{9 + 16}} = \\frac{12}{5}$$",
           answer: "答：距离为 \\(\\dfrac{12}{5}\\)。"
         }
       ]
@@ -166,7 +166,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "直线 \\(x + y - 1 = 0\\) 的斜率为（　）",
-          options: ["A. 1", "B. -1", "C. \\(\\dfrac{1}{2}\\)", "D. -2"],
+          options: ["1", "-1", "\\(\\dfrac{1}{2}\\)", "-2"],
           correctIndex: 1,
           answer: "答案：B。化为斜截式 \\(y = -x + 1\\)，斜率为 \\(-1\\)。"
         }
@@ -193,7 +193,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "过点 \\((1, 2)\\) 且斜率为 3 的直线方程是（　）",
-          options: ["A. \\(y = 3x + 1\\)", "B. \\(y = 3x - 1\\)", "C. \\(y = 2x + 3\\)", "D. \\(y = 3x + 5\\)"],
+          options: ["\\(y = 3x + 1\\)", "\\(y = 3x - 1\\)", "\\(y = 2x + 3\\)", "\\(y = 3x + 5\\)"],
           correctIndex: 1,
           answer: "**B**。点斜式 \\(y - 2 = 3(x - 1)\\)，整理得 \\(y = 3x - 1\\)。"
         }

@@ -200,7 +200,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "屏幕显示用的图像分辨率一般为（　）",
-          options: ["A. 72", "B. 300", "C. 1000", "D. 24"],
+          options: ["72", "300", "1000", "24"],
           correctIndex: 0,
           answer: "答案：A。屏幕显示用 72 像素/英寸，印刷用 300。"
         },
@@ -208,7 +208,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "使用椭圆选框工具绘制正圆，需要按住（　）键",
-          options: ["A. Ctrl", "B. Alt", "C. Shift", "D. Tab"],
+          options: ["Ctrl", "Alt", "Shift", "Tab"],
           correctIndex: 2,
           answer: "答案：C。按住 Shift 绘制正圆/正方形。"
         },
@@ -216,7 +216,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "选择图像中颜色相近区域的工具是（　）",
-          options: ["A. 矩形选框", "B. 魔棒工具", "C. 画笔工具", "D. 橡皮擦"],
+          options: ["矩形选框", "魔棒工具", "画笔工具", "橡皮擦"],
           correctIndex: 1,
           answer: "答案：B。魔棒工具按颜色相近选取区域。"
         },
@@ -237,7 +237,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "取消选区的快捷键是（　）",
-          options: ["A. Ctrl+C", "B. Ctrl+D", "C. Ctrl+V", "D. Ctrl+Z"],
+          options: ["Ctrl+C", "Ctrl+D", "Ctrl+V", "Ctrl+Z"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+D 取消选区。Ctrl+C 是复制、Ctrl+V 是粘贴、Ctrl+Z 是撤销上一步操作，注意不要混淆。"
         },
@@ -245,7 +245,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "复制图像某区域到另一位置的工具是（　）",
-          options: ["A. 画笔工具", "B. 仿制图章", "C. 油漆桶", "D. 渐变工具"],
+          options: ["画笔工具", "仿制图章", "油漆桶", "渐变工具"],
           correctIndex: 1,
           answer: "答案：B。仿制图章工具先按住 Alt 在源位置取样，再到目标位置涂抹，即可把图像某区域复制到另一位置，常用于修图、去除水印或杂物。画笔用于绘制，油漆桶填充颜色，渐变工具生成渐变色。"
         },
@@ -253,7 +253,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "在 Photoshop 中精确设置颜色 #1e2d4c，应（　）",
-          options: ["A. 用画笔随意涂", "B. 双击前景色，在拾色器中输入色值", "C. 用吸管吸取", "D. 用魔棒选择"],
+          options: ["用画笔随意涂", "双击前景色，在拾色器中输入色值", "用吸管吸取", "用魔棒选择"],
           correctIndex: 1,
           answer: "答案：B。双击前景色打开拾色器，输入十六进制色值。"
         },

@@ -155,7 +155,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列字段中，最适合作为学生表主键的是（　）",
-          options: ["A. 姓名", "B. 性别", "C. 学号", "D. 成绩"],
+          options: ["姓名", "性别", "学号", "成绩"],
           correctIndex: 2,
           answer: "答案：C。学号具有唯一性；姓名可能重名，性别与成绩都会重复，均不适合做主键。"
         },
@@ -164,10 +164,10 @@ export default {
           type: "single",
           question: "外键的主要作用是（　）",
           options: [
-            "A. 加快表的显示速度",
-            "B. 建立两张表之间的关联关系",
-            "C. 增加表的字段数量",
-            "D. 自动删除重复记录"
+            "加快表的显示速度",
+            "建立两张表之间的关联关系",
+            "增加表的字段数量",
+            "自动删除重复记录"
           ],
           correctIndex: 1,
           answer: "答案：B。外键用于建立表与表之间的关联，并保证引用完整性。"
@@ -176,7 +176,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "存储\"成绩\"（如 88.5）这类需要精确计算的小数，最合适的数据类型是（　）",
-          options: ["A. INT", "B. VARCHAR", "C. DECIMAL", "D. DATE"],
+          options: ["INT", "VARCHAR", "DECIMAL", "DATE"],
           correctIndex: 2,
           answer: "答案：C。DECIMAL 为定点小数，适合成绩、金额等需精确计算的值。"
         }
@@ -203,7 +203,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "某字段长度为 18 且固定不变（如身份证号），较合适的类型是（　）",
-          options: ["A. INT", "B. CHAR(18)", "C. DATE", "D. DECIMAL"],
+          options: ["INT", "CHAR(18)", "DATE", "DECIMAL"],
           correctIndex: 1,
           answer: "答案：B。长度固定且以字符形式存储，适合用 CHAR(18)；身份证号含 X 且不需计算，不宜用 INT。"
         },
@@ -212,10 +212,10 @@ export default {
           type: "single",
           question: "关于主键，下列说法正确的是（　）",
           options: [
-            "A. 主键可以出现重复值",
-            "B. 主键可以为空",
-            "C. 主键值唯一且非空，用于唯一标识记录",
-            "D. 一张表必须有多个主键"
+            "主键可以出现重复值",
+            "主键可以为空",
+            "主键值唯一且非空，用于唯一标识记录",
+            "一张表必须有多个主键"
           ],
           correctIndex: 2,
           answer: "答案：C。主键唯一且非空；一张表通常只有一个主键（也可由多字段组成联合主键，但不会\"必须有多个\"）。"
@@ -224,7 +224,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "成绩表中的\"学号\"字段引用学生表的主键，则该\"学号\"在成绩表中称为（　）",
-          options: ["A. 主键", "B. 外键", "C. 默认值", "D. 数据类型"],
+          options: ["主键", "外键", "默认值", "数据类型"],
           correctIndex: 1,
           answer: "答案：B。引用另一张表主键的字段称为外键，用于建立两表的关联。"
         },
@@ -232,7 +232,7 @@ export default {
           difficulty: "sprint",
           type: "single",
           question: "字段属性一般不包括下列哪一项（　）",
-          options: ["A. 数据类型", "B. 长度", "C. 是否允许为空", "D. 显示器的分辨率"],
+          options: ["数据类型", "长度", "是否允许为空", "显示器的分辨率"],
           correctIndex: 3,
           answer: "答案：D。显示器分辨率与字段属性无关；数据类型、长度、是否允许空均是常见字段属性。"
         }

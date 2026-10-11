@@ -21,7 +21,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "若 \\(a < b < 0\\)，则下列不等式一定成立的是（　）",
-          options: ["A. \\(a^2 < b^2\\)", "B. \\(|a| < |b|\\)", "C. \\(a - 2 < b - 2\\)", "D. \\(\\frac{1}{a} < \\frac{1}{b}\\)"],
+          options: ["\\(a^2 < b^2\\)", "\\(|a| < |b|\\)", "\\(a - 2 < b - 2\\)", "\\(\\frac{1}{a} < \\frac{1}{b}\\)"],
           correctIndex: 2,
           answer: "**C**。两边同减 2，不等号方向不变，故 \\(a-2<b-2\\) 成立。A、B 反了：负数中绝对值越大，平方越大（如 \\(a=-3, b=-1\\)）；D 应为 \\(\\frac{1}{a} > \\frac{1}{b}\\)（同号取倒数变向）。"
         },
@@ -29,7 +29,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "不等式 \\(-x^2 + 2x + 3 > 0\\) 的解集是（　）",
-          options: ["A. \\(\\{x \\mid x < -1 \\text{ 或 } x > 3\\}\\)", "B. \\(\\{x \\mid -1 < x < 3\\}\\)", "C. \\(\\{x \\mid x < -3 \\text{ 或 } x > 1\\}\\)", "D. \\(\\{x \\mid -3 < x < 1\\}\\)"],
+          options: ["\\(\\{x \\mid x < -1 \\text{ 或 } x > 3\\}\\)", "\\(\\{x \\mid -1 < x < 3\\}\\)", "\\(\\{x \\mid x < -3 \\text{ 或 } x > 1\\}\\)", "\\(\\{x \\mid -3 < x < 1\\}\\)"],
           correctIndex: 1,
           answer: "**B**。两边同乘 \\(-1\\) 化正并变号，得 \\(x^2-2x-3<0\\)，即 \\((x-3)(x+1)<0\\)，解集为 \\(-1 < x < 3\\)。"
         },
@@ -37,7 +37,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "不等式 \\(|x - 3| < 2\\) 的解集是（　）",
-          options: ["A. \\((1, 5)\\)", "B. \\((-\\infty, 1) \\cup (5, +\\infty)\\)", "C. \\((3, 5)\\)", "D. \\((-5, -1)\\)"],
+          options: ["\\((1, 5)\\)", "\\((-\\infty, 1) \\cup (5, +\\infty)\\)", "\\((3, 5)\\)", "\\((-5, -1)\\)"],
           correctIndex: 0,
           answer: "**A**。\\(|x-3|<2\\) 等价于 \\(-2 < x-3 < 2\\)，解得 \\(1 < x < 5\\)，即 \\((1,5)\\)。"
         },
@@ -45,7 +45,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "已知 \\(x > 0\\)，则 \\(x + \\frac{4}{x}\\) 的最小值为（　）",
-          options: ["A. 2", "B. 3", "C. 4", "D. 8"],
+          options: ["2", "3", "4", "8"],
           correctIndex: 2,
           answer: "**C**。由均值不等式 \\(x+\\frac{4}{x} \\ge 2\\sqrt{x \\cdot \\frac{4}{x}} = 2\\times 2 = 4\\)，当 \\(x=2\\) 时取等。"
         },
@@ -53,7 +53,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知不等式 \\(x^2 + bx + c > 0\\) 的解集为 \\(\\{x \\mid x < 1 \\text{ 或 } x > 3\\}\\)，则 \\(b + c\\) 的值为（　）",
-          options: ["A. \\(-1\\)", "B. 7", "C. \\(-7\\)", "D. 1"],
+          options: ["\\(-1\\)", "7", "\\(-7\\)", "1"],
           correctIndex: 0,
           answer: "**A**。方程 \\(x^2+bx+c=0\\) 的两根为 \\(1, 3\\)，由韦达定理 \\(1+3=-b\\)，\\(1\\times3=c\\)，得 \\(b=-4\\)，\\(c=3\\)，\\(b+c=-1\\)。"
         },
@@ -61,7 +61,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "若不等式 \\(x^2 + mx + 4 \\ge 0\\) 对一切实数 \\(x\\) 恒成立，则实数 \\(m\\) 的取值范围是（　）",
-          options: ["A. \\(m > 4\\)", "B. \\(-4 < m < 4\\)", "C. \\(m \\ge 4\\)", "D. \\(-4 \\le m \\le 4\\)"],
+          options: ["\\(m > 4\\)", "\\(-4 < m < 4\\)", "\\(m \\ge 4\\)", "\\(-4 \\le m \\le 4\\)"],
           correctIndex: 3,
           answer: "**D**。二次项系数为正，恒成立需判别式 \\(\\Delta = m^2 - 16 \\le 0\\)，即 \\(-4 \\le m \\le 4\\)。"
         },
@@ -69,7 +69,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "不等式 \\(\\frac{x - 1}{x + 2} \\le 0\\) 的解集是（　）",
-          options: ["A. \\((-2, 1]\\)", "B. \\([-2, 1]\\)", "C. \\([-2, 1)\\)", "D. \\((-\\infty, -2) \\cup [1, +\\infty)\\)"],
+          options: ["\\((-2, 1]\\)", "\\([-2, 1]\\)", "\\([-2, 1)\\)", "\\((-\\infty, -2) \\cup [1, +\\infty)\\)"],
           correctIndex: 0,
           answer: "**A**。转化为 \\((x-1)(x+2)\\le0\\) 且 \\(x\\ne-2\\)，得 \\(-2 < x \\le 1\\)，即 \\((-2, 1]\\)。"
         },
@@ -77,7 +77,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知 \\(a > 0, b > 0\\) 且 \\(ab = 9\\)，则 \\(a + b\\) 的最小值为（　）",
-          options: ["A. 3", "B. 6", "C. 9", "D. 18"],
+          options: ["3", "6", "9", "18"],
           correctIndex: 1,
           answer: "**B**。由均值不等式 \\(a+b \\ge 2\\sqrt{ab} = 2\\sqrt{9} = 6\\)，当 \\(a=b=3\\) 时取等。"
         }

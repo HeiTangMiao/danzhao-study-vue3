@@ -20,7 +20,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在数据表中，用于唯一标识每条记录的字段（或字段组合）称为（　）",
-          options: ["A. 外键", "B. 主键", "C. 索引", "D. 视图"],
+          options: ["外键", "主键", "索引", "视图"],
           correctIndex: 1,
           answer: "答案：B。主键用于唯一标识记录，且不允许重复与为空。"
         },
@@ -28,7 +28,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "数据库管理系统（DBMS）属于（　）",
-          options: ["A. 应用软件", "B. 系统软件", "C. 硬件设备", "D. 数据库文件"],
+          options: ["应用软件", "系统软件", "硬件设备", "数据库文件"],
           correctIndex: 1,
           answer: "答案：B。DBMS 属于系统软件，位于用户与操作系统之间。"
         },
@@ -36,7 +36,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列软件中，属于数据库管理系统的是（　）",
-          options: ["A. WPS 文字", "B. Access", "C. Photoshop", "D. 浏览器"],
+          options: ["WPS 文字", "Access", "Photoshop", "浏览器"],
           correctIndex: 1,
           answer: "答案：B。Access 是关系型数据库管理系统；其余三项均非数据库软件。"
         },
@@ -44,7 +44,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在关系模型中，用二维表表示数据，其中\"一行\"称为（　）",
-          options: ["A. 字段", "B. 属性", "C. 记录（元组）", "D. 主键"],
+          options: ["字段", "属性", "记录（元组）", "主键"],
           correctIndex: 2,
           answer: "答案：C。一行是一条记录（元组）；一列是一个字段（属性）。"
         },
@@ -53,10 +53,10 @@ export default {
           type: "single",
           question: "关于主键的特点，下列说法**错误**的是（　）",
           options: [
-            "A. 主键值不能重复",
-            "B. 主键值不能为空",
-            "C. 主键值可以随意重复以方便统计",
-            "D. 主键用于唯一标识一条记录"
+            "主键值不能重复",
+            "主键值不能为空",
+            "主键值可以随意重复以方便统计",
+            "主键用于唯一标识一条记录"
           ],
           correctIndex: 2,
           answer: "答案：C。主键具有唯一性与非空性，不能重复。"
@@ -65,7 +65,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列字段中，最不适合单独作为主键的是（　）",
-          options: ["A. 学号", "B. 身份证号", "C. 姓名", "D. 订单编号"],
+          options: ["学号", "身份证号", "姓名", "订单编号"],
           correctIndex: 2,
           answer: "答案：C。姓名可能重名，不满足唯一性；学号、身份证号、订单编号均具有唯一性。"
         },
@@ -74,10 +74,10 @@ export default {
           type: "single",
           question: "外键的作用是（　）",
           options: [
-            "A. 唯一标识本表记录",
-            "B. 建立两张表之间的关联关系",
-            "C. 加快查询显示速度",
-            "D. 自动为字段赋默认值"
+            "唯一标识本表记录",
+            "建立两张表之间的关联关系",
+            "加快查询显示速度",
+            "自动为字段赋默认值"
           ],
           correctIndex: 1,
           answer: "答案：B。外键指向另一张表的主键，用于建立表间关联并保证引用完整性。"
@@ -86,7 +86,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "存储金额、成绩等需要精确计算的数值，应选用（　）",
-          options: ["A. INT", "B. DECIMAL", "C. VARCHAR", "D. DATE"],
+          options: ["INT", "DECIMAL", "VARCHAR", "DATE"],
           correctIndex: 1,
           answer: "答案：B。DECIMAL 是定点小数类型，适合金额与成绩等需精确计算的场景。"
         },
@@ -94,7 +94,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "用于从表中查询（检索）数据的 SQL 语句是（　）",
-          options: ["A. INSERT", "B. SELECT", "C. UPDATE", "D. DELETE"],
+          options: ["INSERT", "SELECT", "UPDATE", "DELETE"],
           correctIndex: 1,
           answer: "答案：B。SELECT 用于查询数据。"
         },
@@ -103,10 +103,10 @@ export default {
           type: "single",
           question: "将 student 表中学号 1001 的成绩改为 90，正确的语句是（　）",
           options: [
-            "A. UPDATE student SET score = 90;",
-            "B. UPDATE student SET score = 90 WHERE id = 1001;",
-            "C. MODIFY student SET score = 90 WHERE id = 1001;",
-            "D. ALTER student score = 90 WHERE id = 1001;"
+            "UPDATE student SET score = 90;",
+            "UPDATE student SET score = 90 WHERE id = 1001;",
+            "MODIFY student SET score = 90 WHERE id = 1001;",
+            "ALTER student score = 90 WHERE id = 1001;"
           ],
           correctIndex: 1,
           answer: "答案：B。UPDATE ... SET ... WHERE ... 修改指定记录；A 会改全表。"
@@ -116,10 +116,10 @@ export default {
           type: "single",
           question: "删除 student 表中学号为 1003 的记录，正确的语句是（　）",
           options: [
-            "A. DELETE student WHERE id = 1003;",
-            "B. DELETE FROM student WHERE id = 1003;",
-            "C. DROP student WHERE id = 1003;",
-            "D. REMOVE FROM student WHERE id = 1003;"
+            "DELETE student WHERE id = 1003;",
+            "DELETE FROM student WHERE id = 1003;",
+            "DROP student WHERE id = 1003;",
+            "REMOVE FROM student WHERE id = 1003;"
           ],
           correctIndex: 1,
           answer: "答案：B。DELETE FROM 表名 WHERE 条件 用于删除指定记录。"
@@ -129,10 +129,10 @@ export default {
           type: "single",
           question: "关于 DELETE 与 DROP TABLE 的区别，正确的是（　）",
           options: [
-            "A. 二者完全相同",
-            "B. DELETE 删除记录（结构保留），DROP TABLE 删除整张表",
-            "C. DELETE 删除整张表，DROP 只删记录",
-            "D. DELETE 只能删一张表，DROP 可删多张表"
+            "二者完全相同",
+            "DELETE 删除记录（结构保留），DROP TABLE 删除整张表",
+            "DELETE 删除整张表，DROP 只删记录",
+            "DELETE 只能删一张表，DROP 可删多张表"
           ],
           correctIndex: 1,
           answer: "答案：B。DELETE 删除的是记录（数据），表结构保留；DROP TABLE 删除表结构与全部数据。"
@@ -204,10 +204,10 @@ export default {
           type: "single",
           question: "查询 student 表中成绩及格（≥60）的学生姓名与成绩，正确的语句是（　）",
           options: [
-            "A. SELECT name, score FROM student;",
-            "B. SELECT name, score FROM student WHERE score >= 60;",
-            "C. SELECT name WHERE score >= 60 FROM student;",
-            "D. FIND name, score FROM student WHERE score >= 60;"
+            "SELECT name, score FROM student;",
+            "SELECT name, score FROM student WHERE score >= 60;",
+            "SELECT name WHERE score >= 60 FROM student;",
+            "FIND name, score FROM student WHERE score >= 60;"
           ],
           correctIndex: 1,
           answer: "答案：B。SELECT 字段 → FROM 表 → WHERE 条件，顺序与格式均正确。"
@@ -217,10 +217,10 @@ export default {
           type: "single",
           question: "向 student 表插入记录（学号 1005、姓名 王芳、成绩 76.5），正确的是（　）",
           options: [
-            "A. INSERT INTO student (id, name, score) VALUES (1005, 王芳, 76.5);",
-            "B. INSERT INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
-            "C. ADD INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
-            "D. INSERT student VALUES (id=1005, name='王芳', score=76.5);"
+            "INSERT INTO student (id, name, score) VALUES (1005, 王芳, 76.5);",
+            "INSERT INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
+            "ADD INTO student (id, name, score) VALUES (1005, '王芳', 76.5);",
+            "INSERT student VALUES (id=1005, name='王芳', score=76.5);"
           ],
           correctIndex: 1,
           answer: "答案：B。INSERT INTO ... VALUES ... 格式正确，且字符串'王芳'带有单引号（A 缺少引号）。"
@@ -230,10 +230,10 @@ export default {
           type: "single",
           question: "某 SQL 语句为 `UPDATE student SET score = 100;`，其执行结果是（　）",
           options: [
-            "A. 语句错误，无法执行",
-            "B. 把全表所有学生的成绩都改为 100",
-            "C. 只修改第一条记录",
-            "D. 删除全表成绩"
+            "语句错误，无法执行",
+            "把全表所有学生的成绩都改为 100",
+            "只修改第一条记录",
+            "删除全表成绩"
           ],
           correctIndex: 1,
           answer: "答案：B。缺少 WHERE 条件时，UPDATE 会把整张表的 score 字段全部改为 100。"

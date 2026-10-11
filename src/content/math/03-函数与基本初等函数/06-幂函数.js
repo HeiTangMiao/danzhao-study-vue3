@@ -169,7 +169,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列函数中是幂函数的是（　）",
-          options: ["A. \\(y = 2x\\)", "B. \\(y = x^2\\)", "C. \\(y = 2^x\\)", "D. \\(y = x^2 + 1\\)"],
+          options: ["\\(y = 2x\\)", "\\(y = x^2\\)", "\\(y = 2^x\\)", "\\(y = x^2 + 1\\)"],
           correctIndex: 1,
           answer: "答案：B。幂函数要求系数为 1、底数为自变量、指数为常数。"
         },
@@ -211,7 +211,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列函数中是幂函数的是（　）",
-          options: ["A. \\(y = 2x^2\\)", "B. \\(y = x^2 + 1\\)", "C. \\(y = x^{-2}\\)", "D. \\(y = 2^x\\)"],
+          options: ["\\(y = 2x^2\\)", "\\(y = x^2 + 1\\)", "\\(y = x^{-2}\\)", "\\(y = 2^x\\)"],
           correctIndex: 2,
           answer: "**C**。幂函数形如 \\(y = x^\\alpha\\)（系数为 1、只有一项）；A 系数不为 1，B 是多项式，D 是指数函数。"
         },

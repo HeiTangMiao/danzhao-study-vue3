@@ -20,7 +20,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列部件中，断电后信息**不会**丢失的是（　）",
-          options: ["A. 内存（RAM）", "B. 高速缓存（Cache）", "C. 硬盘", "D. 寄存器"],
+          options: ["内存（RAM）", "高速缓存（Cache）", "硬盘", "寄存器"],
           correctIndex: 2,
           answer: "答案：C。硬盘是外存储器，断电后信息保留；RAM、Cache、寄存器断电后信息丢失。"
         },
@@ -28,7 +28,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "CPU 的主要组成是（　）",
-          options: ["A. 运算器和控制器", "B. 内存和硬盘", "C. 显卡和声卡", "D. 主板和电源"],
+          options: ["运算器和控制器", "内存和硬盘", "显卡和声卡", "主板和电源"],
           correctIndex: 0,
           answer: "答案：A。CPU 由运算器与控制器组成，合称中央处理器。"
         },
@@ -37,10 +37,10 @@ export default {
           type: "single",
           question: "下列全部属于输出设备的一组是（　）",
           options: [
-            "A. 键盘、鼠标、扫描仪",
-            "B. 显示器、打印机、音箱",
-            "C. 硬盘、U 盘、光盘",
-            "D. 摄像头、麦克风、手写板"
+            "键盘、鼠标、扫描仪",
+            "显示器、打印机、音箱",
+            "硬盘、U 盘、光盘",
+            "摄像头、麦克风、手写板"
           ],
           correctIndex: 1,
           answer: "答案：B。显示器、打印机、音箱用于输出；A、D 为输入设备，C 为外存储器。"
@@ -49,7 +49,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 BIOS 设置中，用于调整系统启动顺序的是（　）",
-          options: ["A. Main", "B. Boot", "C. Security", "D. Exit"],
+          options: ["Main", "Boot", "Security", "Exit"],
           correctIndex: 1,
           answer: "答案：B。Boot（启动）选项卡用于设置第一启动设备等启动顺序。"
         },
@@ -58,10 +58,10 @@ export default {
           type: "single",
           question: "CMOS 的作用是（　）",
           options: [
-            "A. 长期保存用户文件",
-            "B. 保存 BIOS 的设置参数（靠电池维持）",
-            "C. 负责图形运算",
-            "D. 负责网络通讯"
+            "长期保存用户文件",
+            "保存 BIOS 的设置参数（靠电池维持）",
+            "负责图形运算",
+            "负责网络通讯"
           ],
           correctIndex: 1,
           answer: "答案：B。CMOS 是保存 BIOS 设置参数的 RAM 芯片，由主板电池供电。"
@@ -71,10 +71,10 @@ export default {
           type: "single",
           question: "安装内存条的正确做法是（　）",
           options: [
-            "A. 用力按压直到插入",
-            "B. 对准防呆缺口垂直插入，卡扣扣紧即可",
-            "C. 任意方向都能插入",
-            "D. 不需要考虑方向"
+            "用力按压直到插入",
+            "对准防呆缺口垂直插入，卡扣扣紧即可",
+            "任意方向都能插入",
+            "不需要考虑方向"
           ],
           correctIndex: 1,
           answer: "答案：B。内存有防呆缺口，对准后垂直插入，听到卡扣声表示到位，不可蛮力。"
@@ -83,7 +83,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "FAT32 文件系统对单个文件的大小限制是（　）",
-          options: ["A. 2 GB", "B. 4 GB", "C. 8 GB", "D. 无限制"],
+          options: ["2 GB", "4 GB", "8 GB", "无限制"],
           correctIndex: 1,
           answer: "答案：B。FAT32 单个文件不能超过 4 GB；NTFS、exFAT 均支持更大文件。"
         },
@@ -91,7 +91,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "要在一块 U 盘上存放一个 10 GB 的文件，应选用的文件系统格式是（　）",
-          options: ["A. FAT32", "B. NTFS 或 exFAT", "C. 只能是 FAT32", "D. 任意格式都可以"],
+          options: ["FAT32", "NTFS 或 exFAT", "只能是 FAT32", "任意格式都可以"],
           correctIndex: 1,
           answer: "答案：B。FAT32 有 4 GB 上限，10 GB 文件需选用 NTFS 或 exFAT。"
         },
@@ -99,7 +99,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在设备管理器中某设备出现黄色感叹号，通常说明（　）",
-          options: ["A. 设备工作最佳", "B. 驱动程序未正确安装", "C. 网络连接正常", "D. 硬盘已满"],
+          options: ["设备工作最佳", "驱动程序未正确安装", "网络连接正常", "硬盘已满"],
           correctIndex: 1,
           answer: "答案：B。黄色感叹号表示驱动异常或未安装，设备无法正常工作。"
         },
@@ -108,10 +108,10 @@ export default {
           type: "single",
           question: "关于固态硬盘（SSD），下列做法正确的是（　）",
           options: [
-            "A. 每天进行磁盘碎片整理",
-            "B. 不需要频繁进行碎片整理",
-            "C. 断电后数据会丢失",
-            "D. 一定比机械硬盘容量大"
+            "每天进行磁盘碎片整理",
+            "不需要频繁进行碎片整理",
+            "断电后数据会丢失",
+            "一定比机械硬盘容量大"
           ],
           correctIndex: 1,
           answer: "答案：B。SSD 无需频繁碎片整理（碎片整理针对机械硬盘）；它断电后数据仍保留。"
@@ -120,7 +120,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列软件类型中，源代码公开、允许用户查看修改的是（　）",
-          options: ["A. 正版软件", "B. 共享软件", "C. 免费软件", "D. 开源软件"],
+          options: ["正版软件", "共享软件", "免费软件", "开源软件"],
           correctIndex: 3,
           answer: "答案：D。开源软件公开源代码；免费软件虽可免费使用但不一定开放源码。"
         },
@@ -129,10 +129,10 @@ export default {
           type: "single",
           question: "卸载软件最恰当的方式是（　）",
           options: [
-            "A. 直接删除安装文件夹",
-            "B. 使用系统卸载功能或软件自带卸载程序",
-            "C. 格式化整个硬盘",
-            "D. 重新安装操作系统"
+            "直接删除安装文件夹",
+            "使用系统卸载功能或软件自带卸载程序",
+            "格式化整个硬盘",
+            "重新安装操作系统"
           ],
           correctIndex: 1,
           answer: "答案：B。通过系统或自带卸载程序卸载最规范，直接删文件夹会留下残留。"
@@ -216,10 +216,10 @@ export default {
           type: "single",
           question: "某计算机开机后主机风扇转动但屏幕无任何显示，最应优先检查的是（　）",
           options: [
-            "A. 显示器信号线与内存、显卡接触情况",
-            "B. 硬盘容量是否足够",
-            "C. 操作系统是否激活",
-            "D. 键盘是否损坏"
+            "显示器信号线与内存、显卡接触情况",
+            "硬盘容量是否足够",
+            "操作系统是否激活",
+            "键盘是否损坏"
           ],
           correctIndex: 0,
           answer: "答案：A。风扇转说明已供电，无显示多与信号线或内存、显卡接触不良有关，应优先排查。"
@@ -229,10 +229,10 @@ export default {
           type: "single",
           question: "某同学想用 U 盘给一台新计算机安装操作系统，需要（　）",
           options: [
-            "A. 在 BIOS 中把 U 盘设为优先启动项",
-            "B. 先格式化所有分区为 FAT32",
-            "C. 更换 CPU",
-            "D. 卸载原有驱动程序"
+            "在 BIOS 中把 U 盘设为优先启动项",
+            "先格式化所有分区为 FAT32",
+            "更换 CPU",
+            "卸载原有驱动程序"
           ],
           correctIndex: 0,
           answer: "答案：A。用 U 盘装系统需调整 BIOS 的启动顺序（Boot），使 U 盘优先启动。"
@@ -242,10 +242,10 @@ export default {
           type: "single",
           question: "关于数据备份与系统还原，下列做法最合理的是（　）",
           options: [
-            "A. 只在系统盘再存一份备份",
-            "B. 定期备份到外置硬盘或云盘，并在异常时还原",
-            "C. 从不备份，故障后重新安装一切",
-            "D. 每天都对固态硬盘做碎片整理"
+            "只在系统盘再存一份备份",
+            "定期备份到外置硬盘或云盘，并在异常时还原",
+            "从不备份，故障后重新安装一切",
+            "每天都对固态硬盘做碎片整理"
           ],
           correctIndex: 1,
           answer: "答案：B。备份应遵循多份、异地、定期原则，存于外置介质或云端；SSD 不需频繁碎片整理。"

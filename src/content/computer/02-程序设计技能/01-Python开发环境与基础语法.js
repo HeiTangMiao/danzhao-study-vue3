@@ -164,7 +164,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "input() 函数返回的数据类型是（　）",
-          options: ["A. int", "B. float", "C. str", "D. bool"],
+          options: ["int", "float", "str", "bool"],
           correctIndex: 2,
           answer: "答案：C。input() 返回的一定是字符串，需要时用 int() 或 float() 转换。"
         },
@@ -172,7 +172,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列变量名中，合法的是（　）",
-          options: ["A. 2name", "B. my-name", "C. student_name", "D. if"],
+          options: ["2name", "my-name", "student_name", "if"],
           correctIndex: 2,
           answer: "答案：C。student_name 由字母和下划线组成且不以数字开头；`if` 是关键字，`2name` 以数字开头，`my-name` 含非法字符 `-`。"
         },
@@ -193,7 +193,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列哪个是 Python 的注释符号（　）",
-          options: ["A. //", "B. #", "C. /*", "D. --"],
+          options: ["//", "#", "/*", "--"],
           correctIndex: 1,
           answer: "答案：B。Python 单行注释用 `#`。"
         },
@@ -201,7 +201,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行 `print(\"3\" + \"4\")` 的输出结果是（　）",
-          options: ["A. 7", "B. 34", "C. 3 4", "D. 报错"],
+          options: ["7", "34", "3 4", "报错"],
           correctIndex: 1,
           answer: "答案：B。两个字符串用 `+` 连接，结果是字符串 `34`。"
         },
@@ -209,7 +209,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码中，能正确输入一个浮点数并输出的程序是（　）",
-          options: ["A. `n = input(\"输入：\")` `print(n + 1)`", "B. `n = float(input(\"输入：\"))` `print(n)`", "C. `n = int(input(\"输入：\"))` `print(n)`", "D. `n = input(\"输入：\")` `print(n)`"],
+          options: ["`n = input(\"输入：\")` `print(n + 1)`", "`n = float(input(\"输入：\"))` `print(n)`", "`n = int(input(\"输入：\"))` `print(n)`", "`n = input(\"输入：\")` `print(n)`"],
           correctIndex: 1,
           answer: "答案：B。用 float() 将输入转换为浮点数；A 中字符串不能与数字相加。"
         },

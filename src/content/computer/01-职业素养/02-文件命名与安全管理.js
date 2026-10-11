@@ -132,7 +132,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列文件名中，最规范的是（　）",
-          options: ["A. 新建文档1.docx", "B. 成绩统计.xlsx", "C. 111111.txt", "D. a b c.docx"],
+          options: ["新建文档1.docx", "成绩统计.xlsx", "111111.txt", "a b c.docx"],
           correctIndex: 1,
           answer: "答案：B。\"成绩统计\"见名知意，能反映文件内容。"
         },
@@ -172,7 +172,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "Windows 文件名中不能包含的字符是（　）",
-          options: ["A. 汉字", "B. 数字", "C. 下划线 _", "D. 问号 ?"],
+          options: ["汉字", "数字", "下划线 _", "问号 ?"],
           correctIndex: 3,
           answer: "答案：D。`?` 是 Windows 文件名禁用字符之一。"
         },
@@ -186,7 +186,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "考试提交前，下列做法最恰当的是（　）",
-          options: ["A. 直接交卷，不检查文件", "B. 校对所有文件是否存在且内容完整", "C. 只检查程序能否运行，不检查保存位置", "D. 随意修改文件名"],
+          options: ["直接交卷，不检查文件", "校对所有文件是否存在且内容完整", "只检查程序能否运行，不检查保存位置", "随意修改文件名"],
           correctIndex: 1,
           answer: "答案：B。提交前必须校对所有文件是否存在、保存位置是否正确、内容是否完整。"
         }

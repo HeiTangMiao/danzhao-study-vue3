@@ -133,7 +133,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "数据库系统的核心是（　）",
-          options: ["A. 数据库", "B. 数据库管理系统（DBMS）", "C. 操作系统", "D. 应用软件"],
+          options: ["数据库", "数据库管理系统（DBMS）", "操作系统", "应用软件"],
           correctIndex: 1,
           answer: "答案：B。DBMS 是数据库系统的核心，负责数据库的建立、使用与维护。"
         },
@@ -142,10 +142,10 @@ export default {
           type: "single",
           question: "下列三者关系中，正确的是（　）",
           options: [
-            "A. DB 包含 DBMS",
-            "B. DBS 包含 DBMS，DBMS 管理 DB",
-            "C. DBMS 包含 DBS",
-            "D. 三者完全相同"
+            "DB 包含 DBMS",
+            "DBS 包含 DBMS，DBMS 管理 DB",
+            "DBMS 包含 DBS",
+            "三者完全相同"
           ],
           correctIndex: 1,
           answer: "答案：B。数据库系统（DBS）包含数据库（DB）、DBMS、应用系统与人员。"
@@ -154,7 +154,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列属于关系型数据库管理系统的是（　）",
-          options: ["A. Windows", "B. MySQL", "C. Photoshop", "D. Word"],
+          options: ["Windows", "MySQL", "Photoshop", "Word"],
           correctIndex: 1,
           answer: "答案：B。MySQL 是典型的关系型数据库管理系统；其余均非数据库软件。"
         }
@@ -181,7 +181,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列不属于数据库系统特征的是（　）",
-          options: ["A. 数据结构化", "B. 数据共享性高", "C. 数据冗余度高", "D. 数据独立性高"],
+          options: ["数据结构化", "数据共享性高", "数据冗余度高", "数据独立性高"],
           correctIndex: 2,
           answer: "答案：C。数据库系统的特征是**冗余度低**，而非冗余度高。"
         },
@@ -189,7 +189,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在关系模型中，表中的一行通常称为（　）",
-          options: ["A. 字段", "B. 元组（记录）", "C. 属性", "D. 主键"],
+          options: ["字段", "元组（记录）", "属性", "主键"],
           correctIndex: 1,
           answer: "答案：B。一行是一条记录（元组）；一列是一个字段（属性）。"
         },
@@ -198,10 +198,10 @@ export default {
           type: "single",
           question: "数据独立性高是数据库系统的重要特征，它包括（　）",
           options: [
-            "A. 物理独立性与逻辑独立性",
-            "B. 软件独立性与硬件独立性",
-            "C. 网络独立性与存储独立性",
-            "D. 用户独立性与系统独立性"
+            "物理独立性与逻辑独立性",
+            "软件独立性与硬件独立性",
+            "网络独立性与存储独立性",
+            "用户独立性与系统独立性"
           ],
           correctIndex: 0,
           answer: "答案：A。数据独立性分为物理独立性（存储变化不影响应用）与逻辑独立性（逻辑结构变化不影响应用）。"
@@ -210,7 +210,7 @@ export default {
           difficulty: "sprint",
           type: "single",
           question: "某小型 Web 项目需要一款开源、免费的数据库，最合适的选择是（　）",
-          options: ["A. Oracle", "B. MySQL", "C. Windows Server", "D. WPS"],
+          options: ["Oracle", "MySQL", "Windows Server", "WPS"],
           correctIndex: 1,
           answer: "答案：B。MySQL 开源免费、轻量高效，是 Web 项目的常见选择；Oracle 是大型商业数据库。"
         }

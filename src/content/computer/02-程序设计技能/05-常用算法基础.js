@@ -125,14 +125,14 @@ export default {
           title: "例题2：判断水仙花数",
           difficulty: "medium",
           question: "水仙花数是指一个三位数，其各位数字的立方和等于该数本身，如 153 = 1³+5³+3³。编写程序判断输入的三位数是否为水仙花数。",
-          solution: "**解：**\n```\nnum = int(input(\"请输入一个三位数：\"))\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\n# 判断立方和是否等于本身\nif bai ** 3 + shi ** 3 + ge ** 3 == num:\n    print(num, \"是水仙花数\")\nelse:\n    print(num, \"不是水仙花数\")\n```\n运行示例：\n请输入一个三位数：153\n153 是水仙花数",
+          solution: "**解：**\n```\nnum = int(input(\"请输入一个三位数：\"))\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\n# 判断立方和是否等于本身\nif bai ** 3 + shi ** 3 + ge ** 3 == num:\nprint(num, \"是水仙花数\")\nelse:\nprint(num, \"不是水仙花数\")\n```\n运行示例：\n请输入一个三位数：153\n153 是水仙花数",
           answer: "分离百十个位，判断 `bai**3 + shi**3 + ge**3 == num`。"
         },
         {
           title: "例题3：求 1~n 中所有素数",
           difficulty: "advanced",
           question: "输入一个正整数 n，输出 2 到 n 之间的所有素数。",
-          solution: "**解：**\n```\nn = int(input(\"请输入 n：\"))\n# 穷举 2 到 n 的每个数\nfor num in range(2, n + 1):\n    is_prime = True\n    # 判断 num 是否为素数\n    for i in range(2, num):\n        if num % i == 0:\n            is_prime = False\n            break\n    if is_prime:\n        print(num, end=\" \")\n```\n运行示例：\n请输入 n：20\n2 3 5 7 11 13 17 19",
+          solution: "**解：**\n```\nn = int(input(\"请输入 n：\"))\n# 穷举 2 到 n 的每个数\nfor num in range(2, n + 1):\nis_prime = True\n# 判断 num 是否为素数\nfor i in range(2, num):\nif num % i == 0:\nis_prime = False\nbreak\nif is_prime:\nprint(num, end=\" \")\n```\n运行示例：\n请输入 n：20\n2 3 5 7 11 13 17 19",
           answer: "外层穷举每个数，内层用 2 到 num-1 试除判断是否为素数。"
         }
       ]
@@ -146,7 +146,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "累乘器（求阶乘）的初始值应为（　）",
-          options: ["A. 0", "B. 1", "C. 2", "D. 任意值"],
+          options: ["0", "1", "2", "任意值"],
           correctIndex: 1,
           answer: "答案：B。累乘器初始化为 1，初始化为 0 结果永远是 0。"
         },
@@ -154,7 +154,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "数字 123 的个位数字是（　）",
-          options: ["A. 1", "B. 2", "C. 3", "D. 0"],
+          options: ["1", "2", "3", "0"],
           correctIndex: 2,
           answer: "答案：C。`123 % 10 = 3`，取余得到个位。"
         },
@@ -162,7 +162,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "数字 456 的十位数字是（　）",
-          options: ["A. 4", "B. 5", "C. 6", "D. 45"],
+          options: ["4", "5", "6", "45"],
           correctIndex: 1,
           answer: "答案：B。`456 // 10 % 10 = 45 % 10 = 5`。"
         },
@@ -183,7 +183,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nproduct = 1\nfor i in range(1, 5):\n    product *= i\nprint(product)\n```",
-          options: ["A. 10", "B. 24", "C. 120", "D. 12"],
+          options: ["10", "24", "120", "12"],
           correctIndex: 1,
           answer: "答案：B。1×2×3×4 = 24，即 4 的阶乘。"
         },
@@ -191,7 +191,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "判断 n 是否为素数，正确的循环范围是（　）",
-          options: ["A. `range(2, n)`", "B. `range(1, n)`", "C. `range(2, n + 1)`", "D. `range(0, n)`"],
+          options: ["`range(2, n)`", "`range(1, n)`", "`range(2, n + 1)`", "`range(0, n)`"],
           correctIndex: 0,
           answer: "答案：A。用 2 到 n-1 试除即可，`range(2, n)` 左闭右开正好是 2 到 n-1。"
         },
@@ -199,7 +199,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nnum = 789\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\nprint(bai + shi + ge)\n```",
-          options: ["A. 789", "B. 24", "C. 21", "D. 27"],
+          options: ["789", "24", "21", "27"],
           correctIndex: 1,
           answer: "答案：B。百位 7 + 十位 8 + 个位 9 = 24。"
         },
@@ -207,7 +207,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码中，能正确求出 1 到 10 中所有偶数的乘积的是（　）",
-          options: ["A. `p = 1` `for i in range(1, 11):` `if i % 2 == 0:` `p *= i`", "B. `p = 0` `for i in range(1, 11):` `if i % 2 == 0:` `p *= i`", "C. `p = 1` `for i in range(1, 11):` `p *= i`", "D. `p = 1` `for i in range(2, 11, 2):` `p += i`"],
+          options: ["`p = 1` `for i in range(1, 11):` `if i % 2 == 0:` `p *= i`", "`p = 0` `for i in range(1, 11):` `if i % 2 == 0:` `p *= i`", "`p = 1` `for i in range(1, 11):` `p *= i`", "`p = 1` `for i in range(2, 11, 2):` `p += i`"],
           correctIndex: 0,
           answer: "答案：A。累乘器初始化为 1，判断偶数后累乘；B 初始化为 0 结果恒为 0，C 乘了所有数，D 是累加不是累乘。"
         }

@@ -150,6 +150,25 @@ export function inspectItem(it) {
       if (o.some((x) => /以上(都|均)?(对|正确|是)|以上(都|均)?(不对|错)|以上都不是/.test(String(x)))) {
         soft.push(['B4', '含「以上都对/都不对」类选项（干扰项设计，请确认是否预期）', ''])
       }
+      // B8：选项文本自带字母前缀 → UI 的 `option-letter` 会再渲染一遍字母，屏上呈「A  A. xxx」。
+      //     2026-10-12 实测证实（798/931 题曾受影响），全库已剥离 3335 处，本规则用于**防复发**。
+      //     ⚠️ 只认「字母 == 序号对应字母」：`H.264` 这类字母≠序号的是**真实内容**（视频编码名），
+      //        不算前缀，否则会误报（剥离后全库仅剩这一处，已由自检守卫固定）。
+      const prefixed = o.reduce((acc, x, i) => {
+        const m = /^\s*([A-HＡ-Ｈ])\s*[.、．)）]/.exec(String(x))
+        if (!m) return acc
+        const code = m[1].charCodeAt(0)
+        const letter = code >= 0xff21 && code <= 0xff28 ? String.fromCharCode(code - 0xfee0) : m[1]
+        if (letter === letterOf(i)) acc.push(letterOf(i))
+        return acc
+      }, [])
+      if (prefixed.length) {
+        soft.push([
+          'B8',
+          `选项文本自带字母前缀 ${prefixed.length} 项（${prefixed.join('/')}）—— UI 会把字母渲染两遍，应剥掉内容里的前缀`,
+          ''
+        ])
+      }
     }
   }
 
@@ -252,6 +271,14 @@ function selftest() {
   const spacedOk = spaced.length === 0
   console.log(`  ${spacedOk ? '✓' : '✗'} 选项空格有义（\`3 4\`≠\`34\`）不误报重复`)
   if (!spacedOk) bad++
+  // B8 防复发：选项自带字母前缀必须报（全库 3335 处已剥离，靠这条守住存量清零）
+  const b8 = inspectItem({ ...base, o: ['A. 甲', 'B. 乙', 'C. 丙', 'D. 丁'] }).soft.some((s) => s[0] === 'B8')
+  console.log(`  ${b8 ? '✓' : '✗'} B8 能报「选项自带字母前缀」（防复发）`)
+  if (!b8) bad++
+  // B8 反向：字母≠序号的是真实内容（H.264 = 视频编码名），不得误报
+  const b8ok = !inspectItem({ ...base, o: ['H.264', 'MP4', 'AVI', 'MOV'] }).soft.some((s) => s[0] === 'B8')
+  console.log(`  ${b8ok ? '✓' : '✗'} B8 不误报「H.264」（字母≠序号 = 真实内容）`)
+  if (!b8ok) bad++
   // 已派生判分结构的条目（g/dv 为真）不得算硬缺陷（护住对"构建期派生"这一事实的误伤）
   const derivedOk = inspectItem({ ...base, it: '', g: true, dv: true, o: ['正确', '错误'], ci: 1 }).hard.length === 0
   console.log(`  ${derivedOk ? '✓' : '✗'} 已派生结构（g/dv 真）不计硬缺陷`)

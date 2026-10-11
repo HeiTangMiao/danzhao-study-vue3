@@ -27,7 +27,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\nd = {\"语文\": 90, \"数学\": 85}\nprint(d[\"数学\"])\n```",
-          options: ["A. 85", "B. 90", "C. 数学", "D. 程序报错"],
+          options: ["85", "90", "数学", "程序报错"],
           correctIndex: 0,
           answer: "答案：A。字典按「键」取值，`d[\"数学\"]` 取出对应的值 85。"
         },
@@ -36,7 +36,7 @@ export default {
           type: "single",
           score: 5,
           question: "向列表 `nums` 的末尾追加一个元素 7，应使用（　）",
-          options: ["A. `nums.add(7)`", "B. `nums.append(7)`", "C. `nums.push(7)`", "D. `nums.insert(7)`"],
+          options: ["`nums.add(7)`", "`nums.append(7)`", "`nums.push(7)`", "`nums.insert(7)`"],
           correctIndex: 1,
           answer: "答案：B。Python 列表用 `append()` 追加到末尾；`add` 是集合的方法，`push` 是其他语言的写法，`insert` 需指定插入位置。"
         },
@@ -45,7 +45,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行 `print(len(\"hello\"))` 的输出结果是（　）",
-          options: ["A. 4", "B. 5", "C. hello", "D. 程序报错"],
+          options: ["4", "5", "hello", "程序报错"],
           correctIndex: 1,
           answer: "答案：B。`len()` 返回序列长度，字符串 `\"hello\"` 共 5 个字符。"
         },
@@ -54,7 +54,7 @@ export default {
           type: "single",
           score: 5,
           question: "以「写入」方式打开文件（会清空原内容），open 函数的 mode 参数应填（　）",
-          options: ["A. `\"r\"`", "B. `\"w\"`", "C. `\"rb\"`", "D. `\"a+\"`"],
+          options: ["`\"r\"`", "`\"w\"`", "`\"rb\"`", "`\"a+\"`"],
           correctIndex: 1,
           answer: "答案：B。`\"w\"` 为写入模式（文件不存在则创建、存在则清空）；`\"r\"` 只读，`\"a\"` 追加不清空。"
         },
@@ -63,7 +63,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\ns = \"Python\"\nprint(s[0:2])\n```",
-          options: ["A. Py", "B. Pyt", "C. thon", "D. P"],
+          options: ["Py", "Pyt", "thon", "P"],
           correctIndex: 0,
           answer: "答案：A。切片 `[0:2]` 含头不含尾，取下标 0、1 两个字符，即 `Py`。"
         },
@@ -72,7 +72,7 @@ export default {
           type: "single",
           score: 5,
           question: "执行以下代码，输出结果是（　）\n```\nnums = [1, 2, 3, 4]\ntotal = 0\nfor n in nums:\n    total += n\nprint(total)\n```",
-          options: ["A. 4", "B. 10", "C. 1234", "D. 24"],
+          options: ["4", "10", "1234", "24"],
           correctIndex: 1,
           answer: "答案：B。依次累加 1+2+3+4=10；`for n in nums` 逐个取出列表元素。"
         },
@@ -133,7 +133,7 @@ export default {
           type: "single",
           score: 5,
           question: "IP 地址 192.168.1.100/26 对应的子网掩码是（　）",
-          options: ["A. 255.255.255.0", "B. 255.255.255.128", "C. 255.255.255.192", "D. 255.255.255.224"],
+          options: ["255.255.255.0", "255.255.255.128", "255.255.255.192", "255.255.255.224"],
           correctIndex: 2,
           answer: "答案：C。/26 表示网络位 26 位，掩码前 26 位为 1，即 255.255.255.192（最后一段 11000000 = 192）。"
         },
@@ -142,7 +142,7 @@ export default {
           type: "single",
           score: 5,
           question: "子网掩码 255.255.255.224 划分出的每个子网，可用主机地址数为（　）",
-          options: ["A. 30", "B. 32", "C. 62", "D. 16"],
+          options: ["30", "32", "62", "16"],
           correctIndex: 0,
           answer: "答案：A。224 = 11100000，主机位剩 5 位，2^5=32，减去网络地址与广播地址，可用主机 30 个。"
         },
@@ -151,7 +151,7 @@ export default {
           type: "single",
           score: 5,
           question: "关于交换机端口模式，下列说法正确的是（　）",
-          options: ["A. access 端口可承载多个 VLAN 的带标签数据", "B. trunk 端口多用于交换机之间，可承载多个 VLAN 的数据", "C. access 端口用于连接路由器以互连多个 VLAN", "D. trunk 端口只能属于一个 VLAN"],
+          options: ["access 端口可承载多个 VLAN 的带标签数据", "trunk 端口多用于交换机之间，可承载多个 VLAN 的数据", "access 端口用于连接路由器以互连多个 VLAN", "trunk 端口只能属于一个 VLAN"],
           correctIndex: 1,
           answer: "答案：B。access 端口只属于一个 VLAN，用于接终端设备；trunk 端口承载多个 VLAN 的带标签数据，多用于交换机之间级联。"
         },
@@ -160,7 +160,7 @@ export default {
           type: "single",
           score: 5,
           question: "配置到目标网络 192.168.3.0/24、下一跳为 192.168.2.2 的静态路由，正确命令是（　）",
-          options: ["A. `ip route 192.168.3.0 255.255.255.0 192.168.2.2`", "B. `ip route 192.168.2.2 255.255.255.0 192.168.3.0`", "C. `route add 192.168.3.0 192.168.2.2`", "D. `static route 192.168.3.0 192.168.2.2`"],
+          options: ["`ip route 192.168.3.0 255.255.255.0 192.168.2.2`", "`ip route 192.168.2.2 255.255.255.0 192.168.3.0`", "`route add 192.168.3.0 192.168.2.2`", "`static route 192.168.3.0 192.168.2.2`"],
           correctIndex: 0,
           answer: "答案：A。静态路由格式为 `ip route 目标网络 子网掩码 下一跳`：先写目标网络与掩码，再写下一跳地址。"
         },
@@ -169,7 +169,7 @@ export default {
           type: "single",
           score: 5,
           question: "下列 IP 地址中属于 A 类地址的是（　）",
-          options: ["A. 10.1.1.1", "B. 172.16.0.1", "C. 192.168.1.1", "D. 224.0.0.1"],
+          options: ["10.1.1.1", "172.16.0.1", "192.168.1.1", "224.0.0.1"],
           correctIndex: 0,
           answer: "答案：A。A 类首字节范围 1~126（10.x.x.x 属 A 类）；172.x 属 B 类，192.x 属 C 类，224.x 为组播地址。"
         },
@@ -178,7 +178,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 PacketTracer 中为路由器添加 WIC-1T 模块，正确的操作是（　）",
-          options: ["A. 直接把模块拖入扩展槽", "B. 先点击电源开关关闭路由器，拖入模块后再开机", "C. 重启 PacketTracer 软件后添加", "D. 在 CLI 中输入命令添加模块"],
+          options: ["直接把模块拖入扩展槽", "先点击电源开关关闭路由器，拖入模块后再开机", "重启 PacketTracer 软件后添加", "在 CLI 中输入命令添加模块"],
           correctIndex: 1,
           answer: "答案：B。PT 中增删硬件模块必须先给设备断电，拖入模块后再重新开机，否则无法添加。"
         },
@@ -239,7 +239,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 图层蒙版中，用黑色画笔涂抹的部分会（　）",
-          options: ["A. 完全显示", "B. 被隐藏", "C. 半透明显示", "D. 变为黑色"],
+          options: ["完全显示", "被隐藏", "半透明显示", "变为黑色"],
           correctIndex: 1,
           answer: "答案：B。蒙版中白色显示、黑色隐藏、灰色半透明，黑色涂抹处的图层内容被遮住。"
         },
@@ -248,7 +248,7 @@ export default {
           type: "single",
           score: 5,
           question: "想让上层图像与下层产生「正片叠底」式的变暗叠加效果，应设置图层的（　）",
-          options: ["A. 不透明度", "B. 混合模式", "C. 图层样式", "D. 填充"],
+          options: ["不透明度", "混合模式", "图层样式", "填充"],
           correctIndex: 1,
           answer: "答案：B。图层面板顶部的「混合模式」下拉框可设置正常、正片叠底、滤色、叠加等混合效果。"
         },
@@ -257,7 +257,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 时间线中用于切割片段的剃刀工具，其快捷键是（　）",
-          options: ["A. V（选择工具）", "B. C（剃刀工具）", "C. H（手形工具）", "D. Z（缩放工具）"],
+          options: ["V（选择工具）", "C（剃刀工具）", "H（手形工具）", "Z（缩放工具）"],
           correctIndex: 1,
           answer: "答案：B。剃刀工具快捷键为 C，用于切割、裁剪片段；选择工具为 V。"
         },
@@ -266,7 +266,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Premiere 导出视频时，设置目标码率（比特率）主要影响（　）",
-          options: ["A. 视频的时长", "B. 视频的画质与文件体积", "C. 音频的声道数", "D. 字幕的字体"],
+          options: ["视频的时长", "视频的画质与文件体积", "音频的声道数", "字幕的字体"],
           correctIndex: 1,
           answer: "答案：B。码率越高画质越好、文件体积越大，与时长、声道数、字幕无关。"
         },
@@ -275,7 +275,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中查看或单独编辑图像的 R、G、B 三个颜色分量，应打开（　）面板",
-          options: ["A. 图层", "B. 通道", "C. 路径", "D. 历史记录"],
+          options: ["图层", "通道", "路径", "历史记录"],
           correctIndex: 1,
           answer: "答案：B。「通道」面板显示复合通道与红、绿、蓝三个颜色通道，可单独查看与编辑。"
         },
@@ -284,7 +284,7 @@ export default {
           type: "single",
           score: 5,
           question: "在 Photoshop 中对整个图层做缩放、旋转等自由变换，正确的操作是（　）",
-          options: ["A. 用移动工具直接拖动", "B. 按 Ctrl+T 调出自由变换，拖动控制点后回车确认", "C. 按 Ctrl+J 复制图层", "D. 按 Ctrl+E 合并图层"],
+          options: ["用移动工具直接拖动", "按 Ctrl+T 调出自由变换，拖动控制点后回车确认", "按 Ctrl+J 复制图层", "按 Ctrl+E 合并图层"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+T 进入自由变换：拖角点缩放、移到角外可旋转，回车或双击确认；Ctrl+J 复制图层，Ctrl+E 向下合并。"
         },

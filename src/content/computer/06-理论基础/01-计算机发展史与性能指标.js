@@ -164,7 +164,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列属于计算机第四代核心器件的是（　）",
-          options: ["A. 电子管", "B. 晶体管", "C. 中小规模集成电路", "D. 大规模与超大规模集成电路"],
+          options: ["电子管", "晶体管", "中小规模集成电路", "大规模与超大规模集成电路"],
           correctIndex: 3,
           answer: "答案：D。第四代（1971 至今）以大规模与超大规模集成电路为标志，微处理器诞生并普及。"
         },
@@ -172,7 +172,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "某计算机字长为 64 位，这主要影响计算机的（　）",
-          options: ["A. 硬盘容量", "B. 运算精度与处理能力", "C. 显示器分辨率", "D. 键盘按键数量"],
+          options: ["硬盘容量", "运算精度与处理能力", "显示器分辨率", "键盘按键数量"],
           correctIndex: 1,
           answer: "答案：B。字长是一次能直接处理的二进制位数，字长越长，运算精度越高、处理能力越强。"
         },
@@ -180,7 +180,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在计算机的应用领域中，应用最广泛的是（　）",
-          options: ["A. 科学计算", "B. 数据处理", "C. 过程控制", "D. 人工智能"],
+          options: ["科学计算", "数据处理", "过程控制", "人工智能"],
           correctIndex: 1,
           answer: "答案：B。数据处理（信息处理）是计算机应用最广泛的领域，涉及办公、管理、金融等各个方面。"
         }
@@ -207,7 +207,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列指标中，用来衡量 CPU 时钟频率的是（　）",
-          options: ["A. 字长", "B. 主频", "C. 存储容量", "D. 存取周期"],
+          options: ["字长", "主频", "存储容量", "存取周期"],
           correctIndex: 1,
           answer: "答案：B。主频即 CPU 的时钟频率，单位常为 GHz；字长是位数，存储容量是存储空间，存取周期是存储器的读写时间。"
         },
@@ -215,7 +215,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "1 GB 的存储容量等于（　）",
-          options: ["A. 1000 MB", "B. 1024 MB", "C. 1024 KB", "D. 1000 KB"],
+          options: ["1000 MB", "1024 MB", "1024 KB", "1000 KB"],
           correctIndex: 1,
           answer: "答案：B。1 GB = 1024 MB，存储单位进率为 1024 而非 1000。"
         },
@@ -223,7 +223,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "某单位需要对大量人事档案、工资数据进行统计与管理，这主要属于计算机在（　）领域的应用",
-          options: ["A. 科学计算", "B. 数据处理", "C. 过程控制", "D. 计算机辅助设计"],
+          options: ["科学计算", "数据处理", "过程控制", "计算机辅助设计"],
           correctIndex: 1,
           answer: "答案：B。人事、工资等大量数据的统计与管理属于典型的数据处理应用。"
         },
@@ -232,10 +232,10 @@ export default {
           type: "single",
           question: "关于计算机发展四代的说法，正确的是（　）",
           options: [
-            "A. 第一代以晶体管为核心器件",
-            "B. 第二代以电子管为核心器件",
-            "C. 第三代以中小规模集成电路为核心器件",
-            "D. 第四代以继电器为核心器件"
+            "第一代以晶体管为核心器件",
+            "第二代以电子管为核心器件",
+            "第三代以中小规模集成电路为核心器件",
+            "第四代以继电器为核心器件"
           ],
           correctIndex: 2,
           answer: "答案：C。第三代（1965—1970）采用中小规模集成电路；第一代是电子管，第二代是晶体管，第四代是大规模/超大规模集成电路。"

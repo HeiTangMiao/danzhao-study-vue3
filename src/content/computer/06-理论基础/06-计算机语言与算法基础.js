@@ -189,7 +189,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列语言中，属于高级语言的是（　）",
-          options: ["A. 机器语言", "B. 汇编语言", "C. Python", "D. 二进制代码"],
+          options: ["机器语言", "汇编语言", "Python", "二进制代码"],
           correctIndex: 2,
           answer: "答案：C。Python 是高级语言；机器语言与二进制代码同类，汇编语言属低级语言。"
         },
@@ -198,10 +198,10 @@ export default {
           type: "single",
           question: "关于编译与解释，下列说法正确的是（　）",
           options: [
-            "A. 编译程序不生成目标文件",
-            "B. 解释程序生成目标文件后可独立运行",
-            "C. 编译是整体翻译，解释是逐条翻译并立即执行",
-            "D. Python 属于典型的编译型语言"
+            "编译程序不生成目标文件",
+            "解释程序生成目标文件后可独立运行",
+            "编译是整体翻译，解释是逐条翻译并立即执行",
+            "Python 属于典型的编译型语言"
           ],
           correctIndex: 2,
           answer: "答案：C。编译整体翻译并生成目标文件；解释逐条翻译执行、不生成目标文件。Python 属解释型。"
@@ -210,7 +210,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "流程图中用来表示条件判断的符号是（　）",
-          options: ["A. 圆角矩形", "B. 矩形", "C. 平行四边形", "D. 菱形"],
+          options: ["圆角矩形", "矩形", "平行四边形", "菱形"],
           correctIndex: 3,
           answer: "答案：D。判断框用菱形，有两个出口；圆角矩形是起止框，矩形是处理框，平行四边形是输入输出框。"
         }
@@ -238,10 +238,10 @@ export default {
           type: "single",
           question: "下列描述中，不满足算法\"确定性\"要求的是（　）",
           options: [
-            "A. 若 x > 0，则输出\"正数\"，否则输出\"非正数\"",
-            "B. 取一个适当大的数作为初始值",
-            "C. 令 s = s + i",
-            "D. 若 a 等于 b，则结束"
+            "若 x > 0，则输出\"正数\"，否则输出\"非正数\"",
+            "取一个适当大的数作为初始值",
+            "令 s = s + i",
+            "若 a 等于 b，则结束"
           ],
           correctIndex: 1,
           answer: "答案：B。\"适当大\"含义模糊，违反确定性；其余表述均明确无歧义。"
@@ -250,7 +250,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Python 中，`sorted()` 函数的作用是（　）",
-          options: ["A. 求绝对值", "B. 求最大值", "C. 排序", "D. 求长度"],
+          options: ["求绝对值", "求最大值", "排序", "求长度"],
           correctIndex: 2,
           answer: "答案：C。`sorted()` 用于排序；`abs()` 求绝对值，`max()` 求最大值，`len()` 求长度。"
         },
@@ -258,7 +258,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "某程序段反复判断条件并重复执行一段代码，直到条件不成立为止，这属于（　）",
-          options: ["A. 顺序结构", "B. 选择结构", "C. 循环结构", "D. 递归结构"],
+          options: ["顺序结构", "选择结构", "循环结构", "递归结构"],
           correctIndex: 2,
           answer: "答案：C。满足条件时重复执行、条件不成立即退出，这是典型的循环结构。"
         },
@@ -267,10 +267,10 @@ export default {
           type: "single",
           question: "关于三种基本结构的共同特征，正确的是（　）",
           options: [
-            "A. 每种结构都可以有多个入口",
-            "B. 每种结构都只有一个入口和一个出口",
-            "C. 循环结构没有出口",
-            "D. 选择结构不能嵌套"
+            "每种结构都可以有多个入口",
+            "每种结构都只有一个入口和一个出口",
+            "循环结构没有出口",
+            "选择结构不能嵌套"
           ],
           correctIndex: 1,
           answer: "答案：B。三种基本结构均为单入口单出口，这是结构化程序设计的重要特征。"

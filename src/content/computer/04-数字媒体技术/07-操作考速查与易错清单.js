@@ -133,7 +133,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 Photoshop 中制作「直排文字」，应选择的工具是（　）",
-          options: ["A. 横排文字工具", "B. 直排文字工具", "C. 段落文字工具", "D. 文字变形工具"],
+          options: ["横排文字工具", "直排文字工具", "段落文字工具", "文字变形工具"],
           correctIndex: 1,
           answer: "答案：B。直排文字竖向排列；若工具组里当前是横排，右键切换为「直排文字工具」。"
         },
@@ -141,7 +141,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Premiere 中为音频添加淡入效果，应使用的效果是（　）",
-          options: ["A. 颜色键", "B. 恒定增益", "C. 带状擦除", "D. 亮度调整"],
+          options: ["颜色键", "恒定增益", "带状擦除", "亮度调整"],
           correctIndex: 1,
           answer: "答案：B。恒定增益（音频过渡）拖到音频开头实现淡入、结尾实现淡出。"
         }

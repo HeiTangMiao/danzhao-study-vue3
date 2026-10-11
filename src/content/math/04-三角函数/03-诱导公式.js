@@ -100,31 +100,31 @@ export default {
         {
           title: "例题1：化简",
           question: "化简：\\(\\sin\\left(\\frac{3\\pi}{2} - \\alpha\\right) + \\cos(\\pi + \\alpha)\\)",
-          solution: "解：\n\n        \\(\\frac{3\\pi}{2} = 3 \\times \\frac{\\pi}{2}\\)，\\(k=3\\) 为奇数，函数名改变。\n\n        将 \\(\\alpha\\) 视为锐角，\\(\\frac{3\\pi}{2} - \\alpha\\) 在第三象限，\\(\\sin\\) 在第三象限为负。\n\n        所以 \\(\\sin\\left(\\frac{3\\pi}{2} - \\alpha\\right) = -\\cos\\alpha\\)\n\n        \\(\\pi + \\alpha\\)：\\(k=2\\) 为偶数，函数名不变，\\(\\pi + \\alpha\\) 在第三象限，\\(\\cos\\) 为负。\n\n        所以 \\(\\cos(\\pi + \\alpha) = -\\cos\\alpha\\)\n\n        原式 \\(= -\\cos\\alpha + (-\\cos\\alpha) = -2\\cos\\alpha\\)",
+          solution: "解：\n\n\\(\\frac{3\\pi}{2} = 3 \\times \\frac{\\pi}{2}\\)，\\(k=3\\) 为奇数，函数名改变。\n\n将 \\(\\alpha\\) 视为锐角，\\(\\frac{3\\pi}{2} - \\alpha\\) 在第三象限，\\(\\sin\\) 在第三象限为负。\n\n所以 \\(\\sin\\left(\\frac{3\\pi}{2} - \\alpha\\right) = -\\cos\\alpha\\)\n\n\\(\\pi + \\alpha\\)：\\(k=2\\) 为偶数，函数名不变，\\(\\pi + \\alpha\\) 在第三象限，\\(\\cos\\) 为负。\n\n所以 \\(\\cos(\\pi + \\alpha) = -\\cos\\alpha\\)\n\n原式 \\(= -\\cos\\alpha + (-\\cos\\alpha) = -2\\cos\\alpha\\)",
           answer: "原式 \\(= -2\\cos\\alpha\\)"
         },
         {
           title: "例题2：求值",
           question: "求值：\\(\\sin\\frac{8\\pi}{3} \\cdot \\cos\\frac{25\\pi}{6}\\)",
-          solution: "解：\n\n        \\(\\sin\\frac{8\\pi}{3} = \\sin\\left(2\\pi + \\frac{2\\pi}{3}\\right) = \\sin\\frac{2\\pi}{3} = \\sin\\left(\\pi - \\frac{\\pi}{3}\\right) = \\sin\\frac{\\pi}{3} = \\frac{\\sqrt{3}}{2}\\)\n\n        \\(\\cos\\frac{25\\pi}{6} = \\cos\\left(4\\pi + \\frac{\\pi}{6}\\right) = \\cos\\frac{\\pi}{6} = \\frac{\\sqrt{3}}{2}\\)\n\n        原式 \\(= \\frac{\\sqrt{3}}{2} \\times \\frac{\\sqrt{3}}{2} = \\frac{3}{4}\\)",
+          solution: "解：\n\n\\(\\sin\\frac{8\\pi}{3} = \\sin\\left(2\\pi + \\frac{2\\pi}{3}\\right) = \\sin\\frac{2\\pi}{3} = \\sin\\left(\\pi - \\frac{\\pi}{3}\\right) = \\sin\\frac{\\pi}{3} = \\frac{\\sqrt{3}}{2}\\)\n\n\\(\\cos\\frac{25\\pi}{6} = \\cos\\left(4\\pi + \\frac{\\pi}{6}\\right) = \\cos\\frac{\\pi}{6} = \\frac{\\sqrt{3}}{2}\\)\n\n原式 \\(= \\frac{\\sqrt{3}}{2} \\times \\frac{\\sqrt{3}}{2} = \\frac{3}{4}\\)",
           answer: "原式 \\(= \\frac{3}{4}\\)"
         },
         {
           title: "例题3：证明",
           question: "求证：\\(\\frac{\\sin(\\pi - \\alpha)\\cos(-\\alpha)}{\\tan(\\pi + \\alpha)} = \\cos^2\\alpha\\)",
-          solution: "证明：\n\n        左边 \\(= \\frac{\\sin\\alpha \\cdot \\cos\\alpha}{\\tan\\alpha}\\)\n\n        \\(= \\frac{\\sin\\alpha \\cdot \\cos\\alpha}{\\frac{\\sin\\alpha}{\\cos\\alpha}}\\)\n\n        \\(= \\sin\\alpha \\cdot \\cos\\alpha \\cdot \\frac{\\cos\\alpha}{\\sin\\alpha}\\)\n\n        \\(= \\cos^2\\alpha =\\) 右边\n\n        所以等式成立。",
+          solution: "证明：\n\n左边 \\(= \\frac{\\sin\\alpha \\cdot \\cos\\alpha}{\\tan\\alpha}\\)\n\n\\(= \\frac{\\sin\\alpha \\cdot \\cos\\alpha}{\\frac{\\sin\\alpha}{\\cos\\alpha}}\\)\n\n\\(= \\sin\\alpha \\cdot \\cos\\alpha \\cdot \\frac{\\cos\\alpha}{\\sin\\alpha}\\)\n\n\\(= \\cos^2\\alpha =\\) 右边\n\n所以等式成立。",
           answer: "是（左边化简得 \\(\\cos^2\\alpha\\)，与右边相等，得证）"
         },
         {
           title: "例题4：公式推导",
           question: "利用已学诱导公式，推导 \\(\\sin\\left(\\frac{3\\pi}{2} + \\alpha\\right)\\) 的表达式。",
-          solution: "推导：\n\n        将 \\(\\frac{3\\pi}{2} + \\alpha\\) 拆分为 \\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\)，分两步使用诱导公式。\n\n        第一步：对 \\(\\frac{\\pi}{2} + \\alpha\\) 使用公式六（函数名改变）。\n\n        将 \\(\\alpha\\) 视为锐角，\\(\\frac{\\pi}{2} + \\alpha\\) 在第二象限，\\(\\sin\\) 为正，故 \\(\\sin\\left(\\frac{\\pi}{2} + \\alpha\\right) = \\cos\\alpha\\)。\n\n        第二步：对 \\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\) 使用公式二（函数名不变）。\n\n        \\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right) = \\frac{3\\pi}{2} + \\alpha\\) 在第四象限，\\(\\sin\\) 为负，故：\n\n        \\(\\sin\\left(\\frac{3\\pi}{2} + \\alpha\\right) = \\sin\\left[\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\right] = -\\sin\\left(\\frac{\\pi}{2} + \\alpha\\right) = -\\cos\\alpha\\)\n\n        亦可直接用口诀验证：\\(\\frac{3\\pi}{2} + \\alpha = 3 \\times \\frac{\\pi}{2} + \\alpha\\)，\\(k = 3\\) 为奇数，函数名改变（正弦变余弦）；\\(\\frac{3\\pi}{2} + \\alpha\\) 在第四象限，\\(\\sin\\) 为负，所以结果为 \\(-\\cos\\alpha\\)，两种方法一致。",
+          solution: "推导：\n\n将 \\(\\frac{3\\pi}{2} + \\alpha\\) 拆分为 \\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\)，分两步使用诱导公式。\n\n第一步：对 \\(\\frac{\\pi}{2} + \\alpha\\) 使用公式六（函数名改变）。\n\n将 \\(\\alpha\\) 视为锐角，\\(\\frac{\\pi}{2} + \\alpha\\) 在第二象限，\\(\\sin\\) 为正，故 \\(\\sin\\left(\\frac{\\pi}{2} + \\alpha\\right) = \\cos\\alpha\\)。\n\n第二步：对 \\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\) 使用公式二（函数名不变）。\n\n\\(\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right) = \\frac{3\\pi}{2} + \\alpha\\) 在第四象限，\\(\\sin\\) 为负，故：\n\n\\(\\sin\\left(\\frac{3\\pi}{2} + \\alpha\\right) = \\sin\\left[\\pi + \\left(\\frac{\\pi}{2} + \\alpha\\right)\\right] = -\\sin\\left(\\frac{\\pi}{2} + \\alpha\\right) = -\\cos\\alpha\\)\n\n亦可直接用口诀验证：\\(\\frac{3\\pi}{2} + \\alpha = 3 \\times \\frac{\\pi}{2} + \\alpha\\)，\\(k = 3\\) 为奇数，函数名改变（正弦变余弦）；\\(\\frac{3\\pi}{2} + \\alpha\\) 在第四象限，\\(\\sin\\) 为负，所以结果为 \\(-\\cos\\alpha\\)，两种方法一致。",
           answer: "\\(\\sin\\left(\\frac{3\\pi}{2} + \\alpha\\right) = -\\cos\\alpha\\)"
         },
         {
           title: "例题5：易错辨析",
           question: "化简：\\(\\sin(\\pi - \\alpha) + \\cos(\\pi + \\alpha)\\)",
-          solution: "常见错误解法：\n\n        误认为 \\(\\pi - \\alpha\\) 与 \\(\\pi + \\alpha\\) 都是\"加 \\(\\pi\\)\"型，统一变号：\n\n        错误地写 \\(\\sin(\\pi - \\alpha) = -\\sin\\alpha\\)，\\(\\cos(\\pi + \\alpha) = \\cos\\alpha\\)，\n\n        得原式 \\(= -\\sin\\alpha + \\cos\\alpha\\)（错误！）。\n\n        错误原因：混淆了 \\(\\pi - \\alpha\\) 与 \\(\\pi + \\alpha\\)。两者虽都属\"函数名不变\"型，但所在象限不同，符号不同。\\(\\pi - \\alpha\\) 在第二象限，\\(\\sin\\) 为正；\\(\\pi + \\alpha\\) 在第三象限，\\(\\cos\\) 为负。\n\n        正确解法：\n\n        \\(\\sin(\\pi - \\alpha) = \\sin\\alpha\\)（第二象限，\\(\\sin\\) 为正）\n\n        \\(\\cos(\\pi + \\alpha) = -\\cos\\alpha\\)（第三象限，\\(\\cos\\) 为负）\n\n        原式 \\(= \\sin\\alpha + (-\\cos\\alpha) = \\sin\\alpha - \\cos\\alpha\\)",
+          solution: "常见错误解法：\n\n误认为 \\(\\pi - \\alpha\\) 与 \\(\\pi + \\alpha\\) 都是\"加 \\(\\pi\\)\"型，统一变号：\n\n错误地写 \\(\\sin(\\pi - \\alpha) = -\\sin\\alpha\\)，\\(\\cos(\\pi + \\alpha) = \\cos\\alpha\\)，\n\n得原式 \\(= -\\sin\\alpha + \\cos\\alpha\\)（错误！）。\n\n错误原因：混淆了 \\(\\pi - \\alpha\\) 与 \\(\\pi + \\alpha\\)。两者虽都属\"函数名不变\"型，但所在象限不同，符号不同。\\(\\pi - \\alpha\\) 在第二象限，\\(\\sin\\) 为正；\\(\\pi + \\alpha\\) 在第三象限，\\(\\cos\\) 为负。\n\n正确解法：\n\n\\(\\sin(\\pi - \\alpha) = \\sin\\alpha\\)（第二象限，\\(\\sin\\) 为正）\n\n\\(\\cos(\\pi + \\alpha) = -\\cos\\alpha\\)（第三象限，\\(\\cos\\) 为负）\n\n原式 \\(= \\sin\\alpha + (-\\cos\\alpha) = \\sin\\alpha - \\cos\\alpha\\)",
           answer: "原式 \\(= \\sin\\alpha - \\cos\\alpha\\)"
         }
       ]
@@ -183,7 +183,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\(\\sin 210° = \\)（　）",
-          options: ["A. \\(\\dfrac{1}{2}\\)", "B. \\(-\\dfrac{1}{2}\\)", "C. \\(\\dfrac{\\sqrt{3}}{2}\\)", "D. \\(-\\dfrac{\\sqrt{3}}{2}\\)"],
+          options: ["\\(\\dfrac{1}{2}\\)", "\\(-\\dfrac{1}{2}\\)", "\\(\\dfrac{\\sqrt{3}}{2}\\)", "\\(-\\dfrac{\\sqrt{3}}{2}\\)"],
           correctIndex: 1,
           answer: "答案：B。\\(\\sin 210° = \\sin(180° + 30°) = -\\sin 30° = -\\dfrac{1}{2}\\)。"
         }
@@ -210,7 +210,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\(\\sin 210^\\circ\\) 的值等于（　）",
-          options: ["A. \\(\\frac{1}{2}\\)", "B. \\(-\\frac{1}{2}\\)", "C. \\(\\frac{\\sqrt{3}}{2}\\)", "D. \\(-\\frac{\\sqrt{3}}{2}\\)"],
+          options: ["\\(\\frac{1}{2}\\)", "\\(-\\frac{1}{2}\\)", "\\(\\frac{\\sqrt{3}}{2}\\)", "\\(-\\frac{\\sqrt{3}}{2}\\)"],
           correctIndex: 1,
           answer: "**B**。\\(\\sin 210^\\circ = \\sin(180^\\circ + 30^\\circ) = -\\sin 30^\\circ = -\\frac{1}{2}\\)。"
         }

@@ -87,7 +87,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "Photoshop 中新建图层的快捷键是（　）",
-          options: ["A. Ctrl+N", "B. Ctrl+Shift+N", "C. Ctrl+J", "D. Ctrl+T"],
+          options: ["Ctrl+N", "Ctrl+Shift+N", "Ctrl+J", "Ctrl+T"],
           correctIndex: 1,
           answer: "答案：B。Ctrl+Shift+N 新建图层。"
         },
@@ -95,7 +95,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 Photoshop 中要将当前选区反选，应执行（　）",
-          options: ["A. 选择 → 全选", "B. 选择 → 反选", "C. 选择 → 取消选择", "D. 选择 → 修改 → 羽化"],
+          options: ["选择 → 全选", "选择 → 反选", "选择 → 取消选择", "选择 → 修改 → 羽化"],
           correctIndex: 1,
           answer: "答案：B。「选择 → 反选」（Ctrl+Shift+I）用于选中原选区之外的部分。"
         },
@@ -103,7 +103,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Photoshop 中，撤销上一步操作的快捷键是（　）",
-          options: ["A. Ctrl+Z", "B. Ctrl+Y", "C. Ctrl+X", "D. Ctrl+D"],
+          options: ["Ctrl+Z", "Ctrl+Y", "Ctrl+X", "Ctrl+D"],
           correctIndex: 0,
           answer: "答案：A。Ctrl+Z 撤销上一步（连续按可多步撤销）；Ctrl+X 是剪切，Ctrl+D 是取消选区。"
         },
@@ -111,7 +111,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "要让文字以选区形式出现（而非新建文字图层），应使用（　）",
-          options: ["A. 横排文字工具", "B. 文字蒙版工具", "C. 直排文字工具", "D. 油漆桶工具"],
+          options: ["横排文字工具", "文字蒙版工具", "直排文字工具", "油漆桶工具"],
           correctIndex: 1,
           answer: "答案：B。文字蒙版工具输入的文字直接成为选区，可用于填充或剪裁。"
         },
@@ -119,7 +119,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Photoshop 中「通过拷贝的图层」的快捷键是（　）",
-          options: ["A. Ctrl+J", "B. Ctrl+E", "C. Ctrl+D", "D. Ctrl+T"],
+          options: ["Ctrl+J", "Ctrl+E", "Ctrl+D", "Ctrl+T"],
           correctIndex: 0,
           answer: "答案：A。Ctrl+J 复制当前图层；Ctrl+E 向下合并；Ctrl+D 取消选择；Ctrl+T 自由变换。"
         },
@@ -127,7 +127,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 Premiere 中，要将播放头快速移到序列的起始位置，应按（　）",
-          options: ["A. Home", "B. End", "C. Page Down", "D. 空格键"],
+          options: ["Home", "End", "Page Down", "空格键"],
           correctIndex: 0,
           answer: "答案：A。Home 键跳到序列开头，End 键跳到序列末尾，空格键用于播放/暂停预览。"
         },
@@ -135,7 +135,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "在效果控件中开启属性动画，应点击（　）",
-          options: ["A. 秒表图标", "B. 眼睛图标", "C. 锁图标", "D. 垃圾桶"],
+          options: ["秒表图标", "眼睛图标", "锁图标", "垃圾桶"],
           correctIndex: 0,
           answer: "答案：A。点击属性名称左侧的秒表图标即可开启关键帧，之后在不同时间点修改该属性值就能生成动画。眼睛图标控制显示/隐藏，锁图标用于锁定轨道，垃圾桶是删除，都与动画无关。"
         },
@@ -143,7 +143,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "要让两个相邻视频片段之间平滑过渡，应添加（　）",
-          options: ["A. 视频过渡（如交叉溶解）", "B. 视频效果（如颜色键）", "C. 音频过渡", "D. 字幕"],
+          options: ["视频过渡（如交叉溶解）", "视频效果（如颜色键）", "音频过渡", "字幕"],
           correctIndex: 0,
           answer: "答案：A。片段之间的切换用视频过渡；颜色键属于抠像效果，不改变片段衔接。"
         },
@@ -151,7 +151,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列属于 Premiere「视频效果」（而非转场）的是（　）",
-          options: ["A. 交叉溶解", "B. 带状擦除", "C. 颜色键", "D. 黑场过渡"],
+          options: ["交叉溶解", "带状擦除", "颜色键", "黑场过渡"],
           correctIndex: 2,
           answer: "答案：C。颜色键是抠像类的视频效果；交叉溶解、带状擦除、黑场过渡都是转场。"
         },
@@ -159,7 +159,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "在 Premiere 中整体调整片段音量（如统一降低 6 dB），应使用（　）",
-          options: ["A. 音频增益", "B. 恒定增益", "C. 交叉溶解", "D. 降噪"],
+          options: ["音频增益", "恒定增益", "交叉溶解", "降噪"],
           correctIndex: 0,
           answer: "答案：A。音频增益用于整体加减分贝；恒定增益是音频过渡，用于淡入淡出。"
         }
@@ -220,7 +220,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列不属于数字媒体的是（　）",
-          options: ["A. 数字照片", "B. 纸质书籍", "C. 数字视频", "D. 数字音频"],
+          options: ["数字照片", "纸质书籍", "数字视频", "数字音频"],
           correctIndex: 1,
           answer: "答案：B。纸质书籍以纸张为载体，不是数字（二进制）形式；其余三项都是典型数字媒体。"
         },
@@ -228,7 +228,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "视频每秒播放的画面张数称为（　）",
-          options: ["A. 分辨率", "B. 帧率", "C. 码率", "D. 采样率"],
+          options: ["分辨率", "帧率", "码率", "采样率"],
           correctIndex: 1,
           answer: "答案：B。帧率（fps）是每秒播放的帧数；采样率是音频参数，分辨率指画面尺寸。"
         },
@@ -237,10 +237,10 @@ export default {
           type: "single",
           question: "关于数字媒体作品的创作流程，正确的顺序是（　）",
           options: [
-            "A. 素材准备 → 需求分析 → 制作合成 → 设计构思 → 测试输出",
-            "B. 需求分析 → 设计构思 → 素材准备 → 制作合成 → 测试输出",
-            "C. 设计构思 → 需求分析 → 制作合成 → 素材准备 → 测试输出",
-            "D. 需求分析 → 制作合成 → 设计构思 → 素材准备 → 测试输出"
+            "素材准备 → 需求分析 → 制作合成 → 设计构思 → 测试输出",
+            "需求分析 → 设计构思 → 素材准备 → 制作合成 → 测试输出",
+            "设计构思 → 需求分析 → 制作合成 → 素材准备 → 测试输出",
+            "需求分析 → 制作合成 → 设计构思 → 素材准备 → 测试输出"
           ],
           correctIndex: 1,
           answer: "答案：B。先需求分析、再设计构思、然后备素材、制作合成，最后测试输出。"

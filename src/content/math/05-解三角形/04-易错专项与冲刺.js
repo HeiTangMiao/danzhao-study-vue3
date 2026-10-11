@@ -50,10 +50,10 @@ export default {
         },
         {
           type: "single", difficulty: "sprint",
-          question: "在 \\(\\triangle ABC\\) 中，\\(a = 2\\)，\\(b = 3\\)，\\(c = 4\\)，则最大角的余弦值为（　）",
-          options: ["\\(\\frac{1}{4}\\)", "\\(-\\frac{1}{4}\\)", "\\(\\frac{3}{4}\\)", "\\(-\\frac{3}{4}\\)"],
-          correctIndex: 1,
-          answer: "**B**。最大边为 \\(c = 4\\)，故最大角为 \\(C\\)。由余弦定理：\\(\\cos C = \\frac{a^2 + b^2 - c^2}{2ab} = \\frac{4 + 9 - 16}{2 \\times 2 \\times 3} = \\frac{-3}{12} = -\\frac{1}{4}\\)。余弦值为负，说明角 \\(C\\) 为钝角，三角形为钝角三角形。"
+          question: "在 \\(\\triangle ABC\\) 中，\\(a = 5\\)，\\(b = 6\\)，\\(c = 7\\)，则最大角的余弦值为（　）",
+          options: ["\\(\\frac{1}{5}\\)", "\\(-\\frac{1}{5}\\)", "\\(\\frac{19}{35}\\)", "\\(\\frac{1}{7}\\)"],
+          correctIndex: 0,
+          answer: "**A**。最大边为 \\(c = 7\\)，故最大角为 \\(C\\)。由余弦定理：\\(\\cos C = \\frac{a^2 + b^2 - c^2}{2ab} = \\frac{25 + 36 - 49}{2 \\times 5 \\times 6} = \\frac{12}{60} = \\frac{1}{5}\\)。易错点：最大角对最大边，别把 \\(a\\)、\\(b\\) 当最大边代入（那样会得到 \\(\\frac{19}{35}\\)）。"
         },
         {
           type: "single", difficulty: "sprint",

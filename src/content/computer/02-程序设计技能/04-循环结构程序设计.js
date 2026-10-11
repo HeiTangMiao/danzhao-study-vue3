@@ -113,21 +113,21 @@ export default {
           title: "例题1：累加求和（考试样题三）",
           difficulty: "basic",
           question: "请计算 1 到 100 的所有整数之和，并输出结果。要求：代码有注释，保存到\"考生文件夹\\程序设计\\试题三\"。",
-          solution: "**解：**\n```\n# 试题三：计算 1 到 100 的和\n# 初始化累加器\nsum = 0\n# 循环 1 到 100\nfor i in range(1, 101):\n    sum += i   # 累加\n# 输出结果\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
+          solution: "**解：**\n```\n# 试题三：计算 1 到 100 的和\n# 初始化累加器\nsum = 0\n# 循环 1 到 100\nfor i in range(1, 101):\nsum += i   # 累加\n# 输出结果\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
           answer: "`sum = 0` 初始化，`for i in range(1, 101)` 循环，`sum += i` 累加，输出 5050。"
         },
         {
           title: "例题2：while 循环累加",
           difficulty: "medium",
           question: "用 while 循环计算 1 到 100 的所有整数之和。",
-          solution: "**解：**\n```\n# 用 while 计算 1 到 100 的和\nsum = 0\ni = 1\nwhile i <= 100:\n    sum += i\n    i += 1   # 计数器自增\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
+          solution: "**解：**\n```\n# 用 while 计算 1 到 100 的和\nsum = 0\ni = 1\nwhile i <= 100:\nsum += i\ni += 1   # 计数器自增\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
           answer: "计数器 i 从 1 开始，`while i <= 100` 循环累加，循环内 `i += 1` 防止死循环。"
         },
         {
           title: "例题3：求 1~100 中偶数的和",
           difficulty: "advanced",
           question: "计算 1 到 100 中所有偶数的和，并输出结果。",
-          solution: "**解：**\n方法一（步长法）：\n```\nsum = 0\nfor i in range(2, 101, 2):\n    sum += i\nprint(\"偶数和是：\", sum)\n```\n方法二（判断法）：\n```\nsum = 0\nfor i in range(1, 101):\n    if i % 2 == 0:\n        sum += i\nprint(\"偶数和是：\", sum)\n```\n运行结果：\n偶数和是： 2550",
+          solution: "**解：**\n方法一（步长法）：\n```\nsum = 0\nfor i in range(2, 101, 2):\nsum += i\nprint(\"偶数和是：\", sum)\n```\n方法二（判断法）：\n```\nsum = 0\nfor i in range(1, 101):\nif i % 2 == 0:\nsum += i\nprint(\"偶数和是：\", sum)\n```\n运行结果：\n偶数和是： 2550",
           answer: "方法一用 `range(2, 101, 2)` 直接取偶数；方法二用 `i % 2 == 0` 判断后累加。"
         }
       ]
@@ -141,7 +141,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "`range(1, 5)` 生成的序列是（　）",
-          options: ["A. 1, 2, 3, 4, 5", "B. 1, 2, 3, 4", "C. 0, 1, 2, 3, 4", "D. 0, 1, 2, 3, 4, 5"],
+          options: ["1, 2, 3, 4, 5", "1, 2, 3, 4", "0, 1, 2, 3, 4", "0, 1, 2, 3, 4, 5"],
           correctIndex: 1,
           answer: "答案：B。range 左闭右开，`range(1, 5)` 包含 1 不包含 5。"
         },
@@ -149,7 +149,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "执行以下代码，循环体执行次数是（　）\n```\nfor i in range(1, 101):\n    print(i)\n```",
-          options: ["A. 99", "B. 100", "C. 101", "D. 0"],
+          options: ["99", "100", "101", "0"],
           correctIndex: 1,
           answer: "答案：B。range(1, 101) 生成 1 到 100 共 100 个数。"
         },
@@ -157,7 +157,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nsum = 0\nfor i in range(1, 5):\n    sum += i\nprint(sum)\n```",
-          options: ["A. 10", "B. 15", "C. 9", "D. 14"],
+          options: ["10", "15", "9", "14"],
           correctIndex: 0,
           answer: "答案：A。累加 1+2+3+4 = 10。"
         },
@@ -165,7 +165,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 while 循环中，防止死循环的关键是（　）",
-          options: ["A. 循环体尽量短", "B. 循环内有改变条件的语句", "C. 使用 for 循环", "D. 添加注释"],
+          options: ["循环体尽量短", "循环内有改变条件的语句", "使用 for 循环", "添加注释"],
           correctIndex: 1,
           answer: "答案：B。循环内必须有改变条件（如计数器自增）的语句，否则条件永远成立形成死循环。"
         }
@@ -180,7 +180,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列代码中，能正确输出 1 到 10 的是（　）",
-          options: ["A. `for i in range(1, 10):` `print(i)`", "B. `for i in range(1, 11):` `print(i)`", "C. `for i in range(0, 10):` `print(i)`", "D. `for i in range(10):` `print(i)`"],
+          options: ["`for i in range(1, 10):` `print(i)`", "`for i in range(1, 11):` `print(i)`", "`for i in range(0, 10):` `print(i)`", "`for i in range(10):` `print(i)`"],
           correctIndex: 1,
           answer: "答案：B。range(1, 11) 生成 1 到 10。"
         },
@@ -188,7 +188,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i == 3:\n        break\n    print(i)\n```",
-          options: ["A. 1 2 3", "B. 1 2", "C. 1 2 3 4 5", "D. 1 2 4 5"],
+          options: ["1 2 3", "1 2", "1 2 3 4 5", "1 2 4 5"],
           correctIndex: 1,
           answer: "答案：B。i 等于 3 时 break 跳出循环，只输出 1 和 2。"
         },
@@ -196,7 +196,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "执行以下代码，输出结果是（　）\n```\nfor i in range(1, 6):\n    if i == 3:\n        continue\n    print(i)\n```",
-          options: ["A. 1 2 3 4 5", "B. 1 2 4 5", "C. 1 2", "D. 1 2 3"],
+          options: ["1 2 3 4 5", "1 2 4 5", "1 2", "1 2 3"],
           correctIndex: 1,
           answer: "答案：B。i 等于 3 时 continue 跳过本次，不输出 3，其余照常输出。"
         },
@@ -204,7 +204,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "计算 1 到 100 中所有奇数的和，正确的代码是（　）",
-          options: ["A. `sum = 0` `for i in range(1, 101):` `sum += i`", "B. `sum = 0` `for i in range(1, 101):` `if i % 2 == 1:` `sum += i`", "C. `sum = 0` `for i in range(1, 101, 2):` `sum += i`", "D. B 和 C 都对"],
+          options: ["`sum = 0` `for i in range(1, 101):` `sum += i`", "`sum = 0` `for i in range(1, 101):` `if i % 2 == 1:` `sum += i`", "`sum = 0` `for i in range(1, 101, 2):` `sum += i`", "B 和 C 都对"],
           correctIndex: 3,
           answer: "答案：D。B 用 `i % 2 == 1` 判断奇数累加；C 用 `range(1, 101, 2)` 步长 2 直接取奇数，两种方法都正确。"
         }

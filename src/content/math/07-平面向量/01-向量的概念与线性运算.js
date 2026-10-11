@@ -125,13 +125,13 @@ export default {
         {
           title: "例题1：向量运算",
           question: "化简以下向量表达式：\\(\\overrightarrow{AB} - \\overrightarrow{AC} + \\overrightarrow{BD} - \\overrightarrow{CD}\\)",
-          solution: "解：\n\n        \\(\\overrightarrow{AB} - \\overrightarrow{AC} + \\overrightarrow{BD} - \\overrightarrow{CD}\\)\n\n        \\(= (\\overrightarrow{AB} + \\overrightarrow{BD}) - (\\overrightarrow{AC} + \\overrightarrow{CD})\\)\n\n        \\(= \\overrightarrow{AD} - \\overrightarrow{AD}\\)\n\n        \\(= \\boldsymbol{0}\\)",
+          solution: "解：\n\n\\(\\overrightarrow{AB} - \\overrightarrow{AC} + \\overrightarrow{BD} - \\overrightarrow{CD}\\)\n\n\\(= (\\overrightarrow{AB} + \\overrightarrow{BD}) - (\\overrightarrow{AC} + \\overrightarrow{CD})\\)\n\n\\(= \\overrightarrow{AD} - \\overrightarrow{AD}\\)\n\n\\(= \\boldsymbol{0}\\)",
           answer: "\\(\\boldsymbol{0}\\)（零向量）"
         },
         {
           title: "例题2：化简",
           question: "已知 \\(\\boldsymbol{a}\\)、\\(\\boldsymbol{b}\\) 为向量，化简：\\(3(\\boldsymbol{a} - 2\\boldsymbol{b}) - 2(2\\boldsymbol{a} + \\boldsymbol{b})\\)",
-          solution: "解：\n\n        \\(3(\\boldsymbol{a} - 2\\boldsymbol{b}) - 2(2\\boldsymbol{a} + \\boldsymbol{b})\\)\n\n        \\(= 3\\boldsymbol{a} - 6\\boldsymbol{b} - 4\\boldsymbol{a} - 2\\boldsymbol{b}\\)\n\n        \\(= (3 - 4)\\boldsymbol{a} + (-6 - 2)\\boldsymbol{b}\\)\n\n        \\(= -\\boldsymbol{a} - 8\\boldsymbol{b}\\)",
+          solution: "解：\n\n\\(3(\\boldsymbol{a} - 2\\boldsymbol{b}) - 2(2\\boldsymbol{a} + \\boldsymbol{b})\\)\n\n\\(= 3\\boldsymbol{a} - 6\\boldsymbol{b} - 4\\boldsymbol{a} - 2\\boldsymbol{b}\\)\n\n\\(= (3 - 4)\\boldsymbol{a} + (-6 - 2)\\boldsymbol{b}\\)\n\n\\(= -\\boldsymbol{a} - 8\\boldsymbol{b}\\)",
           answer: "\\(-\\boldsymbol{a} - 8\\boldsymbol{b}\\)"
         }
       ]
@@ -185,7 +185,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "\\(\\overrightarrow{AB} + \\overrightarrow{BC} = \\)（　）",
-          options: ["A. \\(\\overrightarrow{AC}\\)", "B. \\(\\overrightarrow{CA}\\)", "C. \\(\\overrightarrow{BA}\\)", "D. \\(\\overrightarrow{CB}\\)"],
+          options: ["\\(\\overrightarrow{AC}\\)", "\\(\\overrightarrow{CA}\\)", "\\(\\overrightarrow{BA}\\)", "\\(\\overrightarrow{CB}\\)"],
           correctIndex: 0,
           answer: "答案：A。三角形法则：首尾相接的向量和等于从起点指向终点的向量。"
         }
@@ -212,7 +212,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "化简 \\(\\vec{AB} + \\vec{BC} - \\vec{AC}\\) 的结果是（　）",
-          options: ["A. \\(\\vec{0}\\)", "B. \\(\\vec{AC}\\)", "C. \\(2\\vec{AC}\\)", "D. \\(\\vec{CA}\\)"],
+          options: ["\\(\\vec{0}\\)", "\\(\\vec{AC}\\)", "\\(2\\vec{AC}\\)", "\\(\\vec{CA}\\)"],
           correctIndex: 0,
           answer: "**A**。由三角形法则 \\(\\vec{AB} + \\vec{BC} = \\vec{AC}\\)，故原式 \\(= \\vec{AC} - \\vec{AC} = \\vec{0}\\)。"
         }

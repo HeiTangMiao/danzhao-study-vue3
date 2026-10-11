@@ -21,7 +21,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，已知 \\(A = 60°\\)，\\(B = 45°\\)，则 \\(a : b =\\)（　）",
-          options: ["A. \\(\\sqrt{3} : 1\\)", "B. \\(1 : \\sqrt{3}\\)", "C. \\(\\sqrt{3} : \\sqrt{2}\\)", "D. \\(\\sqrt{2} : \\sqrt{3}\\)"],
+          options: ["\\(\\sqrt{3} : 1\\)", "\\(1 : \\sqrt{3}\\)", "\\(\\sqrt{3} : \\sqrt{2}\\)", "\\(\\sqrt{2} : \\sqrt{3}\\)"],
           correctIndex: 2,
           answer: "**C**。由正弦定理 \\(a : b = \\sin A : \\sin B = \\sin 60° : \\sin 45° = \\frac{\\sqrt{3}}{2} : \\frac{\\sqrt{2}}{2} = \\sqrt{3} : \\sqrt{2}\\)。"
         },
@@ -29,7 +29,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，\\(a = \\sqrt{3}\\)，\\(b = 1\\)，\\(C = 30°\\)，则边 \\(c =\\)（　）",
-          options: ["A. 1", "B. \\(\\sqrt{2}\\)", "C. 2", "D. \\(\\sqrt{3}\\)"],
+          options: ["1", "\\(\\sqrt{2}\\)", "2", "\\(\\sqrt{3}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(c^2 = a^2 + b^2 - 2ab\\cos C = 3 + 1 - 2\\times\\sqrt{3}\\times 1\\times\\frac{\\sqrt{3}}{2} = 4 - 3 = 1\\)，\\(c = 1\\)。"
         },
@@ -37,7 +37,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，\\(a^2 + b^2 = c^2\\)，则三角形为（　）",
-          options: ["A. 锐角三角形", "B. 直角三角形", "C. 钝角三角形", "D. 无法确定"],
+          options: ["锐角三角形", "直角三角形", "钝角三角形", "无法确定"],
           correctIndex: 1,
           answer: "**B**。由勾股定理逆定理，\\(a^2 + b^2 = c^2\\) 时角 \\(C = 90°\\)，即直角三角形（直角边为 \\(a, b\\)，斜边为 \\(c\\)）。"
         },
@@ -45,7 +45,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，\\(a = 2\\)，\\(b = 3\\)，\\(c = 4\\)，则最大角的余弦值为（　）",
-          options: ["A. \\(\\frac{1}{4}\\)", "B. \\(-\\frac{1}{4}\\)", "C. \\(\\frac{11}{12}\\)", "D. \\(-\\frac{11}{12}\\)"],
+          options: ["\\(\\frac{1}{4}\\)", "\\(-\\frac{1}{4}\\)", "\\(\\frac{11}{12}\\)", "\\(-\\frac{11}{12}\\)"],
           correctIndex: 1,
           answer: "**B**。最大边为 \\(c = 4\\)，最大角为 \\(C\\)。\\(\\cos C = \\frac{a^2 + b^2 - c^2}{2ab} = \\frac{4 + 9 - 16}{12} = -\\frac{1}{4}\\)。"
         },
@@ -53,7 +53,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，\\(a = 4\\)，\\(b = 4\\sqrt{2}\\)，\\(A = 30°\\)，则角 \\(B\\) 的值为（　）",
-          options: ["A. 45°", "B. 45° 或 135°", "C. 30°", "D. 60°或120°"],
+          options: ["45°", "45° 或 135°", "30°", "60°或120°"],
           correctIndex: 1,
           answer: "**B**。由正弦定理 \\(\\sin B = \\frac{b\\sin A}{a} = \\frac{4\\sqrt{2}\\times\\frac{1}{2}}{4} = \\frac{\\sqrt{2}}{2}\\)。\\(b > a\\)，\\(B > A\\)，\\(B = 45°\\) 或 \\(135°\\) 均可使 \\(A + B < 180°\\)，均成立（SSA 两解）。"
         },
@@ -61,7 +61,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，\\(a = 3\\)，\\(b = 4\\)，\\(C = 60°\\)，则三角形面积 \\(S =\\)（　）",
-          options: ["A. \\(6\\sqrt{3}\\)", "B. \\(3\\sqrt{3}\\)", "C. \\(6\\)", "D. \\(12\\)"],
+          options: ["\\(6\\sqrt{3}\\)", "\\(3\\sqrt{3}\\)", "\\(6\\)", "\\(12\\)"],
           correctIndex: 1,
           answer: "**B**。\\(S = \\frac{1}{2}ab\\sin C = \\frac{1}{2}\\times 3\\times 4\\times\\sin 60° = 6\\times\\frac{\\sqrt{3}}{2} = 3\\sqrt{3}\\)。"
         },
@@ -69,7 +69,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，若 \\(a^2 = b^2 + c^2 + bc\\)，则角 \\(A =\\)（　）",
-          options: ["A. 60°", "B. 90°", "C. 120°", "D. 30°"],
+          options: ["60°", "90°", "120°", "30°"],
           correctIndex: 2,
           answer: "**C**。由余弦定理 \\(a^2 = b^2 + c^2 - 2bc\\cos A\\)，与 \\(a^2 = b^2 + c^2 + bc\\) 比较得 \\(-2bc\\cos A = bc\\)，\\(\\cos A = -\\frac{1}{2}\\)，故 \\(A = 120°\\)。"
         },
@@ -77,7 +77,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "在 \\(\\triangle ABC\\) 中，若 \\(a\\cos B = b\\cos A\\)，则 \\(\\triangle ABC\\) 的形状为（　）",
-          options: ["A. 直角三角形", "B. 等腰三角形", "C. 等边三角形", "D. 等腰直角三角形"],
+          options: ["直角三角形", "等腰三角形", "等边三角形", "等腰直角三角形"],
           correctIndex: 1,
           answer: "**B**。由正弦定理 \\(a = 2R\\sin A\\)，\\(b = 2R\\sin B\\) 代入：\\(\\sin A\\cos B = \\sin B\\cos A\\)，即 \\(\\sin(A - B) = 0\\)。因 \\(A, B \\in (0, \\pi)\\)，故 \\(A = B\\)，三角形为等腰三角形。"
         }

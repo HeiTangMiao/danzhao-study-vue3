@@ -21,7 +21,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "函数 \\(f(x) = \\sqrt{x-1} + \\frac{1}{x-2}\\) 的定义域是（　）",
-          options: ["A. \\([1, 2) \\cup (2, +\\infty)\\)", "B. \\([1, +\\infty)\\)", "C. \\((1, 2) \\cup (2, +\\infty)\\)", "D. \\((1, +\\infty)\\)"],
+          options: ["\\([1, 2) \\cup (2, +\\infty)\\)", "\\([1, +\\infty)\\)", "\\((1, 2) \\cup (2, +\\infty)\\)", "\\((1, +\\infty)\\)"],
           correctIndex: 0,
           answer: "**A**。需 \\(x-1\\ge0\\) 且 \\(x-2\\ne0\\)，即 \\(x\\ge1\\) 且 \\(x\\ne2\\)，所以 \\([1,2)\\cup(2,+\\infty)\\)。"
         },
@@ -29,7 +29,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列函数中，既是偶函数又在 \\((0, +\\infty)\\) 上单调递增的是（　）",
-          options: ["A. \\(y = x^2\\)", "B. \\(y = x^3\\)", "C. \\(y = -x^2\\)", "D. \\(y = \\frac{1}{x}\\)"],
+          options: ["\\(y = x^2\\)", "\\(y = x^3\\)", "\\(y = -x^2\\)", "\\(y = \\frac{1}{x}\\)"],
           correctIndex: 0,
           answer: "**A**。\\(y=x^2\\) 是偶函数且在 \\((0,+\\infty)\\) 上递增。B、D 是奇函数；C 是偶函数但在 \\((0,+\\infty)\\) 上递减。"
         },
@@ -37,7 +37,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "幂函数 \\(y = x^\\alpha\\)（\\(\\alpha\\) 为常数）的图像恒过定点（　）",
-          options: ["A. \\((0, 0)\\)", "B. \\((1, 1)\\)", "C. \\((0, 1)\\)", "D. \\((1, 0)\\)"],
+          options: ["\\((0, 0)\\)", "\\((1, 1)\\)", "\\((0, 1)\\)", "\\((1, 0)\\)"],
           correctIndex: 1,
           answer: "**B**。因为无论 \\(\\alpha\\) 取何值，\\(1^\\alpha = 1\\) 恒成立，所以图像恒过定点 \\((1, 1)\\)。"
         },
@@ -45,7 +45,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "设 \\(a = 0.7^{1.5}\\)，\\(b = 0.7^{1.8}\\)，则 \\(a\\) 与 \\(b\\) 的大小关系是（　）",
-          options: ["A. \\(a = b\\)", "B. \\(a < b\\)", "C. \\(a > b\\)", "D. 无法确定"],
+          options: ["\\(a = b\\)", "\\(a < b\\)", "\\(a > b\\)", "无法确定"],
           correctIndex: 2,
           answer: "**C**。底数 \\(0.7\\in(0,1)\\)，指数函数 \\(y=0.7^x\\) 单调递减，\\(1.5<1.8\\)，故 \\(0.7^{1.5}>0.7^{1.8}\\)，即 \\(a>b\\)。"
         },
@@ -53,7 +53,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "\\(\\log_{0.3} 0.7\\) 与 \\(\\log_{0.3} 0.5\\) 的大小关系是（　）",
-          options: ["A. \\(\\log_{0.3} 0.7 > \\log_{0.3} 0.5\\)", "B. \\(\\log_{0.3} 0.7 < \\log_{0.3} 0.5\\)", "C. \\(\\log_{0.3} 0.7 = \\log_{0.3} 0.5\\)", "D. 无法确定"],
+          options: ["\\(\\log_{0.3} 0.7 > \\log_{0.3} 0.5\\)", "\\(\\log_{0.3} 0.7 < \\log_{0.3} 0.5\\)", "\\(\\log_{0.3} 0.7 = \\log_{0.3} 0.5\\)", "无法确定"],
           correctIndex: 1,
           answer: "**B**。底数 \\(0.3\\in(0,1)\\)，对数函数 \\(y=\\log_{0.3}x\\) 单调递减。\\(0.7>0.5\\)，故 \\(\\log_{0.3}0.7 < \\log_{0.3}0.5\\)。"
         },
@@ -61,7 +61,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列函数中是**幂函数**的是（　）",
-          options: ["A. \\(y = 2x\\)", "B. \\(y = x^2\\)", "C. \\(y = 2^x\\)", "D. \\(y = x^2 + 1\\)"],
+          options: ["\\(y = 2x\\)", "\\(y = x^2\\)", "\\(y = 2^x\\)", "\\(y = x^2 + 1\\)"],
           correctIndex: 1,
           answer: "**B**。幂函数要求系数为 \\(1\\)、底数为自变量 \\(x\\)、指数为常数。\\(y=2x\\) 系数为 2，\\(y=2^x\\) 自变量在指数位置（指数函数），\\(y=x^2+1\\) 多了常数项，均不是幂函数。"
         },
@@ -69,7 +69,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "二次函数 \\(y = -x^2 + 4x - 1\\) 的顶点坐标是（　）",
-          options: ["A. \\((2, 3)\\)", "B. \\((-2, 3)\\)", "C. \\((2, -3)\\)", "D. \\((2, 1)\\)"],
+          options: ["\\((2, 3)\\)", "\\((-2, 3)\\)", "\\((2, -3)\\)", "\\((2, 1)\\)"],
           correctIndex: 0,
           answer: "**A**。对称轴 \\(x=-\\frac{4}{2\\times(-1)}=2\\)，顶点纵坐标 \\(y=-4+8-1=3\\)，顶点为 \\((2,3)\\)。"
         },
@@ -77,7 +77,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知 \\(f(x)\\) 是定义在 \\(\\mathbb{R}\\) 上的奇函数，且 \\(f(2) = 5\\)，则 \\(f(-2)\\) 的值是（　）",
-          options: ["A. 5", "B. \\(-5\\)", "C. 0", "D. 25"],
+          options: ["5", "\\(-5\\)", "0", "25"],
           correctIndex: 1,
           answer: "**B**。奇函数满足 \\(f(-x)=-f(x)\\)，故 \\(f(-2)=-f(2)=-5\\)。"
         }

@@ -190,7 +190,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "分割视频片段的工具是（　）",
-          options: ["A. 选择工具", "B. 剃刀工具", "C. 钢笔工具", "D. 抓手工具"],
+          options: ["选择工具", "剃刀工具", "钢笔工具", "抓手工具"],
           correctIndex: 1,
           answer: "答案：B。剃刀工具（快捷键 C）在时间轴上点击即可把片段从该点切成两段。选择工具用于选中和移动，钢笔工具绘制路径，抓手工具用于平移视图。"
         },
@@ -198,7 +198,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "调整视频播放速度或时长，应使用（　）",
-          options: ["A. 速度/持续时间", "B. 删除", "C. 复制", "D. 旋转"],
+          options: ["速度/持续时间", "删除", "复制", "旋转"],
           correctIndex: 0,
           answer: "答案：A。右键片段→速度/持续时间。"
         },
@@ -206,7 +206,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在效果控件面板中，开启属性动画应点击（　）",
-          options: ["A. 秒表图标", "B. 垃圾桶", "C. 眼睛图标", "D. 锁图标"],
+          options: ["秒表图标", "垃圾桶", "眼睛图标", "锁图标"],
           correctIndex: 0,
           answer: "答案：A。点击秒表图标开启关键帧动画。"
         },
@@ -227,7 +227,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "导入素材到项目面板的方法是（　）",
-          options: ["A. 文件→导入", "B. 文件→导出", "C. 编辑→复制", "D. 序列→渲染"],
+          options: ["文件→导入", "文件→导出", "编辑→复制", "序列→渲染"],
           correctIndex: 0,
           answer: "答案：A。执行\"文件→导入\"（或在项目面板空白处双击）把素材导入项目面板。注意\"文件→导出\"是输出成品，方向与导入相反；复制和渲染都不是导入操作。"
         },
@@ -235,7 +235,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "视频轨道中，V2 轨道上的素材会（　）",
-          options: ["A. 遮挡 V1 轨道素材", "B. 被 V1 遮挡", "C. 与 V1 无关", "D. 自动删除"],
+          options: ["遮挡 V1 轨道素材", "被 V1 遮挡", "与 V1 无关", "自动删除"],
           correctIndex: 0,
           answer: "答案：A。编号大的视频轨道在上层，遮挡下层。"
         },
@@ -243,7 +243,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "设置片段不透明度 60%，应在（　）面板操作",
-          options: ["A. 项目面板", "B. 效果控件面板", "C. 历史记录", "D. 源监视器"],
+          options: ["项目面板", "效果控件面板", "历史记录", "源监视器"],
           correctIndex: 1,
           answer: "答案：B。效果控件面板设置不透明度。"
         },

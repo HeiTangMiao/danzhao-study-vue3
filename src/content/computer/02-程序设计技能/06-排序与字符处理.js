@@ -124,21 +124,21 @@ export default {
           title: "例题1：冒泡排序",
           difficulty: "medium",
           question: "用冒泡排序法将列表 [9, 5, 7, 2, 6] 按升序排列，并输出排序结果。",
-          solution: "**解：**\n```\n# 冒泡排序升序\na = [9, 5, 7, 2, 6]\nn = len(a)\nfor i in range(n - 1):\n    for j in range(n - 1 - i):\n        if a[j] > a[j + 1]:\n            a[j], a[j + 1] = a[j + 1], a[j]\nprint(\"排序结果：\", a)\n```\n运行结果：\n排序结果： [2, 5, 6, 7, 9]",
+          solution: "**解：**\n```\n# 冒泡排序升序\na = [9, 5, 7, 2, 6]\nn = len(a)\nfor i in range(n - 1):\nfor j in range(n - 1 - i):\nif a[j] > a[j + 1]:\na[j], a[j + 1] = a[j + 1], a[j]\nprint(\"排序结果：\", a)\n```\n运行结果：\n排序结果： [2, 5, 6, 7, 9]",
           answer: "外层 n-1 轮，内层 n-1-i 次相邻比较，逆序则交换。"
         },
         {
           title: "例题2：字符串统计",
           difficulty: "medium",
           question: "输入一个字符串，统计其中字母 'a' 出现的次数并输出。",
-          solution: "**解：**\n```\ns = input(\"请输入一个字符串：\")\ncount = 0\n# 遍历每个字符\nfor ch in s:\n    if ch == \"a\":\n        count += 1\nprint(\"字母 a 出现次数：\", count)\n```\n运行示例：\n请输入一个字符串：banana\na 出现次数： 3",
+          solution: "**解：**\n```\ns = input(\"请输入一个字符串：\")\ncount = 0\n# 遍历每个字符\nfor ch in s:\nif ch == \"a\":\ncount += 1\nprint(\"字母 a 出现次数：\", count)\n```\n运行示例：\n请输入一个字符串：banana\na 出现次数： 3",
           answer: "遍历字符串，`if ch == \"a\"` 计数累加；也可用 `s.count(\"a\")`。"
         },
         {
           title: "例题3：字符串反转",
           difficulty: "advanced",
           question: "输入一个字符串，将其反转后输出。",
-          solution: "**解：**\n方法一（切片）：\n```\ns = input(\"请输入字符串：\")\nprint(\"反转结果：\", s[::-1])\n```\n方法二（循环）：\n```\ns = input(\"请输入字符串：\")\nresult = \"\"\nfor ch in s:\n    result = ch + result\nprint(\"反转结果：\", result)\n```\n运行示例：\n请输入字符串：abcde\n反转结果： edcba",
+          solution: "**解：**\n方法一（切片）：\n```\ns = input(\"请输入字符串：\")\nprint(\"反转结果：\", s[::-1])\n```\n方法二（循环）：\n```\ns = input(\"请输入字符串：\")\nresult = \"\"\nfor ch in s:\nresult = ch + result\nprint(\"反转结果：\", result)\n```\n运行示例：\n请输入字符串：abcde\n反转结果： edcba",
           answer: "方法一用切片 `s[::-1]`；方法二循环把每个字符放到结果前面。"
         }
       ]
@@ -152,7 +152,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "表达式 `\"ab\" * 3` 的结果是（　）",
-          options: ["A. \"ababab\"", "B. \"ab3\"", "C. \"3ab\"", "D. 报错"],
+          options: ["\"ababab\"", "\"ab3\"", "\"3ab\"", "报错"],
           correctIndex: 0,
           answer: "答案：A。`*` 重复字符串，`\"ab\" * 3` 得到 \"ababab\"。"
         },
@@ -160,7 +160,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "`len(\"hello\")` 的结果是（　）",
-          options: ["A. 4", "B. 5", "C. 6", "D. 0"],
+          options: ["4", "5", "6", "0"],
           correctIndex: 1,
           answer: "答案：B。hello 共 5 个字符。"
         },
@@ -168,7 +168,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "`\"hello\"[1:3]` 的结果是（　）",
-          options: ["A. \"hel\"", "B. \"el\"", "C. \"ell\"", "D. \"he\""],
+          options: ["\"hel\"", "\"el\"", "\"ell\"", "\"he\""],
           correctIndex: 1,
           answer: "答案：B。切片左闭右开，取下标 1、2 的字符 \"el\"。"
         },
@@ -189,7 +189,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "`\"AbC\".lower()` 的结果是（　）",
-          options: ["A. \"AbC\"", "B. \"abc\"", "C. \"ABC\"", "D. \"aBC\""],
+          options: ["\"AbC\"", "\"abc\"", "\"ABC\"", "\"aBC\""],
           correctIndex: 1,
           answer: "答案：B。lower() 将所有字母转为小写。"
         },
@@ -197,7 +197,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "`\"hello\".count(\"l\")` 的结果是（　）",
-          options: ["A. 1", "B. 2", "C. 3", "D. 0"],
+          options: ["1", "2", "3", "0"],
           correctIndex: 1,
           answer: "答案：B。hello 中有两个 l。"
         },
@@ -205,7 +205,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "对列表 [3, 1, 2] 进行冒泡排序，第一轮（i=0）结束后列表是（　）",
-          options: ["A. [1, 2, 3]", "B. [1, 3, 2]", "C. [3, 2, 1]", "D. [2, 1, 3]"],
+          options: ["[1, 2, 3]", "[1, 3, 2]", "[3, 2, 1]", "[2, 1, 3]"],
           correctIndex: 0,
           answer: "答案：A。第一轮比较 2 次：先 3 和 1 比较，3>1 交换得 [1,3,2]；再 3 和 2 比较，3>2 交换得 [1,2,3]。所以第一轮结束是 [1,2,3]。"
         },
@@ -213,7 +213,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "下列代码中，能正确统计字符串中数字字符个数的是（　）",
-          options: ["A. `s = input(\"输入：\")` `count = 0` `for ch in s:` `if ch.isdigit():` `count += 1`", "B. `s = input(\"输入：\")` `count = 0` `for ch in s:` `count += 1`", "C. `s = input(\"输入：\")` `print(len(s))`", "D. `s = input(\"输入：\")` `print(s.count(\"0\"))`"],
+          options: ["`s = input(\"输入：\")` `count = 0` `for ch in s:` `if ch.isdigit():` `count += 1`", "`s = input(\"输入：\")` `count = 0` `for ch in s:` `count += 1`", "`s = input(\"输入：\")` `print(len(s))`", "`s = input(\"输入：\")` `print(s.count(\"0\"))`"],
           correctIndex: 0,
           answer: "答案：A。用 `ch.isdigit()` 判断是否为数字字符并计数；B 统计所有字符，C 是总长度，D 只统计字符 0。"
         }

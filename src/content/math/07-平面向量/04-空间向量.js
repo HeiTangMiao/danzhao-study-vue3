@@ -241,7 +241,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "已知空间向量 \\(\\vec{a} = (1, 0, 2)\\)，则 \\(|\\vec{a}| = \\)（　）",
-          options: ["A. 3", "B. \\(\\sqrt{5}\\)", "C. 5", "D. \\(\\sqrt{3}\\)"],
+          options: ["3", "\\(\\sqrt{5}\\)", "5", "\\(\\sqrt{3}\\)"],
           correctIndex: 1,
           answer: "答案：B。\\(|\\vec{a}| = \\sqrt{1^2 + 0^2 + 2^2} = \\sqrt{5}\\)。"
         }
@@ -268,7 +268,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "在空间直角坐标系中，点 \\(A(1, 2, 3)\\) 关于原点对称的点的坐标是（　）",
-          options: ["A. \\((-1, -2, -3)\\)", "B. \\((1, -2, -3)\\)", "C. \\((-1, 2, 3)\\)", "D. \\((-1, -2, 3)\\)"],
+          options: ["\\((-1, -2, -3)\\)", "\\((1, -2, -3)\\)", "\\((-1, 2, 3)\\)", "\\((-1, -2, 3)\\)"],
           correctIndex: 0,
           answer: "**A**。关于原点对称时三个坐标都取相反数。"
         }

@@ -172,7 +172,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "网页标题（显示在浏览器标签页上）应写在（　）",
-          options: ["A. `<title>` 标签", "B. `<body>` 标签", "C. `<h1>` 标签", "D. `<meta>` 标签"],
+          options: ["`<title>` 标签", "`<body>` 标签", "`<h1>` 标签", "`<meta>` 标签"],
           correctIndex: 0,
           answer: "答案：A。`<title>` 写在 `<head>` 内，显示在浏览器标签页；`<h1>` 是页面正文里的一级标题。"
         },
@@ -180,7 +180,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "为防止中文显示乱码，网页应设置字符编码，正确的写法是（　）",
-          options: ["A. `<meta charset=\"UTF-8\">`", "B. `<title>UTF-8</title>`", "C. `<charset>UTF-8</charset>`", "D. `<html UTF-8>`"],
+          options: ["`<meta charset=\"UTF-8\">`", "`<title>UTF-8</title>`", "`<charset>UTF-8</charset>`", "`<html UTF-8>`"],
           correctIndex: 0,
           answer: "答案：A。用 `<meta charset=\"UTF-8\">` 声明字符编码，写在 `<head>` 内。"
         }
@@ -207,7 +207,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "在网页中插入图片，正确的标签写法是（　）",
-          options: ["A. `<img src=\"pic.jpg\">`", "B. `<image src=\"pic.jpg\">`", "C. `<picture src=\"pic.jpg\">`", "D. `<img href=\"pic.jpg\">`"],
+          options: ["`<img src=\"pic.jpg\">`", "`<image src=\"pic.jpg\">`", "`<picture src=\"pic.jpg\">`", "`<img href=\"pic.jpg\">`"],
           correctIndex: 0,
           answer: "答案：A。图片用单标签 `<img>`，地址写在 `src` 属性中；`href` 是超链接 `<a>` 的属性。"
         },
@@ -215,7 +215,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "定义无序列表（项目符号列表）应使用的标签是（　）",
-          options: ["A. `<ul>`", "B. `<ol>`", "C. `<li>`", "D. `<dl>`"],
+          options: ["`<ul>`", "`<ol>`", "`<li>`", "`<dl>`"],
           correctIndex: 0,
           answer: "答案：A。`<ul>` 是无序列表，`<ol>` 是有序列表，`<li>` 是其中的列表项。"
         },
@@ -223,7 +223,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "关于标题标签 `<h1>`~`<h6>`，说法正确的是（　）",
-          options: ["A. `<h6>` 的字号最大", "B. 数字越大字号越大", "C. `<h1>` 的字号最大", "D. 每页只能使用一个标题标签"],
+          options: ["`<h6>` 的字号最大", "数字越大字号越大", "`<h1>` 的字号最大", "每页只能使用一个标题标签"],
           correctIndex: 2,
           answer: "答案：C。`<h1>` 是一级标题、字号最大，依次到 `<h6>` 最小。"
         },
@@ -231,7 +231,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "超链接 `<a>` 标签中，用于指定链接目标地址的属性是（　）",
-          options: ["A. src", "B. href", "C. link", "D. url"],
+          options: ["src", "href", "link", "url"],
           correctIndex: 1,
           answer: "答案：B。链接地址写在 `href` 属性中，如 `<a href=\"https://www.example.com\">`。"
         },
@@ -240,10 +240,10 @@ export default {
           type: "single",
           question: "关于静态网页与动态网页，说法正确的是（　）",
           options: [
-            "A. 静态网页的内容会随用户操作自动变化",
-            "B. 动态网页由服务器程序处理后再返回给浏览器",
-            "C. 静态网页必须连接数据库才能运行",
-            "D. 动态网页的扩展名一定是 .html"
+            "静态网页的内容会随用户操作自动变化",
+            "动态网页由服务器程序处理后再返回给浏览器",
+            "静态网页必须连接数据库才能运行",
+            "动态网页的扩展名一定是 .html"
           ],
           correctIndex: 1,
           answer: "答案：B。动态网页需要服务器程序处理（如登录后显示用户名），静态网页内容固定、不依赖数据库。"

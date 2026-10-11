@@ -86,7 +86,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列文件名中，不符合命名规范的是（　）",
-          options: ["A. 期末成绩统计", "B. 2026单招复习计划", "C. 我的文件*最终版", "D. 网络实验报告1"],
+          options: ["期末成绩统计", "2026单招复习计划", "我的文件*最终版", "网络实验报告1"],
           correctIndex: 2,
           answer: "答案：C。文件名中不能包含 `*` 等特殊字符；其余三项均规范且能反映文件内容。"
         },
@@ -94,7 +94,7 @@ export default {
           difficulty: "basic",
           type: "single",
           question: "下列字符中，不属于 Windows 文件名禁用字符的是（　）",
-          options: ["A. \\", "B. :", "C. _", "D. *"],
+          options: ["\\", ":", "_", "*"],
           correctIndex: 2,
           answer: "答案：C。下划线 `_` 是合法字符，`\\`、`:`、`*` 均为禁用字符。"
         },
@@ -102,7 +102,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "关于开关机顺序，下列说法正确的是（　）",
-          options: ["A. 开机先开主机再开显示器", "B. 关机先关显示器再关主机", "C. 开机先开显示器再开主机", "D. 开关机顺序无关紧要"],
+          options: ["开机先开主机再开显示器", "关机先关显示器再关主机", "开机先开显示器再开主机", "开关机顺序无关紧要"],
           correctIndex: 2,
           answer: "答案：C。开机先开外设再开主机；关机先关主机再关外设。"
         },
@@ -110,7 +110,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "考试中新建考生文件夹，最合适的名称是（　）",
-          options: ["A. 新建文件夹", "B. 准考证号", "C. 我的文件夹", "D. 考试"],
+          options: ["新建文件夹", "准考证号", "我的文件夹", "考试"],
           correctIndex: 1,
           answer: "答案：B。考试说明要求：考试前新建以准考证号为名称的考生文件夹。"
         },
@@ -118,7 +118,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "下列做法中，不符合计算机操作职业道德的是（　）",
-          options: ["A. 使用正版软件并遵守授权协议", "B. 未经允许查看他人文件夹中的资料", "C. 定期备份重要数据", "D. 保持机房整洁、爱护设备"],
+          options: ["使用正版软件并遵守授权协议", "未经允许查看他人文件夹中的资料", "定期备份重要数据", "保持机房整洁、爱护设备"],
           correctIndex: 1,
           answer: "答案：B。未经允许查看他人资料侵犯隐私，不符合职业道德；其余三项均为规范做法。"
         },
@@ -126,7 +126,7 @@ export default {
           difficulty: "medium",
           type: "single",
           question: "标准指法中，双手食指应放在的定位键是（　）",
-          options: ["A. A 和 L 键", "B. F 和 J 键", "C. D 和 K 键", "D. S 和 L 键"],
+          options: ["A 和 L 键", "F 和 J 键", "D 和 K 键", "S 和 L 键"],
           correctIndex: 1,
           answer: "答案：B。F 和 J 键上有定位凸点，是标准指法的基准。"
         },
@@ -134,7 +134,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "考试中程序运行出错，下列做法最恰当的是（　）",
-          options: ["A. 直接放弃该题", "B. 检查代码逻辑并修改后重新运行", "C. 反复重启计算机", "D. 删除程序文件重新创建"],
+          options: ["直接放弃该题", "检查代码逻辑并修改后重新运行", "反复重启计算机", "删除程序文件重新创建"],
           correctIndex: 1,
           answer: "答案：B。应先分析错误原因，检查代码逻辑，修改后重新运行。"
         },
@@ -142,7 +142,7 @@ export default {
           difficulty: "advanced",
           type: "single",
           question: "关于文件安全管理，下列说法错误的是（　）",
-          options: ["A. 重要文件应设置权限保护", "B. 定期查杀病毒", "C. 打开来历不明的邮件附件", "D. 重要数据定期备份"],
+          options: ["重要文件应设置权限保护", "定期查杀病毒", "打开来历不明的邮件附件", "重要数据定期备份"],
           correctIndex: 2,
           answer: "答案：C。打开来历不明的邮件附件可能感染病毒，属于不安全行为。"
         }

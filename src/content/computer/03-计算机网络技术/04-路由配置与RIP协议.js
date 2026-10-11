@@ -162,7 +162,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "basic",
           type: "single",
           question: "启用路由器接口的命令是（　）",
-          options: ["A. `shutdown`", "B. `no shutdown`", "C. `enable`", "D. `no switchport`"],
+          options: ["`shutdown`", "`no shutdown`", "`enable`", "`no switchport`"],
           correctIndex: 1,
           answer: "答案：B。`no shutdown` 启用接口。"
         },
@@ -170,7 +170,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "basic",
           type: "single",
           question: "配置默认路由的命令是（　）",
-          options: ["A. `ip route 0.0.0.0 0.0.0.0 下一跳`", "B. `ip route 192.168.1.0 255.255.255.0 下一跳`", "C. `default route`", "D. `route add default`"],
+          options: ["`ip route 0.0.0.0 0.0.0.0 下一跳`", "`ip route 192.168.1.0 255.255.255.0 下一跳`", "`default route`", "`route add default`"],
           correctIndex: 0,
           answer: "答案：A。默认路由目标网络和掩码都是 0.0.0.0。"
         },
@@ -178,7 +178,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "medium",
           type: "single",
           question: "进入 RIP 路由配置模式的命令是（　）",
-          options: ["A. `router rip`", "B. `rip`", "C. `enable rip`", "D. `configure rip`"],
+          options: ["`router rip`", "`rip`", "`enable rip`", "`configure rip`"],
           correctIndex: 0,
           answer: "答案：A。全局模式下输入 `router rip` 进入 RIP 配置。"
         },
@@ -199,7 +199,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "basic",
           type: "single",
           question: "配置接口 IP 地址的命令是（　）",
-          options: ["A. `ip address 192.168.1.1 255.255.255.0`", "B. `ip 192.168.1.1`", "C. `address 192.168.1.1`", "D. `set ip 192.168.1.1`"],
+          options: ["`ip address 192.168.1.1 255.255.255.0`", "`ip 192.168.1.1`", "`address 192.168.1.1`", "`set ip 192.168.1.1`"],
           correctIndex: 0,
           answer: "答案：A。接口模式下用 `ip address IP 掩码` 配置。"
         },
@@ -207,7 +207,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "medium",
           type: "single",
           question: "三层交换机开启路由功能的命令是（　）",
-          options: ["A. `router rip`", "B. `ip routing`", "C. `routing enable`", "D. `ip route`"],
+          options: ["`router rip`", "`ip routing`", "`routing enable`", "`ip route`"],
           correctIndex: 1,
           answer: "答案：B。`ip routing` 开启三层交换机的路由功能。"
         },
@@ -215,7 +215,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "advanced",
           type: "single",
           question: "把静态路由引入 RIP 协议的命令是（　）",
-          options: ["A. `redistribute static`", "B. `network static`", "C. `import static`", "D. `default static`"],
+          options: ["`redistribute static`", "`network static`", "`import static`", "`default static`"],
           correctIndex: 0,
           answer: "答案：A。RIP 配置模式下用 `redistribute static` 重发布静态路由。"
         },
@@ -223,7 +223,7 @@ RA(config-router)# network 202.101.172.0`
           difficulty: "advanced",
           type: "single",
           question: "配置 VLAN 10 的 SVI 接口地址，正确的命令是（　）",
-          options: ["A. `interface vlan 10` 后 `ip address 192.168.10.254 255.255.255.0`", "B. `interface f0/10` 后 `ip address`", "C. `vlan 10` 后 `ip address`", "D. `ip address vlan 10`"],
+          options: ["`interface vlan 10` 后 `ip address 192.168.10.254 255.255.255.0`", "`interface f0/10` 后 `ip address`", "`vlan 10` 后 `ip address`", "`ip address vlan 10`"],
           correctIndex: 0,
           answer: "答案：A。先 `interface vlan 10` 进入 SVI 接口，再配置 IP 地址。"
         }
