@@ -294,11 +294,20 @@ function onKeyDown(e) {
 onMounted(() => window.addEventListener('keydown', onKeyDown))
 
 // 抽屉打开时锁定背景滚动（移动端手势隔离）
-watch(sheetOpen, (s) => {
-  document.body.style.overflow = s ? 'hidden' : ''
+// 归属感知：只清自己加的锁 —— 侧栏抽屉与笔记抽屉可能同时锁 body，关闭本抽屉不应误释放别人的锁
+// （照搬 NotesPanel 已验证的 lockOwned 形态；UnitView 的键盘翻页守卫依赖 overflow==='hidden'，勿破坏）
+let lockOwned = false
+watch(sheetOpen, (open) => {
+  if (open && document.body.style.overflow !== 'hidden') {
+    document.body.style.overflow = 'hidden'
+    lockOwned = true
+  } else if (!open && lockOwned) {
+    document.body.style.overflow = ''
+    lockOwned = false
+  }
 })
 onBeforeUnmount(() => {
-  document.body.style.overflow = ''
+  if (lockOwned) document.body.style.overflow = ''
   window.removeEventListener('keydown', onKeyDown)
 })
 
