@@ -110,3 +110,151 @@
 ---
 
 _报告人：QA 严过关｜Round 1（批 F）｜基线 `bb4b1d4`（Fc2/Fc3/Fc4 末笔）｜方法：独立证伪 + 换形状对抗 + 反例_
+
+---
+
+## Round 2（批 F 第二波）—— Fc6 志愿填报 / CSP 元检查收口 / Fc5 作品训练卡
+
+> 对象四笔：`89d2e60`（Fc6 `/guide` + openExternal + L4 登记）/ `3ce7f01`（批 E CSP 复核用例同步）/ **`1282813`（CSP 元检查提取器收口，本轮关键对抗目标）** / `c98e6a3`（Fc5 workcard 新块 + useCountdown）。
+> 派单基线 HEAD = `1282813`；验证期间内容侧终态交付 `c1531d7` 落到 `main`（`1282813` 为其**祖先**），故**全量关口在干净工作树 @ `1282813`** 跑，复现该提交点的确定数字。
+> 环境：Node **v22.22.2**；`vitest --pool=threads --maxWorkers=1`。纪律：仅新增 `tests/batch-f-verify-r2-*.test.js`（5 文件 / **41** 用例）与本文报告；未改 `src/`；未 commit；跑完删除临时工作树。
+
+### 结论速览
+
+| 攻点 | 判定 | 新用例 | 要点 |
+|---|---|:--:|---|
+| 1 openExternal 回退 | **成立** | 5 | jsdom 无 Tauri→`window.open(_blank,noopener)` 且不调 shell；伪 `__TAURI_INTERNALS__`+shell 抛错→try/catch 回退+warn 不炸；成功→不再 window.open；工具内**零 URL 字面量**；**静态字面量 import** |
+| 2 L4/L6 + 元检查（`1282813`） | **成立** | 14 | 生产 CSP **未放宽**；`HOST_ALLOWLIST` 恰 `{www.zjzs.net}`；**6 向量对抗矩阵**（双引号/模板字面量/裸标识符：旧静默放行→新抓红；单引号URL/拼接：新旧均抓）；真实文件**无假红**；锚点懒加载 **10→11** |
+| 3 useCountdown 跳时校准（Fc5） | **成立** | 4 | deadline 口径：跳 +30s 仅放行一 tick → **569（09:29）** 而非 599（累减口径）；到点钳 0 且自动 stop；unmount 清 interval |
+| 4 WorkCardBlock 三勾（Fc5） | **成立** | 8 | 浏览态挂载 **不写库**（H3）；勾选写 `page_progress.workcards[id]` 子键 + 保留原行其它字段；子键 spread 不动他卡；幂等；**不写错题本**；DB 停 v7；H5 四处一致 |
+| 5 `/guide` 独立性 | **成立** | 10 | 顶层非学科路由（`name=guide`、无 `meta.tab`）；`NON_PAGE_DIRS` 含 guide；collectFiles 不收 guide；纯数据 ESM（零 import）；HomeView 入口可达；区块合 schema；唯一外链 |
+| 6 依赖面 | **成立** | 3 | 运行期仅新增 `@tauri-apps/plugin-shell`；Fc6 对 lock 的**新增** `@tauri-apps/*` 恰 2（api + plugin-shell） |
+| 7 全量关口 | **通过** | — | 干净树 **76 文件 / 875 通过 + 6 跳过（881）/ 0 失败**（与 engineer 口径 & `c98e6a3` 一致，**含 `1282813` 后不变**）；validate:content 182+3 绿；block-registry 26 绿 |
+
+新增测试（5 文件，共 **41** 用例，全通过）：
+- `tests/batch-f-verify-r2-openext.test.js`（5）—— 攻点[1]
+- `tests/batch-f-verify-r2-csp-meta.test.js`（14）—— 攻点[2]
+- `tests/batch-f-verify-r2-countdown.test.js`（4）—— 攻点[3]
+- `tests/batch-f-verify-r2-workcard.test.js`（8）—— 攻点[4]
+- `tests/batch-f-verify-r2-guide.test.js`（10）—— 攻点[5]/[6]
+
+---
+
+### 1. openExternal 回退（Fc6）
+
+**结论：验证成立。** 源码 `src/utils/openExternal.js` 逐行核对（`isTauri()` 判 `window.__TAURI_INTERNALS__`；`shellOpen` try/catch→`console.warn`→回退 `openInBrowser`）。
+
+| 攻击点 | 用例证据 | 结果 |
+|---|---|---|
+| jsdom（无 Tauri） | `await openExternal(URL)` → `mocks.open` **未调用**；`window.open` 调 1 次，实参 `(URL,'_blank','noopener')` | ✅ |
+| 反向锚：有 Tauri 但 shell.open 抛错 | 置 `window.__TAURI_INTERNALS__={}`，`mocks.open.mockRejectedValueOnce` → 行为 `resolves.toBeUndefined()`（**不炸**）+ warn 被调 + 回退 window.open | ✅ |
+| 有 Tauri 且成功 | `mockResolvedValueOnce` → shell.open 调、**不再** window.open（短路 return） | ✅ |
+| 零 URL 字面量 | 去注释后 `src/utils/openExternal.js` **无 `http(s)://`** | ✅ |
+| 静态 import（L6） | `import { open as shellOpen } from '@tauri-apps/plugin-shell'`；无 `import(` 动态/拼接 | ✅ |
+
+> 红线与源码注释一致：URL 属数据（归页面数据文件），工具不硬编码；shell 失败不静默吞错。
+
+### 2. L4/L6 + CSP 元检查提取器收口（`1282813`）—— 本轮关键对抗
+
+**结论：验证成立；`1282813` 收口有效且未过度收紧。**
+
+**做法（独立）**：不凭记忆复写正则，而是**运行时从被验对象 `tests/batch-e-verify-csp.test.js` 抽取它实际使用的提取器与残留守卫**，再喂 6 形态输入核「放行/抓红」；并用 **Python 独立复算**同一矩阵（规避 grep/凭记忆误差）。
+
+抽取到的事实（被验对象本体）：
+- 提取器：`[...hostM[1].matchAll(/['"`]([^'"`]+)['"`]/g)]`
+- 残留守卫：`hostM[1].replace(/['"`][^'"`]*['"`]/g, '').replace(/[\s,]/g, '') === ''`
+
+| 输入形态 | `3ce7f01` 原版 | `1282813` 收口后 |
+|---|:--:|:--:|
+| 正常 `'www.zjzs.net'` | 放行 | 放行 |
+| 双引号 `"evil.com"` | **静默放行** | **抓红** |
+| 模板字面量 `` `evil2.com` `` | **静默放行** | **抓红** |
+| 裸标识符 `evil3.com` | **静默放行** | **抓红** |
+| 单引号 URL `'https://evil4.com'` | 抓红 | 抓红 |
+| 拼接 `'www.zjzs' + '.net'` | 抓红 | 抓红 |
+| **真实 `HOST_ALLOWLIST` 体** | — | **放行（无假红）** |
+
+> Vitest 探针与 Python 复算**结论一致**。原版盲区（只认单引号 → 换引号即静默绕过）已被消除；残留守卫额外封堵裸标识符/拼接；对真实文件的**精确集合相等**（`=== ['www.zjzs.net']`）保持不变，**未削弱 D 组断言**。
+
+**其余核对**：
+- 生产 CSP **未放宽**：`tauri.conf.json` `csp` 不含 `zjzs`、无协议源通配。✅
+- `EVAL_ALLOWLIST` 仍为空；`HOST_ALLOWLIST` 恰 `{www.zjzs.net}`；理由注释（openExternal / webview 不加载 / 不改生产 CSP）与事实相符。✅
+- L6 懒加载锚点：`src/router/index.js` 的 `@/views/*.vue` 懒加载实数 **11**，`csp-guard.test.js` 断言 **11**（10→11 随 `/guide` 增）。✅
+
+> 与本批 batch-E 报告的口径更正：见 `docs/proposals/batch-e-qa-report.md` **附录 A**（`HOST_ALLOWLIST 均为空集` 已作废；「未授权主机必抓红」的保证以 `1282813` 为界成立）。
+
+### 3. useCountdown 跳时校准（Fc5）
+
+**结论：验证成立。** 源码 `src/composables/useCountdown.js` 为 **deadline 口径**：`remaining = max(0, ceil((deadline − Date.now())/1000))`，非 `timeLeft--` 累减。
+
+| 用例 | 证据 | 结果 |
+|---|---|---|
+| 跳时校准 | `setSystemTime(t0+30000)`（不触发定时器）+ `advanceTimersByTime(1000)`（仅一 tick，时钟至 t0+31000）→ `timeLeft === 569`；**显式断言 `!== 599`**（累减口径会得 599） | ✅ |
+| 到点钳 0 | 跳 +5s > 总 2s → `timeLeft === 0`、`>=0`、`running === false`（自动 stop） | ✅ |
+| reset | `reset(50)` → `timeLeft===50` 且停表 | ✅ |
+| unmount 清 interval | 组件内 `useCountdown().start()` → `unmount()` → `running===false` 且 `spyOn(clearInterval)` 被调 | ✅ |
+
+### 4. WorkCardBlock 三勾（Fc5）
+
+**结论：验证成立。** 源码 `src/components/blocks/WorkCardBlock.vue` 的 `persist`：**仅当已有进度行**才 `savePageProgress({...existing, workcards:{...(existing.workcards||{}), [wcId]:{...checks}}})` → 浏览态不写、写子键、spread 合并不动他卡。
+
+| 用例 | 证据 | 结果 |
+|---|---|---|
+| 浏览态挂载不写库（H3） | 预置进度行后挂载 → `spyOn(db,'savePageProgress')` **未被调** | ✅ |
+| 勾选写子键 + 保留原行 | 点 `.workcard__box[0]` → `row.workcards.B.guided===true`、`restore===false`；`visited/subject/fileTitle` 保留 | ✅ |
+| 子键 spread 不动他卡 | 预置 `workcards.A` → 勾 B → A **原样**、B.restore 置真 | ✅ |
+| 幂等 | 勾→取消→再勾：`false` → `true` 终态一致 | ✅ |
+| 不写错题本（H3） | `db.getAllErrors()` 中该 `fileKey` 为空 | ✅ |
+| DB 停 v7 | `studyDb.js` `const DB_VERSION = 7` | ✅ |
+| H5 四处一致 | schema `enum` 含 workcard + `allOf` 分支（`intro`/`duration`）；`blockTypes` `workcard:{kind:'practice'}`；`registry` `workcard:WorkCardBlock`；`content.d.ts` `'workcard'` + `interface WorkCardBlock` | ✅ |
+
+### 5. `/guide` 独立性 + 搜索/题库边界
+
+**结论：验证成立。**
+
+- **路由**：`router.getRoutes()` 中 `name=guide`、`path='/guide'`、非 `/study` 子路径、`meta.tab` 为空 → 顶层独立页。✅
+- **采集边界**：`scripts/lib/load-content.mjs` `NON_PAGE_DIRS = new Set(['guide'])`；`collectFiles(CONTENT_DIR)` 返回 >100 文件且**无一 guide 文件**。源码注释明确其**设计意图**：guide 是独立非学科页，**让搜索索引 / 题库构建不误收该页数据**。✅
+- **搜索索引不入 guide**（派单待定项 · 已定论）：`build-search-index.mjs` 亦走 `collectFiles`（同排除）；实测构建产物 `public/search-body/{math,chinese,computer}.json` **仅三学科**，「志愿填报」内容**零命中** → guide 有意**不进搜索索引**。**实现与注释意图一致，判定为正确决定**（外链工具入口页不属于检索知识点）。✅
+- **内容纯度**：`src/content/guide/01-志愿填报.js` 零 `import`（纯数据）。✅
+- **入口可达**：`HomeView.vue` 含 `to="/guide"`。✅
+- **schema**：guide 骨架区块经 `createBlockValidator` 逐块复算 **0 错误**；唯一外链 `https://www.zjzs.net`。✅
+- **站点配置数 = 3**：`SITE_FILES` keys = `{math,chinese,computer}`（对应 `validate:content` 输出「+3」）。✅
+
+### 6. 依赖面
+
+**结论：验证成立。**
+- `package.json` 运行期 `@tauri-apps/*` = **仅** `@tauri-apps/plugin-shell`（`^2.5.0`）。✅
+- Fc6 提交对 `package-lock.json` 的**新增** `@tauri-apps/*` 顶层键 = **恰 2**（`node_modules/@tauri-apps/api`、`node_modules/@tauri-apps/plugin-shell`）——由 `git show 89d2e60` diff 独立得出。
+- ⚠️ **口径澄清**：全量 lock 另有 **12 个预存** `@tauri-apps/cli*` 平台包（devDependency，构建用，与本笔无关）。故「仅 2」的正确判据是 **lock 的 diff**，非全量 lock 的计数——初版探针按全量计数误报，已修正。
+
+---
+
+### 全量关口（干净工作树 @ `1282813`）
+
+| 关口 | 命令 | 结果 |
+|---|---|---|
+| 全量测试 | `npx vitest run --pool=threads --maxWorkers=1` | **76 文件 / 875 通过 + 6 跳过（881）/ 0 失败** ✅（与 engineer @ `c98e6a3` 口径一致；**含 `1282813` 后用例数不变**） |
+| CSP 守护双子集 | `vitest run tests/csp-guard.test.js tests/batch-e-verify-csp.test.js` | **31 通过**（17 + 14），与 `1282813` 提交信息口径一致 ✅ |
+| 内容 Schema | `npm run validate:content` | **182 内容文件 + 3 站点配置**，全部通过 ✅ |
+| 区块注册表 | `vitest run tests/block-registry.test.js` | 26 通过 ✅ |
+| 作品卡/外链 | `vitest run tests/workcard-block.test.js tests/open-external.test.js` | 21 + 5 通过 ✅ |
+
+> **6 跳过说明（非回归）**：`tests/batch-e-verify-search.test.js` 依赖 `.gitignore` 的构建产物（`public/search-body/*.json` 等），干净工作树未 `build:index` → 跳过。属**环境性**，非代码缺陷（本轮攻点[5] 已在主树用现成产物独立核过 guide 不入索引）。
+
+---
+
+### 新遗留风险（Round 2）
+
+| # | 等级 | 项 | 说明 |
+|---|---|---|---|
+| — | — | **无** | 四笔均通过独立证伪；无功能性缺陷。 |
+| R-1（批F） | **低** | Fc2 对称边角 | 承 Round 1 登记，本轮四笔未触及该路径；维持「低/可能不可达」。 |
+| R-2（批F） | 信息 | 内容侧终态交付 `c1531d7` | 验证期间 `main` 前进至内容侧终态交付；本轮四笔均早于它，干净树已隔离。内容侧大改的独立验证属**另一批次**，不在本轮范围。 |
+
+**其余：0**。`1282813` 的元检查收口**消除了**原版引号形态盲区且**不引入假红**——该笔对口径是关键改进；批 E 报告 §1 的「`HOST_ALLOWLIST` 均为空集」表述已随之作废（更正见 `docs/proposals/batch-e-qa-report.md` 附录 A）。
+
+**建议 patch：无**（本轮无需源码修改；`1282813` 已自证充分）。
+
+---
+
+_报告人：QA 严过关｜Round 2（批 F 第二波）｜基线 `1282813`（含 `89d2e60`/`3ce7f01`/`1282813`/`c98e6a3` 四笔）｜方法：独立证伪 + 运行时抽取被验正则 + Python 双实现对照 + 干净树全量关口_
