@@ -22,6 +22,7 @@
     "build:practice": "node scripts/build-practice-bank.mjs",
     "build:search": "node scripts/build-search-index.mjs",
     "build:index": "npm run build:practice && npm run build:search",
+    "build:content-remote": "node scripts/build-content-remote.mjs",
     "geogebra": "node scripts/fetch-geogebra.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
