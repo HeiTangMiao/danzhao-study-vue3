@@ -1,7 +1,7 @@
 <!--
   QuizBlock —— 快速检测 / 练习题区块（自主学习版）
   职责：
-   - 选择题：点击选项标记所选，不判定对错，直接展开答案/解析
+   - 选择题：点选即**判定对错**（正确项恒绿、错选红）+ 即时揭示答案/解析，与判断题派生行为一致
    - 判断题（P0-1）：命中判据的判断题派生成「正确 / 错误」可点选题 —— 点选即**判定对错**
      （绿/红）+ 揭示答案（构建期与页面内共用 judgeDerive 同一纯函数，H7）
    - 非选择题（含未派生判断题）：仅提供「查看答案 / 隐藏答案」，不对作答情况判定
@@ -41,14 +41,14 @@
           <MathJaxRender :text="item.question" />
         </div>
 
-        <!-- 可点选题（原生选择 / 判断题派生）：选择题仅标记所选；判断题派生「正确/错误」并即时判定 -->
+        <!-- 可点选题（原生选择 / 判断题派生）：点选即判定对错（绿/红）并展开答案（与判断题派生同款） -->
         <div v-if="choiceOf(item)" class="option-list">
           <button
             v-for="(opt, oi) in choiceOf(item).options"
             :key="oi"
             class="option-btn"
             :class="optionClass(i, oi)"
-            :disabled="choiceOf(item).derived && states[i]?.selected !== undefined"
+            :disabled="states[i]?.selected !== undefined"
             @click="pickChoice(i, oi)"
           >
             <span class="option-letter">{{ choiceOf(item).derived ? (oi === 0 ? 'T' : 'F') : 'ABCDEFGH'[oi] }}</span>
@@ -88,16 +88,16 @@
           <button class="answer-toggle" @click="toggle(i)">{{ opened[i] ? '隐藏答案' : '查看答案' }}</button>
         </div>
 
-        <!-- 判断题派生判定结果（绿/红；仅本次点选算「自动判」） -->
+        <!-- 判定结果（绿/红）：原生选择与判断题派生同款 —— 点选即判，仅本次点选算「自动判」 -->
         <p
-          v-if="choiceOf(item)?.derived && states[i]?.correct !== undefined"
+          v-if="states[i]?.correct !== undefined"
           class="judge-feedback"
           :class="states[i].correct ? 'judge-ok' : 'judge-no'"
         >
           {{ states[i].correct ? '回答正确' : '回答错误' }}
         </p>
 
-        <!-- 答案 / 解析（不判定对错，仅展示参考答案） -->
+        <!-- 答案 / 解析（判分已在选项行完成，此处仅展示参考答案） -->
         <transition name="fade">
           <div v-if="opened[i]" class="answer-panel">
             <div class="answer-text">
@@ -149,15 +149,18 @@ function isJudge(item) {
   return isJudgeItem(item)
 }
 
-// 是否原生选择题（有 options 且含正确索引）
+// 是否原生选择题（有 options 且 correctIndex 落在合法范围）—— 越界视为「不可判分」，回落「查看答案」：
+// 若越界还判分，`oi === correctIndex` 恒 false → 所有选项恒红，比不判分更误导学员（安全降级）。
 function isChoice(item) {
-  return Array.isArray(item.options) && item.options.length > 0 && item.correctIndex !== undefined
+  return Array.isArray(item.options) && item.options.length > 0
+    && Number.isInteger(item.correctIndex)
+    && item.correctIndex >= 0 && item.correctIndex < item.options.length
 }
 
 /**
  * 该条目的「可点选题」形态：
- *  - 原生选择题 → 原样（derived=false，点击只标记所选、不判对错）
- *  - 判断题命中判据 → 派生成「正确/错误」可点选题（derived=true，点击即判定对错）
+ *  - 原生选择题 → 原样（derived=false）
+ *  - 判断题命中判据 → 派生成「正确/错误」可点选题（derived=true）
  *  - 其余 → null（退回「查看答案」）
  * 与构建脚本共用 deriveJudge 同一纯函数（H7 单一真相源）
  */
@@ -167,25 +170,24 @@ function choiceOf(item) {
   return d ? { options: d.options, correctIndex: d.correctIndex, derived: true } : null
 }
 
-// 选项样式：原生选择题仅高亮所选；判断题派生分别高亮正确项（绿）与错选（红）
+// 选项样式：原生选择与判断题派生统一为「正确项恒绿、错选红」（不再有「仅标记所选」态）
 function optionClass(i, oi) {
   const st = states[i]
   if (!st || st.selected === undefined) return {}
   const eff = choiceOf(props.block.items[i])
-  if (!eff || !eff.derived) return { 'option-selected': st.selected === oi }
+  if (!eff) return {}
   return {
     'option-correct': oi === eff.correctIndex,
     'option-wrong': st.selected === oi && oi !== eff.correctIndex
   }
 }
 
-// 标记所选选项并展开答案；判断题派生命中的同时即时判定对错（仅本题这次算「自动判」）
+// 点选即判分并展开答案：原生选择题与判断题派生**统一判分**（绿/红 + 判定文案）。
+// 判分只落在这道题的本地状态里（不落库、不上报，维持浏览态契约）。
 function pickChoice(i, oi) {
   const eff = choiceOf(props.block.items[i])
   if (!eff) return
-  const next = { selected: oi }
-  if (eff.derived) next.correct = oi === eff.correctIndex
-  states[i] = next
+  states[i] = { selected: oi, correct: oi === eff.correctIndex }
   opened[i] = true
 }
 
@@ -248,8 +250,7 @@ function toggle(i) { opened[i] = !opened[i] }
   cursor: pointer;
 }
 .option-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
-.option-selected { border-color: var(--primary); background: var(--primary-soft); }
-/* 判断题派生：点选即判定 —— 正确项恒绿、错选红 */
+/* 原生选择与判断题派生统一：点选即判定 —— 正确项恒绿、错选红 */
 .option-correct { border-color: var(--success); background: rgba(var(--success-rgb), 0.08); }
 .option-correct .option-letter { background: var(--success); color: #fff; border-color: var(--success); }
 .option-wrong { border-color: var(--danger); background: rgba(var(--danger-rgb), 0.06); }
@@ -264,7 +265,6 @@ function toggle(i) { opened[i] = !opened[i] }
   display: inline-flex; align-items: center; justify-content: center;
   font-size: var(--fs-sm); font-weight: 700; color: var(--text-muted);
 }
-.option-selected .option-letter { background: var(--primary); color: #fff; border-color: var(--primary); }
 .option-text { flex: 1; }
 
 /* 非选择题操作区 */
