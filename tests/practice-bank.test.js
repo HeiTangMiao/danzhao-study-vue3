@@ -25,11 +25,11 @@ import { composePaper } from '@/utils/composePaper'
 import { normalizeBankItem, paperKeyOf } from '@/content/practiceBank'
 import { deriveJudge, isJudgeItem } from '@/content/judgeDerive'
 
-// 人类可读的参考基线（内容冻结于 2026-10-10 内容侧入库：179 个内容文件）：
-//   total 2102（数学 1052 / 计算机 674 / 语文 376）/ gradable 1251 / derived 404 / normalizable 144。
-//   历史基线（已过期，仅留档）：1624/592/163（内容冻结于 44d087a）；1393/363/77（仅 06 单元前口径）。
+// 人类可读的参考基线（2026-10-11 重设：内容侧三批补密入库后，182 个内容文件）：
+//   total 2357（数学 1073 / 计算机 754 / 语文 530）/ gradable 1482 / derived 515 / normalizable 153。
+//   历史基线（已过期，仅留档）：2102/1251/404（2026-10-10）；1624/592/163（44d087a）；1393/363/77（仅 06 单元前）。
 // 参考值仅作人工核对，**不作为硬断言**（内容侧并行维护内容时避免假红）。
-const REFERENCE_BASELINE = { total: 2102, gradable: 1251, derived: 404 }
+const REFERENCE_BASELINE = { total: 2357, gradable: 1482, derived: 515 }
 // 内容只增不减的原始下限（低于此值说明内容被误删）。
 // 2026-10-10 重设：1393 → 2000（内容侧一批把总量从 1624 推到 2102，原下限已离实际太远、失去绊线意义）
 const MIN_TOTAL = 2000
