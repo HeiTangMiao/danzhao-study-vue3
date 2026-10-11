@@ -10,7 +10,8 @@
  *  - L3 代码层：独立扫描「字符串转代码」（不 import 护栏的 EVAL_PATTERNS）
  *  - L4 代码层：独立 walkSrc + 主机抽取；排除边界只到三学科页面目录；合成反向锚
  *  - L6 代码层：独立 import() 实参抽取 + 三档判定；真实 loadPage.js 模板 glob 必放行
- *  - 元检查：护栏自身的 EVAL_ALLOWLIST / HOST_ALLOWLIST 必须为空（不许静默放行）
+ *  - 元检查：护栏自身的 EVAL_ALLOWLIST 必须为空；HOST_ALLOWLIST 只允许已登记的网络侧授权
+ *            （批 F · F-1 加入 www.zjzs.net，见 §F-1）—— 不许静默放行其它主机
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
@@ -141,14 +142,17 @@ describe('E-0 独立复核 · L4 外部主机被 prod CSP 覆盖', () => {
     return out
   }
   const isContentPage = (r) => ['math', 'chinese', 'computer'].some((s) => r.startsWith(`src/content/${s}/`))
+  // 批 F · F-1 授权的唯一网络侧例外：志愿填报官方入口（交系统浏览器打开，webview 不加载该主机）。
+  // 与 csp-guard.test.js 的 HOST_ALLOWLIST 同口径；此处独立复算，故就地登记一份。
+  const AUTHED_HOSTS = new Set(['www.zjzs.net'])
 
-  it('排除三学科页面数据目录后，普通代码文件 0 处未覆盖主机', () => {
+  it('排除三学科页面数据目录后，普通代码文件 0 处未覆盖主机（已授权例外除外）', () => {
     const found = []
     for (const f of ALL_SRC) {
       const r = rel(f)
       if (isContentPage(r)) continue
       for (const h of hostsIn(readFileSync(f, 'utf-8'))) {
-        if (!covered.has(h)) found.push(`${r} → ${h}`)
+        if (!covered.has(h) && !AUTHED_HOSTS.has(h)) found.push(`${r} → ${h}`)
       }
     }
     expect([...new Set(found)]).toEqual([])
@@ -236,16 +240,19 @@ describe('E-0 独立复核 · L6 import() 三档判定', () => {
 })
 
 // ---------------- 护栏自身元检查 ----------------
-describe('E-0 独立复核 · 护栏白名单必须为空（防静默放行）', () => {
+describe('E-0 独立复核 · 护栏白名单只含已登记项（防静默放行）', () => {
   const guard = readFileSync(join(ROOT, 'tests/csp-guard.test.js'), 'utf-8')
 
-  it('EVAL_ALLOWLIST 与 HOST_ALLOWLIST 均为空集', () => {
+  it('EVAL_ALLOWLIST 为空；HOST_ALLOWLIST 恰为已授权的 {www.zjzs.net}', () => {
     const evalM = /const EVAL_ALLOWLIST\s*=\s*new Set\(\[([\s\S]*?)\]\)/.exec(guard)
     const hostM = /const HOST_ALLOWLIST\s*=\s*new Set\(\[([\s\S]*?)\]\)/.exec(guard)
     expect(evalM, 'EVAL_ALLOWLIST 未找到').toBeTruthy()
     expect(hostM, 'HOST_ALLOWLIST 未找到').toBeTruthy()
+    // 代码执行类白名单：永远必须为空（不许静默放行）
     expect(evalM[1].replace(/\/\/.*$/gm, '').trim()).toBe('')
-    expect(hostM[1].replace(/\/\/.*$/gm, '').trim()).toBe('')
+    // 网络侧白名单：仅允许批 F · F-1 授权的官方入口主机，不得夹带其它
+    const hosts = [...hostM[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort()
+    expect(hosts).toEqual(['www.zjzs.net'])
   })
 
   it('www.example.com 未被加进任何白名单（P-E1 边界处置）', () => {
