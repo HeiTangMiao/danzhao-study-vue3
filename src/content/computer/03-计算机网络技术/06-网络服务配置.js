@@ -180,7 +180,7 @@ export default {
           question: "将域名解析为 IP 地址的服务是（　）",
           options: ["A. DNS", "B. DHCP", "C. FTP", "D. WWW"],
           correctIndex: 0,
-          answer: "答案：A。DNS 负责域名解析。"
+          answer: "答案：A。DNS（域名系统）负责把域名解析为 IP 地址。B DHCP 用于自动分配 IP 地址等参数；C FTP 是文件传输协议；D WWW 是万维网信息服务，都不做域名解析。"
         },
         {
           difficulty: "medium",

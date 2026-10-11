@@ -204,7 +204,7 @@ export default {
           question: "去除视频中白色背景应使用（　）特效",
           options: ["A. 颜色键", "B. 亮度与对比度", "C. 模糊", "D. 锐化"],
           correctIndex: 0,
-          answer: "答案：A。颜色键去除指定颜色背景。"
+          answer: "答案：A。颜色键（Color Key）通过抠除指定颜色实现去背，本题抠除白色。亮度与对比度只调整明暗反差，模糊用于柔化画面，锐化增强边缘清晰度，都不能去背景。"
         },
         {
           difficulty: "basic",
@@ -212,7 +212,7 @@ export default {
           question: "新建字幕的入口是（　）",
           options: ["A. 文件→新建→字幕", "B. 文件→导入", "C. 编辑→复制", "D. 序列→渲染"],
           correctIndex: 0,
-          answer: "答案：A。文件→新建→字幕。"
+          answer: "答案：A。执行\"文件→新建→字幕\"打开字幕设计窗口，输入文字并设置字体、字号、字距、填充与描边后保存为 .prtl 字幕文件，再拖到时间轴上使用。"
         },
         {
           difficulty: "medium",
@@ -220,7 +220,7 @@ export default {
           question: "实现音频淡入淡出的效果是（　）",
           options: ["A. 恒定增益", "B. 颜色键", "C. 带状擦除", "D. 亮度调整"],
           correctIndex: 0,
-          answer: "答案：A。恒定增益实现音量渐变。"
+          answer: "答案：A。恒定增益（Constant Gain）配合关键帧可实现音量由小到大或由大到小的渐变，即淡入淡出。颜色键用于抠像，带状擦除是转场效果，亮度调整只改明暗，都与音量无关。"
         },
         {
           difficulty: "medium",
@@ -249,7 +249,7 @@ export default {
           question: "将图片亮度调整为 -100，效果是（　）",
           options: ["A. 变亮", "B. 变暗", "C. 变模糊", "D. 变色"],
           correctIndex: 1,
-          answer: "答案：B。负的亮度值使图像变暗。"
+          answer: "答案：B。亮度取负值会使图像变暗，-100 是较大的负向调整，画面会明显压暗（正值才是变亮）。亮度不改变清晰度，也不改变色相。"
         },
         {
           difficulty: "advanced",

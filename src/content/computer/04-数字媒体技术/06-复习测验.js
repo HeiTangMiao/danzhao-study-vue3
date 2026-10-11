@@ -102,10 +102,10 @@ export default {
         {
           difficulty: "medium",
           type: "single",
-          question: "将图片定义为图案，应使用（　）",
-          options: ["A. 编辑→定义图案", "B. 滤镜→模糊", "C. 图像→调整", "D. 图层→复制"],
+          question: "在 Photoshop 中，撤销上一步操作的快捷键是（　）",
+          options: ["A. Ctrl+Z", "B. Ctrl+Y", "C. Ctrl+X", "D. Ctrl+D"],
           correctIndex: 0,
-          answer: "答案：A。编辑→定义图案。"
+          answer: "答案：A。Ctrl+Z 撤销上一步（连续按可多步撤销）；Ctrl+X 是剪切，Ctrl+D 是取消选区。"
         },
         {
           difficulty: "medium",
@@ -126,10 +126,10 @@ export default {
         {
           difficulty: "medium",
           type: "single",
-          question: "Premiere 中分割视频片段的工具是（　）",
-          options: ["A. 选择工具", "B. 剃刀工具", "C. 钢笔工具", "D. 抓手工具"],
-          correctIndex: 1,
-          answer: "答案：B。剃刀工具（C）。"
+          question: "在 Premiere 中，要将播放头快速移到序列的起始位置，应按（　）",
+          options: ["A. Home", "B. End", "C. Page Down", "D. 空格键"],
+          correctIndex: 0,
+          answer: "答案：A。Home 键跳到序列开头，End 键跳到序列末尾，空格键用于播放/暂停预览。"
         },
         {
           difficulty: "advanced",
@@ -137,7 +137,7 @@ export default {
           question: "在效果控件中开启属性动画，应点击（　）",
           options: ["A. 秒表图标", "B. 眼睛图标", "C. 锁图标", "D. 垃圾桶"],
           correctIndex: 0,
-          answer: "答案：A。秒表图标开启关键帧。"
+          answer: "答案：A。点击属性名称左侧的秒表图标即可开启关键帧，之后在不同时间点修改该属性值就能生成动画。眼睛图标控制显示/隐藏，锁图标用于锁定轨道，垃圾桶是删除，都与动画无关。"
         },
         {
           difficulty: "advanced",

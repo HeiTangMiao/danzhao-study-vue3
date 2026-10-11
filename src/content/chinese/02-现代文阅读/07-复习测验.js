@@ -16,10 +16,10 @@ export default {
         {
           difficulty: "basic",
           type: "single",
-          question: "记叙文的六要素中，居于核心地位的是（　）",
-          options: ["A. 时间", "B. 人物", "C. 经过", "D. 结果"],
+          question: "下列各项中，不属于记叙文六要素的是（　）",
+          options: ["A. 时间", "B. 地点", "C. 环境", "D. 事件的起因"],
           correctIndex: 2,
-          answer: "**C**。事件的\"经过\"是叙事的主体部分，是六要素的核心，人物的性格、事件的意义主要通过\"经过\"来呈现。"
+          answer: "**C**。记叙文的六要素是时间、地点、人物、起因、经过、结果。\"环境\"属于小说的三要素之一，不在记叙文六要素之列。"
         },
         {
           difficulty: "basic",

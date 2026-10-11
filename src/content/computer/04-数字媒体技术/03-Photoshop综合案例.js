@@ -190,7 +190,7 @@ export default {
           question: "自由变换的快捷键是（　）",
           options: ["A. Ctrl+T", "B. Ctrl+D", "C. Ctrl+J", "D. Ctrl+L"],
           correctIndex: 0,
-          answer: "答案：A。Ctrl+T 自由变换。"
+          answer: "答案：A。Ctrl+T 进入自由变换，可对图层或选区内容进行缩放、旋转、斜切。Ctrl+D 取消选区，Ctrl+J 复制图层，Ctrl+L 打开色阶调整。"
         },
         {
           difficulty: "basic",

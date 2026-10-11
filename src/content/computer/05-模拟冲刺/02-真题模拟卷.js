@@ -23,10 +23,10 @@ export default {
           difficulty: "basic",
           type: "single",
           score: 5,
-          question: "下列变量名中，合法的是（　）",
-          options: ["A. 2num", "B. my-name", "C. student_name", "D. for"],
-          correctIndex: 2,
-          answer: "答案：C。student_name 合法；`for` 是关键字，`2num` 以数字开头，`my-name` 含非法字符。"
+          question: "下列变量名中，不符合 Python 命名规则的是（　）",
+          options: ["A. `name_1`", "B. `_count`", "C. `stu2`", "D. `2stu`"],
+          correctIndex: 3,
+          answer: "答案：D。变量名必须以字母或下划线开头，不能以数字开头。`name_1`、`_count`、`stu2` 均合法（下划线可开头，数字只要不在首位即可）。"
         },
         {
           difficulty: "basic",
@@ -50,10 +50,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "执行以下代码，输出结果是（　）\n```\nsum = 0\nfor i in range(1, 5):\n    sum += i\nprint(sum)\n```",
-          options: ["A. 10", "B. 15", "C. 6", "D. 4"],
-          correctIndex: 0,
-          answer: "答案：A。range(1, 5) 生成 1、2、3、4，累加得 10。"
+          question: "执行以下代码，输出结果是（　）\n```\ns = 0\ni = 1\nwhile i <= 5:\n    s += i\n    i += 1\nprint(s)\n```",
+          options: ["A. 10", "B. 15", "C. 21", "D. 6"],
+          correctIndex: 1,
+          answer: "答案：B。while 循环依次累加 1+2+3+4+5 = 15。注意循环条件是 `i <= 5`，5 也被累加；若写成 `i < 5` 结果才是 10。"
         },
         {
           difficulty: "medium",
@@ -185,28 +185,28 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "连接两台交换机并传输多个 VLAN 数据的端口应设为（　）",
-          options: ["A. access", "B. trunk", "C. console", "D. vlan"],
+          question: "关于交换机 access 端口与 trunk 端口的区别，下列说法正确的是（　）",
+          options: ["A. access 端口只能属于一个 VLAN，trunk 端口可承载多个 VLAN", "B. access 端口的传输速率比 trunk 端口更高", "C. trunk 端口只能用于连接 PC 等终端设备", "D. 两种端口在功能上没有区别"],
+          correctIndex: 0,
+          answer: "答案：A。access 端口用于接入终端，只属于一个 VLAN；trunk 端口用于交换机之间互联，可同时承载多个 VLAN 的数据。速率与端口模式无关。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          score: 5,
+          question: "配置静态路由时，命令末尾填写的\"下一跳\"指的是（　）",
+          options: ["A. 本路由器出口接口的 IP 地址", "B. 相邻路由器与本路由器直连的那个接口的 IP 地址", "C. 目标网络里某台主机的 IP 地址", "D. 本网络的默认网关 MAC 地址"],
           correctIndex: 1,
-          answer: "答案：B。trunk 端口承载多个 VLAN。"
+          answer: "答案：B。\"下一跳\"是数据包要交给的下一台路由器、且与该路由器直连的那个接口的 IP 地址；不是本端接口 IP，也不是最终目标主机 IP。"
         },
         {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "配置默认路由的命令是（　）",
-          options: ["A. `ip route 0.0.0.0 0.0.0.0 下一跳`", "B. `ip route 192.168.1.0 255.255.255.0 下一跳`", "C. `default route`", "D. `route default`"],
-          correctIndex: 0,
-          answer: "答案：A。默认路由目标网络和掩码均为 0.0.0.0。"
-        },
-        {
-          difficulty: "medium",
-          type: "single",
-          score: 5,
-          question: "进入 RIP 路由配置模式的命令是（　）",
-          options: ["A. `router rip`", "B. `rip enable`", "C. `configure rip`", "D. `ip rip`"],
-          correctIndex: 0,
-          answer: "答案：A。`router rip` 进入 RIP 配置模式。"
+          question: "在 RIP 配置中输入 `network 192.168.1.0` 的作用是（　）",
+          options: ["A. 设置该路由器的默认网关", "B. 宣告与本路由器直连的网段，使其参与 RIP 通告", "C. 指定去往该网段的下一跳地址", "D. 设置该网段的子网掩码"],
+          correctIndex: 1,
+          answer: "答案：B。RIP 用 `network` 宣告本路由器直连的主类网段，宣告后该网段才会被通告给邻居；下一跳、掩码不在这里配置。"
         },
         {
           difficulty: "advanced",
@@ -325,10 +325,10 @@ export default {
           difficulty: "medium",
           type: "single",
           score: 5,
-          question: "文字竖排显示应使用（　）",
-          options: ["A. 横排文字工具", "B. 直排文字工具", "C. 段落文字", "D. 钢笔工具"],
-          correctIndex: 1,
-          answer: "答案：B。直排文字工具。"
+          question: "在 Photoshop 中，要使选区边缘过渡柔和、不生硬，应进行（　）操作",
+          options: ["A. 羽化", "B. 锐化", "C. 反相", "D. 去色"],
+          correctIndex: 0,
+          answer: "答案：A。羽化（Feather）使选区边缘产生渐变过渡，抠图后边缘更自然；锐化增强清晰度，反相与去色只改变颜色。"
         },
         {
           difficulty: "medium",

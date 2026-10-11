@@ -196,7 +196,7 @@ export default {
           question: "文字竖排显示应使用（　）",
           options: ["A. 横排文字工具", "B. 直排文字工具", "C. 段落文字", "D. 画笔工具"],
           correctIndex: 1,
-          answer: "答案：B。直排文字工具使文字竖排。"
+          answer: "答案：B。直排文字工具使文字自上而下竖排排列；横排文字工具才是常规横排。段落文字指在文本框内按段落排版，画笔工具不能输入文字。"
         },
         {
           difficulty: "medium",
@@ -204,7 +204,7 @@ export default {
           question: "将图片保存为可重复使用的图案，应使用（　）",
           options: ["A. 编辑→定义图案", "B. 滤镜→模糊", "C. 图层→复制", "D. 图像→调整"],
           correctIndex: 0,
-          answer: "答案：A。编辑→定义图案。"
+          answer: "答案：A。先用选框选中要作为图案的区域，再执行\"编辑→定义图案\"，之后即可用油漆桶或填充命令把该图案平铺填充到任意区域。"
         },
         {
           difficulty: "medium",
@@ -225,7 +225,7 @@ export default {
           question: "复制图层的方法是（　）",
           options: ["A. 右键图层→复制图层", "B. 删除图层", "C. 合并图层", "D. 隐藏图层"],
           correctIndex: 0,
-          answer: "答案：A。右键图层选择复制图层。"
+          answer: "答案：A。在图层面板右键图层选择\"复制图层\"即可生成副本（快捷键 Ctrl+J 也可）。删除图层会移除图层，合并图层会把多层压为一层，隐藏图层只是不显示，都不会产生副本。"
         },
         {
           difficulty: "medium",

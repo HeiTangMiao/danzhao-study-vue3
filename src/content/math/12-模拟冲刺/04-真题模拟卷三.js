@@ -46,10 +46,10 @@ export default {
         },
         {
           type: "single", difficulty: "medium", score: 5,
-          question: "等比数列 \\(\\{a_n\\}\\) 中，\\(a_1 = 1\\)，\\(a_4 = 8\\)，则公比 \\(q =\\)（　）",
-          options: ["2", "3", "4", "\\(\\frac{1}{2}\\)"],
-          correctIndex: 0,
-          answer: "**A**。\\(q^3 = \\frac{a_4}{a_1} = 8\\)，故 \\(q = 2\\)。"
+          question: "等比数列 \\(\\{a_n\\}\\) 中，\\(a_1 = 2\\)，公比 \\(q = 3\\)，则 \\(a_3 =\\)（　）",
+          options: ["6", "12", "18", "24"],
+          correctIndex: 2,
+          answer: "**C**。\\(a_3 = a_1 q^2 = 2 \\times 3^2 = 18\\)；注意是 \\(q^2\\) 而不是 \\(q^3\\)（从第 1 项到第 3 项只乘 2 次公比）。"
         },
         {
           type: "single", difficulty: "medium", score: 5,

@@ -239,7 +239,7 @@ export default {
           question: "取消选区的快捷键是（　）",
           options: ["A. Ctrl+C", "B. Ctrl+D", "C. Ctrl+V", "D. Ctrl+Z"],
           correctIndex: 1,
-          answer: "答案：B。Ctrl+D 取消选区。"
+          answer: "答案：B。Ctrl+D 取消选区。Ctrl+C 是复制、Ctrl+V 是粘贴、Ctrl+Z 是撤销上一步操作，注意不要混淆。"
         },
         {
           difficulty: "medium",
@@ -247,7 +247,7 @@ export default {
           question: "复制图像某区域到另一位置的工具是（　）",
           options: ["A. 画笔工具", "B. 仿制图章", "C. 油漆桶", "D. 渐变工具"],
           correctIndex: 1,
-          answer: "答案：B。仿制图章复制图像区域。"
+          answer: "答案：B。仿制图章工具先按住 Alt 在源位置取样，再到目标位置涂抹，即可把图像某区域复制到另一位置，常用于修图、去除水印或杂物。画笔用于绘制，油漆桶填充颜色，渐变工具生成渐变色。"
         },
         {
           difficulty: "advanced",
