@@ -19,6 +19,11 @@ tests/tmp-*.test.js
 public/search-meta.json
 public/search-body/
 
+# Generated content snapshot（批 S1 · 构建产物，按需生成，不入库）：清单 + 每单元分片
+# 理由：快照含 182 页正文（LaTeX / mermaid），入库会让每次内容改动产生巨大 JSON diff；
+#      与 public/search-* 先例一致，发布前跑 npm run build:content-remote 现生成（S3 接 CI）
+public/content-remote/
+
 # Rust / Tauri build outputs
 src-tauri/target/
 src-tauri/gen/
