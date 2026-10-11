@@ -66,6 +66,12 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
       if (it.correctIndex !== undefined && it.options && (it.correctIndex < 0 || it.correctIndex >= it.options.length)) {
         errors.push(`${prefix}[${ii}] correctIndex 越界`)
       }
+      // solution 只在例题块渲染（ExampleBlock 的「先思考，再看解答」折叠区）——
+      // quiz/exam 的答案区只读 answer；若题目误带 solution，学员将看不到这段解析（静默丢失）。
+      // 故把「solution 只属于例题」从口头约定变成校验器绊线：Node 校验与编辑器实时提示两端共用同一份规则。
+      if (it.solution !== undefined) {
+        errors.push(`${prefix}[${ii}] solution 只在例题块渲染（请改用 answer）`)
+      }
       // 题目必须给出题干与答案，防止空白占位
       if (isEmpty(it.question)) errors.push(`${prefix}[${ii}] question 为空`)
       if (isEmpty(it.answer)) errors.push(`${prefix}[${ii}] answer 为空`)
