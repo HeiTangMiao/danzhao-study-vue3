@@ -18,7 +18,7 @@
 | **批 E** | P1 其余四项（CSP 护栏 / 自评三档 / 双轨进度 / 番茄分科 / 搜索覆盖题干） | ✅ **已完成**（QA 独立验证 0 缺陷，+41 用例） | commit `faecfae`…`acc049d`；QA 收编 `a5a141d` |
 | **P1-T5** | CSP 护栏（`system_design.md` §10；**方案已有**，见 `csp-guard-plan.md`） | ✅ **已完成**（并入批 E·E-0，含 L6 运行时拼接 import） | `tests/csp-guard.test.js` + `tests/helpers/csp-lock.js` |
 | **批 F0** | 来件响应热修（浏览态单选判分 / 深链 `05≡5` / `solution` 核实与绊线 / 判分·去重脚本接 CI） | ✅ **已完成**（含追加 F0c5 + F0c6；独立 QA 两轮 **774 用例全绿**、0 缺陷） | commit `8e2fad9`…`d4be892`；QA 收编 `3f68ec5`；报告 `batch-f0-qa-report.md` |
-| **批 F** | P2 其余 + 备案小项收拢 | ⚡ **实施中**（第一波 Fc2–Fc4 已派工；§7 十二项待拍板已全部裁定） | 任务卡 `batch-f-tasks.md`（含 §8 拍板记录） |
+| **批 F** | P2 其余 + 备案小项收拢 | ⚡ **实施中**：Fc2–Fc4 已推送（QA Round 1 三笔全成立、0 缺陷）；Fc6 已提交待 QA；Fc5 在制 | 任务卡 `batch-f-tasks.md`（含 §8 拍板记录）；报告 `batch-f-qa-report.md` |
 | **S1–S5** | 内容扩展双轨（方案已定稿） | ⏳ 待做 | `content-extension-dual-track.md` |
 | **P5** | Android 打包（Tauri） | ⏳ 待做 | 依赖 S5 + F |
 
@@ -273,6 +273,7 @@ flowchart TB
    - **几何字段未入 schema**（`diagram` 仅 `boardId`，但 `GeometryBlock` 已读 `boundingbox/height/fixed`）→ 补 schema + d.ts（零数据迁移）。
 4. **`AGENT_BROWSER_ARGS` 传参查证**：✅ **已查证归档**——全仓（含上层 `danzhao/`）仅 roadmap 本行出现该字符串，**零代码/CI 引用**；属外部浏览器自动化测试栈的环境变量，与产品零耦合，无需改任何代码。
 5. **`MindMapBlock` 高频连续导航竞态**（内容侧 2026-10-12 来件 §4.4 实测：连续 12 次导航、每次 120ms 时 1 次 `querySelector of null`；冷启动直达不复现）——修法已定位（`MindMapBlock.vue:200-233` 的 await **之后**补 `if (!container.value) return`）。**低优先**：真实用户难以 120ms 连点换页；**触发条件 = 用户实测/崩溃日志复现即升级**。
+6. **两抽屉同时开时的 body 锁对称边角**（批 F QA Round 1 的 R-1，低）：`ContentSidebar` 先持锁 → `NotesPanel` 后开（不夺锁）→ CS 关 → body 解锁但 NP 仍开。属「单一 body 锁 + `lockOwned`」模式的固有对称边角（`NotesPanel` 同款，非 Fc2 引入）；移动端「从抽屉内开笔记」的真实路径是**先关抽屉再 emit toggle-notes** → 二者不重叠，**判定很可能不可达、不阻断**。**触发条件 = 真出现两抽屉可同开 → 改引用计数锁**。
 
 ### 批 S —— 内容扩展双轨（并行轨，已定稿待实施）
 
