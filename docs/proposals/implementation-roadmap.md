@@ -1,6 +1,6 @@
 # 实施路线图（内容侧 17 项 + 功能侧存量方案 · 批次与依赖编排）
 
-> 状态：**执行中**（2026-10-12 更新）——批 A/B/C/D/E/F0 已完成并推送；**批 F 主体（Fc2–Fc6）已推送 + QA 两轮全过（0 缺陷）**，余 Fc1 查证归档与 F-3 小项收尾，见下方「进度看板」。
+> 状态：**执行中**（2026-10-12 更新）——批 A/B/C/D/E/F0 已完成并推送；**批 F 已收尾并可标 ✅**（Fc2–Fc6 已推送 + QA 两轮 0 缺陷 + 收尾核实通过，唯一实质遗留 C-1＝19 块 `lines`→`formulas` 迁移待内容侧）；**下一批 S1（内容快照/清单·纯构建期）已立项并派工**，见下方「进度看板」。
 > 本文件是**排期的单一真相源**；每批开工前由架构师细化为 `batch-?-tasks.md` 任务卡（本文件只到「批次」粒度）。
 > 角色：架构师（高见远 / Gao）产出；供用户拍板后进入实施。
 > 文档地图见 `docs/README.md`。
@@ -18,8 +18,9 @@
 | **批 E** | P1 其余四项（CSP 护栏 / 自评三档 / 双轨进度 / 番茄分科 / 搜索覆盖题干） | ✅ **已完成**（QA 独立验证 0 缺陷，+41 用例） | commit `faecfae`…`acc049d`；QA 收编 `a5a141d` |
 | **P1-T5** | CSP 护栏（`system_design.md` §10；**方案已有**，见 `csp-guard-plan.md`） | ✅ **已完成**（并入批 E·E-0，含 L6 运行时拼接 import） | `tests/csp-guard.test.js` + `tests/helpers/csp-lock.js` |
 | **批 F0** | 来件响应热修（浏览态单选判分 / 深链 `05≡5` / `solution` 核实与绊线 / 判分·去重脚本接 CI） | ✅ **已完成**（含追加 F0c5 + F0c6；独立 QA 两轮 **774 用例全绿**、0 缺陷） | commit `8e2fad9`…`d4be892`；QA 收编 `3f68ec5`；报告 `batch-f0-qa-report.md` |
-| **批 F** | P2 其余 + 备案小项收拢 | ⚡ **实施中（主体已落地）**：Fc2–Fc6 已推送；**QA Round 1/2 全过、0 缺陷**（Round 2 含对 lead 补丁的对抗复算，7 攻点）；余 Fc1 查证归档 + F-3 剩余小项 | 任务卡 `batch-f-tasks.md`（含 §8 拍板记录）；报告 `batch-f-qa-report.md`；已推送 `0dad4e2` |
-| **S1–S5** | 内容扩展双轨（方案已定稿） | ⏳ 待做 | `content-extension-dual-track.md` |
+| **批 F** | P2 其余 + 备案小项收拢 | ✅ **已完成并可标 ✅**：Fc2–Fc6 已推送；**QA Round 1/2 全过、0 缺陷**（Round 2 含对 lead 补丁的对抗复算，7 攻点）；收尾核实 F-3 六项全过，唯一实质遗留 C-1（19 块迁移，待内容侧）；Fc1 已归档 | 任务卡 `batch-f-tasks.md`；报告 `batch-f-qa-report.md`；收尾 `batch-f-closeout-tasks.md`；已推送 `0dad4e2` |
+| **S1** | 内容快照/清单形状定义 + 发布脚本（**纯构建期、零运行时**） | ⚡ **已派工实施中**（P-S01…P-S07 已裁定） | 任务卡 `batch-s1-tasks.md`；派工单 `batch-s1-workcard.md` |
+| **S2–S5** | 内容扩展双轨（方案已定稿；S2 的 DB 升版已**提前满足**——`content_cache`/`content_meta` 已在 v7 建好空表） | ⏳ 待做 | `content-extension-dual-track.md` |
 | **P5** | Android 打包（Tauri） | ⏳ 待做 | 依赖 S5 + F |
 
 > **当前基线（2026-10-12 更新）**：测试 **81 文件 / 916 通过 + 6 跳过（922）**（批 F 第二波后全绿）；
@@ -281,8 +282,8 @@ flowchart TB
 
 | 阶段 | 关键文件 | 与主线的接口 | 预估 | 状态 |
 |---|---|---|:--:|---|
-| **S1 快照格式+构建脚本** | 新增 `src/content/contentManifest.js`、`scripts/build-content-remote.mjs` | **零运行时影响**，可与批 A 并行 | M | 已定稿待实施 |
-| **S2 客户端加载层+缓存** | 新增 `src/utils/contentClient.js`、`src/content/mergeContent.js`；改 `src/content/loadPage.js`、`src/stores/studyDb.js`（**v7**） | **最高风险**：动 `loadPage` 运行时核心路径；`DB_VERSION 6→7` **须与 A-2/D-2 的存储变更合并为一次升版** | **L** | 已定稿待实施 |
+| **S1 快照格式+构建脚本** | 新增 `src/content/contentManifest.js`、`scripts/build-content-remote.mjs` | **零运行时影响**，可与主线并行 | M | ⚡ **已派工实施中**（P-S01…P-S07 裁定：gitignore 产物 / 单调号+指纹 / 一单元一片 / sitePatch 空结构 / 独立手动脚本 / 规范化序列化 / 预留键位不产出）→ 派工单 `batch-s1-workcard.md` |
+| **S2 客户端加载层+缓存** | 新增 `src/utils/contentClient.js`、`src/content/mergeContent.js`；改 `src/content/loadPage.js`、`src/stores/studyDb.js`（**表已在 v7 建好**） | **最高风险**：动 `loadPage` 运行时核心路径；⚠️ **DB 升版已被 S1 前置满足**——`content_cache`/`content_meta` 已在 v7 建好空表，S2 **无需再升版** | **L** | 已定稿待实施 |
 | **S3 服务器静态目录发布** | 发布脚本 + CI（rsync，零后端代码） | 复用现成部署链，可与 S2 并行 | S | 已定稿待实施 |
 | **S4 校验与回滚** | 改 `scripts/build-content-remote.mjs`；`contentClient.js` 校验分支 | **前进式回滚**（发一版新的旧内容） | S–M | 已定稿待实施 |
 | **S5 Android 侧验证 + search/practice 接入** | 改 `src/utils/search.js`、`practiceBankClient.js`；真机验证 | **与 P5 合并**（首个 APK 即带远程内容层） | M | 已定稿待实施 |
