@@ -1,0 +1,40 @@
+%% 批 F0「来件响应热修」关键调用流（HEAD = d486b8a）
+%% 覆盖：F0-1 浏览态单选判分 / F0-2 深链 unitNum 归一化 / F0-4 去重脚本 CI 卡口
+%% F0-3 为零代码核实（以 Note 标注，无消息链）
+sequenceDiagram
+    autonumber
+    participant U as 学员/外部链接
+    participant RT as vue-router
+    participant UV as UnitView.vue
+    participant CS as ContentSidebar.vue
+    participant QZ as QuizBlock.vue
+    participant JD as judgeDerive(共用函数)
+    participant CD as scripts/check-duplicates.mjs
+    participant CI as CI(quality job)
+
+    Note over QZ,JD: ① F0-1 浏览态单选判分（对齐判断题派生；不落库，H3）
+    U->>QZ: 点选原生单选选项 oi
+    QZ->>QZ: choiceOf(item)：原生 options+correctIndex（越界→null，回落「查看答案」）
+    QZ->>QZ: pickChoice(i, oi) → states[i] = { selected: oi, correct: (oi === correctIndex) }
+    QZ->>QZ: optionClass：正确项 option-correct(绿) / 错选 option-wrong(红)
+    QZ->>QZ: 锁定重选（selected 后 disabled）+ 揭示答案（不写 studyDb）
+    QZ-->>U: 「回答正确 / 回答错误」+ 答案面板
+    Note over QZ,JD: 判断题派生条目仍走 deriveJudge（H7 单一真相源），行为与原生单选一致
+
+    Note over U,CS: ② F0-2 深链 unitNum 归一化（只归一化 unitNum）
+    U->>RT: 访问 #/study/computer/5/4（外部链接未零填充）
+    RT->>RT: unit.beforeEnter → normalizeUnitNum('5') = '05' ≠ '5'
+    RT-->>U: replace → #/study/computer/05/4（URL 规范化）
+    RT->>UV: route.params.unitNum = '05'
+    UV->>UV: units.find(u => u.num === '05') → 命中单元（不再空白页）
+    UV->>CS: :unit-num="'05'" → unitIdx 命中（单元切换正常）
+    Note over RT: 旧 /unit/5 重定向亦经 normalizeUnitNum（双保险）<br/>站内导航恒用规范形 '05' → beforeEnter 返回 undefined（零跳转）
+
+    Note over CI,CD: ④ F0-4 去重卡口（脚本本体不改）
+    CI->>CI: npm run build（prebuild → build:index → 题库产物就绪）
+    CI->>CD: npm run check:dup
+    CD->>CD: L1 题干+选项（有序）/ L2 题干+正确项（跨文件）→ 命中则退出码 1
+    CD->>CD: L3 题干主干+正确项（模糊，仅报告，不进退出码）
+    CD-->>CI: exit 0（0/0/0）或 1（L1/L2 命中 → 阻断）
+
+    Note over QZ: ③ F0-3 零代码核实：全库 425 处 solution 全在 example 块，<br/>ExampleBlock 已渲染（先思考，再看解答）→ quiz/exam 无 solution 字段，无渲染缺口
