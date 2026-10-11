@@ -30,6 +30,7 @@
     "format": "prettier --write \"src/**/*.{js,vue,css}\" \"tests/**/*.js\""
   },
   "dependencies": {
+    "@tauri-apps/plugin-shell": "^2.5.0",
     "jsxgraph": "^1.13.1",
     "katex": "^0.18.4",
     "mermaid": "^11.16.1",

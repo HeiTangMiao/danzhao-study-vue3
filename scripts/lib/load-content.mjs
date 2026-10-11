@@ -51,13 +51,26 @@ export function normalizePath(p) {
   return p.split(/[\\/]+/).filter(Boolean).join('/')
 }
 
-/** 递归收集内容页 .js 文件（跳过 NON_PAGE_FILES 中登记的系统模块） */
+/**
+ * 内容目录下「非学科页」的数据子目录 —— 遍历时**整目录跳过**。
+ *
+ * 为什么要它：src/content/<dir>/ 下的 .js 默认被当作「学科内容页」，必须由对应学科的
+ *   site.js 注册，否则 validate-content.mjs 判为孤儿。但志愿填报页（批 F · F-1 / Fc6）
+ *   是**独立顶层页**（/guide），不属于 math/chinese/computer 任一学科、也不经 site.js 注册。
+ *   故整目录排除：既避免孤儿误报，也让搜索索引 / 题库构建不误收该页数据。
+ *   新增其它「独立非学科页」数据目录时在此登记。
+ */
+export const NON_PAGE_DIRS = new Set(['guide'])
+
+/** 递归收集内容页 .js 文件（跳过 NON_PAGE_FILES 登记的系统模块与 NON_PAGE_DIRS 登记的非学科页目录） */
 export function collectFiles(dir, acc = []) {
   for (const name of readdirSync(dir)) {
     if (NON_PAGE_FILES.has(name)) continue
     const p = join(dir, name)
-    if (statSync(p).isDirectory()) collectFiles(p, acc)
-    else if (name.endsWith('.js')) acc.push(p)
+    if (statSync(p).isDirectory()) {
+      if (NON_PAGE_DIRS.has(name)) continue
+      collectFiles(p, acc)
+    } else if (name.endsWith('.js')) acc.push(p)
   }
   return acc
 }

@@ -102,6 +102,13 @@
           <span class="tool-desc">预算 · 倒计时 · 清单</span>
         </div>
       </router-link>
+      <router-link to="/guide" class="tool-card" style="border-top-color: #2f8f7d">
+        <span class="tool-icon"><AppIcon name="compass" :size="20" /></span>
+        <div class="tool-text">
+          <span class="tool-name">志愿填报</span>
+          <span class="tool-desc">流程 · 步骤 · 材料 · 官方入口</span>
+        </div>
+      </router-link>
       <router-link v-if="sprintUnit" :to="mockRoute" class="tool-card" style="border-top-color: #a855f7">
         <span class="tool-icon"><AppIcon name="crosshair" :size="20" /></span>
         <div class="tool-text">

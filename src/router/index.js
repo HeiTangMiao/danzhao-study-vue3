@@ -69,6 +69,12 @@ const routes = [
     component: () => import('@/views/PlanView.vue')
   },
   {
+    // 志愿填报（批 F F-1）：独立顶层页，非学科页；无 meta.tab（与 /plan、/dashboard 同款隐藏底部 pill）
+    path: '/guide',
+    name: 'guide',
+    component: () => import('@/views/GuideView.vue')
+  },
+  {
     // 错题本
     path: '/error-book',
     name: 'error-book',

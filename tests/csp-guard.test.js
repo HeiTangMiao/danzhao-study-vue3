@@ -188,8 +188,13 @@ describe('L3 · 全仓不得出现「字符串转代码」', () => {
 
 // ────────── L4 源码引用的外部主机必须被生产 CSP 覆盖 ──────────
 
-/** 允许出现但不在 CSP 里的主机（仅限确实不用于加载资源的情形；非空须说明理由） */
-const HOST_ALLOWLIST = new Set([])
+/**
+ * 允许出现但不在 CSP 里的主机（仅限确实不用于加载资源的情形；非空须说明理由）。
+ * - `www.zjzs.net`：志愿填报页（批 F · F-1 / Fc6）的**官方入口外链**，经 openExternal 交
+ *   OS 默认浏览器打开；webview **不加载**该主机（打开外链不是 webview 请求）→ 与 CSP 无关，
+ *   故仅登记于 L4 允许清单，**不改生产 CSP**。
+ */
+const HOST_ALLOWLIST = new Set(['www.zjzs.net'])
 
 /** prod CSP 已覆盖的主机集合（去协议前缀与端口） */
 function prodCoveredHosts() {
@@ -325,11 +330,11 @@ describe('L6 · 无「运行时拼接」import()（H1）', () => {
     expect(violations, '运行时拼接 import() 违反 H1（生产 CSP 无 unsafe-eval，且无法构建期分包）').toEqual([])
   })
 
-  it('附加锚：router 的 10 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
+  it('附加锚：router 的 11 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
     const routerSrc = readFileSync(join(ROOT, 'src/router/index.js'), 'utf-8')
     const args = extractImportArgs(routerSrc)
     const viewLazy = args.filter((a) => /^['"]@\/views\/.+\.vue['"]$/.test(a.trim()))
-    expect(viewLazy, 'router 应为 10 处 @/views/*.vue 懒加载').toHaveLength(10)
+    expect(viewLazy, 'router 应为 11 处 @/views/*.vue 懒加载').toHaveLength(11)
     // 其余（如 main.js 预热 useKatex 的动态 import）同样必须静态可分析
     for (const a of args) {
       expect(isStaticImportArg(a), `import(${a.trim()}) 必须静态可分析`).toBe(true)
