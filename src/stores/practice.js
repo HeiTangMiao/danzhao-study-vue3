@@ -367,7 +367,8 @@ export const usePracticeStore = defineStore('practice', () => {
           q.question,
           q.answer,
           userAnswer,
-          `练习解析：${q.answer}`,
+          // F0c5：例题解析（solution）优先；缺省回落答案（旧产物 explanation 为空 → 行为不变）
+          `练习解析：${q.explanation || q.answer}`,
           {
             fileKey: q.fileKey,
             fileTitle: q.fileTitle,

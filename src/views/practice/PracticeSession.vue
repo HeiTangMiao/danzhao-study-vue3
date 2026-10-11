@@ -85,6 +85,10 @@
         <div v-if="rec.revealed" class="ps-answer">
           <div class="ps-answer-label"><AppIcon name="lightbulb" :size="15" /> 参考答案 / 解析</div>
           <MathJaxRender :text="q.answer" />
+          <!-- F0c5：例题把「答案」与详细解析拆成两字段；有解析才追加展示（旧产物无此字段 → 隐藏，不改变既有） -->
+          <div v-if="q.explanation" class="ps-answer-explain">
+            <MathJaxRender :text="q.explanation" />
+          </div>
         </div>
       </transition>
     </main>
@@ -471,6 +475,12 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; gap: 4px;
   font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--text-muted);
   margin-bottom: var(--space-2);
+}
+/* F0c5：例题详细解析（solution）——与答案同卡，用分隔线弱化层级，避免与答案混读 */
+.ps-answer-explain {
+  margin-top: var(--space-2); padding-top: var(--space-2);
+  border-top: 1px dashed var(--border);
+  color: var(--text);
 }
 
 /* 底部动作条：常驻拇指区，sticky 兜住长题干 */

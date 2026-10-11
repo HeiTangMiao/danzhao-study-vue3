@@ -184,6 +184,24 @@ describe('题库覆盖与形状（验收 5.7-1 + A-1 派生）', () => {
     },
     60000
   )
+
+  it(
+    'F0c5：解析字段 x 只出现在例题条目，且为源 solution 文本（非空字符串）',
+    async () => {
+      const { shards } = await getBank()
+      const all = flat(shards)
+      const withX = all.filter((it) => it.x !== undefined)
+      // 内容库确有带 solution 的例题（语文/数学均有多条）
+      expect(withX.length).toBeGreaterThan(0)
+      for (const it of withX) {
+        // x（解析）是例题专有：quiz/exam 无 solution 字段，不得携带 x
+        expect(it.it, `条目 ${it.k} 非例题却带 x`).toBe('example')
+        expect(typeof it.x).toBe('string')
+        expect(it.x.length).toBeGreaterThan(0)
+      }
+    },
+    60000
+  )
 })
 
 describe('D-3 kp 构建期派生（A 档，P1-14）', () => {
@@ -239,6 +257,11 @@ describe('题库产物与归一化（A-4 同权口径）', () => {
   it('normalizeBankItem 展开紧凑键 vf → verified（缺省 false）', () => {
     expect(normalizeBankItem({ k: 'x', dv: true, vf: true }).verified).toBe(true)
     expect(normalizeBankItem({ k: 'x', dv: true }).verified).toBe(false)
+  })
+
+  it('F0c5：normalizeBankItem 展开紧凑键 x → explanation（缺省空串）', () => {
+    expect(normalizeBankItem({ k: 'x', x: '解：先化简再代入' }).explanation).toBe('解：先化简再代入')
+    expect(normalizeBankItem({ k: 'x' }).explanation).toBe('') // 旧产物无 x 键 → 优雅降级空串
   })
 })
 

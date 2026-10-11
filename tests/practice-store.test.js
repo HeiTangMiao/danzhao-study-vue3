@@ -115,6 +115,24 @@ describe('practice store 会话状态机', () => {
     expect((await db.getAllErrors()).length).toBe(before + 1)
   })
 
+  it('F0c5：条目带 explanation（例题解析）时，错题本解析优先取解析而非答案', async () => {
+    const q = { ...makeQ(0), explanation: '解析：先化简再代入' }
+    store.startSession({
+      mode: 'unit',
+      title: '数学 · 测试',
+      subject: 'math',
+      unitNums: ['01'],
+      questions: [q],
+      compose: null
+    })
+    store.pickOption(1) // 答错（正确项是 0）
+    await store.assess('unknown')
+    const errors = await db.getAllErrors()
+    const rec = errors[errors.length - 1]
+    expect(rec.explanation).toBe('练习解析：解析：先化简再代入')
+    expect(rec.explanation).not.toContain('答案与解析') // 不再回落到 answer
+  })
+
   it('recordAnswered 逐题计数：自评一题，今日答题 +1（验收 5.7-6 数据面）', async () => {
     await startThree()
     const today = todayStr()

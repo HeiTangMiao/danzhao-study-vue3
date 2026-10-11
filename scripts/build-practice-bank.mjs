@@ -217,6 +217,10 @@ export async function collectBank() {
         // 例题可能只有 solution 没有 answer：回退取 solution，保证解析字段可用
         const rawAnswer = typeof item.answer === 'string' && item.answer ? item.answer : item.solution
         const aCap = capText(rawAnswer, ANSWER_LIMIT)
+        // F0c5：例题把「答案」与「解析」拆成 answer / solution 两字段；练习/复习流原本只拿 a
+        // （= answer，或 answer 缺失时回退 solution）。短式答案的例题解析只在 solution → 会对
+        // 练习流静默不可达。故 solution 非空时**单独**导出紧凑键 x（与 a 同截断上限），缺省不写键。
+        const xCap = item.solution ? capText(item.solution, ANSWER_LIMIT) : null
         // 判分口径（prd-mobile §5.1）：有 options 且有 correctIndex → 可机器判分
         let gradable =
           Array.isArray(item.options) && item.options.length > 0 && item.correctIndex !== undefined
@@ -253,6 +257,8 @@ export async function collectBank() {
           gradable = true
         }
         entry.g = gradable
+        // F0c5：解析字段（紧凑键 x）—— 仅例题会带；缺省不写 → 运行时 explanation='' 优雅降级
+        if (xCap && xCap.text) entry.x = xCap.text
         // B-2：fill 题构建期只标「可规整性」布尔 nz（期望值抽取非空），不预生成规整结果
         // —— 期望值抽取是启发式，算法升级不应要求重建产物；标注仅供组卷统计 / M1 测算
         if (isFillItem(item)) {
@@ -269,7 +275,7 @@ export async function collectBank() {
             s: info.subject
           })
         }
-        if (qCap.truncated || aCap.truncated) {
+        if (qCap.truncated || aCap.truncated || (xCap && xCap.truncated)) {
           truncated.push({ rel, key: entry.k })
         }
         list.push(entry)

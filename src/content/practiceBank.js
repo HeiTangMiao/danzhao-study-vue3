@@ -69,7 +69,8 @@ export const BANK_ITEM_KEYS = {
   q: 'question',
   o: 'options',
   ci: 'correctIndex',
-  a: 'answer', // 「答案 + 解析」整段，直接填 recordError 的 explanation
+  a: 'answer', // 「答案」文本（例题可能仅有 solution 时由此回退）；直接填 recordError 的 explanation
+  x: 'explanation', // F0c5：例题的详细解析（source=solution）；仅例题携带，缺省不写
   d: 'difficulty',
   it: 'itemType', // 内容侧题型：single / judge / fill / solution 等
   g: 'gradable', // 有 options 且有 correctIndex → 可机器判分
@@ -94,6 +95,9 @@ export function normalizeBankItem(raw) {
   item.difficulty = raw.d || ''
   item.options = Array.isArray(raw.o) ? raw.o : null
   item.correctIndex = typeof raw.ci === 'number' ? raw.ci : undefined
+  // F0c5：解析字段（例题的 solution）——缺省空串。旧产物无 x 键时优雅降级：
+  // 渲染隐藏解析、错题本回落 answer（与历史行为一致）。
+  item.explanation = typeof raw.x === 'string' ? raw.x : ''
   // 派生/核验/可规整标记：缺省即 false（紧凑键缺失时不污染运行时口径）
   item.derived = raw.dv === true
   item.verified = raw.vf === true

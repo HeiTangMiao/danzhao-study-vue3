@@ -96,6 +96,11 @@
           <span class="review-label">参考答案：</span>
           <MathJaxRender :text="item.answer" />
         </div>
+        <!-- F0c5：例题详细解析（solution）与答案分字段；有解析才追加展示（旧产物无此字段 → 隐藏） -->
+        <div v-if="item.explanation" class="review-explain">
+          <span class="review-label">解析：</span>
+          <MathJaxRender :text="item.explanation" />
+        </div>
       </div>
     </section>
   </div>
@@ -290,6 +295,12 @@ async function again() {
 .review-user { background: rgba(var(--warning-rgb), 0.08); border: 1px dashed var(--warning); }
 .review-no .review-user { border-color: var(--danger); background: rgba(var(--danger-rgb), 0.06); }
 .review-answer { background: var(--surface-muted); }
+/* F0c5：例题详细解析（solution）——沿用答案区排版，靠上分隔弱化层级 */
+.review-explain {
+  font-size: var(--fs-base); border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3); margin-top: var(--space-2);
+  background: var(--surface-muted); border-top: 1px dashed var(--border);
+}
 .review-label { font-weight: var(--fw-semibold); color: var(--text-muted); }
 
 /* 单题耗时（P0-3） */
