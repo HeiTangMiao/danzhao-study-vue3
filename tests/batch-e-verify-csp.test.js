@@ -250,9 +250,12 @@ describe('E-0 独立复核 · 护栏白名单只含已登记项（防静默放�
     expect(hostM, 'HOST_ALLOWLIST 未找到').toBeTruthy()
     // 代码执行类白名单：永远必须为空（不许静默放行）
     expect(evalM[1].replace(/\/\/.*$/gm, '').trim()).toBe('')
-    // 网络侧白名单：仅允许批 F · F-1 授权的官方入口主机，不得夹带其它
-    const hosts = [...hostM[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort()
+    // 网络侧白名单：仅允许批 F · F-1 授权的官方入口主机，不得夹带其它。
+    // 提取对引号形态无关（单引号/双引号/模板字面量）——只认单引号时，换个引号写新增项即可绕过本检查（2026-10-12 审计实测）。
+    const hosts = [...hostM[1].matchAll(/['"`]([^'"`]+)['"`]/g)].map((m) => m[1]).sort()
     expect(hosts).toEqual(['www.zjzs.net'])
+    // 残留守卫：剥掉引号条目与空白后必须无剩余（裸标识符、拼接等未识别写法同样不许溜过）。
+    expect(hostM[1].replace(/['"`][^'"`]*['"`]/g, '').replace(/[\s,]/g, '')).toBe('')
   })
 
   it('www.example.com 未被加进任何白名单（P-E1 边界处置）', () => {
