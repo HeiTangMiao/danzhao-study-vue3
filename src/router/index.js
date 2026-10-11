@@ -33,23 +33,16 @@ const routes = [
   },
   {
     // 内容页：按学科 + 单元号 + 页面索引渲染
+    // unitNum 归一化不在此处（beforeEnter）——见下方「全局 unitNum 归一化守卫」：
+    // beforeEnter 是 per-record 守卫，同一 unit 记录内仅 params 变化时不重入，
+    // 故「已在 unit 页 → push 非规范同记录深链」的缺口由全局守卫收口（F0c6）。
     path: '/study/:subject/:unitNum/:fileIndex?',
     name: 'unit',
-    component: () => import('@/views/UnitView.vue'),
-    // 外部深链可能不带零填充（`5`），而 site.js 的单元号是 `"05"` 字符串相等匹配 →
-    // 不归一化即匹配失败、空白页。在路由层归一化并 replace，保证 route.params.unitNum
-    // 恒为规范形（URL 一并规范化），一处覆盖 UnitView 与 ContentSidebar 全部消费点。
-    beforeEnter: (to) => {
-      const norm = normalizeUnitNum(to.params.unitNum)
-      if (norm !== to.params.unitNum) {
-        return { ...to, params: { ...to.params, unitNum: norm }, replace: true }
-      }
-      // 规范形：返回 undefined 不重定向 —— 站内导航（恒用规范形）与翻页转场零影响。
-    }
+    component: () => import('@/views/UnitView.vue')
   },
   {
-    // 兼容旧路由：/unit/:unitNum/:fileIndex? → 重定向到数学（重定向目标会再经 unit 的
-    // beforeEnter，此处归一化是双保险；站内旧链接亦可能带非零填充单元号）
+    // 兼容旧路由：/unit/:unitNum/:fileIndex? → 重定向到数学（重定向目标会再经全局归一化
+    // 守卫（F0c6）；此处归一化是双保险 + 少一跳；站内旧链接亦可能带非零填充单元号）
     path: '/unit/:unitNum/:fileIndex?',
     redirect: (to) => ({
       name: 'unit',
@@ -106,6 +99,30 @@ const router = createRouter({
     if (savedPosition) return savedPosition
     return { top: 0, behavior: 'auto' }
   }
+})
+
+/**
+ * 全局 unitNum 归一化守卫（F0c6）
+ *
+ * 为什么放路由层：外部深链可能不带零填充（`5`），而 site.js 的单元号是 `"05"` 字符串相等
+ * 匹配（UnitView / ContentSidebar 均如此）→ 不归一化即匹配失败、空白页。归一化放路由层
+ * 一处覆盖全部消费点（单一落点，H7）。
+ *
+ * 为什么是全局守卫而非 unit 记录的 beforeEnter：`beforeEnter` 是 **per-record** 守卫，
+ * 「已在 unit 记录 → 仅 params 变化」时不重入（vue-router 4.x 语义；QA R-1 实测：
+ * `/study/computer/05/4` → `/study/computer/7/4` 停在 '7'）。全局 `beforeEach` 每次导航
+ * 都执行，同记录参数变更也能收口。
+ *
+ * 注册顺序收益：本守卫**注册在 auth `beforeEach` 之前**（同类型守卫按注册序执行）→
+ * 未登录时 `/login?redirect=` 携带的是**规范形**路径（不会把 `5` 带进回跳地址）。
+ *
+ * 规范形返回 true（不重定向）—— 站内导航（恒用规范形）与翻页转场零影响。
+ */
+router.beforeEach((to) => {
+  if (to.name !== 'unit') return true
+  const norm = normalizeUnitNum(to.params.unitNum)
+  if (norm === to.params.unitNum) return true
+  return { ...to, params: { ...to.params, unitNum: norm }, replace: true }
 })
 
 /**
