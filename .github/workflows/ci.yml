@@ -35,6 +35,15 @@ jobs:
       - name: 生产构建
         run: npm run build
 
+      # 以下两步读 public/practice-bank/{subject}.json（由 build:practice 产出）→ 必须放在「生产构建」之后：
+      # build 经 prebuild → build:index → build:practice && build:search 已产出题库产物，此时数据就绪。
+      # 阻断口径：check:dup 的 L1/L2 命中 → 退出码 1；check:single 的 A 类命中 → 退出码 1；两者 L3/B 类仅报告不阻断。
+      - name: 题库实质重复检测
+        run: npm run check:dup
+
+      - name: 单选题判分口径检测
+        run: npm run check:single
+
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
