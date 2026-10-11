@@ -26,7 +26,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "columns", "group", "layout", "steps", "summary", "compare", "vocab", "code", "cloze"],
+          "enum": ["mindmap", "objectives", "knowledge", "formula", "table", "warning", "tip", "example", "quiz", "diagram", "errorfocus", "strategy", "exam", "columns", "group", "layout", "steps", "summary", "compare", "vocab", "code", "cloze", "workcard"],
           "description": "区块类型"
         },
         "title": { "type": "string", "description": "区块标题" }
@@ -53,7 +53,8 @@
         { "if": { "properties": { "type": { "const": "compare" } } }, "then": { "required": ["left", "right", "aspects"], "properties": { "left": { "type": "string", "description": "左侧名称：如「列举法」" }, "right": { "type": "string", "description": "右侧名称：如「描述法」" }, "aspects": { "type": "array", "items": { "$ref": "#/definitions/compareAspect" }, "description": "对照维度：每项一行，左右两侧各一句（中性对照，不分对错）" } } } },
         { "if": { "properties": { "type": { "const": "vocab" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/vocabItem" } } } } },
         { "if": { "properties": { "type": { "const": "code" } } }, "then": { "required": ["code"], "properties": { "lang": { "type": "string", "description": "语言标签：如 python / cmd / sql，仅作角标，不做语法高亮" }, "code": { "type": "string", "description": "代码文本：按原样等宽显示，会自动去掉行首缩进，不要写行号和围栏" } } } },
-        { "if": { "properties": { "type": { "const": "cloze" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/clozeItem" }, "description": "挖空默写：每项一句，用 {{答案}} 标出空位" }, "mode": { "enum": ["reveal", "input"], "description": "交互模式：reveal 点击揭晓（缺省，存量兼容）| input 输入默写（批 B P0-8，逐空比对，判分复用 answerNorm）" } } } }
+        { "if": { "properties": { "type": { "const": "cloze" } } }, "then": { "required": ["items"], "properties": { "items": { "type": "array", "items": { "$ref": "#/definitions/clozeItem" }, "description": "挖空默写：每项一句，用 {{答案}} 标出空位" }, "mode": { "enum": ["reveal", "input"], "description": "交互模式：reveal 点击揭晓（缺省，存量兼容）| input 输入默写（批 B P0-8，逐空比对，判分复用 answerNorm）" } } } },
+        { "if": { "properties": { "type": { "const": "workcard" } } }, "then": { "properties": { "intro": { "type": "string", "description": "卡片说明：三遍法总纲 / 作品目标（正文细节等待内容侧）" }, "duration": { "type": "number", "description": "第三遍限时秒数（可选，缺省 900）；浏览态自测，不判分不写错题本" } } } }
       ]
     },
     "layoutKind": {

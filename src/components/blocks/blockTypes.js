@@ -81,7 +81,9 @@ export const BLOCK_TYPES_META = {
   vocab: { label: '术语卡', icon: 'book-marked', kind: 'concept' },
   // 无内容角色（见 KIND_EXEMPT）：代码块自带终端/语言栏形态
   code: { label: '代码', icon: 'code' },
-  cloze: { label: '挖空默写', icon: 'square-pen', kind: 'point' }
+  cloze: { label: '挖空默写', icon: 'square-pen', kind: 'point' },
+  // 作品训练卡（批 F · F-2）：三勾自测 + 限时倒计时，属练习型内容
+  workcard: { label: '作品训练卡', icon: 'timer', kind: 'practice' }
 }
 
 /** 全部区块类型（顺序与 BLOCK_TYPES_META 一致） */

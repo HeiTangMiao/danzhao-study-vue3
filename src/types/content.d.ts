@@ -28,6 +28,7 @@ export type BlockType =
   | 'vocab'      // 术语卡
   | 'code'       // 代码块
   | 'cloze'      // 挖空默写
+  | 'workcard'   // 作品训练卡（三遍法自测，批 F · F-2）
 
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
@@ -286,6 +287,18 @@ export interface ClozeBlock extends BaseBlock {
   items: ClozeItem[]
 }
 
+/**
+ * 作品训练卡区块（三遍法自测，批 F · F-2）
+ * 浏览态契约：不自动判分、不写错题本、不发 XP —— 三个勾选仅作自测清单，
+ * 第三遍「限时独立做」启动倒计时，到点只提示、不评分。
+ * 无必填字段（type 除外）：正文细节等待内容侧经 title / intro 补齐。
+ */
+export interface WorkCardBlock extends BaseBlock {
+  type: 'workcard'
+  intro?: string        // 卡片说明：三遍法总纲 / 作品目标
+  duration?: number     // 第三遍限时秒数（可选，缺省 900）
+}
+
 /** 区块联合类型 */
 export type Block =
   | MindMapBlock
@@ -309,6 +322,7 @@ export type Block =
   | VocabBlock
   | CodeBlock
   | ClozeBlock
+  | WorkCardBlock
 
 /** 内容页面 */
 export interface ContentPage {

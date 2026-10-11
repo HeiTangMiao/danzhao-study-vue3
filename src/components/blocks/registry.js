@@ -28,6 +28,7 @@ import CompareBlock from './CompareBlock.vue'
 import VocabBlock from './VocabBlock.vue'
 import CodeBlock from './CodeBlock.vue'
 import ClozeBlock from './ClozeBlock.vue'
+import WorkCardBlock from './WorkCardBlock.vue'
 // 布局原语分发器（P0）。放在 components/ 根下而非 blocks/：它不含任何「内容语义」，
 // 与区块组件解耦，故不做成区块组件的一员。
 import LayoutRenderer from '../LayoutRenderer.vue'
@@ -67,7 +68,9 @@ const BLOCK_COMPONENTS = {
   compare: CompareBlock,
   vocab: VocabBlock,
   code: CodeBlock,
-  cloze: ClozeBlock
+  cloze: ClozeBlock,
+  // 作品训练卡（批 F · F-2）：带三勾交互 + 倒计时状态，保持同步挂载（异步重挂载会丢勾选状态）
+  workcard: WorkCardBlock
 }
 
 /** 类型 → { component, label, icon }：渲染层视角的完整注册表 */
