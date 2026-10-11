@@ -32,8 +32,11 @@ export type BlockType =
 /** 难度等级 */
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
 
-/** 题型 */
-export type QuestionType = 'single' | 'judge' | 'fill' | 'solve'
+/** 测验题型（quiz 不支持解答题 solve，与 schema quizItem.type 一致） */
+export type QuizQuestionType = 'single' | 'judge' | 'fill'
+
+/** 模拟卷题型（exam 额外支持解答题 solve，与 schema examItem.type 一致） */
+export type ExamQuestionType = 'single' | 'judge' | 'fill' | 'solve'
 
 /** 通用区块基础接口 */
 export interface BaseBlock {
@@ -97,7 +100,7 @@ export interface ExampleBlock extends BaseBlock {
 
 /** 测验题目条目 */
 export interface QuizItem {
-  type?: QuestionType   // 题型：单选/判断/填空
+  type?: QuizQuestionType   // 题型：单选/判断/填空（不含解答题）
   difficulty?: Difficulty
   question: string      // 题目内容
   options?: string[]    // 选择题选项
@@ -116,6 +119,9 @@ export interface DiagramBlock extends BaseBlock {
   type: 'diagram'
   boardId: string       // JSXGraph 画板 ID（对应 src/geometry/boards/<boardId>.js 模块）
   caption?: string      // 图注
+  boundingbox?: number[] // 视口边界框 [xMin, yMax, xMax, yMin]（可选，默认 [-6,4,6,-4]）
+  height?: number       // 画板像素高度（可选，默认 320）
+  fixed?: boolean       // 锁定视口（禁用缩放/平移，可选）
 }
 
 /** 布局原语种类（与 schema 的 definitions.layoutKind 保持一致，由守卫测试钉死） */
@@ -178,7 +184,7 @@ export interface StrategyBlock extends BaseBlock {
 
 /** 模拟卷题目条目 */
 export interface ExamItem {
-  type?: 'single' | 'judge' | 'fill' | 'solve'
+  type?: ExamQuestionType
   difficulty?: Difficulty
   question: string
   options?: string[]

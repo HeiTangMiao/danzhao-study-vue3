@@ -34,13 +34,10 @@ export const MAX_LAYOUT_DEPTH = 8
 export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
   const BLOCK_TYPES = schema.definitions.block.properties.type.enum
   const DIFFICULTY = schema.definitions.exampleItem.properties.difficulty.enum
-  // 题型取 quiz 与 exam 的并集（exam 额外支持解答题 solve）
-  const QUESTION_TYPES = [
-    ...new Set([
-      ...schema.definitions.quizItem.properties.type.enum,
-      ...schema.definitions.examItem.properties.type.enum
-    ])
-  ]
+  // 题型按块从 schema 各自派生（口径差异收敛 item 3）：quiz 不支持解答题 solve、exam 支持。
+  // 此前取 quiz ∪ exam 的并集，会让 quiz 误放行 solve —— 与 schema 的单一口径矛盾，故去并集。
+  const QUIZ_TYPES = schema.definitions.quizItem.properties.type.enum
+  const EXAM_TYPES = schema.definitions.examItem.properties.type.enum
 
   /** 判空：undefined / null / 纯空白 均视为空 */
   const isEmpty = (v) => v === undefined || v === null || String(v).trim() === ''
@@ -48,13 +45,16 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
   /** 是否普通对象（排除 null 与数组）—— 用于 props 这类「应为对象」的字段 */
   const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 
-  /** 题目类区块（quiz / exam）共用的字段校验 */
-  function checkQuestionItems(items, prefix, errors) {
+  /**
+   * 题目类区块（quiz / exam）共用的字段校验
+   * @param {string[]} allowed 该块允许的题型枚举（quiz 传 QUIZ_TYPES / exam 传 EXAM_TYPES）
+   */
+  function checkQuestionItems(items, prefix, errors, allowed) {
     items.forEach((it, ii) => {
       if (it.difficulty && !DIFFICULTY.includes(it.difficulty)) {
         errors.push(`${prefix}[${ii}] 未知难度: ${it.difficulty}`)
       }
-      if (it.type && !QUESTION_TYPES.includes(it.type)) {
+      if (it.type && !allowed.includes(it.type)) {
         errors.push(`${prefix}[${ii}] 未知题型: ${it.type}`)
       }
       if (it.options && !Array.isArray(it.options)) {
@@ -114,10 +114,21 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
       }
       case 'table':
         if (!Array.isArray(block.rows)) errors.push('表格区块缺少 rows')
+        // headers 必填（TableBlock 虽以 v-if 容错，但缺表头的表格语义不完整）——
+        // 并顺带校验每行宽度与表头一致：大表最易「某行与表头列数不齐」而渲染错位（口径差异收敛 item 2）。
+        if (!Array.isArray(block.headers)) {
+          errors.push('表格区块缺少 headers')
+        } else if (Array.isArray(block.rows)) {
+          block.rows.forEach((r, ri) => {
+            if (Array.isArray(r) && r.length !== block.headers.length) {
+              errors.push(`表格第${ri}行宽度与表头不一致（${r.length}≠${block.headers.length}）`)
+            }
+          })
+        }
         break
       case 'quiz':
         if (!Array.isArray(block.items)) errors.push('题目区块缺少 items')
-        else checkQuestionItems(block.items, '题目', errors)
+        else checkQuestionItems(block.items, '题目', errors, QUIZ_TYPES)
         break
       case 'example':
         if (!Array.isArray(block.items)) errors.push('例题区块缺少 items')
@@ -140,7 +151,7 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
         break
       case 'exam':
         if (!Array.isArray(block.items)) errors.push('模拟卷区块缺少 items')
-        else checkQuestionItems(block.items, '模拟卷题目', errors)
+        else checkQuestionItems(block.items, '模拟卷题目', errors, EXAM_TYPES)
         break
       case 'mindmap':
         if (!block.mermaid) errors.push('思维导图区块缺少 mermaid 源码')
@@ -202,6 +213,15 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
       }
       // 容器型区块（阶段 4）：递归校验子区块 —— 子区块的错误带上路径前缀
       case 'columns': {
+        if (!Array.isArray(block.items)) errors.push('分栏区块缺少 items')
+        // cols 受 schema enum(2/3) 约束，此处补两条语义规则（口径差异收敛 item 4）：
+        // 取值域 + 列数一致。否则渲染层 Number(block.cols) + raw[i]||[] 会用兜底静默掩盖写错的内容。
+        if (block.cols !== undefined && ![2, 3].includes(block.cols)) {
+          errors.push(`分栏 cols 只支持 2/3: ${block.cols}`)
+        }
+        if (Array.isArray(block.items) && block.cols !== undefined && block.items.length !== block.cols) {
+          errors.push(`分栏列数 ${block.items.length} 与 cols ${block.cols} 不一致`)
+        }
         const cols = Array.isArray(block.items) ? block.items : []
         cols.forEach((col, ci) => {
           if (!Array.isArray(col)) {
