@@ -259,11 +259,11 @@ flowchart TB
 > ① **前端零外链通路**（无 `@tauri-apps/api`/`plugin-*`；打开外链需补 JS 端，母端 `tauri-plugin-shell` + `shell:allow-open` 已就绪）；
 > ② **`csp-guard` L4 会拦 src 里的外链 URL 字面量**（需登记 `HOST_ALLOWLIST` 或落在被排除的内容数据目录）；
 > ③ **CI 内容关卡从不跑 JSON Schema**（无 `ajv` import）→ 5 处「口径差」全部落**手写 validator**。
-> 另更正：断点范围 **2 文件 → 全站 17 处 CSS + 1 处 JS `matchMedia`**；`ContentSidebar` 锁缺陷**仍在**（修法照搬 `NotesPanel` 的 `lockOwned`）；`AGENT_BROWSER_ARGS` **全仓零引用**（非产品，已归档）；`validateBlock` 行号漂移（`94-97` → `formulas:100-113`）。
+> 另更正：断点范围 **2 文件 → 全站 18 处 CSS + 1 处 JS `matchMedia`**；`ContentSidebar` 锁缺陷**仍在**（修法照搬 `NotesPanel` 的 `lockOwned`）；`AGENT_BROWSER_ARGS` **全仓零引用**（非产品，已归档）；`validateBlock` 行号漂移（`94-97` → `formulas:100-113`）。
 
 #### F-3 备案小项清单（收拢执行，避免长期化）
 
-1. **1150 断点统一化**：**全站 17 处 CSS + 1 处 JS `matchMedia`**（`reader.css` 6 / `UnitView.vue` 2 / `ContentSidebar.vue` 2 / `NotesPanel.vue` 3 + JS `:64` / `PomodoroPanel.vue` 1 / `AppTabBar.vue` 2 / `App.vue` 2）——统一为 `max-width:1149` + `min-width:1150`（口径 `--bp-lg:1150px`，`main.css:206`；媒体查询不解析 `var()`）。完整清单见 `batch-f-tasks.md` §2 F-3.1。
+1. **1150 断点统一化**：**全站 18 处 CSS + 1 处 JS `matchMedia`**（`reader.css` 6 / `UnitView.vue` 2 / `ContentSidebar.vue` 2 / `NotesPanel.vue` 3 + JS `:64` / `PomodoroPanel.vue` 1 / `AppTabBar.vue` 2 / `App.vue` 2）——统一为 `max-width:1149` + `min-width:1150`（口径 `--bp-lg:1150px`，`main.css:206`；媒体查询不解析 `var()`）。完整清单见 `batch-f-tasks.md` §2 F-3.1。
 2. **`ContentSidebar` 抽屉锁归属感知**：**已复核仍存在**（`:297-303` 无条件 `overflow=''`）；修法照搬 `NotesPanel.vue:129-140` 的 `lockOwned`。
 3. **schema 口径差异 5 处**（**唯一强制层 = 手写 validator**）：
    - `formula` 的 `formulas`/`lines` 双字段名：**19 块 / 9 个数学文件**用 `lines`（block 结构级实测，`formula` 总数 132、`formulas` 113）——内容侧迁移 + validator 兼容期保留（**注意：文本层 `lines:` 有 20 处 / 10 文件，其中 1 处不在 formula 块上 → 迁移必须按块结构改，禁盲正则**）；

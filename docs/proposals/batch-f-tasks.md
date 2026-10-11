@@ -23,7 +23,7 @@
 | **更正 2** | F-1 外链「是否触碰 CSP 红线（`connect-src`/`script-src 'self'`）」 | **不触碰代码执行红线，但触碰 L4 静态扫描线**：① 打开外链 = 交给系统浏览器/OS，**不是** webview 的 fetch/ws → `connect-src` 与 `script-src` 与它无关；② 但 `tests/csp-guard.test.js` **L4** 会扫描 `src/**`（`.js/.vue/.ts`，**排除** `src/content/{math,chinese,computer}/**`）里所有 `https?://host` 字面量，凡不在 prod CSP 覆盖集（实测仅 `ipc.localhost`、`520305.top`）且不在 `HOST_ALLOWLIST`（当前**空**）者即**断言失败**。→ 在 src 非内容目录写 `https://www.zjzs.net` 会**直接红 CI** | F-1 落地**必须**处理 L4：或把 URL 放进被排除的内容数据目录、或在 `HOST_ALLOWLIST` 登记 `www.zjzs.net`（推荐）。**注意 `tests/**` 本批不得改**（见 §7 P-F02 与纪律）——故推荐改「内容数据落点」绕过，若必须改测试须先请 team-lead 授权 |
 | **更正 3** | F-3.3「`formula` 的 `formulas`/`lines` 双字段名，19 处旧写法（`validateBlock.js:94-97`）」 | 数字对、**行号漂移**：当前 `validateBlock.js:100-113`。且**校验链全程容忍双名**：validator `:101-103`（`formulas || lines`）+ `FormulaCard.vue:28`（`formulas || lines`）；只有 **JSON Schema**（`content-schema.json:38` `required:["formulas"]`）与 `content.d.ts:66` 声明单名。实测：`formulas` 块 **113**、`lines` 块 **19**（**9 个数学文件**，`both=0`）、文件内 `lines:` 出现 **20** 次 | F-3.3 第 1 项 = 「内容迁移 + schema 单名 vs validator 兼容」的取舍，**非**「改渲染点」。见 §7 P-F09(a) |
 | **更正 4（关键）** | roadmap 通篇假设「JSON Schema 是 CI 强制关卡」 | **实际不成立**：CI 内容关卡 `scripts/validate-content.mjs` **只调用手写语义校验器** `createBlockValidator`（`:29`），**从不跑 JSON Schema**（全仓 `ajv` 仅存在于 `package-lock.json` 传递依赖，**无任何源码 import**）。即 `content-schema.json` 的 `required`/`additionalProperties` **目前不产生任何运行时/CI 强制**，它只作为**枚举单一来源**被 validator 派生（`BLOCK_TYPES`/`DIFFICULTY`/`QUESTION_TYPES`/`LAYOUT_*`） | **F-3.3 五项全部是「validator 与 schema 的口径差」**，修法一律落在**手写 validator**（或显式给 schema 补被代码读取的字段）；**不存在**「schema 已挡住、无需处理」的可能。见 §2 F-3.3 表 |
-| **更正 5** | F-3.1「`reader.css` 1150/1151 混用（`:55/123/132/321/331/334`）；`UnitView.vue:.664/703`」 | 数字形态对，**行号与全站范围都要更正**：`reader.css` 6 处**行号不变**（`:55/123/132/321/331/334`）；`UnitView.vue` 实为 `:671`（`min-width:1150`）与 `:710`（`min-width:1151 and max-width:1456`）。**全站 1150 断点共 17 处**（`reader.css` 6 + `UnitView.vue` 2 + `ContentSidebar.vue` 2 + `NotesPanel.vue` 3 + `PomodoroPanel.vue` 1 + `AppTabBar.vue` 2 + `App.vue` 2），**含 1 处 JS `matchMedia`**（`NotesPanel.vue:64` `MOBILE_MQ`）。写法分三档：`min-width:1150`（7 处）/ `min-width:1151`（3 处）/ `max-width:1149`（2 处）/ `max-width:1150`（多） | F-3.1 落点**不止** roadmap 列的 2 个文件；**必须连带 JS `matchMedia`**，否则 CSS/JS 在 1150px 处撕裂。见 §2 F-3.1 完整清单 |
+| **更正 5** | F-3.1「`reader.css` 1150/1151 混用（`:55/123/132/321/331/334`）；`UnitView.vue:.664/703`」 | 数字形态对，**行号与全站范围都要更正**：`reader.css` 6 处**行号不变**（`:55/123/132/321/331/334`）；`UnitView.vue` 实为 `:671`（`min-width:1150`）与 `:710`（`min-width:1151 and max-width:1456`）。**全站 1150 断点共 18 处 CSS + 1 处 JS（共 19 个断点；本次需改 10 处 CSS + 1 处 JS，其余 8 处本已规范）**（`reader.css` 6 + `UnitView.vue` 2 + `ContentSidebar.vue` 2 + `NotesPanel.vue` 3 + `PomodoroPanel.vue` 1 + `AppTabBar.vue` 2 + `App.vue` 2），**含 1 处 JS `matchMedia`**（`NotesPanel.vue:64` `MOBILE_MQ`）。写法分三档：`min-width:1150`（7 处）/ `min-width:1151`（3 处）/ `max-width:1149`（2 处）/ `max-width:1150`（多） | F-3.1 落点**不止** roadmap 列的 2 个文件；**必须连带 JS `matchMedia`**，否则 CSS/JS 在 1150px 处撕裂。见 §2 F-3.1 完整清单 |
 | **更正 6** | F-3.2「`ContentSidebar` 抽屉锁归属感知（QA 观察项）」——须先复核是否仍存在 | **仍存在**：`ContentSidebar.vue:297-299` `watch(sheetOpen, s => document.body.style.overflow = s ? 'hidden' : '')` + `:300-303` `onBeforeUnmount` 无条件 `overflow=''`——**不感知归属**（关闭即清空，会误释放他人加的锁）。对照组 `NotesPanel.vue:129-140` **已实现**归属感知（`lockOwned` 标志 + `syncBodyLock`）。故 F-3.2 = **把 NotesPanel 的成熟做法搬到 ContentSidebar** | F-3.2 确认为真，修法照搬 `lockOwned`。见 §2 F-3.2 |
 | **补充 1** | F-3.4「`AGENT_BROWSER_ARGS` 传参查证（测试工具，非产品）」 | 实测：全仓（含上层目录 `danzhao/`）**仅** `implementation-roadmap.md:268` 出现该字符串，**无任何脚本/配置/CI 引用**——它是**外部浏览器自动化测试栈的环境变量**，与本仓库代码零耦合 | F-3.4 = **纯查证/登记归档**，**不改任何代码**。见 §2 F-3.4 |
 | **补充 2** | F-3.5「`MindMapBlock` 高频导航竞态——本批只登记不实施」 | 实测：`MindMapBlock.vue:200-233` `renderMindmap()` 为 async，`:207 await loadMermaid()`、`:210 await renderMermaidTo(container.value,…)`，**await 之后**再访问 `container.value.querySelector(...)`（`:212`）与 `requestAnimationFrame(fitToView)`（`:220`）；`:201` 的空守卫在 **await 之前**。→ 连续导航导致组件卸载后 `container.value` 变 `null`，**await 后无二次守卫** → `Cannot read properties of null (reading 'querySelector')`，与内容侧所述完全吻合 | 修法已定位（await 后补 `if (!container.value) return`）；**本批只登记不实施**（roadmap 既定，触发条件=用户实测/崩溃日志复现即升级）。见 §2 F-3.5 |
@@ -49,7 +49,7 @@
 |:--:|---|---|:--:|:--:|---|
 | **F-1** | P2-16 | 志愿填报页（**骨架**：纯内容页/独立页 + 流程说明区块）+ **最小外链工具**（打开浙江省教育考试院官方入口）+ L4 处置 | 无 | **M** | 否（CSP 配置**不改**；L4 允许清单**可能**需登记） |
 | **F-2** | P2-17 | 作品训练卡三遍法：新 block 类型（或区块组合）+ 三勾本地状态（可选持久化 `page_progress`）+第三遍倒计时（复用 deadline 骨架） | 无（组件） / 待内容侧（正文） | **M** | 若走新 block：触 `schema`+`content.d.ts`（H5 白名单流程）；持久化**零 DB 升版** |
-| **F-3.1** | F-3-①  | 1150 断点统一化：17 处 CSS + 1 处 JS `matchMedia` 边界写法收敛到 `--bp-lg`（=1150）口径 | 无 | **S** | 否 |
+| **F-3.1** | F-3-①  | 1150 断点统一化：18 处 CSS + 1 处 JS `matchMedia` 边界写法收敛到 `--bp-lg`（=1150）口径 | 无 | **S** | 否 |
 | **F-3.2** | F-3-②  | `ContentSidebar` 抽屉锁**归属感知**（照搬 `NotesPanel` 的 `lockOwned`） | 无 | **XS** | 否 |
 | **F-3.3** | F-3-③  | schema 口径差异**5 处**收敛（formula/table/solve/columns/diagram） | 无 | **M** | 触 `schema`+`content.d.ts`+validator（H5 流程） |
 | **F-3.4** | F-3-④  | `AGENT_BROWSER_ARGS` 传参**查证**（**零代码**，登记归档） | 无 | **XS** | 否 |
@@ -63,7 +63,7 @@
 graph TD
     F1["F-1 P2-16 志愿填报页 + 外链工具<br/>P2-16 · M"]
     F2["F-2 P2-17 作品训练卡三遍法<br/>P2-17 · M"]
-    F31["F-3.1 1150 断点统一化<br/>17 处 CSS + 1 处 JS · S"]
+    F31["F-3.1 1150 断点统一化<br/>18 处 CSS + 1 处 JS · S"]
     F32["F-3.2 ContentSidebar 抽屉锁归属<br/>XS"]
     F33["F-3.3 schema 口径差异 5 处<br/>M"]
     F34["F-3.4 AGENT_BROWSER_ARGS 查证<br/>XS · 零代码"]
@@ -428,7 +428,7 @@ sequenceDiagram
     Note over CS,NP: 修复点：现状无条件清空 → 会误释放 NP 的锁
 
     Note over U,VB: F-3.1 · 1150 边界统一（纯 CSS/JS）
-    Note over UV: 17 处 1150 断言 + NotesPanel JS MOBILE_MQ（:64）→ max-1149 / min-1150 口径
+    Note over UV: 18 处 1150 CSS 断点 + NotesPanel JS MOBILE_MQ（:64）→ max-1149 / min-1150 口径
 
     Note over VB: F-3.3 · schema 口径收敛（CI 唯一强制层 = 手写 validator）
     VB->>VB: formula → 收敛 formulas（lines 兼容期保留）
@@ -472,7 +472,7 @@ sequenceDiagram
 | **F-2** | 倒计时内核**第三份拷贝** | 运维漂移 | 复用 deadline 骨架；是否抽 `useCountdown` 见 §7 P-F06；**不**用 `usePomodoro` |
 | **F-2** | 三勾持久化误升 DB | 破坏 v7 契约 | 只写 `page_progress`（零 schema store，spread 加字段）；**不升 `DB_VERSION`**；`studyDbV7.test.js` 守住 |
 | **F-3.1** | **JS `matchMedia` 未同步**（`NotesPanel:64`） | 1150px 处 JS/CSS 撕裂 | 清单强制含 JS 侧；测试断言 CSS/JS 边界一致 |
-| **F-3.1** | 带 `and` 条件的媒体查询漏改（`ContentSidebar:767`、`UnitView:710`） | 边界残留 | 逐处清单化（§2 表已列全 17 处）；统一后跑残留检索 |
+| **F-3.1** | 带 `and` 条件的媒体查询漏改（`ContentSidebar:767`、`UnitView:710`） | 边界残留 | 逐处清单化（§2 表已列全 18 处 CSS + 1 处 JS）；统一后跑残留检索 |
 | **F-3.3** | `formulas/lines` 迁移与兼容**双轨期**误红 | `validate:content` 假红 | validator **保留兼容分支**直至内容侧迁移完成；迁移脚本仅改公式块 `lines:` |
 | **F-3.3** | `table` 补强暴露 **1 处**数据不符（`数列基础`） | 迁移期红 | 该 1 处交内容侧修；或分两步（先「只报不阻断」再「阻断」） |
 | **F-3.3** | `solve` 按块派生后内容侧误在 quiz 放 solve | 未来内容红 | 符合预期（收紧即目的）；当前 quiz `solve`=0，零暴露 |
@@ -533,7 +533,7 @@ sequenceDiagram
 | **csp-guard L4** 扫 `src/**`（排除 `src/content/{math,chinese,computer}/**`）；prod 覆盖主机 = `ipc.localhost`/`520305.top`；`HOST_ALLOWLIST` 空 | `tests/csp-guard.test.js:80-85,189-253` |
 | csp-guard L6：字面量/静态前缀模板 import 豁免 | `tests/csp-guard.test.js:255-354` |
 | `--bp-lg:1150px`；CSS `@media` 不解析 `var()` | `src/assets/css/main.css:206`（`:200` 注释） |
-| 1150 断点全站 **17 处**（行号见 §2 F-3.1 表）+ JS `matchMedia` `NotesPanel.vue:64` | 脚本逐文件扫描（HEAD 实测） |
+| 1150 断点全站 **18 处 CSS + 1 处 JS**（行号见 §2 F-3.1 表）+ JS `matchMedia` `NotesPanel.vue:64` | 脚本逐文件扫描（HEAD 实测） |
 | `ContentSidebar` 抽屉锁**不感知归属** | `ContentSidebar.vue:297-303`（无条件 `overflow=''`） |
 | `NotesPanel` **已实现** `lockOwned` 归属感知 | `NotesPanel.vue:129-140`（`syncBodyLock`） |
 | CI 内容关卡**不跑 JSON Schema**（无 `ajv` import） | `scripts/validate-content.mjs:29`；全仓 `ajv` 仅在 `package-lock.json` |
