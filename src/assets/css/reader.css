@@ -120,7 +120,7 @@
 .rt-act.on { color: var(--primary); background: var(--glass-active); }
 .rt-act:active { transform: scale(0.94); }
 /* 桌面端有 ContentSidebar 全量快捷区，顶栏入口只服务移动端 */
-@media (min-width: 1151px) {
+@media (min-width: 1150px) {
   .rt-actions { display: none; }
 }
 
@@ -129,7 +129,7 @@
  * --reader-topbar-h 默认值仍为 44px）。图标尺寸走 CSS（覆盖 AppIcon 的 width/height 属性）而非
  * 改 :size —— 这是「窄端才放大」的响应式关切，交给媒体查询单点控制，组件无需读视口、
  * 保持声明式且无 JS 断点耦合。分段条 rt-segs 绝对定位于 bottom:0，随顶部增高自然贴底，无需改。 */
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   :root { --reader-topbar-h: 52px; }
   .rt-back { width: 44px; height: 44px; }
   .rt-back svg { width: 22px; height: 22px; }
@@ -328,7 +328,7 @@ html[data-motion-tier='off'] .reader-content.is-dragging { transform: none; }
  * 桌面 ≥1150：桌面 UX 方案 commit 1 已隐藏；移动 ≤1150：本轮整合进顶栏/侧栏（掌握→rt-actions、
  * 翻页→手势/答题卡/抽屉快捷操作区）。display:none 隐藏但 DOM 保留（ReaderFooter 组件与事件链路零改动），
  * 将来要恢复删两行即可。≥1150 与 ≤1150 两条规则在 1150 断点无缝衔接。 */
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   .reader-footer { display: none; }
 }
 @media (min-width: 1150px) {

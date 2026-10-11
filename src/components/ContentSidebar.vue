@@ -580,7 +580,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 .sb-mobile { display: none; }
 
 /* 响应式：窄屏隐藏桌面侧边栏，改用底部操作栏 + 答题卡抽屉（快捷操作已并入抽屉首区块） */
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   .content-sidebar { display: none; }
 
   .sb-mobile { display: block; }
@@ -773,7 +773,7 @@ const nextUnit = computed(() => unitIdx.value >= 0 && unitIdx.value < props.site
 }
 
 /* 横屏：底部栏与抽屉左右安全区适配（刘海屏） */
-@media (max-width: 1150px) and (orientation: landscape) {
+@media (max-width: 1149px) and (orientation: landscape) {
   .sb-bar { padding-left: calc(10px + var(--sal)); padding-right: calc(10px + var(--sar)); }
   .sb-sheet { left: var(--sal); right: var(--sar); }
 }

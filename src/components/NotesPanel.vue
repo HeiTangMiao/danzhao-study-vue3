@@ -61,7 +61,7 @@ import { clampPos } from '@/utils/panelPos'
 
 const POS_KEY = 'notes_panel_pos'
 // 移动端断点：与 ContentSidebar/reader.css 的 1150 分界一致
-const MOBILE_MQ = '(max-width: 1150px)'
+const MOBILE_MQ = '(max-width: 1149px)'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -251,7 +251,7 @@ function onHandleUp() {
 
 /* 移动端（≤1150）：底部抽屉形态（复用 sb-sheet 视觉语言：圆角顶 + 贴底 + 安全区让位），
  * 不做自由拖拽 */
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   .notes-panel {
     left: 0; right: 0; bottom: 0; top: auto;
     width: auto;
@@ -265,10 +265,10 @@ function onHandleUp() {
 /* 显隐过渡：桌面轻微上浮淡入 / 移动端抽屉滑入滑出（inline transform 为 null 时类才生效） */
 .np-enter-active, .np-leave-active { transition: opacity var(--dur-3) var(--ease-standard), transform var(--dur-3) var(--ease-standard); }
 .np-enter-from, .np-leave-to { opacity: 0; }
-@media (min-width: 1151px) {
+@media (min-width: 1150px) {
   .np-enter-from, .np-leave-to { transform: translateY(8px); }
 }
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   .np-enter-from, .np-leave-to { transform: translateY(100%); }
 }
 </style>

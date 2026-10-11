@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
 .pomodoro-btn--primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
 
 /* 移动端：悬浮球落系统手势区上方（沿用旧 FAB 坐标，页脚已全端退场） */
-@media (max-width: 1150px) {
+@media (max-width: 1149px) {
   .pomodoro-ball {
     right: 16px;
     bottom: calc(var(--sab) + var(--sys-gesture-bottom, 24px) + 12px);

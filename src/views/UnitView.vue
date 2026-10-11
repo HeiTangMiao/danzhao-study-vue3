@@ -707,7 +707,7 @@ watch(
 .block-anchor { scroll-margin-top: 16px; }
 
 /* 侧边栏可见时，为内容区右侧预留空间，避免被固定侧边栏遮挡 */
-@media (min-width: 1151px) and (max-width: 1456px) {
+@media (min-width: 1150px) and (max-width: 1456px) {
   .unit-view { padding-right: 250px; }
 }
 
