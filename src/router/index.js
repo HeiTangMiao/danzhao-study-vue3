@@ -7,6 +7,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { nextTick } from 'vue'
 import { withRouteTransition } from '@/utils/viewTransition'
+import { normalizeUnitNum } from '@/utils/routeParams'
 
 const routes = [
   {
@@ -34,12 +35,26 @@ const routes = [
     // 内容页：按学科 + 单元号 + 页面索引渲染
     path: '/study/:subject/:unitNum/:fileIndex?',
     name: 'unit',
-    component: () => import('@/views/UnitView.vue')
+    component: () => import('@/views/UnitView.vue'),
+    // 外部深链可能不带零填充（`5`），而 site.js 的单元号是 `"05"` 字符串相等匹配 →
+    // 不归一化即匹配失败、空白页。在路由层归一化并 replace，保证 route.params.unitNum
+    // 恒为规范形（URL 一并规范化），一处覆盖 UnitView 与 ContentSidebar 全部消费点。
+    beforeEnter: (to) => {
+      const norm = normalizeUnitNum(to.params.unitNum)
+      if (norm !== to.params.unitNum) {
+        return { ...to, params: { ...to.params, unitNum: norm }, replace: true }
+      }
+      // 规范形：返回 undefined 不重定向 —— 站内导航（恒用规范形）与翻页转场零影响。
+    }
   },
   {
-    // 兼容旧路由：/unit/:unitNum/:fileIndex? → 重定向到数学
+    // 兼容旧路由：/unit/:unitNum/:fileIndex? → 重定向到数学（重定向目标会再经 unit 的
+    // beforeEnter，此处归一化是双保险；站内旧链接亦可能带非零填充单元号）
     path: '/unit/:unitNum/:fileIndex?',
-    redirect: (to) => ({ name: 'unit', params: { subject: 'math', unitNum: to.params.unitNum, fileIndex: to.params.fileIndex } })
+    redirect: (to) => ({
+      name: 'unit',
+      params: { subject: 'math', unitNum: normalizeUnitNum(to.params.unitNum), fileIndex: to.params.fileIndex }
+    })
   },
   {
     // 复习：单卡会话（P0-6）—— 一级 Tab「复习」直达行动页，错题本降为二级入口
