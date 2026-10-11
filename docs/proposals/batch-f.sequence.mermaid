@@ -1,0 +1,53 @@
+%% 批 F 关键程序调用流（HEAD=e0c3f02 实测）
+%% 覆盖：F-1 P2-16 外链打开 · F-2 P2-17 三勾+第三遍倒计时 · F-3.2 抽屉锁归属 · F-3.3 schema 收敛
+%% 同步嵌入 docs/proposals/batch-f-tasks.md §3
+sequenceDiagram
+    autonumber
+    participant U as 学员
+    participant RT as vue-router
+    participant UV as UnitView.vue
+    participant WC as 训练卡(F-2 新块/组合)
+    participant CD as useCountdown(deadline 骨架)
+    participant CS as ContentSidebar.vue
+    participant NP as NotesPanel.vue
+    participant OP as openExternal util(F-1)
+    participant TA as Tauri shell / 系统浏览器
+    participant VB as validateBlock(F-3.3)
+
+    Note over U,RT: F-1 · P2-16 官方入口外链（桌面）
+    U->>OP: 点击「浙江省教育考试院官方入口」
+    OP->>OP: 判定是否 Tauri（window.__TAURI_INTERNALS__）
+    alt 桌面 Tauri
+        OP->>TA: shell.open('https://www.zjzs.net')（经 IPC，capability: shell:allow-open）
+        TA-->>U: 系统默认浏览器打开 zjzs.net
+    else 浏览器 / dev
+        OP->>TA: window.open(url,'_blank','noopener')
+    end
+    Note over OP: 打开外链「不是」webview 网络请求 → connect-src/script-src 不受影响<br/>但 URL 字面量落在 src 非内容目录 → 命中 csp-guard L4 → 须 HOST_ALLOWLIST 登记
+
+    Note over U,CD: F-2 · P2-17 作品训练卡三遍法
+    U->>WC: 勾选① 对照做 / ② 只看成品还原
+    WC->>WC: 本地状态 checks[1/2] = true（可选落 page_progress）
+    U->>WC: 勾选③ 限时独立做 → 启动计时
+    WC->>CD: useCountdown(durationSec)（复用 ExamBlock deadline 骨架）
+    loop 每秒
+        CD->>CD: timeLeft = max(0, ceil((deadline - Date.now())/1000))（时间戳校准）
+    end
+    CD-->>WC: timeLeft<=0 → 到点
+    WC-->>U: 展示「到点」提示（不自动判分）
+
+    Note over U,NP: F-3.2 · 抽屉锁归属感知（CurrentSidebar 修复）
+    U->>CS: 打开答题卡抽屉 sheetOpen=true
+    CS->>CS: body.overflow='hidden'; lockOwned=true（新增）
+    U->>NP: 同时打开学习笔记抽屉
+    NP->>NP: syncBodyLock(true)（已有 lockOwned，NotesPanel 侧）
+    U->>CS: 关闭抽屉 sheetOpen=false
+    CS->>CS: 仅当 lockOwned 才 body.overflow=''（不再无条件清空）
+    Note over CS,NP: 修复点：ContentSidebar 现为无条件 overflow='' → 会误释放 NotePanel 加的锁
+
+    Note over VB: F-3.3 · schema 口径收敛（CI 关卡）
+    VB->>VB: formula: 收敛 formulas（lines 兼容期内仍接收）
+    VB->>VB: table: 强制 headers + 行宽一致
+    VB->>VB: solve: 按块派生（quiz≠exam），去并集
+    VB->>VB: columns: 强制 cols∈{2,3} 且 cols==items.length
+    VB->>VB: diagram: 几何字段入 schema（boundingbox/height/fixed）

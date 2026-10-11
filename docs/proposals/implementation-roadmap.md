@@ -18,7 +18,7 @@
 | **批 E** | P1 其余四项（CSP 护栏 / 自评三档 / 双轨进度 / 番茄分科 / 搜索覆盖题干） | ✅ **已完成**（QA 独立验证 0 缺陷，+41 用例） | commit `faecfae`…`acc049d`；QA 收编 `a5a141d` |
 | **P1-T5** | CSP 护栏（`system_design.md` §10；**方案已有**，见 `csp-guard-plan.md`） | ✅ **已完成**（并入批 E·E-0，含 L6 运行时拼接 import） | `tests/csp-guard.test.js` + `tests/helpers/csp-lock.js` |
 | **批 F0** | 来件响应热修（浏览态单选判分 / 深链 `05≡5` / `solution` 核实与绊线 / 判分·去重脚本接 CI） | ✅ **已完成**（含追加 F0c5 + F0c6；独立 QA 两轮 **774 用例全绿**、0 缺陷） | commit `8e2fad9`…`d4be892`；QA 收编 `3f68ec5`；报告 `batch-f0-qa-report.md` |
-| **批 F** | P2 其余 + 备案小项收拢 | ⏳ **待开工**（F0 已收口） | — |
+| **批 F** | P2 其余 + 备案小项收拢 | ⚡ **实施中**（第一波 Fc2–Fc4 已派工；§7 十二项待拍板已全部裁定） | 任务卡 `batch-f-tasks.md`（含 §8 拍板记录） |
 | **S1–S5** | 内容扩展双轨（方案已定稿） | ⏳ 待做 | `content-extension-dual-track.md` |
 | **P5** | Android 打包（Tauri） | ⏳ 待做 | 依赖 S5 + F |
 
@@ -251,22 +251,28 @@ flowchart TB
 
 | 项 | 落点 | 要点 | 风险 |
 |---|---|---|---|
-| **P2-16 志愿填报** | 新增内容页（走 site.js 末尾追加，H2）+ 官方入口链接 | **仅流程说明 + 浙江省教育考试院官方入口**，不固化任何院校录取结论（硬约束） | 低 |
-| **P2-17 作品训练卡三遍法** | 新增 block 类型或内容页；第三遍复用现有倒计时组件 | 一张卡三勾（对照做 / 只看成品还原 / 限时独立做） | 中 |
+| **P2-16 志愿填报** | ⚠️ **不是**「走 site.js 末尾追加」（本页不属三学科）：新增**独立顶层页** `/guide` + **最小外链工具** `src/utils/openExternal.js`（见 `batch-f-tasks.md` F-1） | **仅流程说明 + 浙江省教育考试院官方入口**，不固化任何院校录取结论（硬约束）；**必须同时给可达入口**（PlanView/ProfileView 择最小侵入） | 中 |
+| **P2-17 作品训练卡三遍法** | 新增 block 类型 `workcard`（走 H5 白名单四处 + 守卫测试）+ `useCountdown`（deadline 骨架）+ 三勾落 `page_progress`（零升版） | 一张卡三勾（对照做 / 只看成品还原 / 限时独立做）；浏览态不落库判分 | 中 |
 | **备案小项收拢** | 见 §2.F-3 | 见下 | 低 |
+
+> ⚠️ **批 F 实施前先读 `batch-f-tasks.md` §0「读码更正」**（7 处，HEAD=`e0c3f02` 实测）——它**更正了本节的 3 个前提**：
+> ① **前端零外链通路**（无 `@tauri-apps/api`/`plugin-*`；打开外链需补 JS 端，母端 `tauri-plugin-shell` + `shell:allow-open` 已就绪）；
+> ② **`csp-guard` L4 会拦 src 里的外链 URL 字面量**（需登记 `HOST_ALLOWLIST` 或落在被排除的内容数据目录）；
+> ③ **CI 内容关卡从不跑 JSON Schema**（无 `ajv` import）→ 5 处「口径差」全部落**手写 validator**。
+> 另更正：断点范围 **2 文件 → 全站 17 处 CSS + 1 处 JS `matchMedia`**；`ContentSidebar` 锁缺陷**仍在**（修法照搬 `NotesPanel` 的 `lockOwned`）；`AGENT_BROWSER_ARGS` **全仓零引用**（非产品，已归档）；`validateBlock` 行号漂移（`94-97` → `formulas:100-113`）。
 
 #### F-3 备案小项清单（收拢执行，避免长期化）
 
-1. **1150 断点统一化**：`reader.css` 同文件内 1150/1151 混用（`:55/123/132/321/331/334`）；`UnitView.vue` 亦 1150/1151 并存（`:664/703`）。统一到 `--bp-lg:1150px`（`main.css:206`）。
-2. **`ContentSidebar` 抽屉锁归属感知**（QA 观察项）。
-3. **schema 口径差异 5 处**：
-   - `formula` 的 `formulas`/`lines` 双字段名，**19 处旧写法**（`validateBlock.js:94-97`）——收敛为单一字段名；
-   - `table` 的 `headers` **语义未强制**（schema 要求但 validator 只查 `rows`，`validateBlock.js:109-111`）；
-   - `solve` 白名单为 quiz/exam **并集**（运行时拼接，非 schema 单一来源，`validateBlock.js:37-43`）；
-   - `columns` 的 `cols` **未强校验**（长度与 `cols` 一致未强制）；
-   - **几何字段未入 schema**（`diagram` 仅 `boardId`，其余走注入）。
-4. **`AGENT_BROWSER_ARGS` 传参查证**（**测试工具，非产品**）——独立小任务，不占产品批次。
-5. **`MindMapBlock` 高频连续导航竞态**（内容侧 2026-10-12 来件 §4.4 实测：连续 12 次导航、每次 120ms 时 1 次 `querySelector of null`；冷启动直达不复现）——修法：mermaid 渲染回调加「已卸载」守卫。**低优先**：真实用户难以 120ms 连点换页；**触发条件 = 用户实测/崩溃日志复现即升级**。
+1. **1150 断点统一化**：**全站 17 处 CSS + 1 处 JS `matchMedia`**（`reader.css` 6 / `UnitView.vue` 2 / `ContentSidebar.vue` 2 / `NotesPanel.vue` 3 + JS `:64` / `PomodoroPanel.vue` 1 / `AppTabBar.vue` 2 / `App.vue` 2）——统一为 `max-width:1149` + `min-width:1150`（口径 `--bp-lg:1150px`，`main.css:206`；媒体查询不解析 `var()`）。完整清单见 `batch-f-tasks.md` §2 F-3.1。
+2. **`ContentSidebar` 抽屉锁归属感知**：**已复核仍存在**（`:297-303` 无条件 `overflow=''`）；修法照搬 `NotesPanel.vue:129-140` 的 `lockOwned`。
+3. **schema 口径差异 5 处**（**唯一强制层 = 手写 validator**）：
+   - `formula` 的 `formulas`/`lines` 双字段名：**19 块 / 9 个数学文件**用 `lines`（block 结构级实测，`formula` 总数 132、`formulas` 113）——内容侧迁移 + validator 兼容期保留（**注意：文本层 `lines:` 有 20 处 / 10 文件，其中 1 处不在 formula 块上 → 迁移必须按块结构改，禁盲正则**）；
+   - `table` 的 `headers` **语义未强制**（validator 只查 `rows`）→ 补强「headers 必填 + 行宽一致」；**1 处数据不符**（`math/06-数列/01-数列基础.js` 1 块 3 行）随补强同 commit 补空单元格；
+   - `solve` 白名单为 quiz/exam **并集** → 按块派生（quiz 0 处 / exam 64 处，收紧零成本）；
+   - `columns` 的 `cols` **未强校验** → 补强（现 2 处合规）；
+   - **几何字段未入 schema**（`diagram` 仅 `boardId`，但 `GeometryBlock` 已读 `boundingbox/height/fixed`）→ 补 schema + d.ts（零数据迁移）。
+4. **`AGENT_BROWSER_ARGS` 传参查证**：✅ **已查证归档**——全仓（含上层 `danzhao/`）仅 roadmap 本行出现该字符串，**零代码/CI 引用**；属外部浏览器自动化测试栈的环境变量，与产品零耦合，无需改任何代码。
+5. **`MindMapBlock` 高频连续导航竞态**（内容侧 2026-10-12 来件 §4.4 实测：连续 12 次导航、每次 120ms 时 1 次 `querySelector of null`；冷启动直达不复现）——修法已定位（`MindMapBlock.vue:200-233` 的 await **之后**补 `if (!container.value) return`）。**低优先**：真实用户难以 120ms 连点换页；**触发条件 = 用户实测/崩溃日志复现即升级**。
 
 ### 批 S —— 内容扩展双轨（并行轨，已定稿待实施）
 
