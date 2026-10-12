@@ -44,7 +44,8 @@ export const NON_PAGE_FILES = new Set([
   'judgeDerive.js', // 判断题派生纯函数（纯 ESM，两端共用，见批 A P0-1）
   'answerNorm.js', // 答案规整判分纯函数（纯 ESM，两端共用，见批 B B-1）
   'clozeVariants.js', // 语文通假字映射纯数据（批 B B-1，内容侧可增补）
-  'contentManifest.js' // 内容快照 / 清单的形状定义（批 S1；与 searchIndex.js / practiceBank.js 同族）
+  'contentManifest.js', // 内容快照 / 清单的形状定义（批 S1；与 searchIndex.js / practiceBank.js 同族）
+  'mergeContent.js' // 内容合并裁决纯函数（批 S2；与 judgeDerive.js / answerNorm.js 同族）
 ])
 
 /** 统一为正斜杠路径（兼容 Windows 的反斜杠） */
