@@ -633,6 +633,69 @@ export const useStudyDbStore = defineStore('studyDb', {
       return dbGetAll('bookmarks')
     },
 
+    // ===== 内容双轨缓存（content_cache / content_meta，v7 预留表，S2 消费） =====
+
+    /**
+     * ⚠️ 这两张表**刻意不进同步**：内容缓存是**设备本地的派生数据**（远程快照的镜像），
+     *    每台设备各自按需拉取即可；一旦进 LWW 同步，两台设备的版本号会互相覆盖，
+     *    反而破坏「前进式回滚」的版本闸门（红线 6）。故 sync/engine.js 的 ENTITIES
+     *    不含它们，本段访问器也**不**提供同步专用入口。
+     */
+
+    /**
+     * 读取一个单元的内容分片缓存（P-S12 a：缓存粒度 = **unitKey 整片**，与分片 1:1）
+     * @param {string} unitKey 单元键，形如 `math/01`
+     * @returns {Promise<{key: string, version: number, hash: string,
+     *   pageHashes: Record<string, string>, pages: Array<object>}|null>} 无缓存时 null
+     */
+    async getContentCache(unitKey) {
+      await this.init()
+      return dbGet('content_cache', unitKey)
+    },
+
+    /**
+     * 写入 / 覆盖一个单元的内容分片缓存（整片原子替换）
+     * @param {{key: string, version: number, hash: string,
+     *   pageHashes: Record<string, string>, pages: Array<object>}} entry 分片条目（key = unitKey）
+     */
+    async saveContentCache(entry) {
+      await this.init()
+      return dbPut('content_cache', entry)
+    },
+
+    /** 读取全部分片缓存（调试 / 测试用；正常路径按单元读） */
+    async getAllContentCache() {
+      await this.init()
+      return dbGetAll('content_cache')
+    },
+
+    /** 清空全部内容缓存（版本回退 / 故障排查用，不影响内置内容） */
+    async clearContentCache() {
+      await this.init()
+      return dbClear('content_cache')
+    },
+
+    /**
+     * 读取内容元信息记录（S2 用 key = 'manifest' 存整份清单摘要）
+     * @param {string} key 记录键（当前约定 'manifest'）
+     * @returns {Promise<object|null>}
+     */
+    async getContentMeta(key) {
+      await this.init()
+      return dbGet('content_meta', key)
+    },
+
+    /**
+     * 写入内容元信息记录 —— **版本闸门的提交点**：
+     * 分片 body 先落 content_cache，全部成功后才写本条，中途失败则闸门不前进，
+     * 下次刷新会重新拉取（见 contentClient.refreshIfNewer 的「先 body 后 meta」顺序）。
+     * @param {{key: string, contentVersion: number, units: Record<string, object>}} record
+     */
+    async saveContentMeta(record) {
+      await this.init()
+      return dbPut('content_meta', record)
+    },
+
     // ===== 学习工具记录（原 gameEngine，已去除游戏化） =====
 
     /**
