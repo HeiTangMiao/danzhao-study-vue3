@@ -10,7 +10,8 @@
  *     或 eval —— `tests/csp-guard.test.js` L6 会扫 src/**。
  *   - **红线 2（轨道 A 零回归）**：本模块的每个对外入口都**不抛**（内部消化异常并返回
  *     null / {updated:false}），调用方无需 try/catch 就能保证「远程拿不到 → 走内置」。
- *   - **红线 6（离线优先）**：失败一律静默跳过，不重试（P-S14 a），下次启动自然再试；
+ *   - **红线 6（离线优先）**：失败一律静默跳过，不重试（P-S14 a）；再试的时机是
+ *     **下次启动且 contentVersion 已前进**（同版本内闸门为 false，不会再拉 —— 见 doRefresh ④）；
  *     内容缓存**不进 sync 的 LWW 同步**（派生数据，见 studyDb 的注释）。
  *   - **H7（单一真相源）**：路径 / 键 / op / 协议常量一律取自 `contentManifest.js`，
  *     裁决一律走 `mergeContent.js`，本文件不复制、不自造口径。
@@ -38,7 +39,7 @@ const memoryCache = new Map()
 /** 并发去重：刷新进行中时复用同一个 Promise（启动检查与手触发可能撞车） */
 let inflight = null
 
-/** 会话内是否已触发过后台刷新（P-S14 a：不重试；下次启动自然再试） */
+/** 会话内是否已触发过后台刷新（P-S14 a：不重试；下次启动 + 版本前进时才自然再试） */
 let backgroundStarted = false
 
 /**
@@ -181,7 +182,10 @@ async function doRefresh({ timeout, base }) {
       .filter((k) => !cachedUnits[k] || cachedUnits[k].hash !== manifest.units[k].hash)
 
     // ④ 逐片拉取 + 校验。**单片失败只跳过该片**（红线 6 静默）：
-    //    失败片在 meta 里保留**旧哈希** → 下次刷新仍会判定为「已变更」再拉一次（不会永久陈旧）
+    //    失败片在 meta 里保留**旧哈希** → 待 `contentVersion` **前进**（下一版发布）时
+    //    才会被判为「已变更」重新拉取；**同一版本内不会重试** —— 同版本 `isNewer` 为 false，
+    //    压根不进刷新流程。这是 P-S14(a)「不重试」的预期行为，**不是缺陷**。
+    //    若将来需要「同版本自愈」，需另存 `pendingUnits` 在闸门之外单独重试（本批不做）。
     const entries = []
     for (const unitKey of changedKeys) {
       const unit = manifest.units[unitKey]
@@ -190,7 +194,7 @@ async function doRefresh({ timeout, base }) {
         const shard = await fetchJson(base, unit.path, { timeout })
         const entry = buildShardEntry(unitKey, unit, shard)
         if (entry) entries.push(entry)
-      } catch { /* 静默：该单元下次再试 */ }
+      } catch { /* 静默：该片留待 contentVersion 前进后再拉（同版本内不重试，见上方 ④） */ }
     }
 
     // body 先落：此刻 meta 尚未前进 → 中途断电/异常也不会让闸门误以为已更新
@@ -201,6 +205,7 @@ async function doRefresh({ timeout, base }) {
     // 提交点：meta 一写，闸门前进（下次刷新将跳过同版本）。
     // ⚠️ units 只把**本次真正写成功的片**更新为新哈希，其余沿用旧记录 ——
     //    否则失败片会被记成新哈希，从此再也不拉（静默陈旧）。
+    // ⚠️ 口径：失败片「再拉」要等 `contentVersion` 前进（见上方 ④），**同版本内不重试**。
     const nextUnits = { ...cachedUnits }
     for (const entry of entries) nextUnits[entry.key] = manifest.units[entry.key]
 
