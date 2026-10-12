@@ -57,6 +57,7 @@ import { useTheme } from './composables/useTheme'
 import { useProgressStore } from '@/stores/progress'
 import { useAuthStore } from '@/stores/auth'
 import { useSyncEngine } from '@/sync/engine'
+import { startBackgroundRefresh } from '@/utils/contentClient'
 import AppTabBar from '@/components/AppTabBar.vue'
 
 const router = useRouter()
@@ -95,6 +96,12 @@ async function doSync() {
 
 let syncTimer = null
 onMounted(() => {
+  // 远程内容：**启动后后台静默**检查一次（P-S11 a / P-S14 a）
+  // 不 await、失败静默跳过、一次会话只触发一次 —— 网络绝不进进页与首屏关键路径。
+  // 拉到新版会写入 IndexedDB 并通知 stores/content.js，**当前已渲染的页不强行重取**
+  // （下次进页生效；UnitView 可 watch contentVersion 主动重取）。
+  startBackgroundRefresh()
+
   if (auth.isLoggedIn) {
     doSync()
     syncTimer = setInterval(() => {
