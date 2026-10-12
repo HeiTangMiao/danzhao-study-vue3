@@ -24,22 +24,6 @@ export function importPageModule(subject, folder, name) {
 }
 
 /**
- * 加载指定学科的某一页，返回已注入 site.js 元信息的页面对象
- *
- * 优先级链（批 S2）：**远程缓存（IndexedDB）> 内置打包（dynamic import）**
- *  - 远程层是**离线优先**的读缓存（`getRemotePage` 不发网络请求），故不会把网络延迟
- *    带进进页关键路径 —— 这是 P-S11(a) 的核心：`UnitView.vue:551` 有一条
- *    `Promise.race([数据, sleep(400)])` 的滑动翻页竞速，一旦在此 await 网络就会劣化转场。
- *  - 远程层任何异常（IDB 不可用 / 页不存在 / 哈希不符）都**静默**回落内置：
- *    永不因为远程而变砖（红线 2）。
- *  - 裁决只走 `mergeContent.pickPage`（H7），本文件不自己写 if。
- *
- * @param {string} subject 'math' | 'chinese' | 'computer'
- * @param {string} unitNum 单元编号，如 "01"
- * @param {number} fileIndex site.js 中 files[] 的下标
- * @returns {Promise<object|null>} 越界或导入失败时返回 null（不抛异常，由调用方决定降级）
- */
-/**
  * 读远程缓存页，**任何异常都吞掉返回 null**（红线 2/6）
  * @param {string} subject 学科 key
  * @param {string} unitNum 单元号
@@ -54,6 +38,29 @@ async function safeRemotePage(subject, unitNum, fileIndex) {
   }
 }
 
+/**
+ * 加载指定学科的某一页，返回已注入 site.js 元信息的页面对象
+ *
+ * 优先级链（批 S2）：**远程缓存（IndexedDB）> 内置打包（dynamic import）**
+ *  - 远程层是**离线优先**的读缓存（`getRemotePage` 不发网络请求），故不会把网络延迟
+ *    带进进页关键路径 —— 这是 P-S11(a) 的核心：`UnitView.vue:551` 有一条
+ *    `Promise.race([数据, sleep(400)])` 的滑动翻页竞速，一旦在此 await 网络就会劣化转场。
+ *  - 远程层任何异常（IDB 不可用 / 页不存在 / 哈希不符）都**静默**回落内置：
+ *    永不因为远程而变砖（红线 2）。
+ *  - 裁决只走 `mergeContent.pickPage`（H7），本文件不自己写 if。
+ *
+ * ⚠️ 可用性闸门（`pickPage`）**只作用于远程**，内置兜底路径**原样透传**
+ *    （`hydratePage(mod.default, meta)`）：
+ *    内置 182 页已由构建期 `validate:content` 把关 —— 这正是轨道 A 的意义，运行期再加
+ *    一道闸门并不增加安全性，反而给「改前能正常渲染、改后整页空白」开了一道**新失效模式**
+ *    （例如某块缺 `type` 时，闸门会把整页判为不可用 → blocks 变空，而原样透传至少能
+ *    渲染出其余块）。由 `tests/loadpage-builtin-passthrough.test.js` 钉死。
+ *
+ * @param {string} subject 'math' | 'chinese' | 'computer'
+ * @param {string} unitNum 单元编号，如 "01"
+ * @param {number} fileIndex site.js 中 files[] 的下标
+ * @returns {Promise<object|null>} 越界或导入失败时返回 null（不抛异常，由调用方决定降级）
+ */
 export async function loadPage(subject, unitNum, fileIndex) {
   // 导航坐标仍**只**来自内置 site.js（红线 4：B1 不改导航、不改 fileIndex）
   const meta = resolvePageMeta(getSubjectConfig(subject), unitNum, fileIndex)
@@ -66,8 +73,9 @@ export async function loadPage(subject, unitNum, fileIndex) {
   const picked = remote ? pickPage(null, remote) : null
   if (picked) return hydratePage(picked, meta)
 
+  // 内置兜底：**不**过可用性闸门，原样透传（见上方 JSDoc 的说明）
   const mod = await importPageModule(subject, meta.folder, meta.name)
-  return hydratePage(pickPage(mod.default, null), meta)
+  return hydratePage(mod.default, meta)
 }
 
 /**

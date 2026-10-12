@@ -12,6 +12,13 @@
  * 注入 fixture。这样「远程命中」与「回退内置」都是真实链路，不是替身之间的握手。
  *
  * ⚠️ 不读盘产物：`public/content-remote/` 已被 S1 写进 .gitignore，干净工作树没有产物。
+ *
+ * ⚠️ 关于 `vi.mock`：本仓 `vi.mock` **是可用的**（已实测：替身能接管 `@/utils/contentClient`
+ *    与单个内置页模块）。本文件**刻意不用**，是为了让读路径与生产完全一致（真 loader + 真
+ *    IndexedDB）。需要 mock 内置页模块的那条契约（「内置兜底不加可用性闸门」）已隔离到
+ *    `tests/loadpage-builtin-passthrough.test.js` —— `vi.mock('@/content/<某页>.js')` 是
+ *    **文件级**替身，写进本文件会把那一页在全部用例里换掉，令「与内置模块逐块比对」
+ *    退化成「替身 vs 替身」的假绿。
  */
 import 'fake-indexeddb/auto'
 import { describe, it, expect, beforeEach } from 'vitest'

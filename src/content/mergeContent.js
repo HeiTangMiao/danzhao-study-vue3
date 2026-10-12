@@ -11,6 +11,19 @@
  * ⚠️ 为什么全是纯函数：本文件不 fetch、不碰 IndexedDB、不 import Vue —— 测试可以
  *    直接注入 fixture 断言，不需要 fake-indexeddb 或 mock fetch。
  *
+ * ⚠️ 哈希校验的能力边界（批 S2 复核已确认，team-lead 采纳）：
+ *    客户端**不重算** sha256，只比对「写入分片时随页登记的哈希」（见 verifyHash）。
+ *    因此它能检出：缓存被写坏 / 半写 / 被旧版本覆盖；
+ *    但**检不出**：服务端发布了错误内容、而该内容与它自带的 hash 自洽。
+ *    后者由**发布期**把关（`scripts/validate-content.mjs` 与
+ *    `build-content-remote.mjs` 共用同一份 `createBlockValidator`，校验不过不落盘）。
+ *    威胁模型是我们自己的域名 + HTTPS + 非对抗场景：客户端哈希的用途是「防脏数据」，
+ *    不是「防篡改」；真正的完整性闸门是**单元级**的
+ *    （`content_cache.units[k].hash !== manifest.units[k].hash` → 重拉），那道不依赖重算。
+ *    不重算的理由：重算需把 `canonicalJSON` 搬进浏览器包（H7 禁止复制），且
+ *    `crypto.subtle` 在 Tauri 的 `tauri://localhost` 下是否算 secure context 无法自证 ——
+ *    一旦不可用会**静默退化成永不校验**，比现在这条确定可用的比对更糟。S4 若要加强再议。
+ *
  * 上游形状定义一律来自 src/content/contentManifest.js（S1 落盘），本文件**不复制**其常量。
  */
 import { HASH_PREFIX } from './contentManifest'
