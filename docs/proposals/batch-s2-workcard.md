@@ -74,4 +74,76 @@
 
 S2 实施落点（详见 `batch-s2-tasks.md` §2）：`src/utils/contentClient.js`（新）、`src/content/mergeContent.js`（新，`pickPage`/`verifyHash`/`isNewer` 纯函数）、`src/utils/fetchJson.js`（新，极薄）、`src/stores/content.js`（新，轻量 Pinia）、改 `src/content/loadPage.js`（**唯一入口插入远程优先，内置兜底原样保留**）+ 补齐 `studyDb.js` 的 content 访问器；测试若干（`fake-indexeddb` 已是 devDependency）。
 
+---
+
+## 5. Web 发布链与 CONTENT_VERSION 操作流程
+
+> 本节落实**用户裁定**：`build:content-remote` **只**并入 **Web 构建链**，**不**并进 **Tauri 链**。
+
+### 5.1 改了什么
+
+```diff
+-  "prebuild": "npm run build:index",
++  "prebuild": "npm run build:index && npm run build:content-remote",
+   "prebuild:tauri": "npm run build:index",        // ← 保持原样，不动
+```
+
+- `npm run build`（Web 入口）→ `prebuild` → 先 `build:index`（题库 + 搜索索引），再 `build:content-remote`（内容快照 + 清单）→ 一起进 `dist/`
+- `npm run build:tauri` → `prebuild:tauri` → **仍只有** `build:index`
+
+### 5.2 为什么只给 Web 链
+
+分两端看 `contentRootFrom()` 的基址派生（P-S16）：
+
+| 端 | 基址 | 快照从哪来 | 缺了会怎样 |
+|---|---|---|---|
+| **桌面端 / APK** | 绝对模式 → `new URL(API_BASE).origin` | 从**服务器**拉 `https://520305.top/content-remote/...` | **无所谓**（本来就不读本地），还省约 **1740 KB** 包体 |
+| **网页端** | 相对模式 → `./content-remote/` | 读**部署出去的 dist 里的文件** | 404 → 静默回退内置（不崩溃，但远程更新能力失效） |
+
+结论：桌面/APK **不需要**这份本地快照（且带了只会白白增大包体），网页端**必须要** → 只给 Web 链加。
+
+### 5.3 ⚠️ 两个预期副作用（别当问题去"修"）
+
+**(a) 内容非法会直接阻断 Web 构建。**
+`scripts/build-content-remote.mjs` 内部复用 CI 同款 `createBlockValidator` 逐页逐块校验，
+**校验失败就抛错、不产出任何分片**。进了 Web 构建链后，这个失败会表现为 `npm run build` 整体失败。
+→ **排查指引**：构建报错先跑 `npm run validate:content` 定位到具体文件与区块；**修内容**，
+   不要绕过（禁止给脚本加"跳过校验"开关）。
+
+**(b) CI 此后也会产出 `content-remote`。**
+`.github/workflows/ci.yml` 的「生产构建」步骤跑的就是 `npm run build`，配合
+`actions/upload-artifact` 的 `path: dist/` → CI 产物里会带 `content-remote`。
+这是**预期且有益**的（发布前置校验：内容非法在 CI 就红），**不要**为了「CI 不该产出它」
+去拆脚本或加条件分支。
+
+### 5.4 CONTENT_VERSION 操作流程（易错，务必按顺序）
+
+`src/content/contentManifest.js` 的 `CONTENT_VERSION`（当前 = **1**）是**手填的单调号**，
+与 release tag / package version **完全解耦**（P-S02 a：发布内容 ≠ 发布应用）。
+
+**正确顺序：**
+
+1. 改内容（`src/content/**`）
+2. `CONTENT_VERSION` **+1**
+3. 跑 Web 构建（`npm run build` → 产出 `public/content-remote/` 并打进 `dist/`）
+4. 部署（ci.yml 的 rsync 步骤 / S3 发布）
+
+**顺序错了会怎样：**
+内容改了但版本号**没 +1** → 客户端 `isNewer(remoteVer, maxSeen)` 返回 **false** → 版本闸门
+不前进 → **永远拉不到新内容**，而且**不报错、不崩溃**。这正是「永不变砖」掩盖问题的一面：
+表现为「我改了但手机上没变」，排查时容易误判成缓存 / 网络 / 渲染问题。
+→ **排查指引**：遇到「内容改了客户端没更新」，**先查 `CONTENT_VERSION` 有没有 +1**。
+
+### 5.5 已知边界（非阻断）
+
+- **本地残留快照会漏进桌面包**：`public/content-remote/` 是 gitignore 的生成物，而 Vite 会
+  **整体拷贝 `public/`**（`publicDir` 取默认值）→ 本地先 `npm run build` 再 `npm run tauri:build`
+  时，桌面 / APK 包里会多带约 1740 KB。**GitHub Release 不受影响**
+  （`actions/checkout` 是干净检出，没有这份生成物）。若要彻底避免需另外处理
+  （如 Tauri 构建前清理，或改用非 publicDir 方案）—— 本批**不做**。
+- **题库不跟随远程内容更新**：`public/practice-bank/*` 为构建期产物（H3 相关），过渡期会出现
+  「看得到新内容、练不到新题」，已由方案 §5 拍板「可接受，S5+ 接入」。
+
+---
+
 > 本文件为功能实现侧技术规划，不构成对考试成绩或录取结果的承诺；考试内容、结构与分值以浙江省教育考试院当年发布为准。

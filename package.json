@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run build:index",
+    "prebuild": "npm run build:index && npm run build:content-remote",
     "build": "vite build",
     "prebuild:tauri": "npm run build:index",
     "build:tauri": "vite build --mode tauri",
