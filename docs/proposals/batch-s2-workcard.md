@@ -134,13 +134,38 @@ S2 实施落点（详见 `batch-s2-tasks.md` §2）：`src/utils/contentClient.j
 表现为「我改了但手机上没变」，排查时容易误判成缓存 / 网络 / 渲染问题。
 → **排查指引**：遇到「内容改了客户端没更新」，**先查 `CONTENT_VERSION` 有没有 +1**。
 
-### 5.5 已知边界（非阻断）
+### 5.5 本地打包：自动清理残留快照（不需人记）
 
-- **本地残留快照会漏进桌面包**：`public/content-remote/` 是 gitignore 的生成物，而 Vite 会
-  **整体拷贝 `public/`**（`publicDir` 取默认值）→ 本地先 `npm run build` 再 `npm run tauri:build`
-  时，桌面 / APK 包里会多带约 1740 KB。**GitHub Release 不受影响**
-  （`actions/checkout` 是干净检出，没有这份生成物）。若要彻底避免需另外处理
-  （如 Tauri 构建前清理，或改用非 publicDir 方案）—— 本批**不做**。
+**落点是 `tauri:build`，不是 `prebuild:tauri`：**
+
+```json
+"clean:content-remote": "node scripts/clean-content-remote.mjs",
+"tauri:build": "npm run clean:content-remote && tauri build"
+```
+
+`prebuild` / `prebuild:tauri` / `build:tauri` / `build` **全部保持现状不动** —— 只动
+「人实际敲的入口」，且 **release.yml 桌面 job 走 `tauri-apps/tauri-action@v0`、android job
+走 `tauri:android:build`，都不经过 `npm run tauri:build`** → **零发布面影响**。
+
+**为什么清：**
+Tauri 模式 `IS_ABSOLUTE_API` 为真 → `contentRootFrom()` 取 `new URL(API_BASE).origin`
+→ loader 从**服务器**拉 `https://520305.top/content-remote/...`，
+**永不读 dist 里那份**。所以本地残留的 `public/content-remote/` 是**纯死文件**，
+清掉可省约 **1740 KB**。
+
+**为什么不写成「文档里提醒一句」：**
+它不影响正确性 → 打包的人**看不出来** → 靠人记住「打包前先删」= 迟早漏（与 §5.4
+`CONTENT_VERSION` 同一类陷阱）。故做成**自动前置**，人不需要记得。
+
+**脚本守卫（`scripts/clean-content-remote.mjs`）：**
+因为要 `rmSync({ recursive: true })`，目标路径算错后果不可逆，故强制三层断言：
+① 以 `<sep>public<sep><REMOTE_DIR>` 结尾；② 位于仓库根之下；③ 不等于 `public/` 或仓库根。
+任一不成立 → 打印原因并 `process.exit(1)`，**一个字节都不删**。目录不存在 → 静默成功（退出码 0）。
+
+---
+
+### 5.6 已知边界（非阻断）
+
 - **题库不跟随远程内容更新**：`public/practice-bank/*` 为构建期产物（H3 相关），过渡期会出现
   「看得到新内容、练不到新题」，已由方案 §5 拍板「可接受，S5+ 接入」。
 
