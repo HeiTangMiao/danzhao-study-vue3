@@ -333,6 +333,42 @@ describe('S4 · 攻点①E · 兼容路径（旧 pending 无 version）/ compute
     expect(seen).toEqual([[1, 1], [2]])
   })
 
+  it('★ 不变量端到端（复核工程师证明）：跨版本提升后 pending 不残留旧 version', async () => {
+    // 工程师声称：nextPending 每轮从本轮 stillPending **重建**、从不与上一轮合并
+    // → 「pending.version < meta.contentVersion」结构性不可达。此处端到端证伪该风险。
+    const db = useStudyDbStore()
+    // v1：01 成功、02 失败 → pending=[02]@v1, meta=1
+    mockFetch({
+      '/manifest.json': jsonOk(manifestOf(1, { '01': 'a1', '02': 'b1' })),
+      '/math/01.json': jsonOk(shardOf('01', 1, 'v1-01', 'a1')),
+      '/math/02.json': () => { throw new Error('down') }
+    })
+    await refreshIfNewer({ base: BASE })
+    let meta = await db.getContentMeta(CONTENT_META_KEY)
+    expect(meta.contentVersion).toBe(1)
+    expect(meta.pendingUnits.map((p) => p.unitKey)).toEqual(['math/02'])
+    expect(meta.pendingUnits.every((p) => p.version === 1)).toBe(true)
+
+    // v2：01 未变（非 target）、02 哈希变 → 02 被**重新捕获**为 version=2（旧 @v1 不残留）
+    resetContentClient()
+    mockFetch({
+      '/manifest.json': jsonOk(manifestOf(2, { '01': 'a1', '02': 'b2' })),
+      '/math/01.json': jsonOk(shardOf('01', 1, 'v1-01', 'a1')), // 不该被拉（未变）
+      '/math/02.json': () => { throw new Error('down') }
+    })
+    const urls = []
+    const realFetch = globalThis.fetch
+    globalThis.fetch = vi.fn(async (u) => { urls.push(String(u)); return realFetch(u) })
+    await refreshIfNewer({ base: BASE })
+    meta = await db.getContentMeta(CONTENT_META_KEY)
+    expect(meta.contentVersion).toBe(2)
+    expect(meta.pendingUnits.map((p) => p.unitKey)).toEqual(['math/02'])
+    // ★ 不变量：无任何 pending 残留旧 version
+    expect(meta.pendingUnits.every((p) => p.version === meta.contentVersion)).toBe(true)
+    // 未变的 01 不被重拉
+    expect(urls.some((u) => u.endsWith('/math/01.json'))).toBe(false)
+  })
+
   it('⚠️ 对抗（当前不可达）：若 pending.version 被人为造得**低于** meta.contentVersion → heal 会接受更旧同号分片', async () => {
     // 这不是现存缺陷：doRefresh 的提交点保证 pending.version === meta.contentVersion（上一用例已证）。
     // 但它说明 heal 的「不写更旧」依赖该不变量，而 guard 本身**不显式**比较 meta.contentVersion。
