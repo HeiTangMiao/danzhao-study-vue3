@@ -287,7 +287,7 @@ flowchart TB
 | **S1 快照格式+构建脚本** | 新增 `src/content/contentManifest.js`、`scripts/build-content-remote.mjs` | **零运行时影响**，可与主线并行 | M | ⚡ **已派工实施中**（P-S01…P-S07 裁定：gitignore 产物 / 单调号+指纹 / 一单元一片 / sitePatch 空结构 / 独立手动脚本 / 规范化序列化 / 预留键位不产出）→ 派工单 `batch-s1-workcard.md` |
 | **S2 客户端加载层+缓存** | 新增 `src/utils/contentClient.js`、`src/content/mergeContent.js`；改 `src/content/loadPage.js`、`src/stores/studyDb.js`（**表已在 v7 建好**） | **最高风险**：动 `loadPage` 运行时核心路径；⚠️ **DB 升版已被 S1 前置满足**——`content_cache`/`content_meta` 已在 v7 建好空表，S2 **无需再升版** | **L** | 已定稿待实施 |
 | **S3 服务器静态目录发布** | 发布脚本 + CI（rsync，零后端代码） | 复用现成部署链，可与 S2 并行 | S | 已定稿待实施 |
-| **S4 校验与回滚** | 改 `scripts/build-content-remote.mjs`；`contentClient.js` 校验分支 | **前进式回滚**（发一版新的旧内容） | S–M | 已定稿待实施 |
+| **S4 校验与回滚** | 改 `scripts/build-content-remote.mjs`；`contentClient.js` 校验分支 | **前进式回滚**（发一版新的旧内容）；**发布/回滚唯一 SOP 见 [`docs/content-release-runbook.md`](../content-release-runbook.md)** | S–M | 已定稿待实施 |
 | **S5 Android 侧验证 + search/practice 接入** | 改 `src/utils/search.js`、`practiceBankClient.js`；真机验证 | **与 P5 合并**（首个 APK 即带远程内容层） | M | 已定稿待实施 |
 
 > **与批 A 的关系（关键拍板点）**：S2 是「改运行时核心加载路径」的最高风险大件；批 A 是「小而快、直接提分」的前哨。用户已拍板「内容层优先于 P5」，但**未裁 S2 与批 A 的先后**——见 §6 待拍板 1。

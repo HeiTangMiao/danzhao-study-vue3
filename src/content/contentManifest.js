@@ -34,8 +34,10 @@ export const SCHEMA_VERSION = 1
  *    就必须 +1 再构建。漏 bump 的后果不是「拉得慢」而是**永远拉不到**：
  *    客户端 `isNewer(remoteVer, maxSeen)` 在版本闸门处直接返回 false（contentClient.js:176），
  *    单元级哈希比对在闸门**之后**，够不着 —— 已缓存旧版的客户端永久停在旧内容，
- *    且不报错、不崩溃（「永不变砖」掩盖问题的一面）。完整流程见
- *    docs/proposals/batch-s2-workcard.md §5.4。
+ *    且不报错、不崩溃（「永不变砖」掩盖问题的一面）。
+ *    **完整流程（发布 / 回滚）以 docs/content-release-runbook.md 为唯一 SOP**：
+ *    改内容 → CONTENT_VERSION +1 → 重建 → 产物自检 → 备份 → 部署（先分片后清单）→ 部署后验证。
+ *    回滚同样走该流程（发一版**号更大**的旧内容，**严禁**降号或同号覆盖）。
  */
 export const CONTENT_VERSION = 2
 
