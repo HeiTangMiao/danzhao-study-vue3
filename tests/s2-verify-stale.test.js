@@ -7,7 +7,8 @@
  * 独立复现：确认失败片在 content_meta.units 里**保留旧哈希**。
  *
  * 另外独立核查「下次是否真的会重拉」——不只信注释，实测三种推进方式：
- *   (a) 同版本再刷新（闸门等值 → 不拉）
+ *   (a) 同版本再刷新：**S4-2 起分两种情况** —— 无待重试片仍不拉（闸门未放宽）；
+ *       有 `pendingUnits` 则**同版本自愈**补拉（旧口径是「一律不拉」，已由 S4-2 改写，见文末）
  *   (b) 版本号前进（→ 会重拉，因为旧哈希 ≠ 新哈希）
  *   (c) 进程内重启（memoryCache 清空后仍能从 IDB 读到旧片，不会开天窗）
  *
@@ -79,9 +80,16 @@ function mockFetch(routes) {
 
 const jsonOk = (obj) => () => ({ ok: true, status: 200, json: async () => obj })
 
-beforeEach(() => {
+beforeEach(async () => {
   setActivePinia(createPinia())
   resetContentClient()
+  // ⚠️ fake-indexeddb 同文件内跨用例持久 → 显式清表，避免上一条用例的 units/pending 污染本轮待拉集
+  const db = useStudyDbStore()
+  await db.init()
+  await db.clearContentCache()
+  await db.saveContentMeta({
+    key: CONTENT_META_KEY, contentVersion: null, contentHash: null, units: {}, pendingUnits: []
+  })
 })
 afterEach(() => {
   globalThis.fetch = ORIGINAL_FETCH
@@ -192,36 +200,62 @@ describe('S2 · 攻点② 单片失败不静默陈旧', () => {
     expect(p.blocks).toEqual([{ type: 'text', text: 'v3-02' }])
   })
 
-  it('⚠️ 实测记录：同版本再刷新时闸门等值 → 失败片**不会**在同版本内重试', async () => {
-    // 这是「不重试（P-S14 a）」与版本闸门叠加的**既定结果**，不是缺陷：
-    // 失败片会一直保持 v1 内容，直到 contentVersion 前进（上一条用例已证那时会重拉）。
-    // 登记为残留风险：源码注释「下次刷新仍会判定为已变更再拉一次」仅在**版本前进**时成立。
+  it('⚠️ 口径变更（S4-2 起之一）：**无待重试片**时同版本仍不拉 —— 闸门未被放宽', async () => {
+    // 旧口径（S2 → S4-2 前）：同版本再刷新一律 not-newer，「失败片在同版本内不重试」。
+    // S4-2 之后该口径**分叉**：只有「有待重试片（pendingUnits 非空）」才自愈。
+    // 本条守住**未放宽**那一面：pending 为空 → 清单拉到了也一片不拉（沿用 s2-verify 原始断言）。
     mockFetch({
-      '/manifest.json': jsonOk(manifest(1, {'02': 'b' })),
+      '/manifest.json': jsonOk(manifest(1, { '02': 'b' })),
       '/math/02.json': jsonOk(shard('02', 1, 'b', 'v1-02'))
     })
     await refreshIfNewer({ base: BASE })
 
-    mockFetch({
-      '/manifest.json': jsonOk(manifest(2, {'02': 'b2' })),
-      '/math/02.json': () => {
-        throw new Error('network down')
-      }
-    })
-    resetContentClient()
-    await refreshIfNewer({ base: BASE })
-
-    // 同一份 v2 再刷一次：清单拉取**成功**但闸门等值 → 直接 not-newer，一片都不拉
+    // 同一份 v1 再刷一次：闸门等值、且没有任何待重试片 → 直接 not-newer，一片都不拉
     resetContentClient()
     mockFetch({
-      '/manifest.json': jsonOk(manifest(2, { '02': 'b2' })),
-      '/math/02.json': jsonOk(shard('02', 2, 'b2', 'v2-02')) // 若被调用即证明「同版本内重试」了
+      '/manifest.json': jsonOk(manifest(1, { '02': 'b' })),
+      '/math/02.json': jsonOk(shard('02', 1, 'b', 'v1-02')) // 若被调用即证明闸门被放宽了
     })
     const r = await refreshIfNewer({ base: BASE })
     expect(r.reason).toBe('not-newer')
     expect(r.updated).toBe(false)
-    // 只应拉 manifest；任何分片 URL 都不该被请求
     const urls = globalThis.fetch.mock.calls.map((c) => String(c[0]))
     expect(urls).toEqual([`${BASE}/manifest.json`])
+  })
+
+  it('⚠️ 口径变更（S4-2 起之二）：**有待重试片**时同版本可自愈（旧行为已废除）', async () => {
+    // 2026-10-15 事故：版本闸门滞后（漏 bump）时，失败片在旧口径下**永久陈旧且不报错**。
+    // S4-2 把失败片记入 `content_meta.pendingUnits`，随「每会话一次的后台刷新」在闸门**之外**补拉。
+    // 本条即旧断言的反面：同一份 v2 再刷新，这次分片可达 → 应当**补拉成功**。
+    mockFetch({
+      '/manifest.json': jsonOk(manifest(1, { '02': 'b' })),
+      '/math/02.json': jsonOk(shard('02', 1, 'b', 'v1-02'))
+    })
+    await refreshIfNewer({ base: BASE })
+
+    // v2：分片失败 → 记入 pending
+    mockFetch({
+      '/manifest.json': jsonOk(manifest(2, { '02': 'b2' })),
+      '/math/02.json': () => { throw new Error('network down') }
+    })
+    resetContentClient()
+    await refreshIfNewer({ base: BASE })
+    const db = useStudyDbStore()
+    expect((await db.getContentMeta(CONTENT_META_KEY)).pendingUnits.map((p) => p.unitKey)).toEqual(['math/02'])
+
+    // 同一份 v2 再刷一次：清单等值**但**有 pending → 自愈分支，补拉该片
+    resetContentClient()
+    mockFetch({
+      '/manifest.json': jsonOk(manifest(2, { '02': 'b2' })),
+      '/math/02.json': jsonOk(shard('02', 2, 'b2', 'v2-02'))
+    })
+    const r = await refreshIfNewer({ base: BASE })
+    expect(r.reason).toBe('healed')
+    expect(r.units).toEqual(['math/02'])
+    expect(r.version).toBe(2) // 内容代次没变 → 版本号不前进
+    expect((await db.getContentMeta(CONTENT_META_KEY)).pendingUnits).toEqual([])
+
+    resetContentClient()
+    expect((await getRemotePage('math', '02', 0)).blocks[0].text).toBe('v2-02')
   })
 })

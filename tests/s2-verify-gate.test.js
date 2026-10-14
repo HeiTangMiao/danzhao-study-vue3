@@ -200,11 +200,18 @@ describe('S2 · isValidManifest 协议闸门', () => {
     expect(isValidManifest({ ...ok(), contentVersion: 'abc' })).toBe(false)
   })
 
-  it('⚠️ 纵深防御：contentVersion=null 形态层会放过（Number(null)===0），但闸门层必挡住', () => {
-    // 实测：isValidManifest 用 Number(m.contentVersion) 判有限性 → null/''/false 都被
-    // 强转成 0 而**通过**形态校验（偏松）。此处不视为缺陷，因为下游 isNewer 是第二道闸：
-    // 0 永远不大于任何已见版本 ≥ 0 → 一律 not-newer → 不写库。故端到端仍然安全。
-    expect(isValidManifest({ ...ok(), contentVersion: null })).toBe(true)
+  it('⚠️ 口径变更（P-S47 / S4 起）：contentVersion 必须**本身**是有限数字（null/空串/布尔一律不消费）', () => {
+    // 旧口径（S2 起）：`Number.isFinite(Number(v))` 会把 null/''/false 强转成 0 而**放过**
+    //   → QA 记为 R-2「偏松」，当时以「下游 isNewer 是第二道闸」为由不视为缺陷。
+    // 新口径（S4 · P-S47 a）：形态层直接要求 typeof === 'number' 且有限 → 上述一律拒绝。
+    //   端到端安全性不变（isNewer 仍是第二道闸，下两行继续钉住），但契约更早收紧。
+    for (const bad of [null, '', false, undefined, 'abc', [], {}]) {
+      expect(isValidManifest({ ...ok(), contentVersion: bad }), `contentVersion=${String(bad)} 应不消费`).toBe(false)
+    }
+    expect(isValidManifest({ ...ok(), contentVersion: 0 })).toBe(true) // 0 是合法数字（虽不会被 isNewer 采纳）
+    expect(isValidManifest({ ...ok(), contentVersion: NaN })).toBe(false)
+    expect(isValidManifest({ ...ok(), contentVersion: Infinity })).toBe(false)
+    // 第二道闸仍在（纵深防御未撤）
     expect(isNewer(null, null)).toBe(false) // 首次也不写
     expect(isNewer(null, 5)).toBe(false) // 有本地记录更不写
     expect(isNewer('', null)).toBe(false)

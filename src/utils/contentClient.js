@@ -10,8 +10,10 @@
  *     或 eval —— `tests/csp-guard.test.js` L6 会扫 src/**。
  *   - **红线 2（轨道 A 零回归）**：本模块的每个对外入口都**不抛**（内部消化异常并返回
  *     null / {updated:false}），调用方无需 try/catch 就能保证「远程拿不到 → 走内置」。
- *   - **红线 6（离线优先）**：失败一律静默跳过，不重试（P-S14 a）；再试的时机是
- *     **下次启动且 contentVersion 已前进**（同版本内闸门为 false，不会再拉 —— 见 doRefresh ④）；
+ *   - **红线 6（离线优先）**：失败一律静默跳过，不重试（P-S14 a）；再试的时机有两个：
+ *     ① **下次启动且 contentVersion 已前进**（正常增量路径）；
+ *     ② **同版本自愈**（S4-2）：失败片记进 `content_meta.pendingUnits`，随「每会话一次的后台刷新」
+ *        在闸门**之外**补拉，连续 `PENDING_MAX_ATTEMPTS` 次失败则停止并一次性点名 warn。
  *     内容缓存**不进 sync 的 LWW 同步**（派生数据，见 studyDb 的注释）。
  *   - **H7（单一真相源）**：路径 / 键 / op / 协议常量一律取自 `contentManifest.js`，
  *     裁决一律走 `mergeContent.js`，本文件不复制、不自造口径。
@@ -41,6 +43,17 @@ let inflight = null
 
 /** 会话内是否已触发过后台刷新（P-S14 a：不重试；下次启动 + 版本前进时才自然再试） */
 let backgroundStarted = false
+
+/**
+ * 同版本自愈的重试上限（P-S44 a）
+ *
+ * 语义：某片连续失败达到该次数 → 从 `pendingUnits` 移除并**一次性** `console.warn` 点名
+ * （「超限必报告」纪律：允许静默跳过，但**不允许永久静默陈旧**）。
+ * 为什么是 5：按会话一次的后台刷新计，约等于「连开 5 天都没拉到」——
+ * 足以排除偶发弱网，又不至于让一条坏分片把 pending 列表永远占着。
+ * ⚠️ 这是**次数**上限，不是退避（不持久化时间戳；P-S44 a 明确不做时间退避）。
+ */
+export const PENDING_MAX_ATTEMPTS = 5
 
 /**
  * 远程内容根地址（P-S16，含 team-lead 的**强制修正**）
@@ -95,7 +108,12 @@ function originOf(apiBase) {
 export function isValidManifest(m) {
   if (!m || typeof m !== 'object') return false
   if (m.schemaVersion !== SCHEMA_VERSION) return false
-  if (!Number.isFinite(Number(m.contentVersion))) return false
+  // ⚠️ P-S47（S4）：`contentVersion` 必须**本身就是有限数字**，不再先强转。
+  //    旧写法 `Number.isFinite(Number(m.contentVersion))` 会把 null / '' / false 强转成 0 而放过
+  //    （QA 记为 R-2「偏松」）。虽然下游 `isNewer` 是第二道闸（0 不大于任何已见版本 → 不写库），
+  //    端到端仍安全，但「形态层就不该放过非数字」是更好的契约：越早拒绝，越不容易在
+  //    未来某个新调用点上被绕过。构建脚本产出的恒为数字 → 收紧不会误杀。
+  if (typeof m.contentVersion !== 'number' || !Number.isFinite(m.contentVersion)) return false
   if (!m.units || typeof m.units !== 'object' || Array.isArray(m.units)) return false
   return true
 }
@@ -147,17 +165,74 @@ function dbStore() {
 }
 
 /**
- * 刷新远程内容（**闸门 + 增量 + 原子写**），任何失败都静默返回 `{updated:false}`
+ * 计算本轮「待拉集合」（**纯函数**，S4-2 抽出，便于单测直接断言）
+ *
+ * 三种模式（红线 4：闸门语义**不变**，本函数只多了一个分支）：
+ *  - `newer`：远程版本**严格大于**本地已见版本 → 以**远程清单**为准，取「哈希变了」的单元；
+ *             同时**丢弃**旧 `pendingUnits`（那些单元在本轮 changedKeys 里必然再次入选，
+ *             两处并存会导致同一片被拉两次）。
+ *  - `heal` ：版本等值/更旧**但** `pendingUnits` 非空 → **同版本自愈**：只用 pending 里
+ *             **已捕获**的 `{unitKey, path, hash, version}` 当坐标，**不读远程 manifest.units**
+ *             —— 2026-10-15 事故里线上清单可能已不可达/旧内容，依赖它自愈等于没有自愈。
+ *  - `skip` ：版本等值/更旧且待重试集为空 → 维持 S2 行为（一片都不拉，返回 not-newer）。
+ *
+ * @param {object} manifest 远程清单（仅 newer 模式用到它的 units/contentVersion）
+ * @param {object|null} meta 本地 content_meta 记录（含 units / contentVersion / pendingUnits）
+ * @returns {{mode: 'newer'|'heal'|'skip', targets: Array<{unitKey: string, path: string,
+ *   hash: string, version: number, attempts: number}>}}
+ */
+export function computeRetrySet(manifest, meta) {
+  const cachedUnits = (meta && meta.units) || {}
+  const pending = Array.isArray(meta?.pendingUnits) ? meta.pendingUnits : []
+
+  if (isNewer(manifest?.contentVersion, meta?.contentVersion ?? null)) {
+    const targets = Object.keys(manifest.units || {})
+      .filter((k) => !cachedUnits[k] || cachedUnits[k].hash !== manifest.units[k].hash)
+      .map((k) => ({
+        unitKey: k,
+        path: manifest.units[k].path,
+        hash: manifest.units[k].hash,
+        version: Number(manifest.contentVersion),
+        attempts: 0
+      }))
+      // 无 path 的单元拉不了（清单坏项）→ 直接不进待拉集，也不留 pending
+      .filter((t) => typeof t.path === 'string' && t.path !== '')
+    return { mode: 'newer', targets }
+  }
+
+  if (pending.length > 0) {
+    const targets = pending
+      .filter((p) => p && typeof p.unitKey === 'string' && typeof p.path === 'string')
+      .map((p) => ({
+        unitKey: p.unitKey,
+        path: p.path,
+        hash: p.hash,
+        // 兼容早期记录：没存 version 时退回本地已见版本
+        version: Number.isFinite(Number(p.version)) ? Number(p.version) : Number(meta?.contentVersion),
+        attempts: Number(p.attempts) || 0
+      }))
+    return { mode: 'heal', targets }
+  }
+
+  return { mode: 'skip', targets: [] }
+}
+
+/**
+ * 刷新远程内容（**闸门 + 增量 + 同版本自愈 + 原子写**），任何失败都静默返回 `{updated:false}`
  *
  * 流程：
  *   ① 拉清单 → 形态校验
- *   ② **版本闸门**：`isNewer(manifest.contentVersion, 本地已见版本)` → 等值/更旧一律**不写**
- *   ③ **增量**：只拉「清单里的单元哈希 ≠ 缓存里记录」的分片（P-S12 a 整片粒度）
- *   ④ 逐片轻量校验 → 先写 **content_cache（body）**，全部成功后才写 **content_meta（提交点）**
- *   ⑤ 通知 `stores/content.js`（P-S13 a）
+ *   ② **闸门判定 + 待拉集计算**（`computeRetrySet`，红线 4：`isNewer` 严格大于语义不变）
+ *      · 版本前进 → changedKeys（原有增量逻辑）
+ *      · 版本等值/更旧但有待重试片 → **同版本自愈**（S4-2，闸门**之外**补拉）
+ *      · 两者皆无 → `not-newer`，一片都不拉
+ *   ③ 逐片轻量校验 → 先写 **content_cache（body）**，全部成功后才写 **content_meta（提交点）**
+ *      （`units` 只把**本轮成功**的片前进；`pendingUnits` 与 `units` **同一次 put**）
+ *   ④ 通知 `stores/content.js`（P-S13 a）
  *
  * @param {{timeout?: number, base?: string}} [options] timeout 毫秒；base 覆盖内容根（测试注入）
  * @returns {Promise<{updated: boolean, version: number|null, units: string[], reason: string}>}
+ *          reason: 'ok'（版本前进）| 'healed'（同版本补拉成功）| 'not-newer' | 'invalid-manifest' | 'error'
  */
 export async function refreshIfNewer({ timeout = DEFAULT_TIMEOUT_MS, base = contentRoot() } = {}) {
   if (inflight) return inflight
@@ -172,29 +247,43 @@ async function doRefresh({ timeout, base }) {
     if (!isValidManifest(manifest)) return { updated: false, version: null, units: [], reason: 'invalid-manifest' }
 
     const meta = await db.getContentMeta(CONTENT_META_KEY)
-    // 版本闸门（红线 3）：旧的 / 等值的一律不写 —— 等值不重写可免一次无意义 IDB 写放大
-    if (!isNewer(manifest.contentVersion, meta?.contentVersion ?? null)) {
+    // ② 闸门判定 + 待拉集（红线 4：isNewer 严格大于语义不变，此处只多一个自愈分支）
+    const { mode, targets } = computeRetrySet(manifest, meta)
+    if (mode === 'skip') {
+      // 等值/更旧且无待重试片 → 维持 S2 行为：清单拉到了，但一片都不拉
       return { updated: false, version: meta?.contentVersion ?? null, units: [], reason: 'not-newer' }
     }
 
-    const cachedUnits = (meta && meta.units) || {}
-    const changedKeys = Object.keys(manifest.units)
-      .filter((k) => !cachedUnits[k] || cachedUnits[k].hash !== manifest.units[k].hash)
-
-    // ④ 逐片拉取 + 校验。**单片失败只跳过该片**（红线 6 静默）：
-    //    失败片在 meta 里保留**旧哈希** → 待 `contentVersion` **前进**（下一版发布）时
-    //    才会被判为「已变更」重新拉取；**同一版本内不会重试** —— 同版本 `isNewer` 为 false，
-    //    压根不进刷新流程。这是 P-S14(a)「不重试」的预期行为，**不是缺陷**。
-    //    若将来需要「同版本自愈」，需另存 `pendingUnits` 在闸门之外单独重试（本批不做）。
+    // ③ 逐片拉取 + 校验。**单片失败只跳过该片**（红线 6 静默），但记入 `pendingUnits`
+    //    以便**同版本内**下次后台刷新补拉（S4-2 自愈；闸门之外，不放宽闸门）。
     const entries = []
-    for (const unitKey of changedKeys) {
-      const unit = manifest.units[unitKey]
-      if (!unit || typeof unit.path !== 'string') continue
+    const stillPending = []
+    for (const t of targets) {
+      const unit = { hash: t.hash, version: t.version, path: t.path }
       try {
-        const shard = await fetchJson(base, unit.path, { timeout })
-        const entry = buildShardEntry(unitKey, unit, shard)
-        if (entry) entries.push(entry)
-      } catch { /* 静默：该片留待 contentVersion 前进后再拉（同版本内不重试，见上方 ④） */ }
+        const shard = await fetchJson(base, t.path, { timeout })
+        const entry = buildShardEntry(t.unitKey, unit, shard)
+        if (entry) {
+          entries.push(entry)
+          continue
+        }
+        // 分片拿到了但结构/协议不符 → 同样算「本轮没成功」，留待重试
+        stillPending.push({ ...t, attempts: t.attempts + 1 })
+      } catch {
+        stillPending.push({ ...t, attempts: t.attempts + 1 })
+      }
+    }
+
+    // 上限（P-S44 a）：达到上限的片从 pending 移除 + **一次性**点名 warn。
+    // 不 warn 的话「永久静默陈旧」会悄悄发生；warn 一次即止，避免刷屏。
+    const giveUp = stillPending.filter((p) => p.attempts >= PENDING_MAX_ATTEMPTS)
+    const nextPending = stillPending.filter((p) => p.attempts < PENDING_MAX_ATTEMPTS)
+    if (giveUp.length > 0) {
+      console.warn(
+        `[content-client] ⚠️ ${giveUp.length} 个单元连续 ${PENDING_MAX_ATTEMPTS} 次补拉失败，` +
+          `已停止重试（这些单元将保持旧版内容，直至发布新版本）：` +
+          giveUp.map((p) => p.unitKey).join('、')
+      )
     }
 
     // body 先落：此刻 meta 尚未前进 → 中途断电/异常也不会让闸门误以为已更新
@@ -202,26 +291,53 @@ async function doRefresh({ timeout, base }) {
       await db.saveContentCache(entry)
       memoryCache.set(entry.key, entry)
     }
-    // 提交点：meta 一写，闸门前进（下次刷新将跳过同版本）。
-    // ⚠️ units 只把**本次真正写成功的片**更新为新哈希，其余沿用旧记录 ——
-    //    否则失败片会被记成新哈希，从此再也不拉（静默陈旧）。
-    // ⚠️ 口径：失败片「再拉」要等 `contentVersion` 前进（见上方 ④），**同版本内不重试**。
+
+    // 提交点：`units` / `pendingUnits` 与版本号**同一次 put**（不存在「body 落了但 pending 没落」）。
+    // ⚠️ units 只把**本轮真正写成功的片**更新为新哈希，其余沿用旧记录 ——
+    //    否则失败片会被记成新哈希，从此再也不拉（静默陈旧，S2 已钉死该口径）。
+    const cachedUnits = (meta && meta.units) || {}
     const nextUnits = { ...cachedUnits }
-    for (const entry of entries) nextUnits[entry.key] = manifest.units[entry.key]
+    const targetByKey = new Map(targets.map((t) => [t.unitKey, t]))
+    for (const entry of entries) {
+      if (mode === 'newer') {
+        // 版本前进：沿用清单里的单元描述（形状与 S2 完全一致）
+        nextUnits[entry.key] = manifest.units[entry.key]
+      } else {
+        // 同版本自愈：没有（可用的）远程清单描述 → 用分片自身信息补齐形状
+        const t = targetByKey.get(entry.key)
+        nextUnits[entry.key] = {
+          hash: entry.hash,
+          version: entry.version,
+          path: t ? t.path : entry.key,
+          count: entry.pages.length,
+          updatedAt: entry.manifestUpdatedAt
+        }
+      }
+    }
+
+    // 版本号：只有「版本前进」才前进；自愈只是补拉，**内容代次没变**（红线 4）
+    const nextVersion = mode === 'newer' ? Number(manifest.contentVersion) : (meta?.contentVersion ?? null)
+    const nextHash = mode === 'newer' ? (manifest.contentHash ?? null) : (meta?.contentHash ?? null)
 
     await db.saveContentMeta({
       key: CONTENT_META_KEY,
-      contentVersion: Number(manifest.contentVersion),
-      contentHash: manifest.contentHash ?? null,
-      units: nextUnits
+      contentVersion: nextVersion,
+      contentHash: nextHash,
+      units: nextUnits,
+      pendingUnits: nextPending
     })
 
     const units = entries.map((e) => e.key)
     try {
-      useContentStore().applyUpdate({ version: Number(manifest.contentVersion), units })
+      useContentStore().applyUpdate({ version: nextVersion, units })
     } catch { /* 通知层不可用时不影响内容本身 */ }
 
-    return { updated: units.length > 0, version: Number(manifest.contentVersion), units, reason: 'ok' }
+    return {
+      updated: units.length > 0,
+      version: nextVersion,
+      units,
+      reason: mode === 'newer' ? 'ok' : 'healed'
+    }
   } catch {
     // 红线 6：离线 / 404 / 解析失败 / IDB 不可用 —— 一律静默跳过，不抛
     return { updated: false, version: null, units: [], reason: 'error' }

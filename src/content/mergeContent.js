@@ -22,7 +22,21 @@
  *    （`content_cache.units[k].hash !== manifest.units[k].hash` → 重拉），那道不依赖重算。
  *    不重算的理由：重算需把 `canonicalJSON` 搬进浏览器包（H7 禁止复制），且
  *    `crypto.subtle` 在 Tauri 的 `tauri://localhost` 下是否算 secure context 无法自证 ——
- *    一旦不可用会**静默退化成永不校验**，比现在这条确定可用的比对更糟。S4 若要加强再议。
+ *    一旦不可用会**静默退化成永不校验**，比现在这条确定可用的比对更糟。
+ *
+ * ⚠️ **S4 已复议（2026-10-15 真实事故之后）：维持「不重算」，本注释即决议留档。**
+ *    - 事故根因是**版本闸门 + 发布纪律**（漏 bump / 同号覆盖 / CI 不发远程内容），
+ *      与哈希校验**无因果**：重算一条都治不到。
+ *    - 重算的**唯一**增量是「服务端发布了错误内容但与其自带 hash 自洽」，而
+ *      `build-content-remote.mjs` 里 `hash` 与 `blocks` 是**同源计算**的 → 无篡改时不可能失配；
+ *      该场景的职责在**发布期校验**（同上注释）。
+ *    - 两个备选方案各有硬伤：`crypto.subtle`（不可用即静默退化）；仓内纯 JS sha256
+ *      （多一份哈希实现 = 多一个「实现有 bug → 全页误判 → 全站回退内置」的失效模式）。
+ *    - **翻案触发条件**（满足其一再议，届时只走纯 JS 方案并带 fail-safe 守卫）：
+ *      出现真实「服务端自洽但错误」事故 / 发布链使用者不再可信 / 域名与证书信任被打破。
+ *      详见 `docs/proposals/batch-s4-tasks.md` §4（A/B 对比与推荐）。
+ *    - 反向锚：`tests/s4-verify-gate.test.js` 断言本文件与 `contentClient.js` 的**代码**
+ *      （排除注释）不含 `crypto.subtle` / `createHash` 引用 —— 防「偷偷加重算」。
  *
  * 上游形状定义一律来自 src/content/contentManifest.js（S1 落盘），本文件**不复制**其常量。
  */
