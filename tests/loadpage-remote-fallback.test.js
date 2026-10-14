@@ -25,6 +25,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { createPinia, setActivePinia } from 'pinia'
 import { loadPage, importPageModule } from '@/content/loadPage'
 import { getSubjectConfig } from '@/content/index'
@@ -179,15 +180,51 @@ describe('B1 边界 · 导航派生层零改动', () => {
     expect(read('src/utils/contentClient.js')).toContain('p.op !== OP.UPSERT')
   })
 
-  it('自批 S2 基线以来 site.js / index.js 从未被改动（fileIndex 零位移）', () => {
+  it('自批 S2 基线以来：index.js 未被改动；各 site.js 的**每单元**页序只允许末尾增长（H2）', async () => {
     // 54300fa = 批 S2 派工基线。fileIndex 是 URL 与历史进度的身份，位移 = 全站进度错位。
+    //
+    // ⚠️ 口径修正（内容侧入库「作品训练卡」新页后本条曾假红，已按红线本意重写）：
+    //    原写法是「site.js 不许出现在 diff 里」—— 太严：H2 本来就允许往 files[] 末尾追加新页。
+    //    fileIndex 是**单元内**的下标（unitNum + files[] 下标），所以口径必须是**逐单元**比对：
+    //      · 单元内**末尾**增删 → 不位移既有下标（新增页拿新下标）→ 允许
+    //      · 单元内**中间插入 / 删除 / 换序** → 既有下标整体位移 → 拒绝
+    //    判据：逐单元取「公共前缀」，要求逐项一致。
     const BASELINE = '54300fa'
+
+    /** 基线侧：从 git 里取旧版本，按单元拆出页名序列（site.js 中 name: 只属于 files[]） */
+    const baselineUnits = (rel) => execSync(`git show ${BASELINE}:${rel}`, { encoding: 'utf-8' })
+      .split(/\bnum:\s*"/).slice(1)
+      .map((chunk) => ({
+        num: chunk.slice(0, chunk.indexOf('"')),
+        names: [...chunk.matchAll(/name:\s*"([^"]+)"/g)].map((m) => m[1])
+      }))
+
+    /** 当前侧：走真实模块（不经正则），顺序即 fileIndex 语义 */
+    const currentUnits = async (rel) => {
+      const mod = await import(pathToFileURL(join(ROOT, rel)).href)
+      return mod.default.units.map((u) => ({
+        num: u.num,
+        names: u.files.map((f) => f.name)
+      }))
+    }
+
+    // 学科索引：S2 与后续批次都不该动它（导航派生层的入口）
     const changed = execSync(`git diff --name-only ${BASELINE} HEAD`, { encoding: 'utf-8' })
       .split('\n').filter(Boolean)
-    expect(changed).not.toContain('src/content/site.js')
     expect(changed).not.toContain('src/content/index.js')
-    expect(changed).not.toContain('src/content/chinese/site.js')
-    expect(changed).not.toContain('src/content/computer/site.js')
+
+    for (const rel of ['src/content/site.js', 'src/content/chinese/site.js', 'src/content/computer/site.js']) {
+      const baseByNum = new Map(baselineUnits(rel).map((u) => [u.num, u.names]))
+      const nowUnits = await currentUnits(rel)
+      expect(nowUnits.length, `${rel} 单元数不应减少`).toBeGreaterThanOrEqual(baseByNum.size)
+      for (const u of nowUnits) {
+        const base = baseByNum.get(u.num)
+        if (!base) continue // 新增单元：B2 才产出，B1 阶段不出现；出现也不位移既有下标
+        const n = Math.min(base.length, u.names.length)
+        expect(u.names.slice(0, n), `${rel} 单元 ${u.num} 页序发生位移（前 ${n} 项必须原样）`)
+          .toEqual(base.slice(0, n))
+      }
+    }
   })
 })
 
