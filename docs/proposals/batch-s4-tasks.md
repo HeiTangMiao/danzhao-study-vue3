@@ -116,7 +116,7 @@
   - `src/stores/content.js`：**零改动**（`applyUpdate` 语义不变；自愈成功仅是「更新了某片」）。
 - **契约与不变量**（逐条钉死，全部可测）：
   1. **闸门不放宽**：`isNewer` 严格大于语义不变（红线 4）。pendingUnits 只在 `!isNewer && pendingUnits.length > 0` 时进入**自愈分支**，且**不**用远程版本号覆盖本地 `contentVersion`。
-  2. **自愈目标须自带坐标**：`pendingUnits` 存**结构化引用** `[{unitKey, path, hash, attempts}]`（在失败那轮的 manifest 里捕获），这样同版本重试**不必依赖**远程 manifest（远程可能已不可达）。
+  2. **自愈目标须自带坐标**：`pendingUnits` 存**结构化引用**（在失败那轮的 manifest 里捕获），这样同版本重试**不依赖**远程 manifest 的 `units` 段取坐标（其内容可能滞后）。⚠️ **实施口径（2026-10-15，team-lead 已追认）**：实际字段为 `[{unitKey, path, hash, version, attempts}]`——`version` 为实现期增补的**超集**字段（供 `buildShardEntry` 的分片代次守卫，QA 报告 R-3）。⚠️ **前提**：自愈发生在 `doRefresh` 内、闸门判定之后，仍需**能拉到合法 manifest** 才进入——覆盖「清单可达但版本滞后」，**不**覆盖「清单完全不可达」（QA 报告 R-2）。
   3. **写库原子性不变**：分片 body 先写 `content_cache`（`:200-204` 模式），全部成功后才写 `content_meta`（提交点，`:205-217`）。`pendingUnits` 是 meta 的一部分 → 与 `units` **同一次 put**，不存在「body 落了但 pending 没落」。
   4. **失败片哈希口径不变**：失败片在 `units` 里仍**保留旧哈希**（`s2-verify-stale.test.js` 已钉死）；只有**本次成功**的片才前进。
   5. **自愈成功后**：把该片从 `pendingUnits` 移除、`units[unitKey]` 更新为引用里的 hash、写回 `content_cache`；**已发布的 `contentVersion` 不变**（因为内容代次没变，只是补拉）。
