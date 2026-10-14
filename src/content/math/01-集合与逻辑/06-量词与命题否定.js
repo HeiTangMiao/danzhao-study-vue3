@@ -103,7 +103,7 @@ export default {
     {
       type: "formula",
       title: "命题否定规则",
-      lines: [
+      formulas: [
         "① \\(\\neg\\big(\\forall x \\in M, p(x)\\big) \\iff \\exists x \\in M, \\neg p(x)\\)（全称命题的否定是特称命题）",
         "② \\(\\neg\\big(\\exists x \\in M, p(x)\\big) \\iff \\forall x \\in M, \\neg p(x)\\)（特称命题的否定是全称命题）",
         "③ 不含量词的命题的否定：只否定结论，如\"若 \\(p\\)，则 \\(q\\)\"的否定是\"若 \\(p\\)，则 \\(\\neg q\\)\""
@@ -127,7 +127,7 @@ export default {
     {
       type: "formula",
       title: "常见否定对照",
-      lines: [
+      formulas: [
         "• \\(\\neg(p \\land q) \\iff \\neg p \\lor \\neg q\\)",
         "• \\(\\neg(p \\lor q) \\iff \\neg p \\land \\neg q\\)",
         "• \"\\(a\\) 且 \\(b\\)\"的否定是\"\\(a\\) 或 \\(b\\) 至少有一个不成立\"",

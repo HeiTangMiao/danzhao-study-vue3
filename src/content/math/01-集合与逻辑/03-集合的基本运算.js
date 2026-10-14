@@ -66,7 +66,7 @@ export default {
     {
       type: "formula",
       title: "交集",
-      lines: ["$$A \\cap B = \\{x \\mid x \\in A \\text{ 且 } x \\in B\\}$$"]
+      formulas: ["$$A \\cap B = \\{x \\mid x \\in A \\text{ 且 } x \\in B\\}$$"]
     },
     {
       type: "knowledge",
@@ -87,7 +87,7 @@ export default {
     {
       type: "formula",
       title: "并集",
-      lines: ["$$A \\cup B = \\{x \\mid x \\in A \\text{ 或 } x \\in B\\}$$"]
+      formulas: ["$$A \\cup B = \\{x \\mid x \\in A \\text{ 或 } x \\in B\\}$$"]
     },
     {
       type: "knowledge",
@@ -108,7 +108,7 @@ export default {
     {
       type: "formula",
       title: "补集",
-      lines: ["$$\\complement_U A = \\{x \\mid x \\in U \\text{ 且 } x \\notin A\\}$$"]
+      formulas: ["$$\\complement_U A = \\{x \\mid x \\in U \\text{ 且 } x \\notin A\\}$$"]
     },
     {
       type: "knowledge",
@@ -122,7 +122,7 @@ export default {
     {
       type: "formula",
       title: "德摩根定律",
-      lines: [
+      formulas: [
         "$$\\complement_U(A \\cap B) = (\\complement_U A) \\cup (\\complement_U B)$$",
         "$$\\complement_U(A \\cup B) = (\\complement_U A) \\cap (\\complement_U B)$$"
       ]

@@ -101,7 +101,7 @@ export default {
     {
       type: "formula",
       title: "四种命题的真假关系",
-      lines: [
+      formulas: [
         "① **互为逆否命题**的两个命题**同真同假**（等价关系）：原命题 \\(\\Leftrightarrow\\) 逆否命题，逆命题 \\(\\Leftrightarrow\\) 否命题",
         "② 原命题与逆命题、原命题与否命题的真假**没有必然联系**"
       ]
@@ -135,7 +135,7 @@ export default {
     {
       type: "formula",
       title: "复合命题真假判断规则",
-      lines: [
+      formulas: [
         "• \\(p \\land q\\)：**一假则假**（全真才真）",
         "• \\(p \\lor q\\)：**一真则真**（全假才假）",
         "• \\(\\neg p\\)：与 \\(p\\) 真假相反"

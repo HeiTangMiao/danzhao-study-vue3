@@ -110,7 +110,7 @@ export default {
               {
                 type: "formula",
                 title: "元素与集合关系",
-                lines: [
+                formulas: [
                   "\\(a \\in A\\)：元素 \\(a\\) 属于集合 \\(A\\)",
                   "\\(a \\notin A\\)：元素 \\(a\\) 不属于集合 \\(A\\)"
                 ]

@@ -116,7 +116,7 @@ export default {
     {
       type: "formula",
       title: "平行与垂直的坐标条件",
-      lines: [
+      formulas: [
         "• \\(\\boldsymbol{a} \\parallel \\boldsymbol{b} \\iff \\boldsymbol{a} = \\lambda\\boldsymbol{b} \\iff \\dfrac{x_1}{x_2} = \\dfrac{y_1}{y_2} = \\dfrac{z_1}{z_2}\\)（对应坐标成比例）",
         "• \\(\\boldsymbol{a} \\perp \\boldsymbol{b} \\iff \\boldsymbol{a} \\cdot \\boldsymbol{b} = 0 \\iff x_1 x_2 + y_1 y_2 + z_1 z_2 = 0\\)"
       ]

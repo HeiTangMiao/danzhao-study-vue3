@@ -66,7 +66,7 @@ export default {
     {
       type: "formula",
       title: "充分条件与必要条件",
-      lines: [
+      formulas: [
         "若 \\(p \\Rightarrow q\\)（即\"若 \\(p\\) 成立，则 \\(q\\) 必成立\"）：",
         "• 称 \\(p\\) 是 \\(q\\) 的**充分条件**",
         "• 称 \\(q\\) 是 \\(p\\) 的**必要条件**"
@@ -87,7 +87,7 @@ export default {
     {
       type: "formula",
       title: "充要条件",
-      lines: [
+      formulas: [
         "若 \\(p \\Rightarrow q\\) 且 \\(q \\Rightarrow p\\)，即 \\(p \\Leftrightarrow q\\)：",
         "• 称 \\(p\\) 是 \\(q\\) 的**充分必要条件**（充要条件）",
         "• 称 \\(q\\) 也是 \\(p\\) 的充要条件"
@@ -122,7 +122,7 @@ export default {
     {
       type: "formula",
       title: "常见等价关系",
-      lines: [
+      formulas: [
         "• \\(a = b \\Leftrightarrow a - b = 0\\)",
         "• \\(a > b \\Leftrightarrow a - b > 0\\)",
         "• \\(ab = 0 \\Leftrightarrow a = 0 \\text{ 或 } b = 0\\)",

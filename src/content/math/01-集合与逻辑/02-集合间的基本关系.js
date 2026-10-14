@@ -60,7 +60,7 @@ export default {
     {
       type: "formula",
       title: "子集",
-      lines: [
+      formulas: [
         "记作：\\(A \\subseteq B\\) 或 \\(B \\supseteq A\\)",
         "读作：\"\\(A\\) 包含于 \\(B\\)\" 或 \"\\(B\\) 包含 \\(A\\)\""
       ]
@@ -83,7 +83,7 @@ export default {
     {
       type: "formula",
       title: "真子集",
-      lines: ["记作：\\(A \\subsetneq B\\) 或 \\(B \\supsetneq A\\)"]
+      formulas: ["记作：\\(A \\subsetneq B\\) 或 \\(B \\supsetneq A\\)"]
     },
     {
       type: "knowledge",
@@ -95,7 +95,7 @@ export default {
     {
       type: "formula",
       title: "集合相等",
-      lines: ["$$A = B \\iff A \\subseteq B \\text{ 且 } B \\subseteq A$$"]
+      formulas: ["$$A = B \\iff A \\subseteq B \\text{ 且 } B \\subseteq A$$"]
     },
     {
       type: "knowledge",
@@ -112,7 +112,7 @@ export default {
     {
       type: "formula",
       title: "子集个数公式",
-      lines: [
+      formulas: [
         "若集合 \\(A\\) 含有 \\(n\\) 个元素（\\(n \\in \\mathbb{N}^*\\)），则：",
         "• 子集总数：\\(2^n\\) 个",
         "• 真子集个数：\\(2^n - 1\\) 个",
