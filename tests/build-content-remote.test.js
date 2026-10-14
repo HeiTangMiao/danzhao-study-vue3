@@ -74,7 +74,7 @@ describe('① 分片与页结构', () => {
 
   it('每页含坐标六件套 + blocks，且 op 恒为 upsert（B1）', () => {
     const pages = allPages(snapA)
-    expect(pages.length).toBe(182) // 内容页总数（与 collectFiles 一致）
+    expect(pages.length).toBe(183) // 内容页总数（与 collectFiles 一致）；+1 = computer 04 单元新增「09-作品训练卡（三遍法）」
     for (const p of pages) {
       expect(Object.keys(p)).toEqual(['subject', 'unitNum', 'fileIndex', 'fileKey', 'op', 'blocks', 'hash'])
       expect(p.op).toBe(OP.UPSERT)
