@@ -39,7 +39,7 @@ export const SCHEMA_VERSION = 1
  *    改内容 → CONTENT_VERSION +1 → 重建 → 产物自检 → 备份 → 部署（先分片后清单）→ 部署后验证。
  *    回滚同样走该流程（发一版**号更大**的旧内容，**严禁**降号或同号覆盖）。
  */
-export const CONTENT_VERSION = 2
+export const CONTENT_VERSION = 3
 
 /**
  * 预留但**当前不产出**的清单子段（S5+ 才填充）
