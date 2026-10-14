@@ -165,6 +165,26 @@ export default {
         "随做随存，别赌机器不出故障",
         "所有操作完成后对照题目要求逐项自查再提交"
       ]
+    },
+    // ---------- 考前快检 · 补充 ----------
+    {
+      type: "quiz",
+      title: "考前快检 · 补充",
+      items: [
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "在 Photoshop 中，用前景色填充当前选区的快捷键是（　）",
+          options: ["Ctrl+T", "Alt+Delete", "Ctrl+J", "Ctrl+D"],
+          correctIndex: 1,
+          answer: "**B**。`Alt+Delete` 用前景色填充选区（`Ctrl+Delete` 用背景色填充）；`Ctrl+T` 是自由变换、`Ctrl+J` 是复制图层、`Ctrl+D` 是取消选区。"
+        },
+        {
+          difficulty: "medium",
+          question: "判断：在 Photoshop 中使用魔棒工具选择区域时，容差数值设得越大，被选中的颜色范围通常也越大。",
+          answer: "**正确。**魔棒工具按颜色相近程度选取，容差越大允许的颜色差异越大，选中的范围也越大；容差过大会选入不需要的区域。"
+        }
+      ]
     }
   ]
 }

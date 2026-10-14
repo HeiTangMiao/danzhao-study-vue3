@@ -191,6 +191,31 @@ export default {
           answer: "答案：B。提交前必须校对所有文件是否存在、保存位置是否正确、内容是否完整。"
         }
       ]
+    },
+    // ---------- 快速检测 · 补充 ----------
+    {
+      type: "quiz",
+      title: "快速检测 · 补充",
+      items: [
+        {
+          difficulty: "basic",
+          question: "判断：在 Windows 中，文件名不区分大小写，`Report.txt` 与 `report.txt` 是同一个文件。",
+          answer: "**正确。**Windows 文件名不区分大小写，而 Linux 等系统区分大小写；跨系统复制文件时要留意这一点。"
+        },
+        {
+          difficulty: "medium",
+          type: "single",
+          question: "下列文件与扩展名的对应，正确的是（　）",
+          options: [
+            "用记事本保存的纯文本文件——.docx",
+            "Python 源程序文件——.py",
+            "Photoshop 源文件——.mp4",
+            "视频文件——.psd"
+          ],
+          correctIndex: 1,
+          answer: "**B**。`.py` 是 Python 源程序文件的扩展名；纯文本文件用 .txt，Photoshop 源文件是 .psd，视频文件是 .mp4。"
+        }
+      ]
     }
   ]
 }
