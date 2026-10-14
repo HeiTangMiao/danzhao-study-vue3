@@ -21,7 +21,7 @@
 | **批 F** | P2 其余 + 备案小项收拢 | ✅ **已完成并可标 ✅**：Fc2–Fc6 已推送；**QA Round 1/2 全过、0 缺陷**（Round 2 含对 lead 补丁的对抗复算，7 攻点）；收尾核实 F-3 六项全过；**C-1 遗留（19 块 lines→formulas 迁移）已于 10-14 由内容侧交付清零**（`6a60870`）；Fc1 已归档 | 任务卡 `batch-f-tasks.md`；报告 `batch-f-qa-report.md`；收尾 `batch-f-closeout-tasks.md`；已推送 `0dad4e2` |
 | **S1** | 内容快照/清单形状定义 + 发布脚本（**纯构建期、零运行时**） | ✅ **已完成并推送** | commits `2a35a5f`/`a095606`/`8cc2485`；任务卡 `batch-s1-tasks.md`；派工单 `batch-s1-workcard.md` |
 | **S2** | 客户端加载层 + 缓存（**最高风险**：动 `loadPage` 运行时核心路径） | ✅ **已完成** | commits `a965fd9`/`acac80f`/`399263c`/`d8723cc`/`6ca781d`；QA 收编 `e66653b`；报告 `batch-s2-qa-report.md`（11 攻点 0 缺陷） |
-| **S3** | 部署侧：服务器结构 + content-remote/practice-bank 上线 + 发布流程（含 CONTENT_VERSION +1 纪律） | ✅ **已完成**（10-14 部署 + 10-15 v2 内容发布；域名实测 v2/hash `b76a40d4…` 生效） | `docs/远程内容链路验证清单.md`；commit `d420885` |
+| **S3** | 部署侧：服务器结构 + content-remote/practice-bank 上线 + 发布流程（含 CONTENT_VERSION +1 纪律） | ✅ **已完成**（10-14 部署；10-15 v2 内容发布 + **网页端验证代跑四项全过**（清单只拉一次/断网三层回退/新版页面 13 断言/反外联审计 0 第三方域）+ **完整 dist 部署**（内置 bundle 同步 v2，新旧资产共存）；仅剩 Tauri 真机可选验证） | `docs/远程内容链路验证清单.md`；commits `d420885`/`e4542d8`/`c63c2d2` |
 | **S4/S5** | 客户端哈希兜底与回滚流程（S4）/ 搜索·题库远程化（S5，`OPTIONAL_SECTIONS` 预留键位） | ⏳ 待做 | `content-extension-dual-track.md` |
 | **P5** | Android 打包（Tauri） | ⏳ 待做 | 依赖 S5 + F |
 
