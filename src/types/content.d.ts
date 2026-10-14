@@ -293,10 +293,21 @@ export interface ClozeBlock extends BaseBlock {
  * 第三遍「限时独立做」启动倒计时，到点只提示、不评分。
  * 无必填字段（type 除外）：正文细节等待内容侧经 title / intro 补齐。
  */
+/**
+ * 作品训练卡的「一遍」（三遍法之一）
+ * ⚠️ 只承载**步骤文案**：「第几遍 · 名字」这个标签由组件固定渲染（骨架，不是内容），
+ *    故这里没有 label 字段 —— 内容侧改不了它，也不该改。
+ */
+export interface WorkCardPass {
+  key: 'guided' | 'restore' | 'timed'  // 第一遍·对照做 | 第二遍·只看成品还原 | 第三遍·限时独立做
+  text: string                          // 该遍的具体步骤 / 验收标准
+}
+
 export interface WorkCardBlock extends BaseBlock {
   type: 'workcard'
   intro?: string        // 卡片说明：三遍法总纲 / 作品目标
   duration?: number     // 第三遍限时秒数（可选，缺省 900）
+  passes?: WorkCardPass[] // 三遍步骤文案（可选）：按 key 覆盖该遍描述，未覆盖的遍回落内置文案；同一 key 只允许一次
 }
 
 /** 区块联合类型 */

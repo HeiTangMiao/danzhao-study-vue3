@@ -39,6 +39,15 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
   const QUIZ_TYPES = schema.definitions.quizItem.properties.type.enum
   const EXAM_TYPES = schema.definitions.examItem.properties.type.enum
 
+  /**
+   * workcard 的「三遍」键（guided / restore / timed）从 schema 分支派生（H7）：
+   * schema 改枚举时校验器自动跟随，不在本文件再抄一份。取不到（老 schema）时为 null，
+   * 此时跳过「未知遍次」这条检查，绝不因为派生失败而误拒合法内容。
+   */
+  const WORKCARD_PASS_KEYS = (schema?.definitions?.block?.allOf || [])
+    .find((b) => b?.if?.properties?.type?.const === 'workcard')
+    ?.then?.properties?.passes?.items?.properties?.key?.enum || null
+
   /** 判空：undefined / null / 纯空白 均视为空 */
   const isEmpty = (v) => v === undefined || v === null || String(v).trim() === ''
 
@@ -321,6 +330,44 @@ export function createBlockValidator(schema, { knownBoardIds = null } = {}) {
           errors.push('代码区块 lang 为空（如需省略请删掉该字段）')
         }
         break
+      case 'workcard': {
+        // passes（三遍步骤）可选：给了就必须形状正确 —— 组件按 key 覆盖该遍描述，
+        // 形状不对或 key 重复会造成「写了但看不到」的静默丢失，故在此拦下。
+        if (block.passes !== undefined) {
+          if (!Array.isArray(block.passes)) {
+            errors.push('作品训练卡 passes 应为数组')
+          } else {
+            const seen = new Set()
+            block.passes.forEach((p, pi) => {
+              if (!p || typeof p !== 'object') {
+                errors.push(`三遍[${pi}] 不是对象`)
+                return
+              }
+              // ⚠️ 类型与枚举必须**在本文件**拦：本仓没有 JSON-Schema 引擎（无 Ajv），
+              //    schema 里写的 type / enum 只供编辑器提示与常量派生，CI 的关卡就是本校验器。
+              //    → schema 声明了而这里不拦 = 形同虚设（写了也不会报错）。
+              if (typeof p.key !== 'string' || p.key === '') {
+                errors.push(`三遍[${pi}] key 为空`)
+                return
+              }
+              if (WORKCARD_PASS_KEYS && !WORKCARD_PASS_KEYS.includes(p.key)) {
+                errors.push(`三遍[${pi}] 未知遍次 key: ${p.key}（仅支持 ${WORKCARD_PASS_KEYS.join(' / ')}）`)
+                return
+              }
+              // 同一 key 重复 → 两条文案互相矛盾，组件取哪条属于未定义行为（schema 的
+              // uniqueItems 只对标量有效，表达不了「对象数组按某字段唯一」，故在此手写）
+              if (seen.has(p.key)) {
+                errors.push(`三遍[${pi}] 遍次 key 重复: ${p.key}`)
+                return
+              }
+              seen.add(p.key)
+              if (typeof p.text !== 'string') errors.push(`三遍[${pi}] text 应为字符串`)
+              else if (isEmpty(p.text)) errors.push(`三遍[${pi}] text 为空`)
+            })
+          }
+        }
+        break
+      }
       case 'cloze':
         // 交互模式白名单（B-3）：schema 会拦非法值，这里补 human-readable 文案
         if (block.mode !== undefined && !['reveal', 'input'].includes(block.mode)) {

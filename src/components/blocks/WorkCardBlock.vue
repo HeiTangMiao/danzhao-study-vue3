@@ -5,7 +5,8 @@
    - 第三勾 → 启动倒计时（复用 useCountdown 的 deadline 校准内核）；到点展示「到点」提示
    - 三勾状态持久化到 page_progress（零 DB 升版：spread 加字段）
   浏览态契约（H3）：**不自动判分、不写错题本、不发 XP** —— 本卡只是自测清单。
-  卡片正文（三遍步骤）等待内容侧补齐；此处为结构占位（block.intro）。
+  三遍描述：内容侧经 block.passes[{key,text}] 逐遍写；未写的遍回落 CHECK_DEFS 的内置占位 desc。
+  「第几遍 · 名字」（label）是固定骨架，不读字段、不由内容侧改。
 -->
 <template>
   <section class="workcard card">
@@ -18,7 +19,7 @@
     <p v-if="block.intro" class="workcard__intro">{{ block.intro }}</p>
 
     <ol class="workcard__checks">
-      <li v-for="c in CHECK_DEFS" :key="c.key" class="workcard__item">
+      <li v-for="c in checkList" :key="c.key" class="workcard__item">
         <button
           class="workcard__box"
           :class="{ 'is-on': checks[c.key] }"
@@ -55,7 +56,7 @@ import { useStudyDbStore } from '@/stores/studyDb'
 import { useCountdown } from '@/composables/useCountdown'
 
 const props = defineProps({
-  // 区块数据：{ type:'workcard', title?, intro?, duration? }
+  // 区块数据：{ type:'workcard', id?, title?, intro?, duration?, passes?: [{key,text}] }
   block: { type: Object, required: true },
   // 页面上下文：{ subject, unitNum, fileKey, ... } —— fileKey 用于 page_progress 持久化
   context: { type: Object, default: () => ({}) }
@@ -69,6 +70,31 @@ const CHECK_DEFS = [
   { key: 'restore', label: '第二遍 · 只看成品还原', desc: '只看成品，凭记忆复原过程（文案等待内容侧）' },
   { key: 'timed', label: '第三遍 · 限时独立做', desc: '不看参考，限时独立完成（文案等待内容侧）' }
 ]
+
+/**
+ * 内容侧写的三遍步骤（block.passes）→ 按 key 索引
+ * 形状不对的条目一律**忽略**（回退内置 desc），不抛错 —— 内容型字段不该让整页崩。
+ */
+const passMap = computed(() => {
+  const map = {}
+  const list = props.block?.passes
+  if (!Array.isArray(list)) return map
+  for (const p of list) {
+    if (!p || typeof p !== 'object') continue
+    if (typeof p.text !== 'string' || !p.text.trim()) continue
+    // 重复 key 取第一条（校验器已禁止重复；这里只是渲染侧兜底，不抛错）
+    if (map[p.key] === undefined) map[p.key] = p.text.trim()
+  }
+  return map
+})
+
+/**
+ * 渲染用的三遍列表：**只**覆盖 desc，label（第几遍 · 名字）保持内置骨架
+ * —— 第几遍的名字是固定结构，不是内容，不交给内容侧改。
+ */
+const checkList = computed(() =>
+  CHECK_DEFS.map((c) => ({ ...c, desc: passMap.value[c.key] ?? c.desc }))
+)
 
 const DEFAULT_DURATION = 900 // 秒（15 分钟）—— 未配置 duration 时的兜底
 

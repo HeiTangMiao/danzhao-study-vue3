@@ -54,7 +54,7 @@ describe('A. workcard 五处接线一致性', () => {
       (b) => b.if?.properties?.type?.const === 'workcard'
     )
     expect(branch).toBeTruthy()
-    expect(Object.keys(branch.then.properties)).toEqual(['intro', 'duration'])
+    expect(Object.keys(branch.then.properties)).toEqual(['intro', 'duration', 'passes'])
   })
 
   it('content.d.ts 的 BlockType 与 Block 联合均含 workcard', () => {
