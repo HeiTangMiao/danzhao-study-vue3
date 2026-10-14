@@ -35,6 +35,13 @@ jobs:
       - name: 生产构建
         run: npm run build
 
+      # 远程内容快照自检（S4-4b，具名步骤）：读 dist 之外的本地产物 public/content-remote/，
+      # 断言清单不变量（schemaVersion / contentVersion / units 与分片数一致 / sitePatch 恒空 /
+      # S5+ 预留键为 null）+ 清单声明的分片逐个存在。产物缺失或形态坏 → **退出码 1**。
+      # 为什么必须显式挂：build 经 prebuild 触发是**隐式**的，链子被改坏时构建可能仍通过而产物缺失。
+      - name: 内容快照自检
+        run: npm run check:content-remote
+
       # 以下两步读 public/practice-bank/{subject}.json（由 build:practice 产出）→ 必须放在「生产构建」之后：
       # build 经 prebuild → build:index → build:practice && build:search 已产出题库产物，此时数据就绪。
       # 阻断口径：check:dup 的 L1/L2 命中 → 退出码 1；check:single 的 A 类命中 → 退出码 1；两者 L3/B 类仅报告不阻断。
@@ -158,6 +165,16 @@ jobs:
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/assets/ "$USER@$HOST:/var/www/danzhao-study/assets/"
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
           rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/search-body/ "$USER@$HOST:/var/www/danzhao-study/search-body/"
+          # 第 4 步：远程内容快照（**S4-4a 闭环修复**：此前 rsync 清单里没有它，
+          #   导致一条 git push 的自动部署**不会**发布远程内容 → 网页端远程更新静默失效）
+          #   顺序纪律：**先分片、后清单** —— manifest 是客户端的入口指针，最后切它才能保证
+          #   任何时刻线上 manifest 指向的分片都已就位（与「最后切 index.html」同款）。
+          #   不带 --delete：单元下线时旧分片残留无害（客户端只按 manifest 指向拉取），
+          #   而 --delete 会在「新清单已上线、仍有旧客户端在飞」的窗口里删掉它们正在请求的文件。
+          rsync -avz --exclude manifest.json -e "ssh $SSH_ARGS" ./dist/content-remote/ "$USER@$HOST:/var/www/danzhao-study/content-remote/"
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/content-remote/manifest.json "$USER@$HOST:/var/www/danzhao-study/content-remote/manifest.json"
+          # 第 5 步：练习题库产物（同批补齐线上缺口；同样不带 --delete，理由同上）
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/practice-bank/ "$USER@$HOST:/var/www/danzhao-study/practice-bank/"
 
       - name: 部署后验证
         env:
@@ -166,6 +183,12 @@ jobs:
         run: |
           # 顺带清掉旧版单文件索引（阶段 7.4 已下线，留着只是占 241 KB 磁盘）
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "rm -f /var/www/danzhao-study/search-index.json; sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
+          # 远程内容快照：**必须**在服务器本地探到 manifest 且是 JSON（不是 SPA 兜底的 text/html）。
+          # 缺失/类型不对 → 部署视为失败，避免重现「网页端远程静默失效」（S4-4a 口径）。
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" \
+            "test -f /var/www/danzhao-study/content-remote/manifest.json || { echo '✗ 线上缺 content-remote/manifest.json'; exit 1; }"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" \
+            "curl -s -o /dev/null -w 'manifest HTTP %{http_code} type %{content_type}\n' http://127.0.0.1/content-remote/manifest.json | grep -q 'HTTP 200 type application/json' || { echo '✗ 线上 manifest 不可按 application/json 取到（可能落进 SPA 兜底）'; exit 1; }"
 
   deploy-backend:
     name: 部署后端到服务器

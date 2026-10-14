@@ -207,8 +207,101 @@ export async function collectSnapshot({
   return { manifest, shards, errors: [] }
 }
 
+/**
+ * 产物清单不变量自检（**纯函数、可测**，批 S4 · S4-4b）
+ *
+ * 为什么要它：`collectSnapshot` 保证「内容逐块合法」，但**不保证清单自身的形态**——
+ * 例如以后有人改脚本时漏掉 `search` 预留键、把 `units[k].path` 写成带 `content-remote/`
+ * 前缀、或让 `sitePatch` 不再是空结构。这类问题不会让构建报错，却会让**客户端**
+ * 静默走错分支（fetch 到错路径 / 协议字段缺失）。故把清单形态也变成可断言的不变量。
+ *
+ * ⚠️ 与既有逐块校验器的分工：**不重复、不替代**（`createBlockValidator` 一行不改）。
+ *    本函数只看「清单骨架」，不看区块内容。
+ *
+ * @param {object} manifest 清单对象
+ * @param {{shardCount?: number|null}} [options] 分片数（构建期传入 → 额外校验 units 键数一致）
+ * @returns {true} 全部通过
+ * @throws {Error} 任一不变量不满足；`err.errors` 为逐条明细（与 collectSnapshot 同款）
+ */
+export function assertManifestInvariants(manifest, { shardCount = null } = {}) {
+  const errors = []
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    errors.push('清单不是对象')
+  } else {
+    // ① 协议版本必须与源码常量一致（否则客户端 isValidManifest 会整份不消费）
+    if (manifest.schemaVersion !== SCHEMA_VERSION) {
+      errors.push(`schemaVersion 应为 ${SCHEMA_VERSION}，实际 ${JSON.stringify(manifest.schemaVersion)}`)
+    }
+    // ② contentVersion：**有限数字**且不低于源码常量 CONTENT_VERSION（构建期应当相等）
+    const v = manifest.contentVersion
+    if (typeof v !== 'number' || !Number.isFinite(v)) {
+      errors.push(`contentVersion 应为有限数字，实际 ${JSON.stringify(v)}`)
+    } else if (v < CONTENT_VERSION) {
+      errors.push(`contentVersion ${v} < CONTENT_VERSION ${CONTENT_VERSION}（构建期不应低于源码常量）`)
+    }
+    // ③ units：非空对象；键数 = 分片数；每个单元路径相对 content-remote/、哈希带前缀、版本与清单一致
+    if (!manifest.units || typeof manifest.units !== 'object' || Array.isArray(manifest.units)) {
+      errors.push('units 应为对象')
+    } else {
+      const keys = Object.keys(manifest.units)
+      if (keys.length === 0) errors.push('units 为空（至少应有 1 个单元分片）')
+      if (shardCount !== null && keys.length !== shardCount) {
+        errors.push(`units 键数 ${keys.length} 与分片数 ${shardCount} 不一致`)
+      }
+      for (const [k, u] of Object.entries(manifest.units)) {
+        if (!u || typeof u !== 'object') {
+          errors.push(`units['${k}'] 不是对象`)
+          continue
+        }
+        if (typeof u.path !== 'string' || u.path === '') {
+          errors.push(`units['${k}'].path 应为非空字符串`)
+        } else if (u.path.startsWith(`${REMOTE_DIR}/`) || u.path.startsWith('public/')) {
+          errors.push(`units['${k}'].path 应相对 ${REMOTE_DIR}/（不带前缀），实际 ${u.path}`)
+        }
+        if (typeof u.hash !== 'string' || !u.hash.startsWith(HASH_PREFIX)) {
+          errors.push(`units['${k}'].hash 应带 ${HASH_PREFIX} 前缀`)
+        }
+        if (u.version !== manifest.contentVersion) {
+          errors.push(`units['${k}'].version ${u.version} 与 contentVersion ${manifest.contentVersion} 不一致`)
+        }
+        if (!Number.isInteger(u.count) || u.count <= 0) {
+          errors.push(`units['${k}'].count 应为正整数`)
+        }
+      }
+    }
+    // ④ sitePatch 恒为空结构（B1 / P-S04 a）—— 非空意味着本批越界产出了导航变更
+    const sp = manifest.sitePatch
+    if (!sp || typeof sp !== 'object' || Array.isArray(sp)) {
+      errors.push('sitePatch 应为对象')
+    } else {
+      if (!sp.units || typeof sp.units !== 'object' || Array.isArray(sp.units) || Object.keys(sp.units).length !== 0) {
+        errors.push('sitePatch.units 应为空对象（B1 不产出导航变更）')
+      }
+      if (!Array.isArray(sp.fileMetaUpdates) || sp.fileMetaUpdates.length !== 0) {
+        errors.push('sitePatch.fileMetaUpdates 应为空数组（B1 不产出导航变更）')
+      }
+    }
+    // ⑤ S5+ 预留键必须存在且为 null（协议一次到位，P-S07 a）
+    for (const key of OPTIONAL_SECTIONS) {
+      if (!(key in manifest)) errors.push(`manifest 缺少预留键 ${key}`)
+      else if (manifest[key] !== null) errors.push(`manifest.${key} 应为 null（S5+ 才填充）`)
+    }
+  }
+
+  if (errors.length) {
+    const err = new Error(`清单不变量自检失败 ${errors.length} 处：${errors[0]}`)
+    err.errors = errors
+    throw err
+  }
+  return true
+}
+
 async function build() {
   const { manifest, shards } = await collectSnapshot()
+
+  // 构建后立即自检清单形态 —— **先于任何落盘**：不变量不满足则一个字节都不写
+  // （与「校验不过不产出分片」同一纪律：宁可不发布，也不发布形态坏掉的清单）
+  assertManifestInvariants(manifest, { shardCount: shards.length })
 
   // 输出：先清掉整个目录，避免单元下线后旧分片残留在产物里（照 build-search-index.mjs:209-213）
   mkdirSync(PUBLIC_DIR, { recursive: true })

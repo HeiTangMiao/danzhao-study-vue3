@@ -37,8 +37,10 @@ vi.mock('../scripts/lib/load-content.mjs', async (importOriginal) => {
 
 const ctl = vi.hoisted(() => ({ mode: 'none' }))
 
-const { collectSnapshot, canonicalJSON, hashOf } = await import('../scripts/build-content-remote.mjs')
-const { OPTIONAL_SECTIONS, OP, SHARD_WARN_BYTES, REMOTE_DIR, MANIFEST_PATH } = await import(
+const { collectSnapshot, canonicalJSON, hashOf, assertManifestInvariants } = await import(
+  '../scripts/build-content-remote.mjs'
+)
+const { OPTIONAL_SECTIONS, OP, SHARD_WARN_BYTES, REMOTE_DIR, MANIFEST_PATH, CONTENT_VERSION } = await import(
   '../src/content/contentManifest.js'
 )
 
@@ -221,6 +223,37 @@ describe('⑦ S5+ 预留键位（P-S07 a）', () => {
     }
     expect(snapA.manifest.search).toBeNull()
     expect(snapA.manifest.practice).toBeNull()
+  })
+})
+
+describe('⑧ 产物清单不变量自检（批 S4 · S4-4b）', () => {
+  it('真实采集的清单 + 分片数 → 通过（构建期同一口径）', () => {
+    expect(assertManifestInvariants(snapA.manifest, { shardCount: snapA.shards.length })).toBe(true)
+  })
+
+  it('分片数传错（与 units 键数不符）→ 抛', () => {
+    let thrown = null
+    try {
+      assertManifestInvariants(snapA.manifest, { shardCount: snapA.shards.length + 1 })
+    } catch (e) { thrown = e }
+    expect(thrown).toBeTruthy()
+    expect(thrown.errors.join('|')).toMatch(/与分片数 \d+ 不一致/)
+  })
+
+  it('contentVersion 低于源码常量 → 抛（构建期不应倒退）', () => {
+    const bad = { ...snapA.manifest, contentVersion: CONTENT_VERSION - 1 }
+    let thrown = null
+    try { assertManifestInvariants(bad, { shardCount: snapA.shards.length }) } catch (e) { thrown = e }
+    expect(thrown).toBeTruthy()
+    expect(thrown.errors.join('|')).toMatch(/CONTENT_VERSION/)
+  })
+
+  it('sitePatch 被填非空 → 抛（B1 不得产出导航变更）', () => {
+    const bad = { ...snapA.manifest, sitePatch: { units: { 'math/01': {} }, fileMetaUpdates: [] } }
+    let thrown = null
+    try { assertManifestInvariants(bad, { shardCount: snapA.shards.length }) } catch (e) { thrown = e }
+    expect(thrown).toBeTruthy()
+    expect(thrown.errors.join('|')).toMatch(/sitePatch\.units 应为空对象/)
   })
 })
 
