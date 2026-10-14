@@ -6,7 +6,8 @@
  *  A. 渲染：含 passes → 逐遍渲染 text；只给一部分 → 其余回落内置；不含 → 全部回落（零回归）
  *  B. 变异验证（关键）：key 枚举外 / text 非字符串 / 重复 key / passes 非数组 / text 空串
  *     → 校验器**必须拒绝**；合法 passes → 零错误
- *  C. 已入库的 4 张卡（无 passes）→ 校验零错误 + 渲染仍走内置描述（零回归实测）
+ *  C. 已入库的 4 张卡（内容侧 2026-10-15 已补 passes）→ 校验零错误 + 渲染 passes 文本
+ *     （真实数据接线实测）；回落逻辑由 A 组的合成数据覆盖
  *  D. 接线：schema 分支形状 + content.d.ts 声明
  *  E. 源码锚：label（第几遍 · 名字）保持硬编码，不读字段
  *
@@ -94,7 +95,7 @@ describe('A. passes 渲染与回落', () => {
     w.unmount()
   })
 
-  it('不含 passes（已入库 4 张卡的形态）→ 三遍全部回落内置描述', () => {
+  it('不含 passes（合成数据）→ 三遍全部回落内置描述（回落兜底）', () => {
     const w = mountCard({ type: 'workcard', id: 'ps-idphoto', title: 'PS-1', duration: 360 })
     expect(descsOf(w)).toEqual([BUILTIN_DESC.guided, BUILTIN_DESC.restore, BUILTIN_DESC.timed])
     w.unmount()
@@ -206,7 +207,7 @@ describe('B. 变异验证 · 校验器必须拒绝坏 passes', () => {
 // ============================================================================
 // C. 已入库 4 张卡零回归（读真实内容文件）
 // ============================================================================
-describe('C. 已入库的 4 张卡（无 passes）零回归', () => {
+describe('C. 已入库的 4 张卡（已补 passes）真实数据接线', () => {
   const FILE = 'src/content/computer/04-数字媒体技术/09-作品训练卡（三遍法）.js'
 
   it('4 个 workcard 块全部通过校验（字段新增不误伤存量内容）', async () => {
@@ -218,11 +219,18 @@ describe('C. 已入库的 4 张卡（无 passes）零回归', () => {
     expect(errs).toEqual([])
   })
 
-  it('按真实卡片数据渲染 → 三遍走内置描述，进度/勾选不受影响', async () => {
+  it('按真实卡片数据渲染 → 三遍渲染各自 passes 文本（真实数据接线），进度/勾选不受影响', async () => {
     const mod = await import(pathToFileURL(join(ROOT, FILE)).href)
     const card = mod.default.blocks.find((b) => b.id === 'ps-idphoto')
+    // 前置事实：该卡现已带 passes（内容侧 2026-10-15 补齐 4 卡 × 3 遍）——断言锚定「数据里的 text 被组件渲染」
+    expect(card.passes).toHaveLength(3)
+    const byKey = Object.fromEntries(card.passes.map((p) => [p.key, p.text]))
     const w = mountCard(card, { fileKey: 'computer_04_x' })
-    expect(descsOf(w)).toEqual([BUILTIN_DESC.guided, BUILTIN_DESC.restore, BUILTIN_DESC.timed])
+    expect(descsOf(w)).toEqual([byKey.guided, byKey.restore, byKey.timed])
+    // 反证：渲染结果不再是内置占位（接线断了会回落占位 → 本断言咬得住）
+    for (const d of descsOf(w)) {
+      expect(Object.values(BUILTIN_DESC)).not.toContain(d)
+    }
     expect(w.find('.workcard__progress').text()).toBe('0/3')
     await w.findAll('.workcard__box')[0].trigger('click')
     expect(w.find('.workcard__progress').text()).toBe('1/3')

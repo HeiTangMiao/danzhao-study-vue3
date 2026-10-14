@@ -29,8 +29,15 @@ export const SCHEMA_VERSION = 1
  * 为什么不是内容指纹：前进式回滚需要一个**可比较大小**的号 —— 指纹只能表达
  * 「内容是否相同」，无法表达「发了一版新的、但内容恰好相同」。故取单调号（P-S02 a），
  * 另在 manifest 里附 contentHash（全页指纹，不含时间戳）供去重与审计。
+ *
+ * ⚠️ **发布纪律（2026-10-15 实证）**：只要 `src/content/**` 有改动并要发布远程快照，
+ *    就必须 +1 再构建。漏 bump 的后果不是「拉得慢」而是**永远拉不到**：
+ *    客户端 `isNewer(remoteVer, maxSeen)` 在版本闸门处直接返回 false（contentClient.js:176），
+ *    单元级哈希比对在闸门**之后**，够不着 —— 已缓存旧版的客户端永久停在旧内容，
+ *    且不报错、不崩溃（「永不变砖」掩盖问题的一面）。完整流程见
+ *    docs/proposals/batch-s2-workcard.md §5.4。
  */
-export const CONTENT_VERSION = 1
+export const CONTENT_VERSION = 2
 
 /**
  * 预留但**当前不产出**的清单子段（S5+ 才填充）
