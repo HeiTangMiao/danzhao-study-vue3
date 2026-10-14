@@ -13,6 +13,14 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          # ⚠️ 必须全量历史（默认 fetch-depth: 1 会浅克隆）：两个守卫测试用
+          # `git diff <baseline> HEAD` / `git show <baseline>:file` 对照基线提交
+          # （tests/loadpage-remote-fallback.test.js 的 54300fa、s2-verify-boundaries.test.js）。
+          # 浅克隆下旧提交不可解析 → execSync 抛错 → 单元测试挂 → **整条自动部署链被跳过**。
+          # 2026-10-15 定位：近 30 次 CI 全红皆因于此（本机全量克隆复现不出，故长期漏看）。
+          # 移除本行前先确认那些测试已改为不依赖 git 历史。
+          fetch-depth: 0
 
       - name: 安装 Node.js
         uses: actions/setup-node@v4
