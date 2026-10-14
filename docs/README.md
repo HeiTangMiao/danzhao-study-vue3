@@ -16,6 +16,8 @@
 | **做移动端 / 交互 / 动效** | `prd-mobile.md` | `system_design.md` 的视觉与交互章节 |
 | **查历史决策「当初为什么这么定」** | `../协同交流/大事记.md` | `archive/README.md`（已失效文档的索引） |
 | **做内容扩展（远程内容层）** | `proposals/content-extension-dual-track.md` | 同上两份 mermaid |
+| **要真机验证远程内容链路** | `远程内容链路验证清单.md` | `proposals/batch-s2-workcard.md`（裁定与口径） |
+| **写作品训练卡（workcard）内容** | `教学方案_作品训练卡三遍法_PS-PR.md` | `content-authoring-guide.md`（通用内容规范） |
 
 ---
 
