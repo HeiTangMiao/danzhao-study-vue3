@@ -1,0 +1,63 @@
+sequenceDiagram
+    autonumber
+    participant App as App.vue（启动）
+    participant SP as SearchPanel.vue
+    participant SC as searchClient（新）
+    participant PC as practiceBankClient（改）
+    participant AC as assetClient（新·共享原语）
+    participant MC as mergeContent（裁决）
+    participant IDB as IndexedDB(content_cache/meta)
+    participant SRV as 同源静态目录（./）
+    participant PS as practice store
+
+    Note over App: ① 启动：内容层后台刷新（既有，S2/S4）
+    App->>AC: startBackgroundRefresh()（内容层，既有入口）
+    AC->>SRV: GET content-remote/manifest.json
+    AC->>MC: computeRetrySet(manifest, meta) → newer/heal/skip
+    alt 版本前进或有待重试片
+        AC->>SRV: GET 变更分片（先分片后清单由发布侧保证）
+        AC->>IDB: content_cache（body 先落）
+        AC->>IDB: content_meta（提交点，含 pendingUnits）
+    else skip
+        AC-->>App: not-newer（一片不拉）
+    end
+
+    Note over SP,SRV: ② 搜索：缓存 > 远程 > 保持旧值（S5-3）
+    SP->>SC: loadSearchMeta()
+    SC->>AC: readByKey('search:meta')
+    AC->>IDB: get content_cache['search:meta']
+    alt 缓存命中
+        IDB-->>SC: 条目（零网络）
+    else 未命中
+        SC->>SRV: GET ./search-meta.json
+        SRV-->>SC: meta 数组
+        SC->>AC: commitAtomically(...)
+        AC->>IDB: content_cache['search:meta']
+    end
+    SP->>SC: loadSearchBody(subject)
+    SC->>SRV: GET ./search-body/{subject}.json（按需，仅当前学科）
+    SRV-->>SC: 正文分片
+    SC->>SC: 逐条轻量校验（坏条丢弃，粒度 bodyKeyOf）
+    SC-->>SP: bodies → prepareSearchIndex + matchSearch（既有纯函数）
+
+    Note over PS,SRV: ③ 题库：缓存 > 远程 > 抛错（S5-4）
+    PS->>PC: ensureBank(subject)
+    PC->>AC: readByKey('practice:' + subject)
+    alt 缓存命中
+        AC-->>PC: 运行时条目（零网络）
+    else 未命中
+        PC->>SRV: GET ./practice-bank/{subject}.json
+        SRV-->>PC: 紧凑键分片
+        PC->>PC: normalizeBankItem（形状兜底真相源，H7）
+        PC->>AC: commitAtomically(...)
+    end
+    PC-->>PS: items → composePaper（既有组卷）
+
+    Note over SRV,IDB: ④ 失败降级（统一契约，见 §4）
+    alt 远程失败（网络/404/超时）
+        SC-->>SP: 用缓存；无缓存 → error 态
+        PC-->>PS: 抛错（视图已有兜底）；已写缓存则用缓存
+    else 版本更旧
+        AC->>MC: isNewer(remote, maxSeen) === false
+        AC-->>SC: 不写缓存（前进式回滚，杜绝旧快照覆盖）
+    end

@@ -1,0 +1,102 @@
+classDiagram
+    direction TB
+
+    class contentManifestJs {
+        <<纯ESM 零import·两端共用>>
+        +SCHEMA_VERSION = 1
+        +CONTENT_VERSION = 3
+        +OPTIONAL_SECTIONS = ['search','practice']
+        +REMOTE_DIR / MANIFEST_PATH / HASH_PREFIX / OP
+        +shardPath(subject, unitNum)
+        +unitKeyOf(meta) / pageKeyOf(meta)
+    }
+    class searchIndexJs {
+        <<纯ESM 零import·形状>>
+        +BODY_LIMIT / BODY_BUDGET_BYTES
+        +QUESTION_MARKER
+        +META_FILE / bodyShardPath(subject) / bodyKeyOf(meta)
+    }
+    class practiceBankJs {
+        <<纯ESM 零import·形状>>
+        +QUESTION_LIMIT / ANSWER_LIMIT
+        +BANK_DIR / BANK_INDEX_FILE
+        +practiceShardPath(subject) / practiceKeyOf(meta) / paperKeyOf(item)
+        +BANK_ITEM_KEYS
+        +normalizeBankItem(raw)
+    }
+    class mergeContent {
+        <<纯函数·易测·裁决唯一真相>>
+        +isNewer(remoteVer, maxSeen)
+        +verifyHash(page, expected)
+        +isWellFormedHash(v) / isUsablePage(raw)
+        +pickPage(builtin, remote)
+        +computeRetrySet(manifest, meta) ← S5-2 迁入
+    }
+    class assetClient {
+        <<新增·共享编排原语>>
+        +gateAndTargets(remote, local)
+        +commitAtomically(db, entries, metaPatch)
+        +readByKey(store, key)
+    }
+    class contentClient {
+        <<既有·最高风险路径·本批不重写>>
+        +refreshIfNewer(opts)
+        +getRemotePage(subject, unitNum, fileIndex)
+        +startBackgroundRefresh(opts)
+        +contentRootFrom(apiBase, isAbsolute)
+    }
+    class searchClient {
+        <<新增>>
+        +loadSearchMeta()
+        +loadSearchBody(subject)
+    }
+    class practiceBankClient {
+        <<改>>
+        +loadBankIndex()
+        +loadSubjectBank(subject)
+    }
+    class fetchJson {
+        <<既有·极薄原语>>
+        +joinUrl(base, path)
+        +fetchJson(base, path, opts)
+    }
+    class ContentCache {
+        <<IndexedDB v7·零升版复用>>
+        +content_cache : {key, version, hash, pageHashes, pages}
+        +content_meta : {key, contentVersion, contentHash, units, pendingUnits}
+    }
+    class SearchPanel {
+        <<改·仅换数据源>>
+        +loadMeta() / ensureBody()
+    }
+    class practiceStore {
+        <<改·签名不变>>
+        +ensureIndex() / ensureBank(subject)
+    }
+    class buildContentRemote {
+        <<Node 发布脚本>>
+        +collectSnapshot(opts)
+        +assertManifestInvariants(manifest, opts)
+        +build()
+    }
+    class checkContentRemote {
+        <<CI 具名门禁>>
+        +listShardFiles(dir)
+        +check()
+    }
+
+    searchClient --> assetClient : 编排
+    practiceBankClient --> assetClient : 编排
+    contentClient ..> mergeContent : 裁决（computeRetrySet 迁入后改 import）
+    assetClient --> mergeContent : 闸门/校验
+    assetClient --> fetchJson : 取数
+    assetClient --> ContentCache : 原子读写
+    searchClient --> searchIndexJs : 路径/键（H7）
+    practiceBankClient --> practiceBankJs : 路径/键/normalize（H7）
+    contentClient --> contentManifestJs : 路径/键/协议（H7）
+    SearchPanel --> searchClient : 数据源替换
+    practiceStore --> practiceBankClient : 既有签名
+    buildContentRemote --> contentManifestJs : 形状
+    buildContentRemote ..> searchIndexJs : 子段指针
+    buildContentRemote ..> practiceBankJs : 子段指针
+    checkContentRemote --> buildContentRemote : 复用 assertManifestInvariants
