@@ -26,7 +26,7 @@
     "check:content-remote": "node scripts/check-content-remote.mjs",
     "clean:content-remote": "node scripts/clean-content-remote.mjs",
     "geogebra": "node scripts/fetch-geogebra.mjs",
-    "test": "vitest run",
+    "test": "vitest run --pool=threads --maxWorkers=1",
     "test:watch": "vitest",
     "lint": "eslint src tests scripts --max-warnings 0",
     "lint:fix": "eslint src tests scripts --fix",
