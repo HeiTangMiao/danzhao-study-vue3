@@ -74,7 +74,9 @@ describe('R2 · 攻点[6] · 依赖面', () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
     const runtimeTauri = Object.keys(pkg.dependencies).filter((k) => k.startsWith('@tauri-apps/'))
     expect(runtimeTauri).toEqual(['@tauri-apps/plugin-shell'])
-    expect(pkg.dependencies['@tauri-apps/plugin-shell']).toMatch(/^\^2\./)
+    // ⚠️ 范围必须与 Rust 侧同线（见下方「版本同线」用例），不写死 ^ 或 ~：
+    //    两侧同 major/minor 是硬约束，具体用哪种范围只是达成手段。
+    expect(pkg.dependencies['@tauri-apps/plugin-shell']).toMatch(/^[~^]2\./)
   })
 
   it('Fc6 提交对 lock 的新增 @tauri-apps/* 顶层包恰为 2（api + plugin-shell）', () => {
@@ -101,9 +103,32 @@ describe('R2 · 攻点[6] · 依赖面', () => {
     ])
   })
 
-  it('lock 已解析 api 2.12.3 与 plugin-shell 2.5.0', () => {
+  // ★ 版本同线（2026-10-17 由 Release 构建失败反推补充的守卫）
+  // 事故：npm 侧 ^2.5.0 而 Rust 侧锁 2.3.5 → `tauri build` / `tauri android build`
+  // 直接被 CLI 的版本一致性检查拒建（四个 job 秒败，日志只有一行 mismatch）。
+  // 原先这里写死 '2.5.0'，既拦不住错配也会随升级误报 —— 改为守**真正的不变量**。
+  it('plugin-shell：npm 与 Rust 同 major/minor（否则 CLI 直接拒建）', () => {
+    const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
     const lock = JSON.parse(readFileSync(join(ROOT, 'package-lock.json'), 'utf8'))
-    expect(lock.packages['node_modules/@tauri-apps/api'].version).toBe('2.12.3')
-    expect(lock.packages['node_modules/@tauri-apps/plugin-shell'].version).toBe('2.5.0')
+    const cargo = readFileSync(join(ROOT, 'src-tauri/Cargo.toml'), 'utf8')
+    const cargoLock = readFileSync(join(ROOT, 'src-tauri/Cargo.lock'), 'utf8')
+
+    const npmRange = pkg.dependencies['@tauri-apps/plugin-shell']
+    const npmResolved = lock.packages['node_modules/@tauri-apps/plugin-shell'].version
+    const cargoReq = (cargo.match(/tauri-plugin-shell\s*=\s*"([^"]+)"/) || [])[1]
+    const cargoLocked = (cargoLock.match(/name = "tauri-plugin-shell"\nversion = "([^"]+)"/) || [])[1]
+
+    expect(npmRange, 'npm 侧范围缺失').toBeTruthy()
+    expect(npmResolved, 'lock 未解析出 plugin-shell').toBeTruthy()
+    expect(cargoReq, 'Cargo.toml 缺 tauri-plugin-shell').toBeTruthy()
+    expect(cargoLocked, 'Cargo.lock 未锁定 tauri-plugin-shell').toBeTruthy()
+
+    const minor = (v) => v.split('.').slice(0, 2).join('.')
+    expect(
+      minor(npmResolved),
+      `npm(${npmResolved}) 与 Rust(${cargoLocked}) 不同线 → tauri CLI 会拒绝构建`
+    ).toBe(minor(cargoLocked))
+    // 反向锚：把 Rust 侧改到不同 minor，本判据必须否（证明它不是恒真）
+    expect(minor('2.3.5')).not.toBe(minor('2.5.0'))
   })
 })
