@@ -184,3 +184,58 @@ fatal: ambiguous argument '54300fa': unknown revision or path not in the working
 ---
 
 ## 6. 结果（回填）
+
+### 6.1 最终结果：**四个 job 全绿，Android 签名 APK 构建成功**（run `38969503550` @ `e3ba769`）
+
+| Job | 结果 | 耗时 |
+|---|---|---|
+| 构建 Android APK | ✅ success | 21:27:32 → 21:34:36（约 7 分钟） |
+| 构建并发布 ubuntu-22.04 | ✅ success | 4 分钟 |
+| 构建并发布 windows-latest | ✅ success | 9.5 分钟 |
+| 构建并发布 macos-latest | ✅ success | 4.5 分钟 |
+
+**R-1（签名 secret）已答：secret 还在**。签名步骤日志原文：
+
+```
+[signing] 使用 Secrets 提供的正式 keystore
+[signing] 签名配置注入完成
+```
+
+即 `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_ALIAS`
+三个 secret 均未丢失，APK 是用正式密钥签的（不是临时 keystore）。
+构建日志末尾：`Finished 1 APK at: .../app-universal-release.apk`。
+
+### 6.2 过程中修掉的四个真问题（都不是「环境抽风」）
+
+| # | 问题 | 根因 | 修复 |
+|---|---|---|---|
+| 1 | 四个 job 全挂在「单元测试」 | `release.yml` 的 checkout 是默认 depth=1 **浅克隆**，三个守卫测试要 `git show/diff <baseline>` → 基线不可解析。与 10-15 CI 全红同坑，但漏改的是这个文件 | 两处 checkout 补 `fetch-depth: 0`；两个 job 测试前补 `build:index`（否则产物级测试静默跳过） |
+| 2 | 四个 job 在构建步骤**秒败**（1-2 秒） | `tauri-plugin-shell`（Rust 2.3.5）与 `@tauri-apps/plugin-shell`（npm 2.5.0）**版本错配**，CLI 的一致性检查直接拒建。错配由 `89d2e60`（10-09 加 openExternal）引入，只加了 npm 侧没同步 Rust 侧 | npm 降到 `~2.3.5` 与 Rust 同线（反向升 Rust 会顺带顶上来 wry 等一堆依赖，不塞进这次修复） |
+| 3 | 我新加的「版本同线」守卫在 Windows 上红 | 正则写死 `\n`，而仓库无 `.gitattributes`，Windows 检出把 Cargo.lock 转成 CRLF → 匹配不到 | 改 `[\s\S]*?` 跨越换行；已造 CRLF 样本验证 |
+| 4 | Windows job 连续三轮「0 秒失败」 | **我的诊断步骤自身**：用了 bash 语法（`set +e` / `$?` / 重定向），而 Windows runner 默认 shell 是 **PowerShell** → 步骤崩掉、测试从未运行 | 诊断步骤显式 `shell: bash`；日志路径改 `$RUNNER_TEMP`（Git Bash 的 `/tmp` 与 Node 眼里的 `/tmp` 在 Windows 上不是同一处） |
+
+⚠️ 第 4 条是教训：**诊断代码自己也会成为故障源**，而且它伪装成「被测系统的失败」。
+第 3 条同型：新加的守卫在目标平台外从未验证过。
+
+### 6.3 读 CI 日志的方法论（本机无 gh、无 token 时）
+
+- job logs 接口需 admin（403）、artifact 下载需鉴权（401）、`::error` 不产生注解 —— 三条路都断；
+- 可行解：`actions/github-script` 调 `checks.create` 把日志写进 **check-run 的 `output.text`**，
+  再用 `GET /repos/{o}/{r}/commits/{sha}/check-runs` 匿名读回（需给 job `checks: write`）。
+- 两个坑：① check-run 的 text 有 60KB 上限，**关键信息要放前面**（签名段曾被构建日志顶掉）；
+  ② 回传步骤若自己失败（如缺权限），会伪装成「被测系统失败」。
+
+### 6.4 结论与剩余项
+
+**P5 的前置条件全部满足**：GitHub 构建链路通、签名 secret 在、CSP 已放行远端、
+内容层纪律已接（`prebuild:tauri` → `build:index` → 产物进 APK）、`lib.rs` 无需改造。
+
+剩余（都不阻断「能不能构建」）：
+
+| 项 | 级别 | 说明 |
+|---|---|---|
+| **真机验证（P5-T3 / M5）** | 高 | CI 出的包只证明「能编译能签名」；CSP、远程内容加载、离线兜底、视觉参数（玻璃 30-42% 不透明度等）、系统手势——都要真人拿手机测 |
+| `bundle.android.minSdkVersion` 未显式设定 | 低 | 走 Tauri 默认 24；项目容器查询要求 WebView 105+（Android 9+），建议定 26 并写清依据 |
+| `ubuntu-22.04` 已弃用（2027-04-17 失效） | 中 | 本次为「一次只改一个变量」未迁；建议择机改 `ubuntu-24.04`（CI 的 quality job 已在用） |
+| `gen/android` 不入库 | 低 | 与 `system_design.md` P5-T2 的建议相反；现状每次 init 约 1 分钟，可接受，P5-T2 收尾时把分歧写进文档 |
+| 仓库无 `.gitattributes` | 低 | Windows 检出转 CRLF 已咬过一次（见 §6.2-3）；建议加 `* text=auto eol=lf` 一劳永逸，但会影响所有文件的检出行为，需单独评估 |
