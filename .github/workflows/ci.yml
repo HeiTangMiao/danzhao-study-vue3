@@ -10,6 +10,9 @@ jobs:
   quality:
     name: 校验 · 测试 · 构建
     runs-on: ubuntu-latest
+    # TEMP-DIAG：仅为了把测试日志推到 ci-logs 分支；定位后连同下面两个临时步骤一起还原
+    permissions:
+      contents: write
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
