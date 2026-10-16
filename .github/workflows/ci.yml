@@ -10,10 +10,6 @@ jobs:
   quality:
     name: 校验 · 测试 · 构建
     runs-on: ubuntu-latest
-    # TEMP-DIAG：仅为了把测试日志写成 check-run；定位后连同下面两个临时步骤一起还原
-    permissions:
-      contents: read
-      checks: write
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -41,43 +37,15 @@ jobs:
       - name: 代码规范检查
         run: npm run lint
 
-      # TEMP-DIAG：CI job logs 需 admin 权限取不到，把测试输出存到 /tmp 后由下一步
-      # 推到 ci-logs 临时分支供排查（job 结论由最后一步按日志判定）。定位后即还原。
+      # ⚠️ 必须先产出：有一批**产物级**测试要读 `public/search-*`、`public/practice-bank/*`
+      #    （批 E 的 `batch-e-verify-search.test.js`：题干覆盖/检索行为/体积闸门）。
+      #    其中 `search-*` 是 .gitignore 的构建产物，干净检出里没有 → 它们会 `skipIf` 静默跳过，
+      #    等于在 CI 上从未真正执行（本地有产物反而会跑，典型的「只在不干净环境才生效」）。
+      - name: 生成搜索/题库产物（供产物级测试）
+        run: npm run build:index
+
       - name: 单元测试
-        id: unit
-        run: |
-          set +e
-          npx vitest run --pool=threads --maxWorkers=1 > /tmp/unit.log 2>&1
-          echo "unit_exit=$?" >> "$GITHUB_OUTPUT"
-          tail -200 /tmp/unit.log
-        continue-on-error: true
-
-      - name: 回传测试日志（写成 check-run，便于无 admin 权限读取）
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs')
-            let log = '(无日志)'
-            try { log = fs.readFileSync('/tmp/unit.log', 'utf8') } catch (e) { log = '读取失败: ' + e.message }
-            // check-run 的 output.text 有长度上限，取尾部（失败信息在末尾）
-            const tail = log.length > 60000 ? log.slice(-60000) : log
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'unit-test-log',
-              head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'neutral',
-              output: { title: '单元测试完整日志（尾部）', summary: `exit=${{ steps.unit.outputs.unit_exit }}`, text: tail }
-            })
-
-      - name: 判定单元测试结果
-        run: |
-          if [ "${{ steps.unit.outputs.unit_exit }}" != "0" ]; then
-            echo "单元测试失败（exit=${{ steps.unit.outputs.unit_exit }}），完整日志见 ci-logs 分支"
-            exit 1
-          fi
+        run: npm test
 
       - name: 生产构建
         run: npm run build

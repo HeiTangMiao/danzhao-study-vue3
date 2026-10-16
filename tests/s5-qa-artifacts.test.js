@@ -109,16 +109,22 @@ describe('D1 · CLI 层：半填充 / 半份缺失 → 非零退出 + 不落盘'
     rmrf(dir)
   })
 
-  /** 从仓库原始产物恢复沙箱的 public/（沙箱里被删过的产物按原样补回） */
+  /**
+   * 把沙箱恢复到「四份产物齐全」（沙箱里被删过的产物补回）
+   *
+   * ⚠️ **不能**从仓库的 `public/` 拷：`search-body/` / `search-meta.json` / `content-remote/`
+   *    都是 **gitignore 的构建产物** —— CI 的干净检出里根本没有，本地跑过构建才有。
+   *    2026-10-17 实证：靠拷贝且 `!existsSync → continue` 静默跳过 → CI 上本组 6 例全红、
+   *    本地全绿（典型的「只在干净环境暴露」）。
+   *    故一律在沙箱里**重新生成**：沙箱自带 `src/` 与 `scripts/`，生成器零 npm 依赖。
+   */
   function restoreArtifacts() {
-    for (const item of PUBLIC_ITEMS) {
-      const s = join(ROOT, 'public', item)
-      const d = join(dir, 'public', item)
-      if (!existsSync(s)) continue
-      rmrf(d)
-      if (statSync(s).isDirectory()) copyInto(s, d)
-      else writeFileSync(d, readFileSync(s))
-    }
+    const p = run(dir, ['scripts/build-practice-bank.mjs'])
+    expect(p.status, `前置：题库产物生成失败：${p.out}`).toBe(0)
+    const s = run(dir, ['scripts/build-search-index.mjs'])
+    expect(s.status, `前置：搜索产物生成失败：${s.out}`).toBe(0)
+    // 刻意**不**清 content-remote：下一个用例要用「上一轮成功留下的清单」证明
+    // 「拒绝之后盘上仍是旧的好清单，而不是被写了 null」
   }
 
   /** 先跑完整链产出四份产物，作为基线 */
