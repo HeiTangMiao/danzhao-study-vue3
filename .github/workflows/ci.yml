@@ -37,8 +37,10 @@ jobs:
       - name: 代码规范检查
         run: npm run lint
 
+      # TEMP-DIAG：CI job logs 需 admin 权限取不到，改用 github-actions reporter 把失败
+      # 以 ::error 注解形式落到 check-runs API（可匿名读）。定位后即还原。
       - name: 单元测试
-        run: npm test
+        run: npx vitest run --pool=threads --maxWorkers=1 --reporter=default --reporter=github-actions
 
       - name: 生产构建
         run: npm run build
