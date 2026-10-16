@@ -15,6 +15,18 @@ import { META_FILE, bodyShardPath } from '@/content/searchIndex'
 
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
+// S5-3：SearchPanel 的数据源改走 searchClient（内部用 studyDb 做缓存 + 读时闸门）。
+// 本文件测的是**加载时机**契约（不是存储），故把 store 换成惰性空实现：
+// 免得为一次加载时机断言引入 fake-indexeddb 与假计时器的相互作用（IDB 回调会被假计时器卡住）。
+vi.mock('@/stores/studyDb', () => ({
+  useStudyDbStore: () => ({
+    getContentMeta: async () => null,
+    getContentCache: async () => null,
+    saveContentCache: async () => {},
+    saveContentMeta: async () => {}
+  })
+}))
+
 const META = [
   { subject: 'math', unitNum: '01', fileIndex: 0, unitTitle: '集合与逻辑', title: '集合的概念', subtitle: '三特性' },
   { subject: 'math', unitNum: '02', fileIndex: 0, unitTitle: '不等式', title: '一元二次不等式', subtitle: '' }

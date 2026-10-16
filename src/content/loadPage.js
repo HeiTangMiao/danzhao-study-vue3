@@ -14,8 +14,10 @@ import { getRemotePage } from '@/utils/contentClient'
  * 按学科目录动态导入内容页模块
  *
  * ⚠️ 模板字符串前缀 `@/content/` 必须保持字面量。
- *    Vite 靠静态分析这个前缀生成 import.meta.glob，182 个内容文件才能各自成为
- *    独立懒加载 chunk（本仓库最有价值的资产之一）。
+ *    Vite 靠静态分析这个前缀生成 import.meta.glob，`src/content/**` 下的内容文件
+ *    才能各自成为独立懒加载 chunk（本仓库最有价值的资产之一）。
+ *    ⚠️ 页数**不写死**：内容侧加页不需要同步改这里（数字必然腐烂，
+ *    权威是 `src/content/**` 本身，构建期 `validate:content` 才是把关者）。
  *    一旦改成变量拼接（如 import(base + '/' + name)），全部页面会被打进同一个
  *    巨型 chunk，首屏与分包策略同时退化。不要改。
  */
@@ -51,7 +53,7 @@ async function safeRemotePage(subject, unitNum, fileIndex) {
  *
  * ⚠️ 可用性闸门（`pickPage`）**只作用于远程**，内置兜底路径**原样透传**
  *    （`hydratePage(mod.default, meta)`）：
- *    内置 182 页已由构建期 `validate:content` 把关 —— 这正是轨道 A 的意义，运行期再加
+ *    内置内容页（`src/content/**`）已由构建期 `validate:content` 把关 —— 这正是轨道 A 的意义，运行期再加
  *    一道闸门并不增加安全性，反而给「改前能正常渲染、改后整页空白」开了一道**新失效模式**
  *    （例如某块缺 `type` 时，闸门会把整页判为不可用 → blocks 变空，而原样透传至少能
  *    渲染出其余块）。由 `tests/loadpage-builtin-passthrough.test.js` 钉死。
@@ -81,7 +83,7 @@ export async function loadPage(subject, unitNum, fileIndex) {
 /**
  * 预取页面模块（P4-T5 §5.7.5）：只预热 import() 缓存，不做 hydrate。
  *  - 命中模块缓存天然幂等；Set 去重避免同一页反复触发 import
- *  - 只预取 1 页（182 个 chunk 全拉对移动端流量与内存无意义）；跨单元由调用方 clearPrefetch()
+ *  - 只预取一页 —— 把 `src/content/**` 的内容页 chunk 全拉对移动端流量与内存无意义；跨单元由调用方 clearPrefetch()
  */
 const prefetched = new Set()
 

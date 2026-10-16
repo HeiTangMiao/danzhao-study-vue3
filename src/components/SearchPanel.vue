@@ -65,7 +65,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { matchSearch, prepareSearchIndex } from '@/utils/search'
-import { META_FILE, bodyShardPath } from '@/content/searchIndex'
+import { loadSearchMeta, loadSearchBody } from '@/utils/searchClient'
 import { SUBJECT_META } from '@/content/index'
 import AppIcon from '@/components/AppIcon.vue'
 
@@ -111,7 +111,7 @@ const bodyCache = new Map()
 // 正在加载正文的学科（防止同一分片并发 fetch）
 let bodyLoading = ''
 
-// 加载标题级索引（base './' 相对路径）
+// 加载标题级索引（S5-3：改走 searchClient —— 缓存 > 远程 > 保持旧值）
 async function loadMeta() {
   if (metaState.value === 'loading') return
   if (metaCache) {
@@ -121,12 +121,7 @@ async function loadMeta() {
   }
   metaState.value = 'loading'
   try {
-    const res = await fetch(`./${META_FILE}`)
-    if (!res.ok) {
-      metaState.value = 'error'
-      return
-    }
-    metaCache = await res.json()
+    metaCache = await loadSearchMeta()
     meta.value = metaCache
     metaState.value = 'ready'
     // meta 到手时若输入框里已经有 ≥2 字的查询词（例如输入早于预取），补一次正文
@@ -150,9 +145,8 @@ async function ensureBody() {
   bodyLoading = subject
   bodyState.value = 'loading'
   try {
-    const res = await fetch(`./${bodyShardPath(subject)}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const shard = await res.json()
+    // S5-3：改走 searchClient（内部已带 IDB 缓存 + 读时闸门 + 远程失败回退缓存）
+    const shard = await loadSearchBody(subject)
     bodyCache.set(subject, shard)
     // 期间学科可能已被切走：只在仍是当前学科时应用，否则重新按新学科取
     if (currentSubject() === subject) {
