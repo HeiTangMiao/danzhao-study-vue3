@@ -72,8 +72,36 @@ jobs:
       - name: 生成搜索/题库产物（供产物级测试）
         run: npm run build:index
 
+      # TEMP-DIAG：Windows 侧测试时红时绿（#13/#15 红、#14 绿），抓日志定位。定位后还原。
       - name: 单元测试
-        run: npm test
+        id: unit
+        run: |
+          set +e
+          npm test > /tmp/unit.log 2>&1
+          echo "unit_exit=$?" >> "$GITHUB_OUTPUT"
+          tail -40 /tmp/unit.log
+        continue-on-error: true
+
+      - name: 回传单元测试日志
+        if: always() && steps.unit.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            let log = '(无日志)'
+            try { log = fs.readFileSync('/tmp/unit.log', 'utf8') } catch (e) { log = '读取失败: ' + e.message }
+            const tail = log.length > 60000 ? log.slice(-60000) : log
+            await github.rest.checks.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              name: 'unit-test-log-' + process.env.RUNNER_OS,
+              head_sha: context.sha, status: 'completed', conclusion: 'neutral',
+              output: { title: `单元测试日志（${process.env.RUNNER_OS}）`, summary: `exit=${{ steps.unit.outputs.unit_exit }}`, text: tail }
+            })
+
+      - name: 判定单元测试结果
+        if: always()
+        run: |
+          if [ "${{ steps.unit.outputs.unit_exit }}" != "0" ]; then exit 1; fi
 
       - name: 构建并发布
         uses: tauri-apps/tauri-action@v0
@@ -166,7 +194,12 @@ jobs:
         run: npm run tauri:android:init
 
       - name: 配置 Android 签名
-        run: node scripts/setup-android-signing.mjs
+        id: signing
+        run: |
+          set +e
+          node scripts/setup-android-signing.mjs > /tmp/android-signing.log 2>&1
+          echo "signing_exit=$?" >> "$GITHUB_OUTPUT"
+          cat /tmp/android-signing.log
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -183,21 +216,23 @@ jobs:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         continue-on-error: true
 
-      # TEMP-DIAG：job logs 需 admin 权限取不到，把构建日志写成 check-run 供无权限读取。定位后还原。
+      # TEMP-DIAG：job logs 需 admin 权限取不到，把构建/签名日志写成 check-run 供无权限读取。定位后还原。
       - name: 回传 Android 构建日志
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs')
-            let log = '(无日志)'
-            try { log = fs.readFileSync('/tmp/android-build.log', 'utf8') } catch (e) { log = '读取失败: ' + e.message }
-            const tail = log.length > 60000 ? log.slice(-60000) : log
+            const read = (p) => { try { return fs.readFileSync(p, 'utf8') } catch (e) { return '(读取失败: ' + e.message + ')' } }
+            const signing = read('/tmp/android-signing.log')
+            const build = read('/tmp/android-build.log')
+            const text = `===== 签名（判断用的是正式 keystore 还是临时）=====\n${signing}\n\n===== 构建 =====\n${build}`
+            const tail = text.length > 60000 ? text.slice(-60000) : text
             await github.rest.checks.create({
               owner: context.repo.owner, repo: context.repo.repo,
               name: 'android-build-log', head_sha: context.sha,
               status: 'completed', conclusion: 'neutral',
-              output: { title: 'Android 构建日志', summary: `exit=${{ steps.andbuild.outputs.android_exit }}`, text: tail }
+              output: { title: 'Android 签名 + 构建日志', summary: `signing=${{ steps.signing.outputs.signing_exit }} build=${{ steps.andbuild.outputs.android_exit }}`, text: tail }
             })
 
       - name: 判定 Android 构建结果
