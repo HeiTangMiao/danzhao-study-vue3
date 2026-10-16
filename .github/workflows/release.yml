@@ -27,6 +27,14 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          # ⚠️ 必须全量历史（默认 depth=1 是浅克隆）：三个守卫测试要用
+          # `git show <baseline>` / `git diff <baseline> HEAD` 对照基线提交
+          # （loadpage-remote-fallback.test.js:212 的 54300fa 等）。
+          # 浅克隆下基线提交不可解析 → execSync 抛错 → 单元测试挂。
+          # 2026-10-17 实证：本 workflow 的四个 job 全部因此步失败（CI 的 quality job
+          # 早已带 fetch-depth: 0，但本文件漏了）。与 ci.yml 的 quality job 保持同口径。
+          fetch-depth: 0
 
       - name: 安装 Node.js
         uses: actions/setup-node@v4
@@ -59,6 +67,11 @@ jobs:
       - name: 内容 Schema 校验
         run: npm run validate:content
 
+      # 与 ci.yml 的 quality job 同口径：先产出搜索/题库产物，否则产物级测试会
+      # `skipIf(!artifactsReady)` 静默跳过（在干净检出里等于从未执行）
+      - name: 生成搜索/题库产物（供产物级测试）
+        run: npm run build:index
+
       - name: 单元测试
         run: npm test
 
@@ -81,6 +94,9 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          # 同 release job：守卫测试依赖 git 历史（浅克隆会挂）
+          fetch-depth: 0
 
       - name: 安装 Node.js
         uses: actions/setup-node@v4
@@ -137,6 +153,10 @@ jobs:
 
       - name: 内容 Schema 校验
         run: npm run validate:content
+
+      # 同 ci.yml：先产出，否则产物级测试静默跳过
+      - name: 生成搜索/题库产物（供产物级测试）
+        run: npm run build:index
 
       - name: 单元测试
         run: npm test
