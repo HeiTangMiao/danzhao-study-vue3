@@ -116,7 +116,9 @@ describe('R2 · 攻点[6] · 依赖面', () => {
     const npmRange = pkg.dependencies['@tauri-apps/plugin-shell']
     const npmResolved = lock.packages['node_modules/@tauri-apps/plugin-shell'].version
     const cargoReq = (cargo.match(/tauri-plugin-shell\s*=\s*"([^"]+)"/) || [])[1]
-    const cargoLocked = (cargoLock.match(/name = "tauri-plugin-shell"\nversion = "([^"]+)"/) || [])[1]
+    // ⚠️ 必须容忍 CRLF：仓库无 .gitattributes，Windows 检出会把 Cargo.lock 转成 \r\n，
+    //    写死 \n 的正则在 Windows 上匹配不到 → 守卫自己先红（2026-10-17 实证）。
+    const cargoLocked = (cargoLock.match(/name = "tauri-plugin-shell"[\s\S]*?version = "([^"]+)"/) || [])[1]
 
     expect(npmRange, 'npm 侧范围缺失').toBeTruthy()
     expect(npmResolved, 'lock 未解析出 plugin-shell').toBeTruthy()
