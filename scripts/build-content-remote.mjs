@@ -21,19 +21,21 @@
  *                 不受分片顺序与 generatedAt 影响
  *  - canonical  = 递归键序归一后 JSON.stringify（零依赖）
  */
-import { writeFileSync, mkdirSync, rmSync, readFileSync, statSync } from 'node:fs'
+import { writeFileSync, mkdirSync, rmSync, readFileSync, statSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createHash } from 'node:crypto'
 import {
-  ROOT, CONTENT_DIR, collectFiles, collectBoardIds, buildMetaIndex, importFresh, relPathOf
+  ROOT, CONTENT_DIR, SITE_FILES, collectFiles, collectBoardIds, buildMetaIndex, importFresh, relPathOf
 } from './lib/load-content.mjs'
 import { createBlockValidator } from '../src/utils/validateBlock.js'
 import { pageFileKeyOf } from '../src/content/pageMeta.js'
 import {
   SCHEMA_VERSION, CONTENT_VERSION, OPTIONAL_SECTIONS, SHARD_WARN_BYTES,
-  MANIFEST_PATH, REMOTE_DIR, shardPath, unitKeyOf, OP, HASH_PREFIX
+  MANIFEST_PATH, REMOTE_DIR, shardPath, unitKeyOf, OP, HASH_PREFIX, subSectionErrors
 } from '../src/content/contentManifest.js'
+import { META_FILE, bodyShardPath } from '../src/content/searchIndex.js'
+import { BANK_INDEX_FILE, practiceShardPath } from '../src/content/practiceBank.js'
 
 const PUBLIC_DIR = join(ROOT, 'public')
 const REMOTE_OUT_DIR = join(PUBLIC_DIR, REMOTE_DIR)
@@ -281,10 +283,27 @@ export function assertManifestInvariants(manifest, { shardCount = null } = {}) {
         errors.push('sitePatch.fileMetaUpdates 应为空数组（B1 不产出导航变更）')
       }
     }
-    // ⑤ S5+ 预留键必须存在且为 null（协议一次到位，P-S07 a）
+    // ⑤ search / practice 子段（P-S07 a 键位一次到位）：键必须存在、必须是指针表、
+    //    且满足子段不变量（P-S51 复用 contentVersion、子段只带指针）。
+    //    ⚠️ **null 不再是合法形态**（D-S5-1）：从前「4 份产物缺 3 份」时本脚本填 null 后 exit 0，
+    //    自检脚本遇 null 又整段跳过 → CI 全绿放行；而运行时零处消费这两个子段，没有第二道防线。
+    //    放开「恒为 null」的旧硬断言与填充是**同一 commit**（C-1 / R-1）；本批再收紧为必填，
+    //    同样是同一 commit（收紧与依赖它的自检脚本同批，否则中间态 CI 全红）。
+    //    「半填充」不再单列一条：一侧为 null 或键缺失本身已是缺陷，会被本循环各自点名。
     for (const key of OPTIONAL_SECTIONS) {
-      if (!(key in manifest)) errors.push(`manifest 缺少预留键 ${key}`)
-      else if (manifest[key] !== null) errors.push(`manifest.${key} 应为 null（S5+ 才填充）`)
+      if (!(key in manifest)) {
+        errors.push(`manifest 缺少预留键 ${key}`)
+        continue
+      }
+      const sub = manifest[key]
+      if (sub === null) {
+        errors.push(
+          `manifest.${key} 不应为 null（S5 起搜索/题库产物必须与清单同批产出：` +
+            '缺产物 = build:index 没跑或产物被删，留空会让客户端以为没这半）'
+        )
+        continue
+      }
+      for (const e of subSectionErrors(key, sub)) errors.push(e)
     }
   }
 
@@ -296,8 +315,80 @@ export function assertManifestInvariants(manifest, { shardCount = null } = {}) {
   return true
 }
 
+/**
+ * 由**已落盘**的搜索 / 题库产物构造 manifest 子段指针表（S5-1，C-1）
+ *
+ * 产物由 `build:index`（= `build:practice && build:search`）先行产出，本脚本在 `prebuild` 链里
+ * **后跑**，故直接读盘即可（与 `check-content-remote.mjs` 同款：只读、不重算、不重生成）。
+ * 路径与键一律取自 `searchIndex.js` / `practiceBank.js`（H7：不在这里重写第二处）。
+ *
+ * ⚠️ 期望文件集**不从盘上枚举**，而由 `SITE_FILES` 的学科清单推导（站点配置是学科的唯一真相源）：
+ *    否则「删掉一个分片」会从 spec 里消失、缺失被静默吞掉（QA 在 S4 已用 stray 分片验证过
+ *    「计数守卫必须独立于枚举」这一课）。
+ *
+ * 缺失口径（契约 1「不允许留空 / 半填」，D-S5-1 收紧后）：
+ *   - 两份产物**都在** → 两个子段都给指针表；
+ *   - **缺任何一份**（整份全缺 / 半份 / 同一子段内部只缺一个文件）→ 抛错并点名缺失文件。
+ *
+ * ⚠️ 为什么不再返回 null：null 曾让「产物全缺」溜过 CI（自检脚本遇 null 整段跳过），
+ *    且运行时零处消费这两个子段，没有第二道防线。宁可让构建失败，也不产出留空清单。
+ *
+ * @param {string} publicDir public/ 目录绝对路径
+ * @returns {{search: object, practice: object}}
+ */
+export function buildSubSections(publicDir) {
+  const subjects = Object.keys(SITE_FILES)
+
+  /** 按规格清单读盘生成指针表；缺任何一个 → 抛错并点名（最多列 3 个，避免刷屏） */
+  const tableOf = (specs) => {
+    const missing = specs.filter((s) => !existsSync(s.abs)).map((s) => s.rel)
+    if (missing.length > 0) {
+      const shown = missing.slice(0, 3).join('、') + (missing.length > 3 ? ` 等 ${missing.length} 项` : '')
+      throw new Error(
+        `产物缺失（${missing.length}/${specs.length}）：${shown}` +
+          ' —— 请先跑 npm run build:index（题库先于搜索），不要留空或半填充子段'
+      )
+    }
+    const table = {}
+    for (const s of specs) {
+      const text = readFileSync(s.abs, 'utf-8')
+      const entry = { path: s.rel, hash: HASH_PREFIX + sha256hex(text) }
+      // count 只在该产物有「条数」语义时给（汇总索引是对象，给了会误导）
+      if (s.count === 'entries') entry.count = JSON.parse(text).length
+      else if (s.count === 'keys') entry.count = Object.keys(JSON.parse(text)).length
+      table[s.rel] = entry
+    }
+    return table
+  }
+
+  const search = tableOf([
+    { abs: join(publicDir, META_FILE), rel: META_FILE, count: 'entries' },
+    ...subjects.map((s) => ({
+      abs: join(publicDir, bodyShardPath(s)),
+      rel: bodyShardPath(s),
+      count: 'keys'
+    }))
+  ])
+
+  const practice = tableOf([
+    { abs: join(publicDir, BANK_INDEX_FILE), rel: BANK_INDEX_FILE, count: null },
+    ...subjects.map((s) => ({
+      abs: join(publicDir, practiceShardPath(s)),
+      rel: practiceShardPath(s),
+      count: 'entries'
+    }))
+  ])
+
+  return { search, practice }
+}
+
 async function build() {
   const { manifest, shards } = await collectSnapshot()
+
+  // S5-1：填充 search / practice 子段（产物由 build:index 先产出；缺失口径见 buildSubSections）
+  const subSections = buildSubSections(PUBLIC_DIR)
+  manifest.search = subSections.search
+  manifest.practice = subSections.practice
 
   // 构建后立即自检清单形态 —— **先于任何落盘**：不变量不满足则一个字节都不写
   // （与「校验不过不产出分片」同一纪律：宁可不发布，也不发布形态坏掉的清单）
@@ -331,7 +422,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       console.error(`[content-remote] 校验失败，未产出任何分片（${e.errors.length} 处）：`)
       for (const line of e.errors) console.error('  ✗ ' + line)
     } else {
-      console.error('[content-remote] 生成失败:', e)
+      // 非清单类失败（如产物缺失）：只打一行结论，不打堆栈 —— 结论才是给人看的
+      console.error(`[content-remote] 生成失败，未产出任何分片：${e.message}`)
     }
     process.exit(1)
   })

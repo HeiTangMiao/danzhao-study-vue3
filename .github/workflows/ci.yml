@@ -45,8 +45,12 @@ jobs:
 
       # 远程内容快照自检（S4-4b，具名步骤）：读 dist 之外的本地产物 public/content-remote/，
       # 断言清单不变量（schemaVersion / contentVersion / units 与分片数一致 / sitePatch 恒空 /
-      # S5+ 预留键为 null）+ 清单声明的分片逐个存在。产物缺失或形态坏 → **退出码 1**。
-      # 为什么必须显式挂：build 经 prebuild 触发是**隐式**的，链子被改坏时构建可能仍通过而产物缺失。
+      # **search / practice 子段必填且指针逐个存在**）+ 清单声明的分片逐个存在。
+      # 产物缺失或形态坏 → **退出码 1**。
+      # ⚠️ 为什么必须显式挂（D-S5-1，2026-10-17 实证）：从前「三份搜索/题库产物全缺」时
+      #    构建脚本填 null 后 exit 0、而自检脚本遇 null 又整段跳过 → 最致命状态反而全绿放行；
+      #    且运行时零处消费这两个子段，没有第二道防线。现已在构建期收紧（缺产物直接失败），
+      #    本步骤仍是**独立**的第二道：即使有人改坏 prebuild 链，也得先过这一关。
       - name: 内容快照自检
         run: npm run check:content-remote
 
@@ -185,16 +189,22 @@ jobs:
           if [ -d dist/vendor ]; then
             rsync -avz --delete -e "ssh $SSH_ARGS" ./dist/vendor/ "$USER@$HOST:/var/www/danzhao-study/vendor/"
           fi
-          # 第 4 步：远程内容快照（**S4-4a 闭环修复**：此前 rsync 清单里没有它，
-          #   导致一条 git push 的自动部署**不会**发布远程内容 → 网页端远程更新静默失效）
-          #   顺序纪律：**先分片、后清单** —— manifest 是客户端的入口指针，最后切它才能保证
-          #   任何时刻线上 manifest 指向的分片都已就位（与「最后切 index.html」同款）。
+          # 第 4 步：远程内容快照 + 练习题库产物（**S4-4a 闭环修复**：此前 rsync 清单里没有
+          #   content-remote，导致一条 git push 的自动部署**不会**发布远程内容 → 网页端远程更新
+          #   静默失效；practice-bank 是同批补齐的线上缺口）
+          #   ⚠️ 顺序纪律：**先产物、后清单**（artifacts first, manifest last）——
+          #   manifest 是客户端唯一的入口指针（既指 content-remote 的单元分片，也经
+          #   manifest.practice / manifest.search 指 practice-bank 与 search-body 的分片），
+          #   所以**所有被它指向的产物都必须先落盘**，manifest 单独最后切。否则会开出一个
+          #   「新清单已上线、它指向的题库分片还没传完」的窗口：客户端按指针拉即 404。
+          #   （搜索产物 search-meta.json / search-body/ 已在第 2 步传完，天然早于本步，同理。）
+          #   与「最后切 index.html」是同一条纪律，只是入口指针换成了 manifest。
           #   不带 --delete：单元下线时旧分片残留无害（客户端只按 manifest 指向拉取），
           #   而 --delete 会在「新清单已上线、仍有旧客户端在飞」的窗口里删掉它们正在请求的文件。
           rsync -avz --exclude manifest.json -e "ssh $SSH_ARGS" ./dist/content-remote/ "$USER@$HOST:/var/www/danzhao-study/content-remote/"
-          rsync -avz -e "ssh $SSH_ARGS" ./dist/content-remote/manifest.json "$USER@$HOST:/var/www/danzhao-study/content-remote/manifest.json"
-          # 第 5 步：练习题库产物（同批补齐线上缺口；同样不带 --delete，理由同上）
           rsync -avz -e "ssh $SSH_ARGS" ./dist/practice-bank/ "$USER@$HOST:/var/www/danzhao-study/practice-bank/"
+          # 提交点：manifest 单独最后切（此刻它指向的 content-remote 分片与 practice-bank 分片均已就位）
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/content-remote/manifest.json "$USER@$HOST:/var/www/danzhao-study/content-remote/manifest.json"
 
       - name: 部署后验证
         env:

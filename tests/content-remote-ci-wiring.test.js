@@ -66,6 +66,16 @@ describe('S4-4a · deploy job 发布闭环（事故头号缺口）', () => {
     expect(manifest).toBeGreaterThan(shard)
   })
 
+  it('顺序纪律（S5 收尾补齐）：**practice-bank 产物也必须先于 manifest**', () => {
+    // 为什么这不是多此一举：manifest 的 practice 子段是指向 practice-bank 分片的指针表，
+    // 所以题库产物同样属于「被 manifest 指向的产物」。若把库放在 manifest 之后传，
+    // 就开出「新清单已上线、它指向的题库分片还没到」的窗口 → 客户端按指针拉即 404。
+    const bank = CI.indexOf(NEEDLES.bankSync)
+    const manifest = CI.indexOf(NEEDLES.manifestSync)
+    expect(bank).toBeGreaterThan(-1)
+    expect(bank).toBeLessThan(manifest)
+  })
+
   it('content-remote / practice-bank **不**带 --delete（避免删掉旧客户端正在请求的分片）', () => {
     const lines = CI.split('\n').filter((l) => l.includes('dist/content-remote/') || l.includes('dist/practice-bank/'))
     expect(lines.length).toBeGreaterThanOrEqual(3)
@@ -89,6 +99,17 @@ describe('反向锚（变异）· 守卫真的会咬', () => {
     }
     const missing = missingIn(mutated)
     expect(missing).toEqual(expect.arrayContaining(['shardSync', 'manifestSync', 'bankSync']))
+  })
+
+  it('顺序纪律的反向锚（S5 收尾）：题库行在 manifest 之后 → 判据必须否', () => {
+    /** 与正序断言同款判据，抽成函数才能喂变异文本 */
+    const isBankBeforeManifest = (t) => {
+      const b = t.indexOf(NEEDLES.bankSync)
+      const m = t.indexOf(NEEDLES.manifestSync)
+      return b > -1 && m > -1 && b < m
+    }
+    expect(isBankBeforeManifest(CI)).toBe(true) // 真实文件满足
+    expect(isBankBeforeManifest([NEEDLES.manifestSync, NEEDLES.bankSync].join('\n'))).toBe(false) // 反序 → 必失败
   })
 
   it('删掉具名自检步骤 → missingIn 必须报缺 namedStep', () => {

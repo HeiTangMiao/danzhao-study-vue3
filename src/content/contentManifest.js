@@ -42,10 +42,15 @@ export const SCHEMA_VERSION = 1
 export const CONTENT_VERSION = 3
 
 /**
- * 预留但**当前不产出**的清单子段（S5+ 才填充）
+ * 清单的 `search` / `practice` 子段（S5-1 起填充，此前为预留键位）
  *
- * 为什么现在就写键位：协议「一次到位」—— 留键位零成本，避免 S5+ 改协议导致
- * 老客户端不认识新字段。S1/B1 阶段这两个键恒为 null（P-S07 a）。
+ * 为什么当初就写键位：协议「一次到位」—— 留键位零成本，避免 S5+ 改协议导致
+ * 老客户端不认识新字段（P-S07 a）。S1/B1 阶段这两个键恒为 null。
+ *
+ * ⚠️ S5-1 起 **null 不再是合法值**（QA D-S5-1）：这三份产物不在盘上时构建脚本曾填 null 后
+ *    exit 0，而自检脚本遇 null 整段 `continue` 跳过 → 「4 份产物缺 3 份」这个最致命状态
+ *    CI 全绿放行；且运行时零处消费这两个子段（客户端按路径直接拉），没有第二道防线。
+ *    故契约收紧为：子段必须是指针表，缺任何一份产物都在**构建期**抛错（不落盘）。
  */
 export const OPTIONAL_SECTIONS = ['search', 'practice']
 
@@ -64,6 +69,15 @@ export const REMOTE_DIR = 'content-remote'
 
 /** 清单文件名（public/ 下的相对路径） */
 export const MANIFEST_PATH = 'content-remote/manifest.json'
+
+/** content_meta 里存「整份清单摘要」的记录键（当前只有一条） */
+export const CONTENT_META_KEY = 'manifest'
+
+/**
+ * 清单文件名（相对**内容根**：`content-remote/manifest.json` → `manifest.json`）
+ * 派生而非手写：内容根 = `REMOTE_DIR`，两者必须同源，否则客户端会去拉一个不存在的地址。
+ */
+export const MANIFEST_FILE = MANIFEST_PATH.slice(REMOTE_DIR.length + 1)
 
 /**
  * 单元分片的路径（public/ 下的相对路径）
@@ -127,3 +141,72 @@ export const OP = {
  * 产物形如 `sha256:<hex64>`
  */
 export const HASH_PREFIX = 'sha256:'
+
+/**
+ * S5-1：manifest 的 `search` / `practice` 子段（`OPTIONAL_SECTIONS` 既有键位的启用）
+ *
+ * 形状 = **分片指针表**：键 = 产物在站点根下的相对路径，值 = `{ path, hash, count?, generatedAt? }`。
+ *   - 与 `units` 同款「指针 + 哈希」 idiom，便于客户端复用「哈希变了才重拉」的增量逻辑；
+ *   - **键即 path**（`entry.path === key`）：路径只写一处，杜绝「键与 path 漂移后客户端按错地址拉」。
+ *
+ * ⚠️ 路径基准是**站点根**（与 `units` 的「相对 content-remote/」不同）：
+ *   搜索/题库产物部署在站点根（`search-meta.json` / `search-body/{学科}.json` / `practice-bank/*`），
+ *   与 `content-remote/` 同在 `public/`、同一份 `dist/`。故 path 为站点根相对（不带 `public/` 前缀）。
+ *
+ * ⚠️ 子段**不带版本号**（P-S51）：版本口径只有 `manifest.contentVersion` 一个，
+ *   客户端读时闸门一律与它比（`mergeContent.isNewer`），不引入 SEARCH_VERSION / BANK_VERSION。
+ */
+export const SUB_SECTION_ENTRY_KEYS = ['path', 'hash', 'count', 'generatedAt']
+
+/** ISO 8601 形态（宽松：字符串且可被 Date 解析）——仅用于 `generatedAt` */
+function isIsoLike(value) {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value))
+}
+
+/**
+ * 校验一个子段（search / practice），返回错误描述列表（空数组 = 合法）
+ *
+ * 纯函数、零 import（本文件纪律不变）：构建脚本 `assertManifestInvariants` 第 ⑤ 段、
+ * CI 门禁 `check-content-remote.mjs` 与测试共用同一份口径（H7：不写第二处）。
+ *
+ * @param {string} name 子段名（'search' | 'practice'）
+ * @param {unknown} sub 子段值
+ * @returns {string[]} 错误描述（可能多条）
+ */
+export function subSectionErrors(name, sub) {
+  // null 由上层的第 ⑤ 段单独判（消息更准），这里只兜住「非对象的其它假值」
+  if (!sub || typeof sub !== 'object' || Array.isArray(sub)) {
+    return [`${name} 应为对象（指针表）`]
+  }
+  const errors = []
+  const keys = Object.keys(sub)
+  if (keys.length === 0) errors.push(`${name} 不应为空（S5 起必须给出指针）`)
+  for (const [key, entry] of Object.entries(sub)) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      errors.push(`${name}['${key}'] 不是对象`)
+      continue
+    }
+    if (typeof entry.path !== 'string' || entry.path === '') {
+      errors.push(`${name}['${key}'].path 应为非空字符串`)
+      continue
+    }
+    if (entry.path !== key) {
+      errors.push(`${name}['${key}'] 的 path 与键不一致（键即 path，路径只写一处）`)
+    }
+    if (entry.path.startsWith('/') || entry.path.startsWith('public/') || entry.path.includes('..')) {
+      errors.push(
+        `${name}['${key}'].path 应为站点根相对路径（不带 public/ 前缀、不以 / 开头、不含 ..），实际 ${entry.path}`
+      )
+    }
+    if (typeof entry.hash !== 'string' || !entry.hash.startsWith(HASH_PREFIX)) {
+      errors.push(`${name}['${key}'].hash 应带 ${HASH_PREFIX} 前缀`)
+    }
+    if (entry.count !== undefined && (!Number.isInteger(entry.count) || entry.count <= 0)) {
+      errors.push(`${name}['${key}'].count 应为正整数`)
+    }
+    if (entry.generatedAt !== undefined && !isIsoLike(entry.generatedAt)) {
+      errors.push(`${name}['${key}'].generatedAt 应为 ISO 8601 字符串`)
+    }
+  }
+  return errors
+}

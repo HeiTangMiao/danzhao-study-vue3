@@ -40,12 +40,33 @@ const ctl = vi.hoisted(() => ({ mode: 'none' }))
 const { collectSnapshot, canonicalJSON, hashOf, assertManifestInvariants } = await import(
   '../scripts/build-content-remote.mjs'
 )
-const { OPTIONAL_SECTIONS, OP, SHARD_WARN_BYTES, REMOTE_DIR, MANIFEST_PATH, CONTENT_VERSION } = await import(
+const {
+  OPTIONAL_SECTIONS, OP, SHARD_WARN_BYTES, REMOTE_DIR, MANIFEST_PATH, CONTENT_VERSION, HASH_PREFIX,
+  subSectionErrors
+} = await import(
   '../src/content/contentManifest.js'
 )
 
 const T1 = '2026-01-01T00:00:00.000Z'
 const T2 = '2026-06-30T12:34:56.000Z'
+
+const H = (c = 'a') => HASH_PREFIX + c.repeat(64)
+
+/**
+ * 合法子段指针表（每次返回新对象，避免用例间共享引用）
+ *
+ * 为什么测试要自己造：`collectSnapshot()` 只采内容、**不读盘上的搜索/题库产物**
+ * （那是 `buildSubSections()` 的活），故真实快照的子段恒为空 → 需要单独注入才能测正向。
+ */
+function subTables() {
+  return {
+    search: { 'search-meta.json': { path: 'search-meta.json', hash: H('a'), count: 3 } },
+    practice: { 'practice-bank/index.json': { path: 'practice-bank/index.json', hash: H('b') } }
+  }
+}
+
+/** 给真实采集的清单补上合法子段（S5 起不变量⑤ 要求必填） */
+const withSubs = (manifest) => ({ ...manifest, ...subTables() })
 
 let snapA = null
 let snapB = null
@@ -215,33 +236,50 @@ describe('⑥ 超限只告警、不截断', () => {
   })
 })
 
-describe('⑦ S5+ 预留键位（P-S07 a）', () => {
-  it('manifest 顶层含 search / practice 且为 null', () => {
+describe('⑦ search / practice 子段（P-S07 a 键位一次到位；S5-1 起必填，null 不再合法）', () => {
+  it('manifest 顶层含 search / practice 预留键（协议一次到位）', () => {
     for (const key of OPTIONAL_SECTIONS) {
-      expect(key in snapA.manifest).toBe(true)
-      expect(snapA.manifest[key]).toBeNull()
+      expect(key in snapA.manifest, `${key} 键必须存在（协议一次到位）`).toBe(true)
     }
-    expect(snapA.manifest.search).toBeNull()
-    expect(snapA.manifest.practice).toBeNull()
+  })
+
+  // ★ D-S5-1：真实采集的清单子段恒为空（产物由 buildSubSections 后补），
+  //   从前这是「合法形态」→ 构建 exit 0、自检整段跳过。现在必须被拒绝。
+  it('★ 真实采集的清单（子段为空）→ 不变量⑤ 必须拒绝', () => {
+    let thrown = null
+    try {
+      assertManifestInvariants(snapA.manifest, { shardCount: snapA.shards.length })
+    } catch (e) { thrown = e }
+    expect(thrown, '子段为 null 却通过 → D-S5-1 门禁失效').toBeTruthy()
+    for (const key of OPTIONAL_SECTIONS) {
+      expect(thrown.errors.join('|')).toMatch(new RegExp(`manifest\\.${key} 不应为 null`))
+    }
+  })
+
+  it('补上合法指针表 → 子段通过各自的形状校验', () => {
+    const m = withSubs(snapA.manifest)
+    for (const key of OPTIONAL_SECTIONS) {
+      expect(subSectionErrors(key, m[key]), `${key} 子段不合法`).toEqual([])
+    }
   })
 })
 
 describe('⑧ 产物清单不变量自检（批 S4 · S4-4b）', () => {
-  it('真实采集的清单 + 分片数 → 通过（构建期同一口径）', () => {
-    expect(assertManifestInvariants(snapA.manifest, { shardCount: snapA.shards.length })).toBe(true)
+  it('真实采集的清单（补上子段）+ 分片数 → 通过（构建期同一口径）', () => {
+    expect(assertManifestInvariants(withSubs(snapA.manifest), { shardCount: snapA.shards.length })).toBe(true)
   })
 
   it('分片数传错（与 units 键数不符）→ 抛', () => {
     let thrown = null
     try {
-      assertManifestInvariants(snapA.manifest, { shardCount: snapA.shards.length + 1 })
+      assertManifestInvariants(withSubs(snapA.manifest), { shardCount: snapA.shards.length + 1 })
     } catch (e) { thrown = e }
     expect(thrown).toBeTruthy()
     expect(thrown.errors.join('|')).toMatch(/与分片数 \d+ 不一致/)
   })
 
   it('contentVersion 低于源码常量 → 抛（构建期不应倒退）', () => {
-    const bad = { ...snapA.manifest, contentVersion: CONTENT_VERSION - 1 }
+    const bad = { ...withSubs(snapA.manifest), contentVersion: CONTENT_VERSION - 1 }
     let thrown = null
     try { assertManifestInvariants(bad, { shardCount: snapA.shards.length }) } catch (e) { thrown = e }
     expect(thrown).toBeTruthy()
@@ -249,7 +287,10 @@ describe('⑧ 产物清单不变量自检（批 S4 · S4-4b）', () => {
   })
 
   it('sitePatch 被填非空 → 抛（B1 不得产出导航变更）', () => {
-    const bad = { ...snapA.manifest, sitePatch: { units: { 'math/01': {} }, fileMetaUpdates: [] } }
+    const bad = {
+      ...withSubs(snapA.manifest),
+      sitePatch: { units: { 'math/01': {} }, fileMetaUpdates: [] }
+    }
     let thrown = null
     try { assertManifestInvariants(bad, { shardCount: snapA.shards.length }) } catch (e) { thrown = e }
     expect(thrown).toBeTruthy()
