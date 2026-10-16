@@ -8,7 +8,8 @@
 > → 已缓存客户端**永久拉不到新内容，且不报错、不崩溃**。
 > 这不是「拉得慢」，是**静默失效**；靠人记住纪律是不可靠的，故把流程写成**可执行、可断言**的单一文档。
 >
-> 相关文档：`docs/proposals/batch-s4-tasks.md`（设计依据）、`docs/远程内容链路验证清单.md`（历史验证记录）。
+> 相关文档：`docs/proposals/batch-s4-tasks.md`（设计依据）、`docs/远程内容链路验证清单.md`（历史验证记录）、
+> `docs/remote-assets.md`（三条远程链的优先级链 / 缓存键 / 读时闸门 / 降级终点，改链路前先读它）。
 
 ---
 
@@ -137,6 +138,7 @@
 | 单个单元内容陈旧、其它正常 | 该单元分片是否发布；客户端 `content_meta.pendingUnits` 是否有它（连续失败 5 次后已停止重试） |
 | 自动部署后线上没变 | CI `deploy` job 的 rsync 是否还包含 `dist/content-remote/`（不要删那几行；有 `tests/content-remote-ci-wiring.test.js` 守着） |
 | 全站回到内置内容 | 清单形态是否合法（`npm run check:content-remote`）；`schemaVersion` 不符会让客户端**整份不消费** |
+| 搜索/练习不可用（S5 起） | 先跑 `npm run check:content-remote`（四件套含子段指针）；再看 Network 的 URL 是否落在 `/api` 下（那说明基址派生被改坏了，`siteRoot()` 应取 origin）；断网场景查 IndexedDB 的 `search:*` / `practice:*` 键。链路细节见 `docs/remote-assets.md` |
 
 ---
 
@@ -148,6 +150,7 @@
 | 清单不变量自检 | ✅ `npm run check:content-remote`（CI 具名步骤「内容快照自检」） |
 | 发布 `content-remote/` 与 `practice-bank/` | ✅ CI `deploy` job rsync（先分片后清单） |
 | 部署后探测线上 manifest | ✅ CI「部署后验证」步骤（缺文件/类型不对即失败） |
+| 搜索 / 题库远程链路验证（S5 起） | ❌ **清单已备、待执行**（`docs/远程内容链路验证清单.md` 第 4 部分：Web 代跑 / Tauri 打包 / Android 真机） |
 | **是否该 bump 版本号** | ❌ **人工判断**（`CONTENT_VERSION` 是手填号，无法自动推断「这是一次内容改动」） |
 | **「与线上版本对比」预检**（本地 ≤ 线上则拒发） | ❌ 不进 CI（CI 里 curl 生产域名脆弱且需网络）→ 人工按 §3 第 7 步 + §4 第 11 步做 |
 

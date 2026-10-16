@@ -86,6 +86,72 @@ describe('三处引用（消除散落）', () => {
   })
 })
 
+describe('S5 增补：验证清单被 SOP 引用（S5-7 验收）', () => {
+  it('runbook 指向验证清单第 4 部分（S5 搜索/题库远程化）', () => {
+    const sop = readFileSync(join(ROOT, SOP), 'utf-8')
+    expect(sop).toContain('远程内容链路验证清单.md')
+    expect(sop).toContain('第 4 部分')
+  })
+
+  it('验证清单里确有 S5 章节，且如实标注「未执行」', () => {
+    const list = readFileSync(join(ROOT, 'docs/远程内容链路验证清单.md'), 'utf-8')
+    expect(list).toContain('第 4 部分：S5')
+    // 诚实标注：不得让人误以为真机已验证
+    expect(list).toMatch(/未执行|待真机|待执行/)
+    // 四项真机才能定的结论必须在清单里点名
+    for (const k of ['弱网', 'bundle 副本', '存储配额', 'tauri://localhost']) {
+      expect(list, `清单应覆盖 ${k}`).toContain(k)
+    }
+  })
+})
+
+describe('S5-7 增补：远程资产链路说明（docs/remote-assets.md）', () => {
+  const DOC = 'docs/remote-assets.md'
+  const doc = readFileSync(join(ROOT, DOC), 'utf-8')
+
+  /** 降级终点是否被写清：三要件缺一不可（抽成函数才能在变异文本上证明判据会否） */
+  const hasDegradeEndpoint = (t) =>
+    t.includes('没有内置兜底层') && t.includes('safeDb') && t.includes('error 态')
+
+  it('文档存在，且三条链的优先级链都点名', () => {
+    expect(existsSync(join(ROOT, DOC))).toBe(true)
+    for (const k of ['内容层', '搜索层', '题库层']) expect(doc).toContain(k)
+  })
+
+  it('缓存键前缀隔离（P-S52）写明：search: / practice: + 零 DB 升版', () => {
+    for (const k of ['search:meta', 'practice:index']) expect(doc).toContain(k)
+    expect(doc).toContain('content_cache')
+    expect(doc).toMatch(/零 DB 升版/)
+  })
+
+  it('读时闸门 + 「搜索/题库无内置兜底」的降级终点写明', () => {
+    expect(doc).toContain('isFreshEntry')
+    expect(doc).toContain('minVersion')
+    expect(hasDegradeEndpoint(doc)).toBe(true)
+  })
+
+  it('发布顺序纪律：产物先行、清单最后', () => {
+    expect(doc).toMatch(/产物先行|先产物、后清单/)
+    expect(doc).toContain('--delete')
+  })
+
+  it('Android 真机清单覆盖 5 组场景', () => {
+    for (const k of ['在线首开', '离线 + 有缓存', '离线 + 无缓存', '远程 404', '半填充清单']) {
+      expect(doc, `真机清单应覆盖：${k}`).toContain(k)
+    }
+  })
+
+  it('SOP 反向指回本文档（三处引用收敛为「单一说明 + 各处指向它」）', () => {
+    expect(readFileSync(join(ROOT, SOP), 'utf-8')).toContain(DOC)
+  })
+
+  it('反向锚：抹掉降级终点的任一要件 → 判据必须否', () => {
+    expect(hasDegradeEndpoint(doc.split('没有内置兜底层').join(''))).toBe(false)
+    expect(hasDegradeEndpoint(doc.split('safeDb').join(''))).toBe(false)
+    expect(hasDegradeEndpoint(doc.split('error 态').join(''))).toBe(false)
+  })
+})
+
 describe('反向锚（变异）· 守卫真的会咬', () => {
   it('删掉「严禁同号覆盖」→ missingIn 必须报缺', () => {
     const mutated = sopText.split('严禁同号覆盖').join('可随意覆盖')
