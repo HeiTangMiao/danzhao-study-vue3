@@ -10,9 +10,10 @@ jobs:
   quality:
     name: 校验 · 测试 · 构建
     runs-on: ubuntu-latest
-    # TEMP-DIAG：仅为了把测试日志推到 ci-logs 分支；定位后连同下面两个临时步骤一起还原
+    # TEMP-DIAG：仅为了把测试日志写成 check-run；定位后连同下面两个临时步骤一起还原
     permissions:
-      contents: write
+      contents: read
+      checks: write
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -51,17 +52,25 @@ jobs:
           tail -200 /tmp/unit.log
         continue-on-error: true
 
-      - name: 上传测试日志到临时分支
+      - name: 回传测试日志（写成 check-run，便于无 admin 权限读取）
         if: always()
-        run: |
-          git config user.name ci-bot
-          git config user.email ci-bot@example.com
-          git checkout -B ci-logs "origin/${GITHUB_REF_NAME}"
-          mkdir -p ci-logs
-          cp /tmp/unit.log "ci-logs/unit-${GITHUB_RUN_NUMBER}.log"
-          git add ci-logs
-          git commit -m "ci: 测试日志 run ${GITHUB_RUN_NUMBER}"
-          git push --force origin ci-logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            let log = '(无日志)'
+            try { log = fs.readFileSync('/tmp/unit.log', 'utf8') } catch (e) { log = '读取失败: ' + e.message }
+            // check-run 的 output.text 有长度上限，取尾部（失败信息在末尾）
+            const tail = log.length > 60000 ? log.slice(-60000) : log
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'unit-test-log',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: 'neutral',
+              output: { title: '单元测试完整日志（尾部）', summary: `exit=${{ steps.unit.outputs.unit_exit }}`, text: tail }
+            })
 
       - name: 判定单元测试结果
         run: |
