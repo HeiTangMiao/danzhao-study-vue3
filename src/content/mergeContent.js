@@ -40,7 +40,7 @@
  *
  * 上游形状定义一律来自 src/content/contentManifest.js（S1 落盘），本文件**不复制**其常量。
  */
-import { HASH_PREFIX } from './contentManifest'
+import { HASH_PREFIX, SCHEMA_VERSION } from './contentManifest'
 
 /** `sha256:` 后的摘要形态：64 位小写十六进制 */
 const HEX64 = /^[0-9a-f]{64}$/
@@ -128,4 +128,77 @@ export function isNewer(remoteVer, maxSeen) {
   // 本地无记录（null/undefined/NaN）→ 视为首次，任何有限版本号都比「没有」新
   if (!Number.isFinite(m)) return true
   return r > m
+}
+
+/**
+ * 清单形态校验（协议闸门，纯函数）
+ *
+ * 协议版本不符 → **整份不消费**（宁可继续用旧数据，也不能按错误协议解析）。
+ * ⚠️ 只验「内容层必需的骨架」（schemaVersion / contentVersion / units）；
+ *    search / practice 子段**不在此处**拦 —— 子段坏不该让内容页也用不了，
+ *    子段口径由 `contentManifest.subSectionErrors` 单独校验（S5-1）。
+ *
+ * @param {unknown} m 解析后的清单对象
+ * @returns {boolean}
+ */
+export function isValidManifest(m) {
+  if (!m || typeof m !== 'object') return false
+  if (m.schemaVersion !== SCHEMA_VERSION) return false
+  // ⚠️ P-S47（S4）：`contentVersion` 必须**本身就是有限数字**，不再先强转
+  if (typeof m.contentVersion !== 'number' || !Number.isFinite(m.contentVersion)) return false
+  if (!m.units || typeof m.units !== 'object' || Array.isArray(m.units)) return false
+  return true
+}
+
+/**
+ * 计算本轮「待拉集合」（**纯函数**，S4-2 由 contentClient 迁入本文件 —— 纯函数家族的正确归属）
+ *
+ * 三种模式（红线 4：闸门语义**不变**，本函数只多了一个分支）：
+ *  - `newer`：远程版本**严格大于**本地已见版本 → 以**远程清单**为准，取「哈希变了」的单元；
+ *             同时**丢弃**旧 `pendingUnits`（那些单元在本轮 changedKeys 里必然再次入选，
+ *             两处并存会导致同一片被拉两次）。
+ *  - `heal` ：版本等值/更旧**但** `pendingUnits` 非空 → **同版本自愈**：只用 pending 里
+ *             **已捕获**的 `{unitKey, path, hash, version}` 当坐标，**不读远程 manifest.units**
+ *             —— 2026-10-15 事故里线上清单可能已不可达/旧内容，依赖它自愈等于没有自愈。
+ *  - `skip` ：版本等值/更旧且待重试集为空 → 一片都不拉。
+ *
+ * @param {object} manifest 远程清单（仅 newer 模式用到它的 units/contentVersion）
+ * @param {object|null} meta 本地 content_meta 记录（含 units / contentVersion / pendingUnits）
+ * @returns {{mode: 'newer'|'heal'|'skip', targets: Array<{unitKey: string, path: string,
+ *   hash: string, version: number, attempts: number}>}}
+ */
+export function computeRetrySet(manifest, meta) {
+  const cachedUnits = (meta && meta.units) || {}
+  const pending = Array.isArray(meta?.pendingUnits) ? meta.pendingUnits : []
+
+  if (isNewer(manifest?.contentVersion, meta?.contentVersion ?? null)) {
+    const targets = Object.keys(manifest.units || {})
+      .filter((k) => !cachedUnits[k] || cachedUnits[k].hash !== manifest.units[k].hash)
+      .map((k) => ({
+        unitKey: k,
+        path: manifest.units[k].path,
+        hash: manifest.units[k].hash,
+        version: Number(manifest.contentVersion),
+        attempts: 0
+      }))
+      // 无 path 的单元拉不了（清单坏项）→ 直接不进待拉集，也不留 pending
+      .filter((t) => typeof t.path === 'string' && t.path !== '')
+    return { mode: 'newer', targets }
+  }
+
+  if (pending.length > 0) {
+    const targets = pending
+      .filter((p) => p && typeof p.unitKey === 'string' && typeof p.path === 'string')
+      .map((p) => ({
+        unitKey: p.unitKey,
+        path: p.path,
+        hash: p.hash,
+        // 兼容早期记录：没存 version 时退回本地已见版本
+        version: Number.isFinite(Number(p.version)) ? Number(p.version) : Number(meta?.contentVersion),
+        attempts: Number(p.attempts) || 0
+      }))
+    return { mode: 'heal', targets }
+  }
+
+  return { mode: 'skip', targets: [] }
 }

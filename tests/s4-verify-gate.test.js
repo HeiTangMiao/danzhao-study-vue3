@@ -50,12 +50,15 @@ describe('A. 闸门语义未被放宽（红线 4）', () => {
   })
 
   it('contentClient 仍以 isNewer 作闸门判定（自愈分支不绕过它）', () => {
-    const code = stripComments(read('src/utils/contentClient.js'))
-    expect(code).toMatch(/import\s*\{[^}]*isNewer[^}]*\}\s*from\s*'@\/content\/mergeContent'/)
-    // 闸门判定仍由 computeRetrySet 内的 isNewer 调用做出（唯一判定点）
-    expect(code).toContain('isNewer(manifest?.contentVersion')
-    // 自愈分支只消费 computeRetrySet 的结果，不自造判据
-    expect(code).toContain('computeRetrySet(manifest, meta)')
+    const client = stripComments(read('src/utils/contentClient.js'))
+    const merge = stripComments(read('src/content/mergeContent.js'))
+    // 闸门判定的唯一实现已随 computeRetrySet 迁入 mergeContent（S5-2）；此处锚「两层都对」：
+    // ① mergeContent 里仍有唯一的 isNewer 闸门调用；② contentClient 只消费其结果，不自造判据
+    expect(merge).toContain('isNewer(manifest?.contentVersion')
+    expect(client).toMatch(/import\s*\{[^}]*computeRetrySet[^}]*\}\s*from\s*'@\/content\/mergeContent'/)
+    expect(client).toContain('computeRetrySet(manifest, meta)')
+    // 反向：contentClient 不得自己再调一次 isNewer 做闸门（那就会出现第二套判据）
+    expect(client).not.toContain('isNewer(')
   })
 
   it('自愈不推进 contentVersion（内容代次没变）', () => {

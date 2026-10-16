@@ -20,20 +20,19 @@
  *
  * 缓存粒度：**unitKey 整片**（P-S12 a），与 manifest.units 分片 1:1。
  */
-import { API_BASE, IS_ABSOLUTE_API } from '@/sync/apiBase'
-import {
-  REMOTE_DIR, MANIFEST_PATH, SCHEMA_VERSION, OP, unitKeyOf, pageKeyOf
-} from '@/content/contentManifest'
-import { isNewer, isUsablePage, verifyHash, isWellFormedHash } from '@/content/mergeContent'
+import { MANIFEST_FILE, CONTENT_META_KEY, OP, unitKeyOf, pageKeyOf } from '@/content/contentManifest'
+import { isUsablePage, verifyHash, isWellFormedHash, computeRetrySet, isValidManifest } from '@/content/mergeContent'
 import { fetchJson, DEFAULT_TIMEOUT_MS } from '@/utils/fetchJson'
+import { contentRoot, contentRootFrom } from '@/utils/assetBase'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useContentStore } from '@/stores/content'
 
-/** 清单文件名（`content-remote/manifest.json` → 相对内容根的 `manifest.json`） */
-export const MANIFEST_FILE = MANIFEST_PATH.slice(REMOTE_DIR.length + 1)
-
-/** content_meta 里存「整份清单摘要」的记录键（当前只有一条） */
-export const CONTENT_META_KEY = 'manifest'
+// 基址派生与纯函数已分别迁入 assetBase / mergeContent（S5-2：共用关注点收敛一处）；
+// MANIFEST_FILE / CONTENT_META_KEY 迁至 contentManifest（协议与存储键的归属模块）。
+// 以下 re-export 保持既有调用方（含 QA 的 s2-verify-* 测试）零改动
+export { contentRoot, contentRootFrom }
+export { computeRetrySet, isValidManifest }
+export { MANIFEST_FILE, CONTENT_META_KEY }
 
 /** 进程内二级缓存：unitKey -> 分片条目（避免每次进页都读一次 IndexedDB） */
 const memoryCache = new Map()
@@ -54,69 +53,6 @@ let backgroundStarted = false
  * ⚠️ 这是**次数**上限，不是退避（不持久化时间戳；P-S44 a 明确不做时间退避）。
  */
 export const PENDING_MAX_ATTEMPTS = 5
-
-/**
- * 远程内容根地址（P-S16，含 team-lead 的**强制修正**）
- *
- * - 相对模式（dev / Web 生产）：`./content-remote` —— 与 `practiceBankClient.js:19/:35`、
- *   `SearchPanel.vue:124/:153` 同款相对路径纪律；Web 生产同源走 CSP `'self'`。
- * - 绝对模式（Tauri）：**站点根** + `/content-remote`，即取 `new URL(API_BASE).origin`。
- *   ⚠️ 不能直接 `API_BASE + '/content-remote/'`：`.env.tauri` 注入的是
- *   `https://520305.top/api`，而 `/api` 在 nginx 是反代给 Fastify 的路由前缀，
- *   静态内容目录并不挂在它下面 → 会稳定拿到 **404**（不是网络错误，极难排查）。
- *   取 origin 后域名仍为 `https://520305.top`（已在 CSP `connect-src`）→ **无需改 CSP**。
- *
- * @returns {string} 内容根地址（不带尾斜杠；fetchJson 会补）
- */
-export function contentRoot() {
-  return contentRootFrom(API_BASE, IS_ABSOLUTE_API)
-}
-
-/**
- * 基址派生的**纯函数**内核（P-S16）—— 从 contentRoot() 里拆出来只为可测：
- * 绝对分支无法在 Node 单测里靠 import.meta.env 构造，把口径抽成函数即可直接注入断言。
- *
- * @param {string} apiBase API 基址（可能带 `/api` 之类的路径前缀）
- * @param {boolean} isAbsolute 是否为绝对地址模式（Tauri）
- * @returns {string} 内容根地址
- */
-export function contentRootFrom(apiBase, isAbsolute) {
-  if (!isAbsolute) return `./${REMOTE_DIR}`
-  return `${originOf(apiBase)}/${REMOTE_DIR}`
-}
-
-/**
- * 取站点根（origin）—— 剥离 `/api` 之类的路径前缀，只保留协议 + 域名 + 端口
- * @param {string} apiBase API 基址
- * @returns {string} origin，形如 `https://520305.top`
- */
-function originOf(apiBase) {
-  try {
-    return new URL(apiBase).origin
-  } catch {
-    // 兜底（IS_ABSOLUTE_API 已保证 http(s)，理论上走不到）：去掉最后一段路径
-    return String(apiBase).replace(/\/[^/]*$/, '')
-  }
-}
-
-/**
- * 清单形态校验（轻量，P-S17 a）
- * 协议版本不符 → **整份不消费**（宁可继续用内置，也不能按错误协议解析）
- * @param {unknown} m 解析后的清单对象
- * @returns {boolean}
- */
-export function isValidManifest(m) {
-  if (!m || typeof m !== 'object') return false
-  if (m.schemaVersion !== SCHEMA_VERSION) return false
-  // ⚠️ P-S47（S4）：`contentVersion` 必须**本身就是有限数字**，不再先强转。
-  //    旧写法 `Number.isFinite(Number(m.contentVersion))` 会把 null / '' / false 强转成 0 而放过
-  //    （QA 记为 R-2「偏松」）。虽然下游 `isNewer` 是第二道闸（0 不大于任何已见版本 → 不写库），
-  //    端到端仍安全，但「形态层就不该放过非数字」是更好的契约：越早拒绝，越不容易在
-  //    未来某个新调用点上被绕过。构建脚本产出的恒为数字 → 收紧不会误杀。
-  if (typeof m.contentVersion !== 'number' || !Number.isFinite(m.contentVersion)) return false
-  if (!m.units || typeof m.units !== 'object' || Array.isArray(m.units)) return false
-  return true
-}
 
 /**
  * 把一个分片整理成可落缓存的条目（纯函数，便于单测直接注入 fixture）
@@ -162,59 +98,6 @@ export function buildShardEntry(unitKey, unit, shard) {
 /** 取 DB 访问器（pinia 未激活时抛，调用方已兜住） */
 function dbStore() {
   return useStudyDbStore()
-}
-
-/**
- * 计算本轮「待拉集合」（**纯函数**，S4-2 抽出，便于单测直接断言）
- *
- * 三种模式（红线 4：闸门语义**不变**，本函数只多了一个分支）：
- *  - `newer`：远程版本**严格大于**本地已见版本 → 以**远程清单**为准，取「哈希变了」的单元；
- *             同时**丢弃**旧 `pendingUnits`（那些单元在本轮 changedKeys 里必然再次入选，
- *             两处并存会导致同一片被拉两次）。
- *  - `heal` ：版本等值/更旧**但** `pendingUnits` 非空 → **同版本自愈**：只用 pending 里
- *             **已捕获**的 `{unitKey, path, hash, version}` 当坐标，**不读远程 manifest.units**
- *             —— 2026-10-15 事故里线上清单可能已不可达/旧内容，依赖它自愈等于没有自愈。
- *  - `skip` ：版本等值/更旧且待重试集为空 → 维持 S2 行为（一片都不拉，返回 not-newer）。
- *
- * @param {object} manifest 远程清单（仅 newer 模式用到它的 units/contentVersion）
- * @param {object|null} meta 本地 content_meta 记录（含 units / contentVersion / pendingUnits）
- * @returns {{mode: 'newer'|'heal'|'skip', targets: Array<{unitKey: string, path: string,
- *   hash: string, version: number, attempts: number}>}}
- */
-export function computeRetrySet(manifest, meta) {
-  const cachedUnits = (meta && meta.units) || {}
-  const pending = Array.isArray(meta?.pendingUnits) ? meta.pendingUnits : []
-
-  if (isNewer(manifest?.contentVersion, meta?.contentVersion ?? null)) {
-    const targets = Object.keys(manifest.units || {})
-      .filter((k) => !cachedUnits[k] || cachedUnits[k].hash !== manifest.units[k].hash)
-      .map((k) => ({
-        unitKey: k,
-        path: manifest.units[k].path,
-        hash: manifest.units[k].hash,
-        version: Number(manifest.contentVersion),
-        attempts: 0
-      }))
-      // 无 path 的单元拉不了（清单坏项）→ 直接不进待拉集，也不留 pending
-      .filter((t) => typeof t.path === 'string' && t.path !== '')
-    return { mode: 'newer', targets }
-  }
-
-  if (pending.length > 0) {
-    const targets = pending
-      .filter((p) => p && typeof p.unitKey === 'string' && typeof p.path === 'string')
-      .map((p) => ({
-        unitKey: p.unitKey,
-        path: p.path,
-        hash: p.hash,
-        // 兼容早期记录：没存 version 时退回本地已见版本
-        version: Number.isFinite(Number(p.version)) ? Number(p.version) : Number(meta?.contentVersion),
-        attempts: Number(p.attempts) || 0
-      }))
-    return { mode: 'heal', targets }
-  }
-
-  return { mode: 'skip', targets: [] }
 }
 
 /**
