@@ -149,9 +149,38 @@ connect-src 'self' ipc: http://ipc.localhost https://520305.top;
 
 ## 5. 本次验证动作记录
 
-- 触发方式：推一个一次性测试 tag（`v0.3.1-precheck`）→ 命中 `on: push: tags: ['v*']`。
-  release job 的 `releaseDraft: true` 保证产物落在**草稿 release**（不公开）。
-- 验证点：android job 是否 success；APK 是否上传到草稿 release；日志里签名用的是
-  「正式 keystore」还是「临时 keystore」（回答 R-1）。
-- 清理方式：验证完删除该 tag 与草稿 release（`git push origin :refs/tags/<tag>` + 网页删 release）。
-- 结果：见 §6（构建完成后回填）。
+### 5.1 第一轮（tag `v0.3.1-precheck` @ `829ffab`）—— 四 job 全挂，暴露一个真 bug
+
+结果：`release`（macos / ubuntu / windows）+ `android` **四个 job 全部失败在「单元测试」步骤**，
+耗时 2–4 分钟（远小于正常构建时长 → 是早退，不是构建问题）。
+
+**根因（本地复现确认）**：`release.yml` 的 checkout 用默认 `depth=1` **浅克隆**，
+而三个守卫测试要 `git show <baseline>` / `git diff <baseline> HEAD` 对照基线提交
+（`tests/loadpage-remote-fallback.test.js:212` 的 `54300fa` 等）→ 基线提交不可解析 → `execSync` 抛错。
+本地按同口径 `git clone --depth 1 file://$PWD` 复现，一次命中：
+
+```
+fatal: ambiguous argument '54300fa': unknown revision or path not in the working tree.
+```
+
+⚠️ 这与 2026-10-15 CI 近 30 次全红是**同一个坑的第二个入口**：当时修的是 `ci.yml` 的 quality job，
+`release.yml` 一直漏改。**两个入口必须同口径**——已修：两处 checkout 补 `fetch-depth: 0`，
+并在两个 job 的测试前补 `npm run build:index`（否则干净检出下产物级测试 `skipIf` 静默跳过，
+等于发布链上从未执行）。
+
+**副产品（好消息）**：四个 job 都在测试步骤就退了，说明工具链安装、SDK/NDK、签名脚本这些
+「会不会装」的问题一个都没遇到——它们排在测试之后，还没轮到。
+
+### 5.2 第二轮（同 tag @ `7ef0960`，修 `fetch-depth` 后重跑）
+
+触发方式不变（推测试 tag → `on: push: tags: ['v*']`，产物落**草稿 release**，不公开）。
+验证点：① 四个 job 是否 success；② APK 是否上传到草稿 release；③ 签名用的是正式 keystore
+还是临时 keystore（回答 R-1）。结果见 §6。
+
+### 5.3 清理方式
+
+验证完删除 tag 与草稿 release：`git push origin :refs/tags/v0.3.1-precheck` + 网页删 release。
+
+---
+
+## 6. 结果（回填）
