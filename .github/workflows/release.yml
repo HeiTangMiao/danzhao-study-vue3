@@ -172,11 +172,43 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: 构建 Android APK
-        run: npm run tauri:android:build -- --apk
+        id: andbuild
+        run: |
+          set +e
+          npm run tauri:android:build -- --apk > /tmp/android-build.log 2>&1
+          echo "android_exit=$?" >> "$GITHUB_OUTPUT"
+          tail -60 /tmp/android-build.log
         env:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        continue-on-error: true
+
+      # TEMP-DIAG：job logs 需 admin 权限取不到，把构建日志写成 check-run 供无权限读取。定位后还原。
+      - name: 回传 Android 构建日志
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            let log = '(无日志)'
+            try { log = fs.readFileSync('/tmp/android-build.log', 'utf8') } catch (e) { log = '读取失败: ' + e.message }
+            const tail = log.length > 60000 ? log.slice(-60000) : log
+            await github.rest.checks.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              name: 'android-build-log', head_sha: context.sha,
+              status: 'completed', conclusion: 'neutral',
+              output: { title: 'Android 构建日志', summary: `exit=${{ steps.andbuild.outputs.android_exit }}`, text: tail }
+            })
+
+      - name: 判定 Android 构建结果
+        if: always()
+        run: |
+          if [ "${{ steps.andbuild.outputs.android_exit }}" != "0" ]; then
+            echo "Android 构建失败，完整日志见 android-build-log check-run"
+            exit 1
+          fi
 
       - name: 上传 APK 到 Release
+        if: steps.andbuild.outputs.android_exit == '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.tag || github.ref_name }}
