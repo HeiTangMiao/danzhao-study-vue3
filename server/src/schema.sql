@@ -1,6 +1,11 @@
 -- 账号同步系统表结构（PostgreSQL / PGlite 通用，同方言）
 -- 采用通用 key-value 同步模型：sync_items 一张表承载全部业务实体，
 -- 服务端不感知业务结构，客户端按 (entity, item_key) 增量推送/拉取。
+--
+-- ⚠️ 本文件的 `CREATE TABLE IF NOT EXISTS` 只能「建表」，**不能修补已存在但丢了约束的表**
+--    （2026-10-17 线上事故：迁移建出的表无主键/唯一/外键，之后每次启动都跳过创建）。
+--    约束与序列的自愈在 `src/db.js` 的 `repairSchema()` —— 改约束请同步改那一处，
+--    两处不一致时以 db.js 的 REQUIRED_CONSTRAINTS 为运行时真相源。
 
 -- 用户表
 CREATE TABLE IF NOT EXISTS users (
