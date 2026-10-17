@@ -29,6 +29,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    // 语法降级目标：对齐 src-tauri/tauri.conf.json 的 bundle.android.minSdkVersion=26
+    // （Android 8.0，出厂 WebView 约 Chromium 58-70）。
+    // ⚠️ 不设时 Vite 6 默认 baseline-widely-available（≈Chrome 107），esbuild 认为目标已支持
+    //    可选链 / 空值合并而**不降级** → 老 WebView 上属语法错误 → 启动白屏且无降级路径。
+    //    这是本项目唯一「没有任何自动化能拦、只有上真机才暴露」的失效模式，详见
+    //    docs/project-assessment-2026-10-17.md §3。
+    // 注：不能退到 'chrome80' —— 那正好是不降级的临界值，Chromium 58-70 仍会中招。
+    target: 'es2019',
     // 关闭 sourcemap，减小打包体积（Tauri 应用体积敏感）
     sourcemap: false,
     // 超过该体积的 chunk 才告警
