@@ -266,6 +266,13 @@ describe('isFillItem 形态判据', () => {
     expect(isFillItem({ question: 'a__b' })).toBe(false)
   })
 
+  it('例题（example）即使题干带 ______ 也不命中——它按设计走自评链路', () => {
+    // 2026-10-18 实证：computer_03_03 的例题题干含多个 ______，被误判成填空后
+    // extractCandidates 抽不出候选（答案为 `enable → configure terminal → ...` 多步序列）
+    // → 学员答对也判 miss。修法是把 example 排除出填空判据，而非放宽 extractCandidates。
+    expect(isFillItem({ type: 'example', question: '填空：`Switch>______`（进入特权模式）' })).toBe(false)
+  })
+
   it('健壮性：null / 非对象返回 false', () => {
     expect(isFillItem(null)).toBe(false)
     expect(isFillItem('fill')).toBe(false)

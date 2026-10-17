@@ -283,5 +283,10 @@ const FILL_BLANK_RE = /_{3,}/
 export function isFillItem(item) {
   if (!item || typeof item !== 'object') return false
   if (item.type === 'fill') return true
+  // 例题（example）按设计走**自评链路**——见 scripts/build-practice-bank.mjs:154-169：
+  // 「题干+答案天然适配自评链路，因此与 quiz/exam 一并入库」。其答案常为多步/开放式，
+  // extractCandidates 抽不出候选；若只因题干带 ______ 就当成填空自动判分，结果必是
+  // 「学员答对也判 miss」。故显式排除，让例题回到自评。
+  if (item.type === 'example') return false
   return typeof item.question === 'string' && FILL_BLANK_RE.test(item.question)
 }
