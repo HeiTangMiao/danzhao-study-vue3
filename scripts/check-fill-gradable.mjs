@@ -59,7 +59,6 @@ if (process.argv.includes('--selftest')) {
     q: '完成命令填空：`Switch>______`', a: 'enable → configure terminal → hostname SWA。'
   }]
   report(fake)
-  const n = report.length // 引用存在性（防止 tree-shaking 式的假调用）
   const real = collectBad()
   console.error(`--- 自检：人造坏样本 ${fake.length} 条已列出；真实数据扫描到 ${real.length} 条 ---`)
   console.error('✗ selftest 期望非零退出（证明守卫具备「红」的能力）')
