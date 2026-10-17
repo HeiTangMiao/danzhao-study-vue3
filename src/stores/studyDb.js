@@ -28,6 +28,7 @@
  */
 import { defineStore } from 'pinia'
 import * as notesDb from './db/notes'
+import * as bookmarksDb from './db/bookmarks'
 
 // IndexedDB 配置（库名保持兼容；版本号 v7 收敛单题作答记录 + S2 预留表）
 const DB_NAME = 'study_game_db'
@@ -606,44 +607,42 @@ export const useStudyDbStore = defineStore('studyDb', {
       return notesDb.getAllNotesRaw(db)
     },
 
-    // ===== 书签 =====
+    // ===== 书签 =====（实现已拆至 ./db/bookmarks.js，此处仅委托；对外行为不变）
 
     /** 获取某页书签（软删墓碑视为未收藏） */
     async getBookmark(pageKey) {
       await this.init()
-      const rec = await dbGet('bookmarks', pageKey)
-      return rec && !rec.deleted ? rec : null
+      return bookmarksDb.getBookmark(db, pageKey)
     },
 
     /** 保存书签（覆盖先前墓碑） */
     async saveBookmark(bookmark) {
       await this.init()
-      return dbPut('bookmarks', { ...bookmark, deleted: false })
+      return bookmarksDb.saveBookmark(db, bookmark)
     },
 
     /** 软删书签：置 deleted 墓碑，跨设备传播删除（取消收藏即触发） */
     async deleteBookmarkSoft(pageKey) {
       await this.init()
-      const rec = await dbGet('bookmarks', pageKey)
-      if (rec && !rec.deleted) await dbPut('bookmarks', { ...rec, deleted: true })
+      await bookmarksDb.deleteBookmarkSoft(db, pageKey)
     },
 
     /** 物理删除书签（仅供同步清理使用；UI 删除用 deleteBookmarkSoft） */
     async deleteBookmark(pageKey) {
       await this.init()
-      return dbDelete('bookmarks', pageKey)
+      return bookmarksDb.deleteBookmark(db, pageKey)
     },
 
     /** 获取全部书签（软删墓碑已过滤） */
     async getAllBookmarks() {
       await this.init()
-      return (await dbGetAll('bookmarks')).filter((b) => !b.deleted)
+      return bookmarksDb.getAllBookmarks(db)
     },
 
     /** 获取全部书签（含软删墓碑；仅供同步推送使用） */
     async getAllBookmarksRaw() {
       await this.init()
-      return dbGetAll('bookmarks')
+      return bookmarksDb.getAllBookmarksRaw(db)
     },
 
     // ===== 内容双轨缓存（content_cache / content_meta，v7 预留表，S2 消费） =====
