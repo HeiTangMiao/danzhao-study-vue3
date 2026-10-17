@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 S2 · 独立证伪 · 攻点②「单片失败不静默陈旧」
  *

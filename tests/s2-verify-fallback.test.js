@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 S2 · 独立证伪 · 攻点⑤ 回退链（红线 2 · 永不变砖）
  *

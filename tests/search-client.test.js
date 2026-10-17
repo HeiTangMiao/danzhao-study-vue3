@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 搜索客户端远程化（批 S5 · S5-3）
  *

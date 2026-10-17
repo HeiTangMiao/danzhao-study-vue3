@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 F0 · F0c4 solution 校验绊线 —— **独立复核**（QA）
  *

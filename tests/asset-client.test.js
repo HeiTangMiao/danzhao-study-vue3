@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * assetClient 共享编排原语（批 S5 · S5-2）
  *

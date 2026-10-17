@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 S2 · 独立证伪 · 攻点① 版本闸门 / 攻点⑦ P-S16 基址派生 / 攻点⑩ 非 UPSERT 静默忽略
  *

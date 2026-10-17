@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 S5 · QA 独立对抗验证 —— A 组：**读时闸门边界** + **原子写提交点**
  *

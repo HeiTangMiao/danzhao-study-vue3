@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * pendingUnits 同版本自愈（批 S4 · S4-2）
  *

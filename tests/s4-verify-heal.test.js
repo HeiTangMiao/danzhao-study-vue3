@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 S4 · 独立证伪 · 攻点① 同版本自愈闸门完整性（`contentClient.js: computeRetrySet/doRefresh`）
  *

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment node
 /**
  * 批 F · Fc4（F-3.3）schema 口径差异 5 处收敛 —— 逐项守卫
  *
