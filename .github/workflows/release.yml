@@ -12,10 +12,60 @@ on:
         default: 'v0.1.0'
 
 jobs:
+  # 发布门禁：与 ci.yml 的 quality job 同口径（lint / 生产构建 / 三个内容校验脚本）。
+  # 背景：此前 release 的 4 个 job 只跑 validate:content + npm test，**缺 lint 与
+  # check:content-remote / check:dup / check:single**——同一个内容缺陷，日常 CI 会红、
+  # 发版时却能出包（QA R5）。现统一由本 job 把关，4 个构建 job 改为 needs: [gate]
+  # 且不再重复跑校验（gate 通过才轮到构建）。
+  gate:
+    name: 发布门禁（与 CI quality 同口径）
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          # 全量历史：三个守卫测试要 git show/diff 对照基线（与 ci.yml quality 同口径）
+          fetch-depth: 0
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装前端依赖
+        run: npm ci
+
+      - name: 内容 Schema 校验
+        run: npm run validate:content
+
+      - name: 代码规范检查
+        run: npm run lint
+
+      # 先产出搜索/题库产物，否则产物级测试会 skipIf(!artifactsReady) 静默跳过
+      - name: 生成搜索/题库产物（供产物级测试）
+        run: npm run build:index
+
+      - name: 单元测试
+        run: npm test
+
+      - name: 生产构建
+        run: npm run build
+
+      - name: 内容快照自检
+        run: npm run check:content-remote
+
+      - name: 题库实质重复检测（含 --selftest）
+        run: npm run check:dup
+
+      - name: 单选题判分口径检测
+        run: npm run check:single
+
   release:
     name: 构建并发布 ${{ matrix.platform }}
     permissions:
       contents: write
+    needs: [gate]
     strategy:
       fail-fast: false
       matrix:
@@ -64,17 +114,8 @@ jobs:
       - name: 安装前端依赖
         run: npm ci
 
-      - name: 内容 Schema 校验
-        run: npm run validate:content
-
-      # 与 ci.yml 的 quality job 同口径：先产出搜索/题库产物，否则产物级测试会
-      # `skipIf(!artifactsReady)` 静默跳过（在干净检出里等于从未执行）
-      - name: 生成搜索/题库产物（供产物级测试）
-        run: npm run build:index
-
-      - name: 单元测试
-        run: npm test
-
+      # 校验（validate:content / lint / 单元测试 / 三个内容校验脚本 / 生产构建）
+      # 已由 gate job 统一把关；本 job 只负责构建与发布，不再重复跑。
       - name: 构建并发布
         uses: tauri-apps/tauri-action@v0
         env:
@@ -90,6 +131,7 @@ jobs:
     name: 构建 Android APK
     permissions:
       contents: write
+    needs: [gate]
     runs-on: ubuntu-24.04
     steps:
       - name: 检出代码
@@ -151,16 +193,7 @@ jobs:
       - name: 安装前端依赖
         run: npm ci
 
-      - name: 内容 Schema 校验
-        run: npm run validate:content
-
-      # 同 ci.yml：先产出，否则产物级测试静默跳过
-      - name: 生成搜索/题库产物（供产物级测试）
-        run: npm run build:index
-
-      - name: 单元测试
-        run: npm test
-
+      # 校验已由 gate job 统一把关；本 job 只负责 Android 构建与签名，不再重复跑。
       - name: 初始化 Android 工程
         run: npm run tauri:android:init
 
