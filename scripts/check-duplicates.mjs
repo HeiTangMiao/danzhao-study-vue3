@@ -13,13 +13,18 @@
  *   L3 题干主干 + 正确项文本（模糊）      → 只报「疑似」，必须人工确认（题干被微改，如加"Premiere 中"）
  *
  * 用法：
- *   node scripts/check-duplicates.mjs            # 全量检查
+ *   node scripts/check-duplicates.mjs            # 自检 + 全量检查
  *   node scripts/check-duplicates.mjs --quiet    # 只打印汇总
  *   node scripts/check-duplicates.mjs --l3-only  # 只看疑似
+ *   node scripts/check-duplicates.mjs --selftest # 只跑自检（证明判据真的会触发）
  *
  * 退出码：L1 或 L2 有命中 → 1（便于 CI 卡口）；否则 0
  *
  * 依赖：需先跑 `npm run build:practice` 生成题库产物
+ *
+ * 为什么必须有 --selftest：2026-10-17 评估实证，把 L1 分组键误加一个唯一字段后，
+ * 查重器**事实失效**（永远 0 命中），但退出码仍是 0、CI 全绿——「0 命中」与
+ * 「检测器坏了」在日志里完全无法区分。自检用人造样本证明三档判据都能触发。
  */
 
 import { readFileSync } from "node:fs";
@@ -45,8 +50,6 @@ const fuzzyStem = (q) =>
     .replace(/[（(]\u3000*[)）]/g, "")
     .replace(/[：:，,。.？?、；;]$/g, "");
 
-const load = (subject) => JSON.parse(readFileSync(join(BANK_DIR, `${subject}.json`), "utf8"));
-
 function group(items, keyFn) {
   const g = new Map();
   for (const it of items) {
@@ -58,16 +61,12 @@ function group(items, keyFn) {
   return g;
 }
 
-const fmt = (items) =>
-  items.map((x) => `${x.k}@${x.fk}`).join("  ||  ");
-
-let hardHits = 0; // L1 + L2
-let fuzzyHits = 0; // L3
-const quiet = process.argv.includes("--quiet");
-const l3only = process.argv.includes("--l3-only");
-
-for (const subject of SUBJECTS) {
-  const items = load(subject);
+/**
+ * 对单科条目跑三档检测（纯函数，供主流程与 --selftest 共用）
+ * @param {Array<object>} items 题库条目（紧凑键 q/o/ci/fk/k）
+ * @returns {Array<{level:'L1'|'L2'|'L3', verdict:string, items:Array, stem:string}>}
+ */
+function detect(items) {
   const report = [];
 
   // ---- L1：题干 + 选项（有序）----
@@ -80,7 +79,6 @@ for (const subject of SUBJECTS) {
       items: bucket,
       stem: norm(bucket[0].q),
     });
-    hardHits++;
   }
 
   // ---- L2：题干 + 正确项文本 ----
@@ -99,7 +97,6 @@ for (const subject of SUBJECTS) {
       items: bucket,
       stem: norm(bucket[0].q),
     });
-    hardHits++;
   }
 
   // ---- L3：题干主干 + 正确项文本（模糊，仅疑似）----
@@ -115,8 +112,105 @@ for (const subject of SUBJECTS) {
       items: bucket,
       stem: norm(bucket[0].q),
     });
-    fuzzyHits++;
   }
+
+  return report;
+}
+
+const fmt = (items) => items.map((x) => `${x.k}@${x.fk}`).join("  ||  ");
+
+// ════════════════════════════════════════════════════════════════
+// --selftest：用人造样本证明三档判据都能触发（防「检测器坏了却 0 命中」）
+// ════════════════════════════════════════════════════════════════
+function selftest() {
+  const mk = (k, fk, q, o, ci) => ({ k, fk, q, o, ci });
+  const cases = [
+    {
+      name: "L1 同文件重复（最严重）",
+      items: [
+        mk("a/0/0/0", "fileA", "下列正确的是？", ["对", "错"], 0),
+        mk("a/0/0/1", "fileA", "下列正确的是？", ["对", "错"], 0),
+      ],
+      expectLevel: "L1",
+      expectVerdict: "同文件重复（严重）",
+    },
+    {
+      name: "L1 跨文件重复",
+      items: [
+        mk("a/0/0/0", "fileA", "1+1 等于几？", ["1", "2"], 1),
+        mk("a/0/0/1", "fileB", "1+1 等于几？", ["1", "2"], 1),
+      ],
+      expectLevel: "L1",
+      expectVerdict: "跨文件重复",
+    },
+    {
+      name: "L2 跨文件·只换干扰项（正确项文本不变）",
+      items: [
+        mk("a/0/0/0", "fileA", "中国的首都？", ["北京", "上海"], 0),
+        mk("a/0/0/1", "fileB", "中国的首都？", ["北京", "广州"], 0),
+      ],
+      expectLevel: "L2",
+      expectVerdict: "跨文件重复（题干同、正确项同，干扰项被换过）",
+    },
+    {
+      name: "反向锚：无重复的干净样本不得误报",
+      items: [
+        mk("a/0/0/0", "fileA", "下列正确的是？", ["对", "错"], 0),
+        mk("a/0/0/1", "fileB", "另一道完全不同的题", ["甲", "乙"], 1),
+      ],
+      expectLevel: null,
+    },
+  ];
+
+  let failed = 0;
+  for (const c of cases) {
+    const report = detect(c.items);
+    if (c.expectLevel === null) {
+      if (report.length !== 0) {
+        console.error(`✗ ${c.name}：期望 0 命中，实际 ${report.length} 组 → ${fmt(report.flatMap((r) => r.items))}`);
+        failed++;
+      } else {
+        console.log(`✓ ${c.name}`);
+      }
+      continue;
+    }
+    const hit = report.find((r) => r.level === c.expectLevel && r.verdict === c.expectVerdict);
+    if (!hit) {
+      console.error(`✗ ${c.name}：期望命中 ${c.expectLevel}「${c.expectVerdict}」，实际 ${report.length} 组`);
+      for (const r of report) console.error(`    实得 [${r.level}] ${r.verdict}`);
+      failed++;
+    } else {
+      console.log(`✓ ${c.name} → [${hit.level}] ${hit.verdict}`);
+    }
+  }
+
+  if (failed > 0) {
+    console.error(`\n✗ 自检失败（${failed} 项）——查重判据可能已失效，「0 命中」不再可信！`);
+    process.exit(1);
+  }
+  console.log("\n✓ 自检通过：L1 同文件 / L1 跨文件 / L2 换干扰项均能触发，干净样本不误报。");
+  console.log("  （若哪天分组键被改坏，这里会先红，而不是让 CI 拿着「0 命中」放行）");
+}
+
+if (process.argv.includes("--selftest")) {
+  selftest();
+  process.exit(0);
+}
+
+const load = (subject) => JSON.parse(readFileSync(join(BANK_DIR, `${subject}.json`), "utf8"));
+
+const quiet = process.argv.includes("--quiet");
+const l3only = process.argv.includes("--l3-only");
+
+let hardHits = 0; // L1 + L2
+let fuzzyHits = 0; // L3
+
+for (const subject of SUBJECTS) {
+  const items = load(subject);
+  const report = detect(items);
+
+  hardHits += report.filter((r) => r.level !== "L3").length;
+  fuzzyHits += report.filter((r) => r.level === "L3").length;
 
   const shown = l3only ? report.filter((r) => r.level === "L3") : report;
   console.log(`\n===== ${subject}：${items.length} 题 | L1/L2 命中 ${report.filter((r) => r.level !== "L3").length} 组 | L3 疑似 ${report.filter((r) => r.level === "L3").length} 组 =====`);

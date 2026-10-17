@@ -17,7 +17,7 @@
     "tauri:android:build": "tauri android build",
     "tauri:android:init": "tauri android init",
     "validate:content": "node scripts/validate-content.mjs",
-    "check:dup": "node scripts/check-duplicates.mjs",
+    "check:dup": "node scripts/check-duplicates.mjs --selftest && node scripts/check-duplicates.mjs",
     "check:single": "node scripts/check-single-choice.mjs --selftest && node scripts/check-single-choice.mjs",
   "check:fill": "node scripts/check-fill-gradable.mjs",
     "build:practice": "node scripts/build-practice-bank.mjs",
