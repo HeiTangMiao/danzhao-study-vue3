@@ -7,6 +7,7 @@ node_modules/
 # Build outputs
 dist/
 dist-ssr/
+coverage/
 
 # 验证期临时产物（浏览器探针目录 / 临时构建配置 / 一次性脚本），不入库
 dist-probe*/

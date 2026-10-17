@@ -27,7 +27,17 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['src/composables/useSpacedReview.js', 'src/stores/studyDb.js']
+      // 覆盖范围 = 全部逻辑代码。此前只列 2 个文件，导致「哪些模块没测」只能靠
+      // 引用关系粗估（QA R5 实证：137 个代码文件中 55 个未被任何测试文本引用）。
+      // 排除 src/content/**：那是纯数据 ESM（零 import 的页面/题库数据），
+      // 测它没有意义，且会把数字稀释到看不出问题。
+      include: ['src/**/*.{js,vue}'],
+      exclude: [
+        'src/content/**',
+        'src/types/**',        // 仅类型声明
+        'src/assets/**',       // 静态资源
+        '**/*.config.js'
+      ]
     }
   }
 })
