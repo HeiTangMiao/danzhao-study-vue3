@@ -101,3 +101,44 @@ describe('example 题目：不受该绊线影响（example 走独立分支且本
     expect(errors.join('\n')).not.toContain(MSG)
   })
 })
+
+describe('quiz/exam 题目：correctIndex 越界绊线', () => {
+  // 背景：correctIndex 越界 = 该题**静默不可判分**（判分端取不到有效正确项，学员答对也判错），
+  // 属于最难自查的缺陷类型。
+  // 2026-10-17 项目评估实证：把 validateBlock.js:75 的越界判据改成 `if (false)` 后，
+  // 全仓 16 个测试文件 / 247 个用例**仍然全绿** —— 规则本身有效，却没有任何测试守护它。
+  // 本组用例即为此而加，把这条规则从「有效但无人守」变成「有人守」。
+
+  const item = (correctIndex) => ({
+    type: 'single',
+    difficulty: 'basic',
+    question: '1+1=?',
+    options: ['1', '2'],
+    correctIndex,
+    answer: '**B**。2'
+  })
+
+  it('correctIndex = -1（负值）→ 报「correctIndex 越界」', () => {
+    const errors = validateBlock({ type: 'quiz', items: [item(-1)] })
+    expect(errors.join('\n')).toContain('correctIndex 越界')
+  })
+
+  it('★ correctIndex === options.length（末位越界，最易漏的一种）→ 报越界', () => {
+    // options 长度 2，合法下标只有 0/1；2 恰好越界一位，是最典型的笔误
+    const errors = validateBlock({ type: 'quiz', items: [item(2)] })
+    expect(errors.join('\n')).toContain('correctIndex 越界')
+  })
+
+  it('exam 题同样受该绊线约束（前缀为「模拟卷题目」）', () => {
+    const errors = validateBlock({ type: 'exam', items: [item(9)] })
+    expect(errors.join('\n')).toContain('模拟卷题目[0] correctIndex 越界')
+  })
+
+  it('反向锚：correctIndex 取合法边界 0 与 length-1 → 无该错', () => {
+    for (const ci of [0, 1]) {
+      const errors = validateBlock({ type: 'quiz', items: [item(ci)] })
+      expect(errors.join('\n')).not.toContain('correctIndex 越界')
+      expect(errors).toEqual([])
+    }
+  })
+})
