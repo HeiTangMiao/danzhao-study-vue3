@@ -15,18 +15,25 @@ import { adminRoutes } from './admin.js'
  * @param {object} opts
  * @param {boolean} [opts.logger=false] 是否开启日志
  * @param {string} [opts.jwtSecret] JWT 签名密钥
- * @param {string[]} [opts.allowedOrigins] CORS 白名单；留空则放行任意来源（仅限本地/测试）
+ * @param {string[]|null} [opts.allowedOrigins] CORS 白名单。
+ *   - `null`（默认，未显式传入）→ 放行任意来源，仅限本地开发与测试便利；
+ *   - `[]`（显式配置为空）→ **拒绝一切跨域**；
+ *   - 非空数组 → 严格按白名单放行。
+ *   ⚠️ 之所以区分 null 与 []：index.js 的 ALLOWED_ORIGINS 由环境变量 split+filter(Boolean) 得到，
+ *      若线上把 ALLOWED_ORIGIN 配成空串，结果正是 `[]`。若沿用「空表即放行」，
+ *      一次配置失误就会让服务静默对所有来源开放——故空表必须意味着拒绝。
  */
-export async function createApp({ logger = false, jwtSecret = 'dev-secret-change-me', allowedOrigins = [] } = {}) {
+export async function createApp({ logger = false, jwtSecret = 'dev-secret-change-me', allowedOrigins = null } = {}) {
   const app = Fastify({ logger })
 
   await app.register(cors, {
     origin: (origin, cb) => {
-      // 无 Origin（同源/服务端请求）或来源命中白名单（或未配置白名单）→ 放行
-      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-        return cb(null, true)
-      }
-      return cb(null, false)
+      // 无 Origin（同源 / 服务端到服务端请求）→ 一律放行
+      if (!origin) return cb(null, true)
+      // 未显式配置白名单 → 放行任意（本地 / 测试便利）
+      if (allowedOrigins === null || allowedOrigins === undefined) return cb(null, true)
+      // 已显式配置（含空数组）→ 严格按白名单；空数组 = 拒绝一切跨域
+      return cb(null, allowedOrigins.includes(origin))
     }
   })
   await app.register(jwt, { secret: jwtSecret })
