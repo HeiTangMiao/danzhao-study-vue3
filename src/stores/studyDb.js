@@ -27,6 +27,7 @@
  *        content_cache / content_meta 两表（形状已定稿，空表零成本，避免 S2 再升 v8）
  */
 import { defineStore } from 'pinia'
+import * as notesDb from './db/notes'
 
 // IndexedDB 配置（库名保持兼容；版本号 v7 收敛单题作答记录 + S2 预留表）
 const DB_NAME = 'study_game_db'
@@ -270,6 +271,20 @@ function dbClear(storeName) {
     r.onsuccess = () => resolve()
     r.onerror = () => reject(r.error)
   })
+}
+
+/**
+ * 数据访问辅助对象 —— 供各域子模块（src/stores/db/*）使用。
+ * 域模块只认这个接口、不直接碰 IndexedDB，因此可独立阅读与测试。
+ */
+const db = {
+  get: dbGet,
+  put: dbPut,
+  del: dbDelete,
+  getAll: dbGetAll,
+  add: dbAdd,
+  clear: dbClear,
+  putSynced,
 }
 
 /** 获取日期字符串 YYYY-MM-DD（本地时区，用于每日统计/学习日志） */
@@ -553,44 +568,42 @@ export const useStudyDbStore = defineStore('studyDb', {
       return true
     },
 
-    // ===== 笔记 =====
+    // ===== 笔记 =====（实现已拆至 ./db/notes.js，此处仅委托；对外行为不变）
 
     /** 获取某页笔记（软删墓碑视为无笔记） */
     async getNote(pageKey) {
       await this.init()
-      const rec = await dbGet('notes', pageKey)
-      return rec && !rec.deleted ? rec : null
+      return notesDb.getNote(db, pageKey)
     },
 
     /** 保存 / 更新笔记（覆盖先前墓碑；对象须含 pageKey） */
     async saveNote(note) {
       await this.init()
-      return dbPut('notes', { ...note, deleted: false })
+      return notesDb.saveNote(db, note)
     },
 
     /** 软删笔记：置 deleted 墓碑，跨设备传播删除（清空正文即触发） */
     async deleteNoteSoft(pageKey) {
       await this.init()
-      const rec = await dbGet('notes', pageKey)
-      if (rec && !rec.deleted) await dbPut('notes', { ...rec, deleted: true })
+      await notesDb.deleteNoteSoft(db, pageKey)
     },
 
     /** 物理删除笔记（仅供同步清理使用；UI 删除用 deleteNoteSoft） */
     async deleteNote(pageKey) {
       await this.init()
-      return dbDelete('notes', pageKey)
+      return notesDb.deleteNote(db, pageKey)
     },
 
     /** 获取全部笔记（软删墓碑已过滤） */
     async getAllNotes() {
       await this.init()
-      return (await dbGetAll('notes')).filter((n) => !n.deleted)
+      return notesDb.getAllNotes(db)
     },
 
     /** 获取全部笔记（含软删墓碑；仅供同步推送使用） */
     async getAllNotesRaw() {
       await this.init()
-      return dbGetAll('notes')
+      return notesDb.getAllNotesRaw(db)
     },
 
     // ===== 书签 =====
