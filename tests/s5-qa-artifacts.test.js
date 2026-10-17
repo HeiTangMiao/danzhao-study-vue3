@@ -115,14 +115,38 @@ describe('D1 · CLI 层：半填充 / 半份缺失 → 非零退出 + 不落盘'
    * ⚠️ **不能**从仓库的 `public/` 拷：`search-body/` / `search-meta.json` / `content-remote/`
    *    都是 **gitignore 的构建产物** —— CI 的干净检出里根本没有，本地跑过构建才有。
    *    2026-10-17 实证：靠拷贝且 `!existsSync → continue` 静默跳过 → CI 上本组 6 例全红、
-   *    本地全绿（典型的「只在干净环境暴露」）。
-   *    故一律在沙箱里**重新生成**：沙箱自带 `src/` 与 `scripts/`，生成器零 npm 依赖。
+   *    本地全绿（典型的「只在干净环境暴露」）。故产物**必须在沙箱里产生**。
+   *
+   * 2026-10-18 提速：两个构建脚本的产出是**确定的**（同输入同输出），而本函数在 D1 的
+   * 8+ 个用例里被反复调用，每次都重跑一遍生成 —— 这是该文件单跑 123s 的主要来源。
+   * 改为：**首次真跑生成并备份到沙箱内** `.artifacts-cache/`，后续从缓存拷回。
+   * 缓存同样产生于沙箱内（不是从仓库 public/ 拷），上面那条坑依然不踩。
    */
+  const CACHE_ITEMS = ['public/practice-bank', 'public/search-body', 'public/search-meta.json']
+  let artifactsCache = null
+
+  /** 恢复单个产物项：目录用 copyInto，文件用 read/write（copyInto 只吃目录，search-meta.json 是文件） */
+  function restoreItem(src, dst) {
+    if (statSync(src).isDirectory()) copyInto(src, dst)
+    else writeFileSync(dst, readFileSync(src))
+  }
+
   function restoreArtifacts() {
+    if (artifactsCache) {
+      for (const item of CACHE_ITEMS) {
+        rmrf(join(dir, item))
+        restoreItem(join(artifactsCache, item), join(dir, item))
+      }
+      return
+    }
     const p = run(dir, ['scripts/build-practice-bank.mjs'])
     expect(p.status, `前置：题库产物生成失败：${p.out}`).toBe(0)
     const s = run(dir, ['scripts/build-search-index.mjs'])
     expect(s.status, `前置：搜索产物生成失败：${s.out}`).toBe(0)
+    artifactsCache = join(dir, '.artifacts-cache')
+    rmrf(artifactsCache)
+    mkdirSync(artifactsCache, { recursive: true })
+    for (const item of CACHE_ITEMS) restoreItem(join(dir, item), join(artifactsCache, item))
     // 刻意**不**清 content-remote：下一个用例要用「上一轮成功留下的清单」证明
     // 「拒绝之后盘上仍是旧的好清单，而不是被写了 null」
   }
