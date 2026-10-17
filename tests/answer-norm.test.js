@@ -273,6 +273,18 @@ describe('isFillItem 形态判据', () => {
     expect(isFillItem({ type: 'example', question: '填空：`Switch>______`（进入特权模式）' })).toBe(false)
   })
 
+  it('★ 显式声明非 fill 类型（solve/single/judge）即使题干带 ______ 也不命中', () => {
+    // 2026-10-18 二次实证：math_12 的 3 道题改标 type:"solve" 后，仍有 1 道因题干含
+    // ______ 被判 fill → 只拦 example 不够，必须「有显式类型就不是填空」。
+    expect(isFillItem({ type: 'solve', question: '直线的斜率为 ______。' })).toBe(false)
+    expect(isFillItem({ type: 'single', question: 'f(x)=______ 的值' })).toBe(false)
+    expect(isFillItem({ type: 'judge', question: '判断：______ 是否正确' })).toBe(false)
+  })
+
+  it('无 type 时才退回题干判据（覆盖省略 type 的存量 fill）', () => {
+    expect(isFillItem({ question: '函数 f(x)=______ 的值是多少' })).toBe(true)
+  })
+
   it('健壮性：null / 非对象返回 false', () => {
     expect(isFillItem(null)).toBe(false)
     expect(isFillItem('fill')).toBe(false)

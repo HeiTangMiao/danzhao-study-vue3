@@ -283,10 +283,15 @@ const FILL_BLANK_RE = /_{3,}/
 export function isFillItem(item) {
   if (!item || typeof item !== 'object') return false
   if (item.type === 'fill') return true
-  // 例题（example）按设计走**自评链路**——见 scripts/build-practice-bank.mjs:154-169：
-  // 「题干+答案天然适配自评链路，因此与 quiz/exam 一并入库」。其答案常为多步/开放式，
-  // extractCandidates 抽不出候选；若只因题干带 ______ 就当成填空自动判分，结果必是
-  // 「学员答对也判 miss」。故显式排除，让例题回到自评。
-  if (item.type === 'example') return false
+  // 显式声明了**非 fill** 类型 → 一律不是填空，不再看题干。
+  // 两个理由：① 例题（example）按设计走自评链路（见 scripts/build-practice-bank.mjs:154-169：
+  //    「题干+答案天然适配自评链路，因此与 quiz/exam 一并入库」）；
+  //    ② solve/single/judge 等同理——题干带 ______ 不代表要自动判分。
+  // 若不拦，`type:"solve"` 但题干含 ______ 的条目仍会被当填空，其答案常为多步/开放式，
+  // extractCandidates 抽不出候选（本文件见 `→` 或 `_{3,}` 直接 return [] 是有意守卫，
+  // 防「误判对」）→ 学员答对也判 miss。2026-10-18 实证：math_12 的 3 道改标 solve 后，
+  // 仍有 1 道因题干含 ______ 被判 fill，就是漏了这条。
+  if (item.type) return false
+  // 无 type 时才退回题干形态判据（覆盖省略 type 的存量 fill 条目）
   return typeof item.question === 'string' && FILL_BLANK_RE.test(item.question)
 }

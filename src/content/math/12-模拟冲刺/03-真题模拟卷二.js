@@ -94,17 +94,17 @@ export default {
           answer: "\\(T = \\frac{2\\pi}{3}\\)。"
         },
         {
-          type: "fill", difficulty: "advanced", score: 5,
+          type: "solve", difficulty: "advanced", score: 5,
           question: "在 \\(\\triangle ABC\\) 中，\\(a = 5\\)，\\(b = 7\\)，\\(\\angle C = 60^\\circ\\)，则边 \\(c =\\) ______。",
           answer: "由余弦定理 \\(c^2 = 25 + 49 - 2 \\times 5 \\times 7 \\times \\frac{1}{2} = 74 - 35 = 39\\)，故 \\(c = \\sqrt{39}\\)。"
         },
         {
-          type: "fill", difficulty: "advanced", score: 5,
+          type: "solve", difficulty: "advanced", score: 5,
           question: "直线 \\(2x - y + 1 = 0\\) 的斜率为 ______。",
           answer: "化为 \\(y = 2x + 1\\)，斜率 \\(k = 2\\)。"
         },
         {
-          type: "fill", difficulty: "sprint", score: 5,
+          type: "solve", difficulty: "sprint", score: 5,
           question: "已知 \\((2x - 1)^4\\) 的展开式中常数项为 ______。",
           answer: "通项 \\(T_{r+1} = C_4^r (2x)^{4-r} (-1)^r\\)，常数项需 \\(4 - r = 0\\) 即 \\(r = 4\\)，\\(T_5 = C_4^4 (2x)^0 (-1)^4 = 1\\)。"
         },
