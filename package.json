@@ -19,6 +19,7 @@
     "validate:content": "node scripts/validate-content.mjs",
     "check:dup": "node scripts/check-duplicates.mjs",
     "check:single": "node scripts/check-single-choice.mjs --selftest && node scripts/check-single-choice.mjs",
+  "check:fill": "node scripts/check-fill-gradable.mjs",
     "build:practice": "node scripts/build-practice-bank.mjs",
     "build:search": "node scripts/build-search-index.mjs",
     "build:index": "npm run build:practice && npm run build:search",
