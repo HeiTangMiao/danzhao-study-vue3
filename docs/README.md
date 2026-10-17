@@ -62,7 +62,7 @@
 | `project-assessment-2026-10-17.md` | 163 | 项目评估（2026-10-17） |
 | `content-release-runbook.md` | 159 | 内容发布流程 runbook（⚠️ 被测试读取，**禁止移动**） |
 | `教学方案_作品训练卡三遍法_PS-PR.md` | 151 | workcard（作品训练卡）三遍法的教学方案 |
-| `README.md` | 97 | 本文档——文档地图 |
+| `README.md` | 120 | 本文档——文档地图 |
 
 **`docs/proposals/`（2 份，均为活跃文档）**
 

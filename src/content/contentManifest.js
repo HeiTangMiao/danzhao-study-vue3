@@ -1,7 +1,7 @@
 /**
  * 内容快照 / 清单的形状定义（纯 ESM，零 import —— 构建脚本与未来浏览器 loader 两端共用）
  *
- * 背景（批 S1，见 docs/proposals/batch-s1-tasks.md）：
+ * 背景（批 S1，见 docs/archive/2026-10/batches/batch-s1-tasks.md）：
  *   双轨内容方案要把「内置内容」之外的**远程快照**也变成可拉取的静态资产 ——
  *   public/content-remote/ 下放一份 manifest.json（清单）+ 每单元一个分片 JSON。
  *   S1 只做**纯构建期**产出，零运行时影响（不接 loadPage / 不接 IndexedDB / 不接 CSP）。
