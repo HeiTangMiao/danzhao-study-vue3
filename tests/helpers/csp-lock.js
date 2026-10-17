@@ -6,7 +6,7 @@
  *   EvalError；本 helper 在运行期把全局 Function / eval 换成抛 EvalError 的桩，
  *   让「依赖 eval」的代码在单测里就炸出来，而不是等到打包成 .app。
  *
- * 定位：按需复用的可选增强，**非** P1-T5 的验收项（见 docs/csp-guard-plan.md §3.2）。
+ * 定位：按需复用的可选增强，**非** P1-T5 的验收项（见 docs/archive/2026-10/plans/csp-guard-plan.md §3.2）。
  *   画板类测试（tests/geometry-board.test.js）已有等价桩执行，可一行接入本 helper。
  *
  * 契约：无论 fn 抛不抛，finally 必须复原全局 Function / eval（防污染后续用例）。

@@ -68,7 +68,7 @@ vue3-refactor/
 │   └── main.js                 # 入口
 ├── scripts/validate-content.mjs # Schema 校验脚本
 ├── src-tauri/                  # Tauri 配置
-├── docs/COMPONENTS.md          # 组件文档
+├── docs/system_design.md       # 系统设计（组件事实以此为准）
 └── vite.config.js              # Vite 配置
 ```
 
@@ -228,7 +228,7 @@ npm run tauri:android:build  # 构建 APK
 | 低代码编辑器 | ✅ 完成 | 三栏布局 + 公式可视化编辑 + 模板面板 |
 | 公式编辑器增强 | ✅ 完成 | 16 个常用公式模板快捷插入 |
 | 类型定义 | ✅ 完成 | content.d.ts + site.d.ts + store.d.ts + composable.d.ts |
-| 组件文档 | ✅ 完成 | docs/COMPONENTS.md |
+| 组件文档 | ✅ 完成 | docs/system_design.md（旧 docs/COMPONENTS.md 已过时，2026-10-18 归档至 docs/archive/2026-10/audit/COMPONENTS.md） |
 | TypeScript 全量迁移 | 待办 | 当前使用 .d.ts 声明文件 |
 
 ## 技术选型说明

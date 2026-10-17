@@ -123,4 +123,4 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 - 路由是 **hash 模式**，Vite `base: './'`——这是 Tauri 本地文件协议所必需的。不要改成 history 模式。
 - `validate:content` + `lint --max-warnings 0` 是硬性 CI 关卡；提交前请在本地跑一遍。
 - 内容/UI 是中文；新增内容 block、站点条目和注释都保持同样风格。
-- `docs/COMPONENTS.md` 和 `MIGRATION-README.md` 记录了组件清单与迁移历史——对命名和意图理解很有用。
+- `MIGRATION-README.md` 记录了迁移历史——对命名和意图理解很有用。（旧组件清单 `docs/COMPONENTS.md` 已过时，2026-10-18 归档至 `docs/archive/2026-10/audit/COMPONENTS.md`；**组件事实一律以源码为准**，不要读归档里的清单。）

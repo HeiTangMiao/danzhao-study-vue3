@@ -34,7 +34,7 @@
  *      （多一份哈希实现 = 多一个「实现有 bug → 全页误判 → 全站回退内置」的失效模式）。
  *    - **翻案触发条件**（满足其一再议，届时只走纯 JS 方案并带 fail-safe 守卫）：
  *      出现真实「服务端自洽但错误」事故 / 发布链使用者不再可信 / 域名与证书信任被打破。
- *      详见 `docs/proposals/batch-s4-tasks.md` §4（A/B 对比与推荐）。
+ *      详见 `docs/archive/2026-10/batches/batch-s4-tasks.md` §4（A/B 对比与推荐）。
  *    - 反向锚：`tests/s4-verify-gate.test.js` 断言本文件与 `contentClient.js` 的**代码**
  *      （排除注释）不含 `crypto.subtle` / `createHash` 引用 —— 防「偷偷加重算」。
  *

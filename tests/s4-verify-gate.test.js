@@ -82,7 +82,7 @@ describe('B. 未引重算 sha256（S4-1 决议 = 维持不重算）', () => {
     const src = read('src/content/mergeContent.js')
     expect(src).toContain('S4 已复议')
     expect(src).toContain('维持「不重算」')
-    expect(src).toContain('docs/proposals/batch-s4-tasks.md')
+    expect(src).toContain('docs/archive/2026-10/batches/batch-s4-tasks.md')
   })
 
   it('全仓 src/** 没有引入 secure-context 探测桩（未走 A1 方案）', () => {

@@ -11,7 +11,7 @@
  *      L6 无「运行时拼接」import()（H1 口径，字面量 / 静态前缀模板 glob 豁免）
  * 另有 L5（tests/helpers/csp-lock.js）：运行时把 Function/eval 置为抛 EvalError，按需复用。
  *
- * 与 QA 守卫的分工（docs/csp-guard-plan.md §2.1）：本文件是**仓库 + 配置级**粗扫
+ * 与 QA 守卫的分工（docs/archive/2026-10/plans/csp-guard-plan.md §2.1）：本文件是**仓库 + 配置级**粗扫
  *      （L1-L4 + L6）；tests/jsxgraph-eval-guard.test.js 是 **jsxgraph 单库级**语义精查
  *      （R0-R3）。两者互补、不重叠，勿互相改写。
  *
@@ -263,7 +263,7 @@ const IMPORT_SCAN_FILES = SRC_FILES // 与 L3 同一份（含 .vue）
 
 /**
  * 判定一个 import() 实参文本是否为「构建期可静态分析」——真值为豁免，假值为违规。
- * 三档（H1 口径，见 docs/proposals/batch-e-tasks.md §0 更正 7）：
+ * 三档（H1 口径，见 docs/archive/2026-10/batches/batch-e-tasks.md §0 更正 7）：
  *   ① 字符串字面量 import('@/views/X.vue')                          → 豁免
  *   ② 模板字面量且**静态前缀含 '/'** import(`@/content/${a}/${b}.js`) → 豁免（Vite 静态 glob）
  *   ③ 裸变量 / `+` 拼接 import(x)                                    → 违规

@@ -3,7 +3,7 @@
  * 批 F · Fc4（F-3.3）schema 口径差异 5 处收敛 —— 逐项守卫
  *
  * 背景：schema / content.d.ts 与手写 validator（CI 唯一强制层）之间存在 5 处口径差，
- *      本次收敛每项的口径差（详见 docs/proposals/batch-f-tasks.md §F-3.3）。
+ *      本次收敛每项的口径差（详见 docs/archive/2026-10/batches/batch-f-tasks.md §F-3.3）。
  *      validator 是唯一的运行时强制层 —— 这些规则不钉死，内容侧写错只会静默降级渲染。
  *
  * 覆盖（与任务卡 5 项一一对应）：

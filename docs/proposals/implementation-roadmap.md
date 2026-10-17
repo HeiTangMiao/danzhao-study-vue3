@@ -16,7 +16,7 @@
 | **批 C** | 复习闭环（`/review` 复习器 + 卡点本 + due 判据收敛 + `reviewed` 语义拆分） | ✅ **已完成** | commit `dabc0aa`…`2f586ab`，QA 三轮 |
 | **批 D** | 限时仿真三档 + 学习计划三件套 + kp 组卷权重 + 句级 `strict` | ✅ **已完成** | commit `35f0027`…`dabcd5e`，QA 两轮 |
 | **批 E** | P1 其余四项（CSP 护栏 / 自评三档 / 双轨进度 / 番茄分科 / 搜索覆盖题干） | ✅ **已完成**（QA 独立验证 0 缺陷，+41 用例） | commit `faecfae`…`acc049d`；QA 收编 `a5a141d` |
-| **P1-T5** | CSP 护栏（`system_design.md` §10；**方案已有**，见 `csp-guard-plan.md`） | ✅ **已完成**（并入批 E·E-0，含 L6 运行时拼接 import） | `tests/csp-guard.test.js` + `tests/helpers/csp-lock.js` |
+| **P1-T5** | CSP 护栏（`system_design.md` §10；**方案已归档**，见 `docs/archive/2026-10/plans/csp-guard-plan.md`） | ✅ **已完成**（并入批 E·E-0，含 L6 运行时拼接 import） | `tests/csp-guard.test.js` + `tests/helpers/csp-lock.js` |
 | **批 F0** | 来件响应热修（浏览态单选判分 / 深链 `05≡5` / `solution` 核实与绊线 / 判分·去重脚本接 CI） | ✅ **已完成**（含追加 F0c5 + F0c6；独立 QA 两轮 **774 用例全绿**、0 缺陷） | commit `8e2fad9`…`d4be892`；QA 收编 `3f68ec5`；报告 `batch-f0-qa-report.md` |
 | **批 F** | P2 其余 + 备案小项收拢 | ✅ **已完成并可标 ✅**：Fc2–Fc6 已推送；**QA Round 1/2 全过、0 缺陷**（Round 2 含对 lead 补丁的对抗复算，7 攻点）；收尾核实 F-3 六项全过；**C-1 遗留（19 块 lines→formulas 迁移）已于 10-14 由内容侧交付清零**（`6a60870`）；Fc1 已归档 | 任务卡 `batch-f-tasks.md`；报告 `batch-f-qa-report.md`；收尾 `batch-f-closeout-tasks.md`；已推送 `0dad4e2` |
 | **S1** | 内容快照/清单形状定义 + 发布脚本（**纯构建期、零运行时**） | ✅ **已完成并推送** | commits `2a35a5f`/`a095606`/`8cc2485`；任务卡 `batch-s1-tasks.md`；派工单 `batch-s1-workcard.md` |
@@ -37,8 +37,8 @@
 > 以下为原始规划正文，**批次划分未变**，但「待实施」类描述请以上方看板为准。
 
 > 上游输入：
-> - 《对内容侧 17 项需求的评审回应》`协同交流/02_功能侧回函/2026-10-09_对内容侧17项需求的评审回应.md`（17 项**全部受理**，3 处调整建议）
-> - 《内容扩展双轨方案》`docs/proposals/content-extension-dual-track.md`（S1–S5 **方案已定稿**，6 个决策点已全部拍板）
+> - 《对内容侧 17 项需求的评审回应》`协同交流/archive/2026-10/02_功能侧回函/2026-10-09_对内容侧17项需求的评审回应.md`（17 项**全部受理**，3 处调整建议；2026-10-18 随往来件归档）
+> - 《内容扩展双轨方案》`docs/archive/2026-10/plans/content-extension-dual-track.md`（S1–S5 **方案已定稿**，6 个决策点已全部拍板；2026-10-18 随 S1–S5 完工归档）
 > - 《功能与布局改进需求（内容侧提出）》`docs/功能与布局改进需求_内容侧提出.md`（需求原文，编号权威）
 >
 > **两条纪律贯穿全文**：① 不承诺日期，工作量只用 **S/M/L**，功能侧对内容侧的依赖一律标「**等待内容侧**」；② 数字与事实以代码/文档为准，不确定处标「待核实」。
@@ -281,7 +281,7 @@ flowchart TB
 
 ### 批 S —— 内容扩展双轨（并行轨，已定稿待实施）
 
-> 完整设计见 `docs/proposals/content-extension-dual-track.md`。此处只给**与主线的接口点**。
+> 完整设计见 `docs/archive/2026-10/plans/content-extension-dual-track.md`（2026-10-18 归档）。此处只给**与主线的接口点**。
 
 | 阶段 | 关键文件 | 与主线的接口 | 预估 | 状态 |
 |---|---|---|:--:|---|
