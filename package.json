@@ -27,7 +27,6 @@
     "clean:content-remote": "node scripts/clean-content-remote.mjs",
     "geogebra": "node scripts/fetch-geogebra.mjs",
   "test": "vitest run --pool=threads --maxWorkers=4",
-  "test:quick": "vitest run --pool=threads --maxWorkers=4 --exclude '**/node_modules/**' --exclude '**/dist/**' --exclude '**/s5-qa-{artifacts,base,docs,gate,degrade}.test.js' --exclude '**/{content-style,csp-guard,loadpage-remote-fallback,batch-f-verify-r2-guide,content-release-runbook}.test.js'",
   "test:watch": "vitest",
     "lint": "eslint src tests scripts --max-warnings 0",
     "lint:fix": "eslint src tests scripts --fix",
