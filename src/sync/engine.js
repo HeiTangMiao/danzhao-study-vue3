@@ -11,7 +11,18 @@ import { useAuthStore } from '@/stores/auth'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { api } from './api'
 
-const META_KEY = 'sync_meta_v1'
+/**
+ * 同步元信息的存储键。
+ *
+ * ⚠️ 必须带用户维度：deviceId / since 游标是**跟着账号走**的。若全局共用一个键，
+ *    A 的游标会被 B 拿去拉取 → B 拉到 A 的增量（或反之漏拉）。
+ *   未登录时用 anon 键，避免与任何账号的元信息互相覆盖。
+ */
+function metaKey() {
+  const auth = useAuthStore()
+  const uid = auth.user && auth.user.id != null ? String(auth.user.id) : null
+  return uid ? `sync_meta_v1:${uid}` : 'sync_meta_v1:anon'
+}
 
 // 业务实体 → IndexedDB 仓库与主键字段
 // 注：user_progress 已退役（完成状态由 page_progress 推导），不再参与同步
@@ -30,7 +41,7 @@ const ENTITIES = [
 function loadMeta() {
   let meta = null
   try {
-    const raw = localStorage.getItem(META_KEY)
+    const raw = localStorage.getItem(metaKey())
     if (raw) meta = JSON.parse(raw)
   } catch { /* 忽略损坏数据 */ }
   if (!meta || !meta.deviceId) {
@@ -44,7 +55,7 @@ function loadMeta() {
 
 function saveMeta(meta) {
   try {
-    localStorage.setItem(META_KEY, JSON.stringify(meta))
+    localStorage.setItem(metaKey(), JSON.stringify(meta))
   } catch { /* 存储不可用时忽略 */ }
 }
 

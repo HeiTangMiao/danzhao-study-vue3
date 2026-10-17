@@ -320,6 +320,21 @@ function genId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 }
 
+/**
+ * 参与同步的对象仓库名 —— 与 sync/engine.js 的 ENTITIES 一一对应。
+ * ⚠️ 两处必须同步维护：新增同步仓库时要同时改这里和 engine.js 的 ENTITIES。
+ * 用于「换账号时整库清理」，防止跨用户数据污染（详见 project-assessment-2026-10-17.md Top 1）。
+ */
+const SYNC_STORE_NAMES = [
+  'study_log',
+  'daily_stats',
+  'page_progress',
+  'error_book',
+  'notes',
+  'bookmarks',
+  'question_attempt'
+]
+
 export const useStudyDbStore = defineStore('studyDb', {
   actions: {
     // ===== 初始化 =====
@@ -327,6 +342,22 @@ export const useStudyDbStore = defineStore('studyDb', {
     /** 初始化数据库连接（幂等，多次调用安全） */
     async init() {
       await openDB()
+    },
+
+    /**
+     * 清空全部同步仓库（换账号隔离专用）。
+     *
+     * ⚠️ **会丢弃本机这些仓库的全部数据**（含未同步的进度）。调用方必须确保：
+     *   ① 确实发生了账号切换（旧 owner ≠ 新 userId），或
+     *   ② 用户已明确知晓并同意。
+     * 不清 content_cache / content_meta：那是设备本地派生数据（远程快照镜像），
+     * 与账号无关，且 engine.js 的 ENTITIES 本就不含它们。
+     */
+    async clearAllSyncedData() {
+      await this.init()
+      for (const name of SYNC_STORE_NAMES) {
+        await dbClear(name)
+      }
     },
 
     /**
