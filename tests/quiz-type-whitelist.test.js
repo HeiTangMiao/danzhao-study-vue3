@@ -8,8 +8,10 @@
  *    真正的关卡是手写 `src/utils/validateBlock.js`）。
  *
  * 本文件钉住两件事：
- *  ① quiz 块允许 solve —— 开放式 / 多步命令序列题应能改标 solve 走自评，
- *     否则它们被 isFillItem 判成填空而**学员答对也判 miss**（静默缺陷）。
+ *  ① 题型白名单**按块派生、去并集**（批 F Fc4 的设计决策）：quiz 不含 solve，
+ *     解答题归 exam / example 块。2026-10-18 曾试图给 quiz 加 solve 以解决
+ *     「多步命令序列题答对判错」，结果撞红本组与 validate-schema-convergence 的
+ *     item3 —— 说明这是**被测试守护的设计边界**，不是待修的 bug，已回滚。
  *  ② validateBlock 的 allowed **必须来自 schema**，不得另起一份硬编码枚举
  *     （否则改 schema 不生效，形同虚设）。
  */
@@ -22,12 +24,13 @@ const schema = JSON.parse(readFileSync(join(ROOT, 'schema/content-schema.json'),
 const validateSrc = readFileSync(join(ROOT, 'src/utils/validateBlock.js'), 'utf8')
 
 describe('题型白名单一致性', () => {
-  it('① quiz 块允许 solve 题型（开放式/多步命令题才能改标走自评）', () => {
+  it('① quiz 块不含 solve（按块派生、去并集：解答题归 exam/example）', () => {
     const quizTypes = schema.definitions.quizItem.properties.type.enum
-    expect(quizTypes, 'quiz 块枚举必须含 solve，否则开放性题目只能顶着 fill 被自动判分').toContain('solve')
+    expect(quizTypes).not.toContain('solve')
+    expect(quizTypes).toEqual(['single', 'judge', 'fill'])
   })
 
-  it('② exam 块允许 solve（与 quiz 口径一致）', () => {
+  it('② exam 块含 solve（解答题的正当归属）', () => {
     const examTypes = schema.definitions.examItem.properties.type.enum
     expect(examTypes).toContain('solve')
   })

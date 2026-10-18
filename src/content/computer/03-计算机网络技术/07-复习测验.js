@@ -171,31 +171,31 @@ export default {
       items: [
         {
           difficulty: "medium",
-          type: "solve",
+          type: "fill",
           question: "完成 SWA 配置命令填空：\n`Switch>______`（进入特权模式）\n`Switch#______`（进入全局模式）\n`Switch(config)#______`（更改设备名称为 SWA）",
           answer: "enable → configure terminal → hostname SWA。"
         },
         {
           difficulty: "medium",
-          type: "solve",
+          type: "fill",
           question: "完成 SWA 配置命令填空：\n`SWA(config)#______`（建立 VLAN 10）\n`SWA(config)#______`（进入端口 F0/1-10）\n`SWA(config-if-range)#______`（将端口 F0/1-10 划入 VLAN 10）",
           answer: "vlan 10 → interface range f0/1-10 → switchport access vlan 10。"
         },
         {
           difficulty: "medium",
-          type: "solve",
+          type: "fill",
           question: "完成 SWA 配置命令填空：\n`SWA(config)#______`（进入端口 F0/23-F0/24）\n`SWA(config-if)#______`（启用端口 trunk 模式）\n`SWA(config-if)#______`（加入链路组 1 并开启）",
           answer: "interface range f0/23-24 → switchport mode trunk → channel-group 1 mode on。"
         },
         {
           difficulty: "advanced",
-          type: "solve",
+          type: "fill",
           question: "完成 SWD 配置命令填空：\n`SWD(config)#______`（开启路由功能）\n`SWD(config)#______`（启用动态路由协议）\n`SWD(config-router)#______`（宣告版本号为 2）",
           answer: "ip routing → router rip → version 2。"
         },
         {
           difficulty: "advanced",
-          type: "solve",
+          type: "fill",
           question: "完成 RA 配置命令填空：\n`RA(config-router)#______`（取消自动汇总功能）\n`RA(config-router)#______`（宣告直连网络号 192.168.1.0）\n`RA(config-router)#______`（重发布默认路由）",
           answer: "no auto-summary → network 192.168.1.0 → redistribute static。"
         },
