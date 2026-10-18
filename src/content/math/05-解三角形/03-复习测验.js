@@ -100,6 +100,7 @@ export default {
         },
         {
           difficulty: "medium",
+          type: "solve",
           question: "在 \\(\\triangle ABC\\) 中，\\(A = 60°\\)，\\(b = 4\\)，\\(c = 3\\)，则边 \\(a =\\) ______。",
           answer: "由余弦定理 \\(a^2 = b^2 + c^2 - 2bc\\cos A = 16 + 9 - 2\\times 4\\times 3\\times\\frac{1}{2} = 25 - 12 = 13\\)，\\(a = \\sqrt{13}\\)。"
         },

@@ -111,6 +111,7 @@ export default {
         },
         {
           difficulty: "medium",
+          type: "solve",
           question: "已知 \"\\((a+1)(b-1) = 0\\)\" 的一个充分不必要条件是 ______（写出一个即可）。",
           answer: "答案不唯一，如 \"\\(a = -1\\)\" 或 \"\\(b = 1\\)\"。因为 \\(a=-1 \\Rightarrow (a+1)(b-1)=0\\)，但反之不成立。"
         }

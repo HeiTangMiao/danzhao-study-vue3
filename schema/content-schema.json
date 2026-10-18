@@ -100,7 +100,7 @@
       "required": ["question", "answer"],
       "properties": {
         "question": { "type": "string", "description": "题目内容" },
-        "type": { "type": "string", "enum": ["single", "judge", "fill"], "description": "题型：单选/判断/填空" },
+        "type": { "type": "string", "enum": ["single", "judge", "fill", "solve"], "description": "题型：单选/判断/填空/解答（解答走自评，不自动判分）" },
         "options": { "type": "array", "items": { "type": "string" }, "description": "选择题选项（可选）" },
         "correctIndex": { "type": "number", "description": "选择题正确选项索引（可选）" },
         "answer": { "type": "string", "description": "答案与解析" },

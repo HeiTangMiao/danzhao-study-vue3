@@ -34,7 +34,7 @@ export type BlockType =
 export type Difficulty = 'basic' | 'medium' | 'advanced' | 'sprint'
 
 /** 测验题型（quiz 不支持解答题 solve，与 schema quizItem.type 一致） */
-export type QuizQuestionType = 'single' | 'judge' | 'fill'
+export type QuizQuestionType = 'single' | 'judge' | 'fill' | 'solve'
 
 /** 模拟卷题型（exam 额外支持解答题 solve，与 schema examItem.type 一致） */
 export type ExamQuestionType = 'single' | 'judge' | 'fill' | 'solve'
