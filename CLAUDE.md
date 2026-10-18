@@ -42,7 +42,7 @@ npm run tauri:dev / tauri:build
 ```bash
 cp .env.example .env       # 首次使用；然后修改 JWT_SECRET
 npm run dev                # node --watch；未设置 DATABASE_URL 时使用 PGlite（文件库位于 server/data/）
-npm test                   # node --test（test/sync-core.test.js）
+npm test                   # node --test（4 个文件：api / sync-core / schema-repair / cors）
 node --env-file=.env src/index.js   # 生产式启动
 ```
 
@@ -50,7 +50,17 @@ node --env-file=.env src/index.js   # 生产式启动
 > 因此根目录的 `npm run lint` **不包含** `server/`，CI 的 server job 也只跑 `npm test`。
 > 已登记待办：若后端要纳入 lint，需先在 `server/` 内单独引入 ESLint 配置与依赖，不要直接把它塞进根 lint 命令（会配置冲突）。
 
-CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容校验 → lint → vitest → `vite build`，另外还有 Tauri 的 `cargo check` 和后端测试。CI 通过后有两个额外任务分别部署前端（零停机 rsync）和后端。
+CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行。主门禁是 `quality` job，共 9 个校验步骤：
+
+```
+validate:content → lint → build:index → npm test → build
+→ check:content-remote → check:dup → check:single
+```
+
+（⚠️ `build:index` 必须先跑：产物级测试若缺产物会 `skipIf` 静默跳过，等于从未执行。）
+另有 `tauri-check`（cargo check）与 `server`（后端 `npm test`）两个 job；CI 通过后 `deploy` / `deploy-backend` 分别部署前端（rsync）与后端。
+
+发版走 `release.yml`（打 `v*` tag 触发）：先跑 **`gate` job**（与 quality 同口径的 9 项门禁），通过后 3 个桌面平台 + Android 并行构建。详见 `docs/content-release-runbook.md`。
 
 ## 内容的工作方式（核心模型）
 
@@ -69,7 +79,7 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 这条规则在**三处**各自钉死，改任何一处都要同步另外两处：`src/content/pageMeta.js` 的 `PAGE_META_KEYS`（常量清单）、`scripts/validate-content.mjs` 的 `residue` 检查（CI 关卡，命中即 `errorCount += residue.length`）、`schema/content-schema.json` 顶层 `required`（**只有 `["blocks"]`**——那 6 个元信息键保留在 `properties` 里但全部标了 `deprecated: true`，标记为遗留字段，**绝不是必填**）。
 另注意：校验器**不跑通用 JSON-Schema 引擎**，走的是 `src/utils/validateBlock.js` 的自定义规则（schema 只被用来派生类型白名单 / 难度 / 题型枚举），所以改了 schema 不等于改了校验口径——语义规则要改 `validateBlock.js`。
 
-- Block 结构由 `schema/content-schema.json` 约束（22 种类型：mindmap / objectives / knowledge / formula / table / warning / tip / example / quiz / diagram / errorfocus / strategy / exam / columns / group / layout / steps / summary / compare / vocab / code / cloze）。该 schema 是**类型白名单的唯一真相源**，validator 的白名单从它派生，`tests/block-registry.test.js` 负责钉死它与渲染注册表 `registry.js`、`.d.ts` 三者一致。
+- Block 结构由 `schema/content-schema.json` 约束（**23 种**，含 `workcard`）。⚠️ **类型清单本身不要抄在这里**——唯一真相源是 `src/components/blocks/blockTypes.js` 的 `BLOCK_TYPES_META`（当前 23 个），`tests/block-registry.test.js` 负责钉死它与 `registry.js`、`schema`、`.d.ts` 四者一致。改任何一处漏改其它，CI 立即失败。
   新增类型 = schema 加 allOf 分支（+ 子对象 definition）+ 新建组件 + `registry.js` / `blockTypes.js` 各加一行 + 同步 `.d.ts`；校验白名单会自动跟随，不要再手写字段表。
 - `UnitView.vue` 把路由参数解析为 学科/单元/fileIndex，再动态导入内容文件，因此**每个内容文件都是独立的懒加载 chunk**（139 个页面）。内容文件需自包含；每个页面文件都单独打包发布。
 - **`site.js` 的 `files[]` 数组顺序就是 `fileIndex`**，直接决定 URL 与历史进度语义——**绝不可重排**，只能追加。
@@ -89,8 +99,9 @@ CI（`.github/workflows/ci.yml`）在每次推送到 `main` 时运行：内容�
 
 ## 数据层与 store
 
-- 单一 IndexedDB 数据库 **`study_game_db`（v6）**，由 `src/stores/studyDb.js`（一个提供 CRUD actions 的 Pinia store）打开并封装。Object store：`study_log`、`daily_stats`、`page_progress`、`error_book`、`notes`、`bookmarks`（`user_progress` 见下条）。
-- **Schema 演进规则：** 新增/重命名 store 时，要升 `DB_VERSION` 并按 `oldVersion` 添加对应的 `onupgradeneeded` 分支——`DB_NAME` 保持不变以兼容旧数据（历史升级分支保留，供老安装包升级用）。已知版本：v5 删除了遗留的 `achievements` store；**v6** 去掉了 `error_book` / `study_log` 的自增主键（改由业务层生成 UUID，避免跨设备撞键）并引入软删墓碑 `deleted`。
+- 单一 IndexedDB 数据库 **`study_game_db`（v7）**，由 `src/stores/studyDb.js`（一个提供 CRUD actions 的 Pinia store）打开并封装。Object store：`study_log`、`daily_stats`、`page_progress`、`error_book`、`notes`、`bookmarks`、`question_attempt`、`content_cache`、`content_meta`（`user_progress` 见下条）。
+- **Schema 演进规则：** 新增/重命名 store 时，要升 `DB_VERSION` 并按 `oldVersion` 添加对应的 `onupgradeneeded` 分支——`DB_NAME` 保持不变以兼容旧数据（历史升级分支保留，供老安装包升级用）。已知版本：v5 删除了遗留的 `achievements` store；v6 去掉了 `error_book` / `study_log` 的自增主键（改由业务层生成 UUID，避免跨设备撞键）并引入软删墓碑 `deleted`；**v7** 新增 `question_attempt`（单题作答记录）并预留 `content_cache` / `content_meta`（S2 内容双轨，空表零成本，避免再升 v8）。
+  ⚠️ 参与同步的 store 清单见 `studyDb.js` 的 `SYNC_STORE_NAMES`——与 `src/sync/engine.js` 的 `ENTITIES` **两处必须同步维护**。
 - **`user_progress` 已退役**：v4 分支里那个 store 仍会被创建（兼容老库），但代码已不再读写它——完成状态改由 `page_progress` 推导，导入/导出也不再包含它。不要再用它做新的进度功能。
 - 功能类组合式函数（`useNotes`、`useBookmarks`、`useSpacedReview`、`usePomodoro`、`useTheme` 等）都是薄封装，内部调用 `studyDb` 的 actions。
 - `src/stores/progress.js` 是**只读缓存**：它维护 `学科→单元→fileIndex` 的完成度快照，唯一数据源是 `studyDb` 的 `page_progress`（完成语义 = 访问过，测验/模拟卷页还需已交卷）。写入侧是 `markPageVisited` / `recordTest`，进度变化后调 `refresh()` 重建快照；它不再持久化到 `user_progress`。
