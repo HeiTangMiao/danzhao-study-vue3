@@ -6,6 +6,7 @@ import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { createApp } from '../src/app.js'
 import { initDB, closeDB, query } from '../src/db.js'
+import { createDbStore, DEFAULT_RULES } from '../src/rateLimit.js'
 
 let app
 
@@ -132,4 +133,160 @@ test('keyset 游标：同毫秒时间戳越过首拉最后一条的行不丢', a
   const second = await head(first.cursor)
   const keys2 = second.changes.map((c) => c.key)
   assert.deepEqual(keys2, ['d'])
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 认证限流的 HTTP 级集成用例
+//
+// ⚠️ 为什么放在本文件而不是新建 rate-limit.test.js 里：这些用例必须用**真库**
+//    （store 走 createDbStore(query)），而 PGlite 的数据目录 server/data/ 不能被两个
+//    进程同时打开 —— `node --test` 默认并发跑文件，新建文件会随机失败。本文件已经
+//    独占该库，且同文件内串行，故追加在这里。
+//
+// ⚠️ rate-limit.test.js 用的是注入式假 store，只能证明**限流器逻辑**对；这里用真库
+//    才能证明 HIT_SQL 在真 PostgreSQL 上那四条分支也对 —— 生产走的正是这条路径。
+//    另外这里的「放行」是真正的 200（假 store 那边只能断言「不是 429」）。
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** 开启限流的 app：trustProxy 必填，否则 IP 维度会被整体跳过（fail-open） */
+let guardedApp
+
+/** 每个用例前清空限流桶，避免用例之间互相污染 */
+async function resetGuards() {
+  await query('TRUNCATE auth_guard')
+}
+
+before(async () => {
+  guardedApp = await createApp({
+    jwtSecret: 'test-secret',
+    trustProxy: '127.0.0.1',
+    rateLimit: {
+      store: createDbStore(query),
+      config: DEFAULT_RULES,
+      trustProxy: '127.0.0.1'
+    }
+  })
+})
+
+after(async () => {
+  await guardedApp?.close()
+})
+
+test('限流默认关闭：连续注册 12 个账号全部 200（阈值 10/小时，第 11 次若被限会 429）', async () => {
+  // 用文件顶部那个**未传 rateLimit** 的 app：一旦有人把默认值改成开启，
+  // 「注册第 11 个」就会 429，本文件的既有用例也会连带变红。
+  for (let i = 1; i <= 12; i++) {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/auth/register',
+      payload: { username: `guard${i}`, password: 'secret123', email: `guard${i}@t.co` }
+    })
+    assert.equal(res.statusCode, 200, `第 ${i} 次注册应成功`)
+  }
+})
+
+test('IP 维度：同 IP 第 11 次 register → 429 + Retry-After；换 IP 立刻恢复 200', async () => {
+  await resetGuards()
+  const ip = '203.0.113.20'
+  const register = (remoteAddress, n) =>
+    guardedApp.inject({
+      method: 'POST',
+      url: '/api/auth/register',
+      remoteAddress,
+      payload: { username: `ipu${n}`, password: 'secret123', email: `ipu${n}@t.co` }
+    })
+
+  for (let i = 1; i <= DEFAULT_RULES.ip.register.limit; i++) {
+    assert.equal((await register(ip, i)).statusCode, 200, `第 ${i} 次注册应放行`)
+  }
+  const blocked = await register(ip, 11)
+  assert.equal(blocked.statusCode, 429)
+  const retryAfter = Number(blocked.headers['retry-after'])
+  assert.ok(retryAfter >= 1 && retryAfter <= DEFAULT_RULES.ip.register.windowSec)
+  assert.equal(blocked.json().retryAfter, retryAfter)
+
+  // 换 IP 立刻放行 → 证明是按 IP 分桶，而不是全站共用一个桶
+  assert.equal((await register('198.51.100.20', 12)).statusCode, 200)
+})
+
+test('账号维度：连续错 8 次后第 9 次 429；换 IP 仍是 429（挡得住换 IP 撞库）', async () => {
+  await resetGuards()
+  const reg = await guardedApp.inject({
+    method: 'POST',
+    url: '/api/auth/register',
+    remoteAddress: '198.51.100.30',
+    payload: { username: 'victim', password: 'secret123', email: 'victim@t.co' }
+  })
+  assert.equal(reg.statusCode, 200)
+
+  const wrongLogin = (remoteAddress) =>
+    guardedApp.inject({
+      method: 'POST',
+      url: '/api/auth/login',
+      remoteAddress,
+      payload: { username: 'victim', password: 'wrong-pass' }
+    })
+
+  // 前 8 次仍是 401（第 8 次落封禁但该次请求本身放行：若这次密码是对的还能登录）
+  for (let i = 1; i <= DEFAULT_RULES.account.failMax; i++) {
+    assert.equal((await wrongLogin('203.0.113.31')).statusCode, 401, `第 ${i} 次失败应仍是 401`)
+  }
+  assert.equal((await wrongLogin('203.0.113.31')).statusCode, 429, '第 9 次应被封禁挡住')
+  // 换一个全新 IP：账号维度的 key 不含 IP，所以撞库照样被挡
+  assert.equal((await wrongLogin('198.51.100.99')).statusCode, 429, '换 IP 也绕不过账号封禁')
+})
+
+test('账号维度：封禁到期后恢复；登录成功即清零', async () => {
+  await resetGuards()
+  const reg = await guardedApp.inject({
+    method: 'POST',
+    url: '/api/auth/register',
+    remoteAddress: '198.51.100.40',
+    payload: { username: 'victim2', password: 'secret123', email: 'victim2@t.co' }
+  })
+  assert.equal(reg.statusCode, 200)
+
+  const login = (remoteAddress, password) =>
+    guardedApp.inject({
+      method: 'POST',
+      url: '/api/auth/login',
+      remoteAddress,
+      payload: { username: 'victim2', password }
+    })
+
+  for (let i = 1; i <= DEFAULT_RULES.account.failMax; i++) {
+    assert.equal((await login('203.0.113.41', 'wrong-pass')).statusCode, 401)
+  }
+  assert.equal((await login('203.0.113.41', 'wrong-pass')).statusCode, 429)
+
+  // 把 blocked_until 往前拨 = 等价于干等 15 分钟（sleep 会让这条用例慢到没人愿意跑）
+  await query(`UPDATE auth_guard SET blocked_until = now() - interval '1 minute' WHERE key = $1`, ['victim2'])
+  assert.equal((await login('203.0.113.42', 'wrong-pass')).statusCode, 401, '封禁到期应恢复')
+  // 关键：此时计数必须已重置为 1，而不是接着 9 往上加（否则再错一次又被封 15 分钟）
+  const rows = await query('SELECT count, blocked_until FROM auth_guard WHERE kind = $1 AND key = $2', ['account', 'victim2'])
+  assert.equal(Number(rows[0].count), 1)
+  assert.equal(rows[0].blocked_until, null)
+
+  const ok = await login('203.0.113.43', 'secret123')
+  assert.equal(ok.statusCode, 200, '封禁解除后正确密码应能登录')
+  const after = await query('SELECT count FROM auth_guard WHERE kind = $1 AND key = $2', ['account', 'victim2'])
+  assert.equal(after.length, 0, '登录成功必须把失败计数清零')
+})
+
+test('账号维度不泄露账号存在性：不存在的账号连错 9 次同样 429', async () => {
+  await resetGuards()
+  const probe = () =>
+    guardedApp.inject({
+      method: 'POST',
+      url: '/api/auth/login',
+      remoteAddress: '203.0.113.50',
+      payload: { username: 'no-such-user', password: 'whatever-pass' }
+    })
+  // 若「账号不存在」不计数，429/401 的响应差异就成了一个免费的账号枚举探针
+  for (let i = 1; i <= DEFAULT_RULES.account.failMax; i++) {
+    assert.equal((await probe()).statusCode, 401, `第 ${i} 次应仍是 401`)
+  }
+  const blocked = await probe()
+  assert.equal(blocked.statusCode, 429, '不存在的账号也要被限流')
+  assert.ok(blocked.json().retryAfter > 0)
 })
