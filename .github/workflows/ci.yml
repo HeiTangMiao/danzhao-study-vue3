@@ -70,6 +70,11 @@ jobs:
       - name: 单选题判分口径检测
         run: npm run check:single
 
+      # 7 道历史题已登记脚本内 KNOWN 清单不报 → 当前实测全绿，接入后 CI 不会红；
+      # **新增**同类条目仍会被拦住，守卫价值不减。
+      - name: 填空可判性检测
+        run: npm run check:fill
+
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:

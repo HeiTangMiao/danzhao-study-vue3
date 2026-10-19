@@ -6,6 +6,7 @@
 import { randomUUID } from 'node:crypto'
 import { hash, verify } from '@node-rs/argon2'
 import { query } from './db.js'
+import { normalizeAccount, tooManyRequestsBody } from './rateLimit.js'
 
 const ACCESS_TTL = '15m'
 const REFRESH_TTL = '30d'
@@ -26,6 +27,21 @@ async function issueTokens(app, userId) {
 }
 
 export async function authRoutes(app) {
+  // 限流器由 app.js 在启用时 decorate；未启用（默认）时为 undefined → 下面一律可选调用，自动跳过。
+  // 账号维度**不能**走全局 onRequest：那时 body 还没解析，拿不到 username。
+  const limiter = app.rateLimiter
+
+  /** 账号维度闸门：该账号是否正处于封禁期（只读，不自增） */
+  async function accountGuard(req, reply) {
+    if (!limiter) return
+    const verdict = await limiter.checkAccount(req.body?.username)
+    if (verdict.allowed) return
+    return reply
+      .code(429)
+      .header('Retry-After', String(verdict.retryAfter))
+      .send(tooManyRequestsBody(verdict.retryAfter))
+  }
+
   // 注册
   app.post('/api/auth/register', async (req, reply) => {
     const { username, password, email } = req.body || {}
@@ -52,18 +68,30 @@ export async function authRoutes(app) {
   })
 
   // 登录（支持用户名或邮箱）
-  app.post('/api/auth/login', async (req, reply) => {
+  app.post('/api/auth/login', { preHandler: accountGuard }, async (req, reply) => {
     const { username, password } = req.body || {}
     if (!username || !password) return reply.code(400).send({ error: '缺少用户名或密码' })
+
+    // 账号 key 归一化后记账：账号不存在时也要记，否则 429/401 的差异会泄露账号是否存在
+    const account = normalizeAccount(username)
 
     const rows = await query('SELECT * FROM users WHERE username = $1 OR email = $1', [
       String(username).trim()
     ])
     const user = rows[0]
-    if (!user) return reply.code(401).send({ error: '用户名或密码错误' })
+    if (!user) {
+      await limiter?.recordFailure(account)
+      return reply.code(401).send({ error: '用户名或密码错误' })
+    }
 
     const ok = await verify(user.password_hash, String(password))
-    if (!ok) return reply.code(401).send({ error: '用户名或密码错误' })
+    if (!ok) {
+      await limiter?.recordFailure(account)
+      return reply.code(401).send({ error: '用户名或密码错误' })
+    }
+
+    // 登录成功即清零：连可能残留的封禁一起解除（用户证明自己知道密码）
+    await limiter?.clearFailures(account)
 
     const tokens = await issueTokens(app, user.id)
     return {

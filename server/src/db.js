@@ -59,6 +59,13 @@ const REQUIRED_CONSTRAINTS = [
   {
     name: 'refresh_sessions_user_id_fkey',
     ddl: 'ALTER TABLE refresh_sessions ADD CONSTRAINT refresh_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE'
+  },
+  {
+    // auth_guard 的计数全靠 INSERT ... ON CONFLICT (kind,key,scope)：
+    // 一旦主键丢了（复制/恢复建表时很容易发生），/api/auth/* 会直接 42P10 报 500 ——
+    // 与 2026-10-17 /api/sync 那次是同一个失效形态，故一并纳入存在性自愈。
+    name: 'auth_guard_pkey',
+    ddl: 'ALTER TABLE auth_guard ADD CONSTRAINT auth_guard_pkey PRIMARY KEY (kind, key, scope)'
   }
 ]
 

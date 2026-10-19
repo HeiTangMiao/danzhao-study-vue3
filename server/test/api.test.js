@@ -13,6 +13,10 @@ before(async () => {
   await initDB()
   // 每轮清空（CASCADE 顺带清 devices / sync_items / refresh_sessions）
   await query('TRUNCATE users RESTART IDENTITY CASCADE')
+  // auth_guard 无外键 → CASCADE 带不到，必须单独清。
+  // （本文件用 createApp({jwtSecret}) 不传 rateLimit → 限流默认关闭、表不会被写；
+  //   显式清是为了「每轮干净」不依赖这条隐含前提 —— 将来谁开了限流也不会互相污染。）
+  await query('TRUNCATE auth_guard')
   app = await createApp({ jwtSecret: 'test-secret' })
 })
 

@@ -61,3 +61,22 @@ CREATE TABLE IF NOT EXISTS refresh_sessions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_refresh_sessions_user ON refresh_sessions (user_id);
+
+-- 认证限流表（服务于 register / login / refresh，逻辑见 src/rateLimit.js）
+-- kind='ip'      时 key=客户端 IP、scope=端点名，走固定窗口计数；
+-- kind='account' 时 key=归一化账号（小写去空白）、scope 恒为 ''，走「连续失败 + 封禁」。
+--   ⚠️ 账号维度用账号字符串而不是 user_id 做 key：账号不存在时也必须计数，
+--      否则「被限流 / 不被限流」的响应差异就成了免费的账号枚举探针。
+-- 主键特意取 (kind,key,scope) 而不用自增 id：计数走 INSERT ... ON CONFLICT，
+--   必须有唯一冲突目标才能在一条 SQL 里完成「累加 + 回读」，保证并发原子。
+CREATE TABLE IF NOT EXISTS auth_guard (
+  kind          TEXT NOT NULL,        -- 'ip' | 'account'
+  key           TEXT NOT NULL,        -- IP 串 / 归一化账号（小写去空白）
+  scope         TEXT NOT NULL,        -- 'register'|'login'|'refresh'；account 时恒为 ''
+  window_start  TIMESTAMPTZ NOT NULL, -- 窗口起点 / 首次失败时间
+  count         INTEGER NOT NULL DEFAULT 0,
+  blocked_until TIMESTAMPTZ,          -- 封禁到期（NULL = 未封禁）
+  PRIMARY KEY (kind, key, scope)
+);
+-- 定时清理只按 window_start 扫（PRUNE_SQL 会再单独保住仍在封禁中的行）
+CREATE INDEX IF NOT EXISTS idx_auth_guard_cleanup ON auth_guard (window_start);

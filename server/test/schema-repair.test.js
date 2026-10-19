@@ -33,6 +33,8 @@ CREATE TABLE sync_items (user_id INTEGER NOT NULL, entity TEXT NOT NULL, item_ke
   payload JSONB, updated_at TIMESTAMPTZ NOT NULL, deleted BOOLEAN NOT NULL DEFAULT false);
 CREATE TABLE refresh_sessions (jti TEXT NOT NULL, user_id INTEGER NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE auth_guard (kind TEXT NOT NULL, key TEXT NOT NULL, scope TEXT NOT NULL,
+  window_start TIMESTAMPTZ NOT NULL, count INTEGER NOT NULL DEFAULT 0, blocked_until TIMESTAMPTZ);
 `
 
 test('自愈前：破库确实复现了事故形态（ON CONFLICT 报 42P10、插入撞 id）', async () => {
@@ -67,11 +69,13 @@ test('repairSchema：补齐全部约束 + 序列归位，且幂等（二次运�
   await db.query('INSERT INTO users (id, username, password_hash) VALUES ($1,$2,$3)', [3, 'caicai', 'x'])
 
   const repaired = await repairSchema(db)
-  // 10 条约束 + 1 项序列归位
-  assert.equal(repaired.length, 11, `应补齐 10 条约束 + 序列归位，实际 ${repaired.length}：${repaired.join('、')}`)
-  assert.equal(repaired.filter((n) => !n.includes('_seq')).length, 10, '约束应为 10 条')
+  // 11 条约束（含 auth_guard_pkey）+ 1 项序列归位
+  assert.equal(repaired.length, 12, `应补齐 11 条约束 + 序列归位，实际 ${repaired.length}：${repaired.join('、')}`)
+  assert.equal(repaired.filter((n) => !n.includes('_seq')).length, 11, '约束应为 11 条')
   assert.ok(repaired.includes('users_pkey'))
   assert.ok(repaired.includes('sync_items_pkey'))
+  // 限流表的主键是 ON CONFLICT 的冲突目标，丢了就是 500，必须纳入自愈
+  assert.ok(repaired.includes('auth_guard_pkey'))
   assert.ok(repaired.includes('users_id_seq→3'), '序列应归位到 max(id)=3')
 
   // 幂等：再跑一遍不该补任何东西（否则每次启动都改库，日志会刷屏）
