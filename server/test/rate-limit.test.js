@@ -23,6 +23,7 @@ import {
   createRateLimiter,
   normalizeAccount,
   parseRateLimitConfig,
+  resolveRateLimitEnabled,
   tooManyRequestsBody
 } from '../src/rateLimit.js'
 
@@ -176,6 +177,47 @@ describe('纯函数：归一化 / 配置解析 / 429 响应体', () => {
     const body = tooManyRequestsBody(120)
     assert.equal(body.retryAfter, 120)
     assert.match(body.error, /120/)
+  })
+})
+
+describe('总开关 RATE_LIMIT 解析（运维「急着关掉」的路径必须真能关）', () => {
+  /** 返回 [结果, 收到的 warn 文案] */
+  function resolve(raw, defaultEnabled) {
+    const warns = []
+    const enabled = resolveRateLimitEnabled(raw, defaultEnabled, { warn: (m) => warns.push(m) })
+    return [enabled, warns]
+  }
+
+  test('留空 / undefined → 回退环境默认（生产默认开，其他环境默认关）', () => {
+    assert.equal(resolveRateLimitEnabled(undefined, true, { warn() {} }), true)
+    assert.equal(resolveRateLimitEnabled(null, false, { warn() {} }), false)
+    assert.equal(resolveRateLimitEnabled('', true, { warn() {} }), true)
+    assert.equal(resolveRateLimitEnabled('   ', true, { warn() {} }), true)
+  })
+
+  test('真值集合全部开启：1 / true / yes / on（含大小写与空白）', () => {
+    for (const raw of ['1', 'true', 'TRUE', ' yes ', 'On']) {
+      const [enabled, warns] = resolve(raw, false)
+      assert.equal(enabled, true, `RATE_LIMIT=${JSON.stringify(raw)} 应开启`)
+      assert.equal(warns.length, 0)
+    }
+  })
+
+  test('★ 假值集合全部关闭：0 / false / no / off —— 这是「开着就被打回」时唯一的逃生口', () => {
+    // 只认 '0' 的旧实现会让 false/no/off 静默落进「生产默认开启」，表现为关不掉
+    for (const raw of ['0', 'false', 'FALSE', ' no ', 'Off']) {
+      const [enabled, warns] = resolve(raw, true)
+      assert.equal(enabled, false, `RATE_LIMIT=${JSON.stringify(raw)} 必须能关掉`)
+      assert.equal(warns.length, 0)
+    }
+  })
+
+  test('无法识别的值：回退环境默认 + 打 warn（静默失败在这里是唯一的敌人）', () => {
+    const [enabled, warns] = resolve('maybe', true)
+    assert.equal(enabled, true)
+    assert.equal(warns.length, 1)
+    assert.match(warns[0], /RATE_LIMIT/)
+    assert.match(warns[0], /maybe/)
   })
 })
 

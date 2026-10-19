@@ -150,6 +150,7 @@ test('keyset 游标：同毫秒时间戳越过首拉最后一条的行不丢', a
 
 /** 开启限流的 app：trustProxy 必填，否则 IP 维度会被整体跳过（fail-open） */
 let guardedApp
+let guardedStore
 
 /** 每个用例前清空限流桶，避免用例之间互相污染 */
 async function resetGuards() {
@@ -157,11 +158,12 @@ async function resetGuards() {
 }
 
 before(async () => {
+  guardedStore = createDbStore(query)
   guardedApp = await createApp({
     jwtSecret: 'test-secret',
     trustProxy: '127.0.0.1',
     rateLimit: {
-      store: createDbStore(query),
+      store: guardedStore,
       config: DEFAULT_RULES,
       trustProxy: '127.0.0.1'
     }
@@ -271,6 +273,26 @@ test('账号维度：封禁到期后恢复；登录成功即清零', async () =>
   assert.equal(ok.statusCode, 200, '封禁解除后正确密码应能登录')
   const after = await query('SELECT count FROM auth_guard WHERE kind = $1 AND key = $2', ['account', 'victim2'])
   assert.equal(after.length, 0, '登录成功必须把失败计数清零')
+})
+
+test('prune 返回真实删除行数：PRUNE_SQL 必须带 RETURNING，且不能清掉仍在封禁中的行', async () => {
+  // 这条专门守 PRUNE_SQL 的 RETURNING：pg / PGlite 的 DELETE 不回行数，
+  // 少了 RETURNING 调用方永远拿到 0 → index.js 的清理日志就成了摆设。
+  await resetGuards()
+  await query(
+    `INSERT INTO auth_guard (kind, key, scope, window_start, count)
+     VALUES ('ip', '203.0.113.200', 'register', now() - interval '2 hours', 3)`
+  )
+  // 窗口同样已过期、但封禁还没到期 → 必须留下（否则一次清理就让被封账号提前出狱）
+  await query(
+    `INSERT INTO auth_guard (kind, key, scope, window_start, count, blocked_until)
+     VALUES ('account', 'keepme', '', now() - interval '2 hours', 8, now() + interval '10 minutes')`
+  )
+
+  assert.equal(await guardedStore.prune({ beforeMs: Date.now() }), 1)
+
+  const left = await query("SELECT key FROM auth_guard WHERE kind = 'account' AND key = 'keepme'")
+  assert.equal(left.length, 1, '封禁中的行必须保留')
 })
 
 test('账号维度不泄露账号存在性：不存在的账号连错 9 次同样 429', async () => {
