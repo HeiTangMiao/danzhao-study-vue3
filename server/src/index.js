@@ -4,7 +4,7 @@
  */
 import { createApp } from './app.js'
 import { initDB, closeDB, query } from './db.js'
-import { createDbStore, parseRateLimitConfig } from './rateLimit.js'
+import { createDbStore, parseRateLimitConfig, resolveRateLimitEnabled } from './rateLimit.js'
 
 const PORT = Number(process.env.PORT || 3000)
 const NODE_ENV = process.env.NODE_ENV || 'development'
@@ -52,10 +52,11 @@ const trustProxy = TRUST_PROXY_RAW.includes(',')
       .filter(Boolean)
   : TRUST_PROXY_RAW || false
 
-// 限流总开关：生产默认开启（线上正是需要它的地方）；其他环境靠 RATE_LIMIT 显式控制，
-// 便于本地「撞 429」验收。createApp 不传 rateLimit = 不启用，测试因此天然不受影响。
-const RATE_LIMIT_RAW = String(process.env.RATE_LIMIT || '').trim()
-const rateLimitEnabled = RATE_LIMIT_RAW === '1' ? true : RATE_LIMIT_RAW === '0' ? false : NODE_ENV === 'production'
+// 生产默认开启（线上正是需要它的地方）；其他环境靠 RATE_LIMIT 显式控制，便于本地「撞 429」验收。
+// createApp 不传 rateLimit = 不启用，测试因此天然不受影响。
+// 解析规则见 rateLimit.js 的 resolveRateLimitEnabled()：false/no/off 必须能真正关掉，
+// 无法识别的值打 warn —— 静默失败在这里是唯一的敌人。
+const rateLimitEnabled = resolveRateLimitEnabled(process.env.RATE_LIMIT, NODE_ENV === 'production', console)
 
 const app = await createApp({
   logger: true,

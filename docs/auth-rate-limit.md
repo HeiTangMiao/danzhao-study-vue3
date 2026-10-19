@@ -94,7 +94,13 @@ done; echo
 | `RATE_LOGIN_FAIL_MAX` | `8` | 账号连续失败上限 | 含「账号不存在」，两者必须同计数（见下） |
 | `RATE_LOGIN_BLOCK_MIN` | `15` | 账号封禁时长（分钟） | 同时充当失败计数的窗口长度 |
 | `RATE_*_PER_IP_WINDOW_SEC` | 3600/300/300 | 窗口长度（秒） | 可选，一般不改 |
-| `RATE_LIMIT` | — | 总开关：`1` 强制开 / `0` 强制关 | 生产默认自动开启，无需配置 |
+| `RATE_LIMIT` | 留空 | 总开关：`1`/`true`/`yes`/`on` 强制开，`0`/`false`/`no`/`off` 强制关 | 留空时：生产自动开启，其他环境关闭 |
+
+> **关于 `RATE_LOGIN_FAIL_MAX` 的生效时点**（运维最容易理解错的一条）：
+> 第 N 次失败**本身仍然返回 401**，封禁是从**第 N+1 次请求起**才返回 429。
+> 这是刻意的：如果闸门提前到第 N 次请求本身，那么「已经错了 7 次、第 8 次终于输对密码」的
+> 用户会被 429 挡在门外 —— 那是真正的误伤，比多给攻击者 1 次机会更糟。
+> 换句话说，用户始终握有自救窗口：**用正确密码登录一次即可清零并重获访问**。
 
 两个容易踩的坑，写在代码注释里也再强调一次：
 
@@ -105,7 +111,7 @@ done; echo
 
 ## 6. 上线验收命令
 
-在服务器上依次执行（第 3 步会真的占用配额，验收完记得清表）：
+在服务器上依次执行（③④ 两步会真的占用配额，验收完记得清表）：
 
 ```bash
 # ① 表与主键存在（主键是 ON CONFLICT 的冲突目标，丢了会直接 500）
@@ -114,24 +120,36 @@ sudo -u postgres psql -d danzhao -c "\d auth_guard"
 # ② 触发前确认是空的
 sudo -u postgres psql -d danzhao -c "SELECT count(*) FROM auth_guard;"
 
-# ③ IP 维度：同 IP 连打 20 次 login，期望前 15 个 401、之后 429
+# ③ IP 维度：同 IP 连打 20 次 login，期望前 15 个 401、第 16 个起 429
+#
+#    ⚠️ 每次必须换成**不同**的 username：若固定 username，账号维度的
+#       「连续失败 8 次」会先触发封禁，你验到的其实是账号维度
+#       （表现为前 8 个 401、第 9 个起 429），会误判成 IP 阈值配错。
+#       轮换 username 后账号维度不累积，撞到的才是 IP 的 15 次/5 分钟。
 for i in $(seq 1 20); do
   curl -s -o /dev/null -w "%{http_code} " -X POST http://127.0.0.1:3000/api/auth/login \
-    -H 'Content-Type: application/json' -d '{"username":"nobody","password":"wrong"}'
+    -H 'Content-Type: application/json' -d "{\"username\":\"nobody$i\",\"password\":\"wrong\"}"
 done; echo
+# 期望：401 × 15，然后 429 × 5
 
-# ④ 检查 429 的响应头与响应体
+# ④ 账号维度：**先清表**，再固定 username 连打 10 次，期望前 8 个 401、第 9 个起 429
+#
+#    ⚠️ 清表不能省：③ 已把该 IP 在 login 上打满（20 > 15），不清表的话
+#       ④ 的第一次请求就会被 IP 维度挡下，看起来像「账号阈值也配错了」。
+sudo -u postgres psql -d danzhao -c "TRUNCATE auth_guard;"
+for i in $(seq 1 10); do
+  curl -s -o /dev/null -w "%{http_code} " -X POST http://127.0.0.1:3000/api/auth/login \
+    -H 'Content-Type: application/json' -d '{"username":"probe","password":"wrong"}'
+done; echo
+# 期望：401 × 8，然后 429
+# （username 不存在也照常计数 —— 这是刻意设计，理由见第 5 节第 1 条）
+
+# ⑤ 检查 429 的响应头与响应体（沿用 ④ 中已被封禁的 probe 来触发）
 curl -s -D - -o /dev/null -X POST http://127.0.0.1:3000/api/auth/login \
-  -H 'Content-Type: application/json' -d '{"username":"nobody","password":"wrong"}' \
+  -H 'Content-Type: application/json' -d '{"username":"probe","password":"wrong"}' \
   | grep -i -E '^(HTTP|retry-after)'
 # 期望：HTTP/1.1 429 Too Many Requests + Retry-After: <秒数>
 # 响应体形如 {"error":"操作过于频繁，请 287 秒后再试","retryAfter":287}
-
-# ⑤ 账号维度：对**存在的账号**连打 10 次错密码，期望前 8 个 401、之后 429
-for i in $(seq 1 10); do
-  curl -s -o /dev/null -w "%{http_code} " -X POST http://127.0.0.1:3000/api/auth/login \
-    -H 'Content-Type: application/json' -d '{"username":"<真实账号>","password":"wrong"}'
-done; echo
 
 # ⑥ 看桶里的数据（kind/key/scope/count/blocked_until 是否符合预期）
 sudo -u postgres psql -d danzhao -c \

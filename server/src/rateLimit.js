@@ -66,6 +66,38 @@ const DEFAULT_LOG = {
 /** 放行（fail-open 与「未超限」共用，调用方只看 `allowed`） */
 const ALLOW = Object.freeze({ allowed: true, retryAfter: 0 })
 
+/** 总开关 RATE_LIMIT 判定为「开启」的字面量（trim + 转小写后比对） */
+const RATE_LIMIT_ON = new Set(['1', 'true', 'yes', 'on'])
+
+/** 总开关 RATE_LIMIT 判定为「关闭」的字面量 */
+const RATE_LIMIT_OFF = new Set(['0', 'false', 'no', 'off'])
+
+/**
+ * 解析限流总开关 `RATE_LIMIT`。
+ *
+ * ⚠️ 为什么必须放宽到 `false` / `no` / `off` 而不只认 `'0'`：
+ *    最容易踩这个坑的场景正是「限流误伤 → 急着关掉」—— 开学集中注册被打回时，
+ *    运维的第一反应是在 .env 里写 `RATE_LIMIT=false`。若只认 `'0'`，`false` 会
+ *    静默落进「生产默认开启」，表现为「关不掉」，接着被误判成代码坏了 —— 白排查一轮。
+ *    所以无法识别的值一律 **打 warn 再回退**：静默失败在这里是唯一的敌人。
+ *
+ * @param {unknown} raw 原始值（一般为 process.env.RATE_LIMIT）
+ * @param {boolean} defaultEnabled 未设置 / 无法识别时的回退值
+ * @param {{warn?: Function}} [log=console] 日志器（单测可传空实现）
+ * @returns {boolean} 是否启用限流
+ */
+export function resolveRateLimitEnabled(raw, defaultEnabled, log = console) {
+  const value = String(raw ?? '').trim().toLowerCase()
+  if (value === '') return defaultEnabled
+  if (RATE_LIMIT_ON.has(value)) return true
+  if (RATE_LIMIT_OFF.has(value)) return false
+  log?.warn?.(
+    `[rate-limit] RATE_LIMIT=${JSON.stringify(raw)} 无法识别（开启用 1/true/yes/on，关闭用 0/false/no/off），` +
+      `已回退为「${defaultEnabled ? '开启' : '关闭'}」。`
+  )
+  return defaultEnabled
+}
+
 /**
  * 账号 key 归一化：去首尾空白 + 转小写。
  *
@@ -178,11 +210,15 @@ const RESET_SQL = 'DELETE FROM auth_guard WHERE kind = $1 AND key = $2 AND scope
 /**
  * 清理：只删「窗口已过期**且**封禁已过期」的行。
  * 保留仍在封禁中的行 —— 否则一次清理就能让被封的账号提前出狱。
+ *
+ * ⚠️ 必须带 RETURNING：pg / PGlite 的 DELETE 不回行数，没有 RETURNING 时
+ *    调用方永远拿到 0，清理日志就成了摆设。
  */
 const PRUNE_SQL = `
 DELETE FROM auth_guard
 WHERE window_start < $1::timestamptz
   AND (blocked_until IS NULL OR blocked_until < $1::timestamptz)
+RETURNING kind
 `
 
 /** 把驱动返回的 timestamptz 统一成毫秒数（pg 给 Date，部分驱动给字符串，故一律过一遍 Date） */
@@ -264,7 +300,7 @@ export function createDbStore(queryFn) {
     /**
      * 清理过期行
      * @param {{beforeMs: number}} opts
-     * @returns {Promise<number>} 删除行数（驱动不回行数时返回 0）
+     * @returns {Promise<number>} 删除行数（依赖 RETURNING；拿不到时返回 0）
      */
     async prune({ beforeMs } = {}) {
       const rows = await queryFn(PRUNE_SQL, [new Date(beforeMs).toISOString()])
