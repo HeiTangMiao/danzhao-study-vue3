@@ -125,14 +125,14 @@ export default {
           title: "例题2：判断水仙花数",
           difficulty: "medium",
           question: "水仙花数是指一个三位数，其各位数字的立方和等于该数本身，如 153 = 1³+5³+3³。编写程序判断输入的三位数是否为水仙花数。",
-          solution: "**解：**\n```\nnum = int(input(\"请输入一个三位数：\"))\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\n# 判断立方和是否等于本身\nif bai ** 3 + shi ** 3 + ge ** 3 == num:\nprint(num, \"是水仙花数\")\nelse:\nprint(num, \"不是水仙花数\")\n```\n运行示例：\n请输入一个三位数：153\n153 是水仙花数",
+          solution: "**解：**\n```\nnum = int(input(\"请输入一个三位数：\"))\nge = num % 10\nshi = num // 10 % 10\nbai = num // 100\n# 判断立方和是否等于本身\nif bai ** 3 + shi ** 3 + ge ** 3 == num:\n    print(num, \"是水仙花数\")\nelse:\n    print(num, \"不是水仙花数\")\n```\n运行示例：\n请输入一个三位数：153\n153 是水仙花数",
           answer: "分离百十个位，判断 `bai**3 + shi**3 + ge**3 == num`。"
         },
         {
           title: "例题3：求 1~n 中所有素数",
           difficulty: "advanced",
           question: "输入一个正整数 n，输出 2 到 n 之间的所有素数。",
-          solution: "**解：**\n```\nn = int(input(\"请输入 n：\"))\n# 穷举 2 到 n 的每个数\nfor num in range(2, n + 1):\nis_prime = True\n# 判断 num 是否为素数\nfor i in range(2, num):\nif num % i == 0:\nis_prime = False\nbreak\nif is_prime:\nprint(num, end=\" \")\n```\n运行示例：\n请输入 n：20\n2 3 5 7 11 13 17 19",
+          solution: "**解：**\n```\nn = int(input(\"请输入 n：\"))\n# 穷举 2 到 n 的每个数\nfor num in range(2, n + 1):\n    is_prime = True\n    # 判断 num 是否为素数\n    for i in range(2, num):\n        if num % i == 0:\n            is_prime = False\n            break\n    if is_prime:\n        print(num, end=\" \")\n```\n运行示例：\n请输入 n：20\n2 3 5 7 11 13 17 19",
           answer: "外层穷举每个数，内层用 2 到 num-1 试除判断是否为素数。"
         }
       ]

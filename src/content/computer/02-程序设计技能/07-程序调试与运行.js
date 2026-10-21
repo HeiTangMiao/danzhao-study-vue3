@@ -151,14 +151,14 @@ export default {
           title: "例题1：找错误并修改",
           difficulty: "medium",
           question: "下列程序想计算 1 到 10 的累加和，但结果不对，请找出错误并修改。\n```\nsum = 1\nfor i in range(1, 11):\n    sum += i\nprint(sum)\n```",
-          solution: "**解：**\n错误：累加器初始化为 1，导致结果多加了 1。\n正确代码：\n```\nsum = 0\nfor i in range(1, 11):\nsum += i\nprint(sum)   # 输出 55\n```",
+          solution: "**解：**\n错误：累加器初始化为 1，导致结果多加了 1。\n正确代码：\n```\nsum = 0\nfor i in range(1, 11):\n    sum += i\nprint(sum)   # 输出 55\n```",
           answer: "累加器应初始化为 0，修改为 `sum = 0`。"
         },
         {
           title: "例题2：找错误并修改",
           difficulty: "advanced",
           question: "下列程序想判断一个数是否为素数，但结果错误，请找出错误并修改。\n```\nn = int(input(\"请输入：\"))\nfor i in range(2, n):\n    if n % i == 0:\n        print(n, \"不是素数\")\n    else:\n        print(n, \"是素数\")\n```",
-          solution: "**解：**\n错误：在循环内直接输出结论，只要有一个 i 不能整除就输出\"是素数\"，判断不完整。\n正确代码：\n```\nn = int(input(\"请输入：\"))\nis_prime = True\nfor i in range(2, n):\nif n % i == 0:\nis_prime = False\nbreak\nif is_prime and n > 1:\nprint(n, \"是素数\")\nelse:\nprint(n, \"不是素数\")\n```",
+          solution: "**解：**\n错误：在循环内直接输出结论，只要有一个 i 不能整除就输出\"是素数\"，判断不完整。\n正确代码：\n```\nn = int(input(\"请输入：\"))\nis_prime = True\nfor i in range(2, n):\n    if n % i == 0:\n        is_prime = False\n        break\nif is_prime and n > 1:\n    print(n, \"是素数\")\nelse:\n    print(n, \"不是素数\")\n```",
           answer: "用标志变量 is_prime 记录，循环结束后统一判断，而不是在循环内直接输出。"
         }
       ]

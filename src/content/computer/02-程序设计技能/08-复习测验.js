@@ -204,7 +204,7 @@ export default {
           title: "编程题：累加求和",
           difficulty: "medium",
           question: "编写程序：输入一个正整数 n，计算 1 到 n 的所有整数之和并输出。要求：输入输出有提示文字，代码有详细注释。",
-          solution: "**解：**\n```\n# 计算 1 到 n 的和\nn = int(input(\"请输入一个正整数 n：\"))\n# 初始化累加器\nsum = 0\n# 循环累加\nfor i in range(1, n + 1):\nsum += i\n# 输出结果\nprint(\"1 到\", n, \"的和是：\", sum)\n```\n运行示例：\n请输入一个正整数 n：10\n1 到 10 的和是： 55",
+          solution: "**解：**\n```\n# 计算 1 到 n 的和\nn = int(input(\"请输入一个正整数 n：\"))\n# 初始化累加器\nsum = 0\n# 循环累加\nfor i in range(1, n + 1):\n    sum += i\n# 输出结果\nprint(\"1 到\", n, \"的和是：\", sum)\n```\n运行示例：\n请输入一个正整数 n：10\n1 到 10 的和是： 55",
           answer: "`sum = 0` 初始化，`for i in range(1, n + 1)` 循环，`sum += i` 累加后输出。"
         }
       ]

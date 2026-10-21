@@ -113,21 +113,21 @@ export default {
           title: "例题1：累加求和（考试样题三）",
           difficulty: "basic",
           question: "请计算 1 到 100 的所有整数之和，并输出结果。要求：代码有注释，保存到\"考生文件夹\\程序设计\\试题三\"。",
-          solution: "**解：**\n```\n# 试题三：计算 1 到 100 的和\n# 初始化累加器\nsum = 0\n# 循环 1 到 100\nfor i in range(1, 101):\nsum += i   # 累加\n# 输出结果\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
+          solution: "**解：**\n```\n# 试题三：计算 1 到 100 的和\n# 初始化累加器\nsum = 0\n# 循环 1 到 100\nfor i in range(1, 101):\n    sum += i   # 累加\n# 输出结果\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
           answer: "`sum = 0` 初始化，`for i in range(1, 101)` 循环，`sum += i` 累加，输出 5050。"
         },
         {
           title: "例题2：while 循环累加",
           difficulty: "medium",
           question: "用 while 循环计算 1 到 100 的所有整数之和。",
-          solution: "**解：**\n```\n# 用 while 计算 1 到 100 的和\nsum = 0\ni = 1\nwhile i <= 100:\nsum += i\ni += 1   # 计数器自增\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
+          solution: "**解：**\n```\n# 用 while 计算 1 到 100 的和\nsum = 0\ni = 1\nwhile i <= 100:\n    sum += i\n    i += 1   # 计数器自增\nprint(\"1 到 100 的和是：\", sum)\n```\n运行结果：\n1 到 100 的和是： 5050",
           answer: "计数器 i 从 1 开始，`while i <= 100` 循环累加，循环内 `i += 1` 防止死循环。"
         },
         {
           title: "例题3：求 1~100 中偶数的和",
           difficulty: "advanced",
           question: "计算 1 到 100 中所有偶数的和，并输出结果。",
-          solution: "**解：**\n方法一（步长法）：\n```\nsum = 0\nfor i in range(2, 101, 2):\nsum += i\nprint(\"偶数和是：\", sum)\n```\n方法二（判断法）：\n```\nsum = 0\nfor i in range(1, 101):\nif i % 2 == 0:\nsum += i\nprint(\"偶数和是：\", sum)\n```\n运行结果：\n偶数和是： 2550",
+          solution: "**解：**\n方法一（步长法）：\n```\nsum = 0\nfor i in range(2, 101, 2):\n    sum += i\nprint(\"偶数和是：\", sum)\n```\n方法二（判断法）：\n```\nsum = 0\nfor i in range(1, 101):\n    if i % 2 == 0:\n        sum += i\nprint(\"偶数和是：\", sum)\n```\n运行结果：\n偶数和是： 2550",
           answer: "方法一用 `range(2, 101, 2)` 直接取偶数；方法二用 `i % 2 == 0` 判断后累加。"
         }
       ]
