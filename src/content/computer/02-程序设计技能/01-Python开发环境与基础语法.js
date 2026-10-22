@@ -145,7 +145,7 @@ export default {
           difficulty: "medium",
           question: "编写程序：输入两个整数，计算并输出它们的和。要求输入输出有提示文字，代码有注释。",
           solution: "**解：**\n```\n# 计算两个数的和\n# 输入第一个整数\nnum1 = int(input(\"请输入第一个整数：\"))\n# 输入第二个整数\nnum2 = int(input(\"请输入第二个整数：\"))\n# 计算和\nsum = num1 + num2\n# 输出结果\nprint(\"两个数的和是：\", sum)\n```\n运行示例：\n请输入第一个整数：12\n请输入第二个整数：30\n两个数的和是： 42",
-          answer: "用 int(input()) 输入两个整数，相加后 print 输出。"
+          answer: "答案：两数之和由 `sum = num1 + num2` 求得并输出，示例输入 12 与 30 得 42。"
         }
       ]
     },

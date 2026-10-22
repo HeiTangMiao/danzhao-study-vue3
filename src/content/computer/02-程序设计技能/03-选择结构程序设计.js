@@ -131,21 +131,21 @@ export default {
           difficulty: "basic",
           question: "请输入一个整数，判断它是奇数还是偶数并输出结果。要求：输入输出有提示文字，代码有注释。",
           solution: "**解：**\n```\n# 试题二：判断奇偶数\n# 输入一个整数\nnum = int(input(\"请输入一个整数：\"))\n# 判断奇偶：能被 2 整除是偶数\nif num % 2 == 0:\n    print(num, \"是偶数\")\nelse:\n    print(num, \"是奇数\")\n```\n运行示例：\n请输入一个整数：7\n7 是奇数",
-          answer: "用 `num % 2 == 0` 判断：余数为 0 是偶数，否则是奇数。"
+          answer: "答案：`num % 2 == 0` 判奇偶——余数 0 为偶数，否则为奇数。示例输入 7，输出「7 是奇数」。"
         },
         {
           title: "例题2：成绩等级判断器（考试样题五）",
           difficulty: "medium",
           question: "请输入一个学生的成绩（0~100 之间），判断其等级并输出：90 分及以上为\"A\"，80~89 为\"B\"，60~79 为\"C\"，60 分以下为\"D\"。",
           solution: "**解：**\n```\n# 试题五：成绩等级判断器\nscore = int(input(\"请输入成绩（0~100）：\"))\n# 多分支判断等级\nif score >= 90:\n    print(\"等级：A\")\nelif score >= 80:\n    print(\"等级：B\")\nelif score >= 60:\n    print(\"等级：C\")\nelse:\n    print(\"等级：D\")\n```\n运行示例：\n请输入成绩（0~100）：85\n等级：B",
-          answer: "用 if-elif-else 从高到低依次判断：≥90 为 A，≥80 为 B，≥60 为 C，否则 D。"
+          answer: "答案：if-elif-else 从高到低依次判断，≥90 为 A、≥80 为 B、≥60 为 C、否则为 D。示例输入 85，输出「等级：B」。"
         },
         {
           title: "例题3：求三个数的最大值",
           difficulty: "advanced",
           question: "输入三个整数，输出其中的最大值。",
           solution: "**解：**\n```\n# 求三个数的最大值\n# 输入三个整数\na = int(input(\"请输入第一个数：\"))\nb = int(input(\"请输入第二个数：\"))\nc = int(input(\"请输入第三个数：\"))\n# 先假设 a 最大\nmax_num = a\n# 依次比较\nif b > max_num:\n    max_num = b\nif c > max_num:\n    max_num = c\n# 输出最大值\nprint(\"最大值为：\", max_num)\n```\n运行示例：\n请输入第一个数：5\n请输入第二个数：9\n请输入第三个数：3\n最大值为： 9",
-          answer: "先假设 a 最大，再与 b、c 依次比较，较大的赋给 max_num。"
+          answer: "答案：先设 `max_num = a`，再与 b、c 依次比较取大。示例输入 5、9、3，输出「最大值为： 9」。"
         }
       ]
     },

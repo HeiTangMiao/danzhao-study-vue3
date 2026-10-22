@@ -125,21 +125,21 @@ export default {
           difficulty: "medium",
           question: "用冒泡排序法将列表 [9, 5, 7, 2, 6] 按升序排列，并输出排序结果。",
           solution: "**解：**\n```\n# 冒泡排序升序\na = [9, 5, 7, 2, 6]\nn = len(a)\nfor i in range(n - 1):\n    for j in range(n - 1 - i):\n        if a[j] > a[j + 1]:\n            a[j], a[j + 1] = a[j + 1], a[j]\nprint(\"排序结果：\", a)\n```\n运行结果：\n排序结果： [2, 5, 6, 7, 9]",
-          answer: "外层 n-1 轮，内层 n-1-i 次相邻比较，逆序则交换。"
+          answer: "答案：外层 n-1 轮、内层 n-1-i 次相邻比较，逆序则交换。示例 `[9,5,7,2,6]` 升序得 `[2, 5, 6, 7, 9]`。"
         },
         {
           title: "例题2：字符串统计",
           difficulty: "medium",
           question: "输入一个字符串，统计其中字母 'a' 出现的次数并输出。",
           solution: "**解：**\n```\ns = input(\"请输入一个字符串：\")\ncount = 0\n# 遍历每个字符\nfor ch in s:\n    if ch == \"a\":\n        count += 1\nprint(\"字母 a 出现次数：\", count)\n```\n运行示例：\n请输入一个字符串：banana\na 出现次数： 3",
-          answer: "遍历字符串，`if ch == \"a\"` 计数累加；也可用 `s.count(\"a\")`。"
+          answer: "答案：遍历字符串统计 `ch == \"a\"` 的次数（或直接用 `s.count(\"a\")`）。示例输入 banana，输出 3。"
         },
         {
           title: "例题3：字符串反转",
           difficulty: "advanced",
           question: "输入一个字符串，将其反转后输出。",
           solution: "**解：**\n方法一（切片）：\n```\ns = input(\"请输入字符串：\")\nprint(\"反转结果：\", s[::-1])\n```\n方法二（循环）：\n```\ns = input(\"请输入字符串：\")\nresult = \"\"\nfor ch in s:\n    result = ch + result\nprint(\"反转结果：\", result)\n```\n运行示例：\n请输入字符串：abcde\n反转结果： edcba",
-          answer: "方法一用切片 `s[::-1]`；方法二循环把每个字符放到结果前面。"
+          answer: "答案：方法一 `s[::-1]` 切片，方法二循环把字符前插到结果串。示例输入 abcde，输出「edcba」。"
         }
       ]
     },
