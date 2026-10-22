@@ -12,12 +12,23 @@
   引擎就绪前先渲染「剥掉定界符的纯文本」，就绪后靠 engineVersion 自动重算。
 -->
 <template>
-  <div class="mathjax-render" :class="{ 'mathjax-block': block }" v-html="html"></div>
+  <div
+    v-if="hasCodeFence"
+    class="mathjax-render"
+    :class="{ 'mathjax-block': block }"
+  >
+    <template v-for="(segment, index) in segments" :key="index">
+      <span v-if="segment.type === 'text'" v-html="segment.html"></span>
+      <pre v-else class="code-fence"><code>{{ segment.content }}</code></pre>
+    </template>
+  </div>
+  <div v-else class="mathjax-render" :class="{ 'mathjax-block': block }" v-html="html"></div>
 </template>
 
 <script setup>
 import { computed, onMounted } from 'vue'
 import { renderMath, renderPlainFallback, engineVersion, warmKatex } from '@/composables/useKatex'
+import { splitCodeFences } from '@/utils/codeFence'
 
 const props = defineProps({
   // 待渲染的原始文本（含 \(...\) 或 $$...$$ 公式，或纯 LaTeX）
@@ -26,14 +37,28 @@ const props = defineProps({
   block: { type: Boolean, default: false }
 })
 
-// 同步渲染：将文本中的 LaTeX 公式转为 HTML
 // 注意：engineVersion 是**必须显式引用**的依赖：renderMath 读的是模块级 katex 变量，
 //    Vue 追踪不到它。少了这个分支，引擎就绪后公式不会重渲染（表现为「点了半天不更新」）。
+function renderText(text) {
+  return engineVersion.value === 0
+    ? renderPlainFallback(text)
+    : renderMath(text, props.block)
+}
+
+const hasCodeFence = computed(() => props.text.includes('```'))
+
+// 无围栏文本继续使用原来的单次渲染路径，避免影响 39 个调用点的既有表现。
 const html = computed(() => {
   if (!props.text) return ''
-  return engineVersion.value === 0
-    ? renderPlainFallback(props.text)
-    : renderMath(props.text, props.block)
+  return renderText(props.text)
+})
+
+const segments = computed(() => {
+  if (!hasCodeFence.value) return []
+  return splitCodeFences(props.text).map((segment) => {
+    if (segment.type === 'code') return segment
+    return { ...segment, html: renderText(segment.content) }
+  })
 })
 
 // 兜底预热：正常导航路径下路由守卫已并行预取，这里保证任何渲染点都不会漏
@@ -42,6 +67,28 @@ onMounted(() => { warmKatex() })
 
 <style scoped>
 .mathjax-render { line-height: 1.8; max-width: 100%; min-width: 0; overflow-wrap: break-word; }
+.code-fence {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 8px 0;
+  padding: 10px 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
+  line-height: 1.6;
+  overflow-wrap: normal;
+  text-align: left;
+  white-space: pre;
+  word-break: normal;
+}
+.code-fence code { font: inherit; white-space: inherit; }
 .mathjax-block {
   display: block; text-align: center; margin: 8px 0; font-size: 1.15em;
   /* 长公式在窄屏横向滚动，避免整页横向溢出/被裁切 */

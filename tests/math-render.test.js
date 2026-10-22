@@ -9,6 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import { splitCodeFences } from '@/utils/codeFence'
 
 describe('MathJaxRender 引擎就绪前后', () => {
   beforeEach(() => {
@@ -43,5 +44,54 @@ describe('MathJaxRender 引擎就绪前后', () => {
     const wrapper = mount(MathJaxRender, { props: { text: '' } })
     expect(wrapper.text()).toBe('')
     wrapper.unmount()
+  })
+
+  it('围栏内容渲染为代码块并安全保留源码', async () => {
+    const { default: MathJaxRender } = await import('@/components/MathJaxRender.vue')
+    const text = '示例：\n```python\nif a < b:\n    value = "<tag>"\n```'
+    const wrapper = mount(MathJaxRender, { props: { text } })
+    const code = wrapper.get('pre.code-fence code')
+
+    expect(wrapper.text()).not.toContain('```')
+    expect(wrapper.text()).not.toContain('python')
+    expect(code.element.textContent).toBe('if a < b:\n    value = "<tag>"')
+    expect(code.html()).toContain('&lt;tag&gt;')
+    wrapper.unmount()
+  })
+})
+
+describe('splitCodeFences', () => {
+  it('无围栏时保持原文为单个文本段', () => {
+    const text = '**重点**\n\\(x=1\\)'
+    expect(splitCodeFences(text)).toEqual([{ type: 'text', content: text }])
+  })
+
+  it('切分单个围栏并保留代码缩进与换行', () => {
+    expect(splitCodeFences('解答：\n```\nif ready:\n    run()\n```\n完成')).toEqual([
+      { type: 'text', content: '解答：\n' },
+      { type: 'code', content: 'if ready:\n    run()', language: '' },
+      { type: 'text', content: '\n完成' }
+    ])
+  })
+
+  it('按顺序切分多个围栏', () => {
+    expect(splitCodeFences('甲```\none\n```乙```\ntwo\n```丙')).toEqual([
+      { type: 'text', content: '甲' },
+      { type: 'code', content: 'one', language: '' },
+      { type: 'text', content: '乙' },
+      { type: 'code', content: 'two', language: '' },
+      { type: 'text', content: '丙' }
+    ])
+  })
+
+  it('遇到未闭合围栏时整体降级为普通文本', () => {
+    const text = '开头```\nprint("未闭合")'
+    expect(splitCodeFences(text)).toEqual([{ type: 'text', content: text }])
+  })
+
+  it('识别语言标注但不混入代码正文', () => {
+    expect(splitCodeFences('```python\r\nelse\r\n    ＿＿＿＿\r\n```')).toEqual([
+      { type: 'code', content: 'else\r\n    ＿＿＿＿', language: 'python' }
+    ])
   })
 })
