@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { check, listShardFiles } from '../scripts/check-content-remote.mjs'
 import { SITE_FILES } from '../scripts/lib/load-content.mjs'
-import { SCHEMA_VERSION, HASH_PREFIX } from '../src/content/contentManifest.js'
+import { SCHEMA_VERSION, HASH_PREFIX, CONTENT_VERSION } from '../src/content/contentManifest.js'
 
 const H = (c = 'a') => HASH_PREFIX + c.repeat(64)
 const SUBJECTS = Object.keys(SITE_FILES)
@@ -25,15 +25,19 @@ function makePublicDir() {
   const dir = mkdtempSync(join(tmpdir(), 'check-content-remote-'))
   // content-remote
   mkdirSync(join(dir, 'content-remote', 'math'), { recursive: true })
-  writeFileSync(join(dir, 'content-remote', 'math', '01.json'), JSON.stringify({ schemaVersion: SCHEMA_VERSION, contentVersion: 3, unitKey: 'math/01', pages: [] }))
+  writeFileSync(join(dir, 'content-remote', 'math', '01.json'), JSON.stringify({ schemaVersion: SCHEMA_VERSION, contentVersion: CONTENT_VERSION, unitKey: 'math/01', pages: [] }))
   const manifest = {
     schemaVersion: SCHEMA_VERSION,
-    contentVersion: 3,
+    // ⚠️ 必须引用源码常量而非写死数字：assertManifestInvariants 会断言
+    //    contentVersion >= CONTENT_VERSION，且 units[].version 必须与它一致。
+    //    写死数字在 CONTENT_VERSION bump 时会连锁腐烂（2026-10-22 3→4 实测：
+    //    夹具停在 3 → 版本闸门先抛错 → 3 个用例全红，且红的理由与用例本意无关）。
+    contentVersion: CONTENT_VERSION,
     contentHash: H('m'),
     generatedAt: '2026-01-01T00:00:00.000Z',
     sitePatchHash: H('s'),
     sitePatch: { units: {}, fileMetaUpdates: [] },
-    units: { 'math/01': { hash: H('a'), version: 3, path: 'math/01.json', count: 1, updatedAt: 'x' } },
+    units: { 'math/01': { hash: H('a'), version: CONTENT_VERSION, path: 'math/01.json', count: 1, updatedAt: 'x' } },
     // 子段由下面按「盘上真有什么」登记（S5 起必填，不留 null）
     search: {},
     practice: {}
@@ -69,7 +73,8 @@ describe('① 正向：产物齐全', () => {
     expect(r.shardCount).toBe(1) // 1 个单元分片
     expect(r.pageTotal).toBe(1)
     expect(r.subSections).toEqual({ search: 1 + SUBJECTS.length, practice: 1 + SUBJECTS.length })
-    expect(r.manifest.contentVersion).toBe(3)
+    // 夹具的 contentVersion 引用源码常量，故这里也跟常量比（不写死数字）
+    expect(r.manifest.contentVersion).toBe(CONTENT_VERSION)
   })
 
   it('listShardFiles 只数列目录下的 json 且排除清单自身（按路径排序）', () => {
