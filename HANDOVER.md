@@ -136,11 +136,12 @@ git tag v0.3.2 && git push origin v0.3.2
 | 项 | 状态 | 说明 |
 |---|---|---|
 | **7 道填空自动判分不生效** | 刻意不修 | 5 道交换机命令序列 + 2 道开放式推导。修法已试两条路都不通（改 `solve` 撞设计边界已回滚；移到 example 块会让学员失去输入框＝体验倒退）。已登记进 `check:fill` 的 `KNOWN` 清单，**新题仍会被拦** |
-| **`build.target` 残余** | 部分修复 | 业务主路径已降级到 es2019；mermaid 特定图型 chunk 还有 8 处 `?.`，GeoGebra 静态资源有大量（第三方内容，无法转译）。**真机验证不可省** |
+| **`build.target` 残余** | 已验证 | 业务主路径已降级到 es2019；**2026-10-24 v0.3.2 APK 真机实测通过（不白屏、代码块与 Python 缩进均正常）**。残余：mermaid 特定图型 chunk 8 处 `?.`、GeoGebra 静态资源大量（第三方内容，无法转译）——已知，不阻塞 |
 | **`studyDb.js` 是 god module** | 拆分中 | 1067 行。已拆出 `stores/db/notes.js` + `bookmarks.js` 两域（委托式，**不减行数**）。剩余 8 个域未拆 |
 | **文档归档遗留** | 已清理 | docs 主浏览面 39→13 份，93 份归入 `docs/archive/2026-10/`（零删除） |
-| **后端无限流** | 未修 | `server/src/auth.js` 的 register/login/refresh 无 rate limit（服务已上线，建议补） |
-| **历史 5.8MB zip 在.git 里** | 未清 | `release/` 的 v0.1.1 便携版 zip 已移除，但历史记录仍在。需 `filter-repo`/BFG 重写历史才能清除（会改所有 commit hash，需全员重新 clone） |
+| **后端无限流** | ✅ 已修 | v0.3.2 已落地（`1925ee3` + `c66bdb5`）：认证端点限流（IP 固定窗口 + 账号封禁），并修 `RATE_LIMIT=false` 静默失效等三处坑。文档见 `docs/auth-rate-limit.md`（含改阈值 / 换部署形态 / 验收上线） |
+| **.git 历史大文件**（68MB） | HEAD 已清 / 历史未清 | HEAD 已清：`release/` v0.1.1 便携版 zip、`.wix-dl/wix-ghproxy.zip`（8.1MB，50afc10）均已摘除。历史仍在（geogebra vendor ~26MB / v0.1.1 zip 5.5MB / wix 8.1MB），需 `filter-repo`/BFG 重写。**⚠️ 重写会改所有 commit hash（含守卫测试硬编码的基线 `54300fa`）**：顺序必须是「先重写 → 取新哈希 → 改 `tests/s2-verify-boundaries.test.js:14` 与 `tests/loadpage-remote-fallback.test.js:192` → 最后 force-push」，且全员重新 clone |
+| **发版门禁（gate）** | 2026-10-23 上线 | `release.yml` 的 gate job（`1704d81`），与 CI quality 同口径（lint / 生产构建 / 三个内容校验脚本），不过门禁不出包。**v0.3.2 为首次执行并通过**。⚠️ v0.3.1 及更早版本是门禁上线前发布的，未经此门禁 |
 | **历史文档路径** | 不要移动 | 5 条硬引用红线，见 `CLAUDE.md` 末尾 |
 
 ---
