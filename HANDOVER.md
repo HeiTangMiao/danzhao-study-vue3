@@ -140,9 +140,33 @@ git tag v0.3.2 && git push origin v0.3.2
 | **`studyDb.js` 是 god module** | 拆分中 | 1067 行。已拆出 `stores/db/notes.js` + `bookmarks.js` 两域（委托式，**不减行数**）。剩余 8 个域未拆 |
 | **文档归档遗留** | 已清理 | docs 主浏览面 39→13 份，93 份归入 `docs/archive/2026-10/`（零删除） |
 | **后端无限流** | ✅ 已修 | v0.3.2 已落地（`1925ee3` + `c66bdb5`）：认证端点限流（IP 固定窗口 + 账号封禁），并修 `RATE_LIMIT=false` 静默失效等三处坑。文档见 `docs/auth-rate-limit.md`（含改阈值 / 换部署形态 / 验收上线） |
-| **.git 历史大文件**（68MB） | HEAD 已清 / 历史未清 | HEAD 已清：`release/` v0.1.1 便携版 zip、`.wix-dl/wix-ghproxy.zip`（8.1MB，50afc10）均已摘除。历史仍在（geogebra vendor ~26MB / v0.1.1 zip 5.5MB / wix 8.1MB），需 `filter-repo`/BFG 重写。**⚠️ 重写会改所有 commit hash（含守卫测试硬编码的基线 `54300fa`）**：顺序必须是「先重写 → 取新哈希 → 改 `tests/s2-verify-boundaries.test.js:14` 与 `tests/loadpage-remote-fallback.test.js:192` → 最后 force-push」，且全员重新 clone |
+| **.git 历史大文件**（68MB） | HEAD 已清 / 历史暂不重写 | HEAD 已清：`release/` v0.1.1 便携版 zip、`.wix-dl/wix-ghproxy.zip`（8.1MB，50afc10）均已摘除。历史仍在（geogebra vendor ~26MB / v0.1.1 zip 5.5MB / wix 8.1MB），需 `filter-repo`/BFG 重写。**⚠️ 重写会改所有 commit hash（含守卫测试硬编码的基线 `54300fa`）**：顺序必须是「先重写 → 取新哈希 → 改 `tests/s2-verify-boundaries.test.js:14` 与 `tests/loadpage-remote-fallback.test.js:192` → 最后 force-push」，且全员重新 clone |
 | **发版门禁（gate）** | 2026-10-23 上线 | `release.yml` 的 gate job（`1704d81`），与 CI quality 同口径（lint / 生产构建 / 三个内容校验脚本），不过门禁不出包。**v0.3.2 为首次执行并通过**。⚠️ v0.3.1 及更早版本是门禁上线前发布的，未经此门禁 |
 | **历史文档路径** | 不要移动 | 5 条硬引用红线，见 `CLAUDE.md` 末尾 |
+
+### 5.1 `.git` 历史重写：2026-10-24 实测结论（暂缓）
+
+**实测收益**（`git rev-list --objects --all` 精确统计，非估算）：
+
+| 项 | 体积 |
+|---|---|
+| `.git` 内全部 blob（原始） | 118.1 MB |
+| 可清理（geogebra 54.4 + wix 8.1 + release zip 5.5） | **68.0 MB** |
+| 清理后剩余（原始） | 50.0 MB |
+| 磁盘 `.git` 预期 | 68 MB → **约 30-35 MB** |
+
+⚠️ 更正：早前口头估计「可降到 5-10MB」**偏高**，实测只能降到 30MB 上下（内容页与题库产物本身就在历史里）。
+
+**实测代价**：
+
+1. **259 处 commit 哈希硬引用失效**，分布在 33 个 md（其中 `协同交流/大事记.md` 101 处、`docs/proposals/implementation-roadmap.md` 38 处）。重写后这些引用全部指向不存在的提交。
+2. **325 个提交全部改哈希** → force-push；内容侧与所有工程师的克隆必须重新 clone。
+3. **6 个 tag（v0.1.0…v0.3.2）随之移动** → 刚产出的 v0.3.2 release 有受影响的风险（产物存于 CDN 不受影响，主要风险是 release 指向的提交变动）。
+4. **两个守卫测试基线必须联动**：`tests/s2-verify-boundaries.test.js:14` 与 `tests/loadpage-remote-fallback.test.js:192` 硬编码 `54300fa`。顺序不可反：**先重写 → 从 `.git/filter-repo/commit-map` 取新哈希 → 改这两个文件 → 再 force-push**。
+
+**结论**：眼下收益只是「克隆略快」，代价却含「刚发布的 v0.3.2 受影响」与「协同记录引用失效」，**不划算，暂缓**。
+
+**复评触发条件**：`.git` 涨到 300MB 以上，或出现明确的带宽/存储痛点时再议。真要做时，除了上面第 4 条的联动，还需把 `commit-map` 落盘成对照表（如 `docs/archive/git-rewrite-map-<日期>.md`）保住 259 处引用的可追溯性。
 
 ---
 
@@ -159,7 +183,7 @@ git tag v0.3.2 && git push origin v0.3.2
 | `docs/远程内容链路验证清单.md` | 远程链路验证 |
 | `docs/project-assessment-2026-10-17.md` | 项目评估报告（12 条风险排序） |
 | `docs/archive/2026-10/` | 归档区（batch 记录、提案、审计） |
-| `协同交流/` | ⚠️ **不在 git 仓库内**（工作区根不是仓库），改动拿不到 git 历史 |
+| `协同交流/` | ⚠️ **有两处同名目录，别搞混**：① 仓库**外** `danzhao/协同交流/`——不在 git 内，改动拿不到 git 历史；② 仓库**内** `danzhao-study-vue3/协同交流/`——59 个文件**已在 git 内**（`9af7a01` 入库），含 `大事记.md` 与 01/02 往来件 |
 
 > ⚠️ 组件事实**一律以源码为准**。旧清单 `docs/COMPONENTS.md` 已归档且过时，不要读。
 
