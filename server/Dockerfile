@@ -14,6 +14,7 @@
 #  3. @node-rs/argon2 是预编译原生模块（按平台发 optional 子包）
 #     npm ci 会在构建平台上自动选对二进制，依赖 glibc（故用 bookworm-slim 而非 alpine）。
 #     除非脱离本镜像交叉编译，否则**不需要**装 python3/make/g++ 等构建工具。
+#     2026-10-24 服务器实测：构建通过，注册接口（argon2 哈希）与登录（verify）均返回正常。
 #
 #  4. 健康检查用 Node 内置 fetch，不引 curl/wget，保持镜像最小。
 #

@@ -1,11 +1,22 @@
 # 单招学习 · 后端容器编排
 #
-# 默认形态：单容器 + PGlite 嵌入式库（数据落在命名卷 api-data，对应容器内 /app/data）
-# 想换外部 PostgreSQL：把 server/.env 里的 DATABASE_URL 填好即可，src/db.js 会自动切到 pg 驱动，
-# 届时删掉下面 volumes 的 api-data 挂载也无所谓（留着无害）。见 docs/docker-deploy.md §4。
+# ⚠️⚠️ 两个不可随意改的设定，都来自 2026-10-24 在服务器上的实测：
 #
-# ⚠️ 与现有部署二选一：后端目前由 systemd 的 danzhao-api 服务占着 3000 端口，
-#    容器起来前必须先停它（systemctl stop danzhao-api），否则端口冲突。
+#   1. **必须用 `network_mode: host`**
+#      服务器的 PostgreSQL 跑在**宿主机**且只监听 127.0.0.1:5432。默认 bridge 网络下，
+#      容器里的 127.0.0.1 是容器自己，实测三种走法：
+#        bridge → 127.0.0.1:5432    ❌ ECONNREFUSED（连的是容器自身）
+#        bridge → 172.17.0.1:5432   ❌ timeout（PG 没监听网桥地址）
+#        host   → 127.0.0.1:5432    ✅ 通
+#      代价：容器共享宿主机网络命名空间，**不能再配 ports 映射**（compose 会直接报错），
+#      应用用 PORT 环境变量直接绑宿主机端口——端口冲突要在宿主机层面规避。
+#
+#   2. **`TRUST_PROXY` 只能是 `127.0.0.1`**
+#      nginx 与后端同机回源。写成 true / * 等于信任 XFF 最左值，可被伪造绕过限流
+#      （详见 server/src/index.js:41-48）。host 网络下这点更要紧，别顺手改。
+#
+# 与现有部署二选一：容器起来前必须停掉 systemd 的 danzhao-api（否则争抢 3000 端口）。
+# 详细步骤与实测证据见 docs/docker-deploy.md。
 
 name: danzhao-study
 
@@ -17,30 +28,27 @@ services:
     image: danzhao-study-api:latest
     container_name: danzhao-api
     restart: unless-stopped
+    network_mode: host
 
-    # 首次部署前请先生成此文件：cp server/.env.example server/.env 并填 JWT_SECRET
-    # （NODE_ENV=production 下缺 JWT_SECRET 会直接拒绝启动——这是有意的护栏，见 src/index.js:16）
+    # 服务器上的实际路径是 /opt/danzhao-study/server/.env（已含 DATABASE_URL）。
+    # 新环境首次部署：cp server/.env.example server/.env 并填好 JWT_SECRET 与 DATABASE_URL
+    # （NODE_ENV=production 下缺 JWT_SECRET 会拒绝启动，这是有意的护栏，见 src/index.js:16）
     env_file:
       - ./server/.env
 
     environment:
       NODE_ENV: production
-      PORT: "3000"
       TZ: Asia/Shanghai
-      # nginx 与后端同机回源，所以只信任回环地址。
-      # ⚠️ 绝不能写 true 或 *：那等于信任 X-Forwarded-For 的最左值，
-      #    攻击者发个头就能每次换一个 IP 桶，限流彻底失效（详见 server/src/index.js:41-48）
+      # ⚠️ 刻意覆盖 env_file 的同名项：限流正确性依赖它，不允许被 .env 写成 true
       TRUST_PROXY: "127.0.0.1"
+      # PORT 不在此写：host 网络下它就是**宿主机真实端口**，沿用 .env 里的 3000，
+      # 改动前先确认宿主机上没人占着。
 
     volumes:
-      # ⚠️ 必须挂到 /app/data：src/db.js 的 PGlite 数据目录就是它，
-      #    挂错路径 = 每次重启都是空库
+      # 生产是外部 PostgreSQL，此卷不会被写入（实测容器内 /app/data 文件数为 0）。
+      # 保留它是为了「不配 DATABASE_URL」的 PGlite 形态仍有持久化；那种形态下
+      # 挂载点不能改 —— src/db.js 认的就是 /app/data。
       - api-data:/app/data
-
-    ports:
-      # 只绑回环：公网一律经宿主机 nginx 反代进来，避免绕过既有的 CORS 与限流入口。
-      # 若确实要让局域网直连，改成 "3000:3000"（并确认防火墙）
-      - "127.0.0.1:3000:3000"
 
     logging:
       driver: json-file
