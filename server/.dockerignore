@@ -1,0 +1,15 @@
+# 依赖与本机运行产物：镜像内会 npm ci 重装，体积与平台都以此为准
+node_modules
+data
+
+# 密钥不进镜像（变量由 compose / docker run 提供）
+.env
+.env.*
+!.env.example
+
+# 测试、git 元数据与日志
+test
+.git
+.gitignore
+*.log
+docker-compose*.yml
