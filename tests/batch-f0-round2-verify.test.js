@@ -19,7 +19,12 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router/index.js'
 
-const TIMEOUT = 3000
+// 15s：本文件首个用例是全新 jsdom 模块注册表下的冷启动 —— UnitView.vue SFC +
+// KaTeX 引擎（auth 守卫对 unit 路由点火）的编译实测约 4.5s（隔离复现：导航本身
+// 一轮收敛 /study/math/0 → /study/math/00，仅冷编译慢）。原 3s 在空载机器上
+// 侥幸通过，加载/并发下必脆化（2026-10-24 全量回归实测 3007ms 超时）。
+// 放宽不削弱测试目的：重定向成环在任何超时下都不会收敛，15s 照样抓住。
+const TIMEOUT = 15000
 
 /** 带超时保护的真导航 —— 若守卫成环，push 不收敛 → 超时抛错（明确证据） */
 function pushWithTimeout(to) {
