@@ -413,8 +413,10 @@ mark.katex-hl {
  * 视觉与 MathJaxRender 的 .code-fence 同款（等宽 + 微底色 + 圆角），但只做行内尺寸，
  * 且**不做语法高亮** —— 学习场景里要的是「这是代码」的辨识度，不是 token 配色。
  * 底色用 --surface-muted / 字体用 --font-mono，随主题联动，不写死色值。
- * ⚠️ 只能以 CSS 类形式存在：项目 CSP 禁 unsafe-* 与运行时内联样式属性，
- *    所以 useKatex 里只允许输出 class，不允许拼 style 属性。 */
+ * ⚠️ 只以 CSS 类形式存在，useKatex 里只允许输出 class、不允许拼 style 属性。
+ *    真实理由是可维护与主题联动（跟随同文件 mark.katex-hl 的先例），**不是被 CSP 禁止**：
+ *    tauri.conf.json 的 style-src 实为 'self' 'unsafe-inline'（允许内联样式）；
+ *    真正禁 unsafe-inline 的是 script-src 'self'。 */
 code.katex-inline-code {
   font-family: var(--font-mono);
   background: var(--surface-muted);
