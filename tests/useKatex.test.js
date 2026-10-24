@@ -180,3 +180,107 @@ describe('渲染结果 memo（阶段 7.2）', () => {
     spy.mockRestore()
   })
 })
+
+/**
+ * 行内代码 `code`（内容侧 2026-10-24 转函：12 类字段共 739 处反引号原样上屏）
+ *
+ * 根因：processSegment 只有 转义 → 加粗 → 高亮 → 换行 四步，没有行内代码，
+ *       而 escapeHTML 只转义 & < >（不转义反引号），于是 `print(...)` 连同反引号一起显示。
+ *
+ * 这里钉死三件事：
+ *  1. 反引号内容必须变成 <code class="katex-inline-code">，且输出里不留孤立反引号；
+ *  2. 代码内部是**字面量**：`2 ** 3`、`a == b` 不得被加粗/高亮误伤（内容侧大量存在）；
+ *  3. 加粗标记常**跨在**代码跨度两侧（`**`no shutdown` 忘写**`），不能为了 2 把粗体弄丢。
+ */
+describe('行内代码 `code`', () => {
+  beforeEach(async () => {
+    await warmKatex()
+    clearMathCache()
+  })
+
+  // 内容侧来件里的原句（src/content/computer/.../01-Python开发环境与基础语法.js:112 附近）
+  const TICKET_TEXT =
+    '**print 输出：**`print(内容)` 用于输出，多个内容用逗号分隔，如 `print("总分", 95)` 输出 `总分 95`。'
+
+  it('基本：反引号内容渲染为 <code>，输出不残留孤立反引号', () => {
+    const html = renderMath(TICKET_TEXT)
+    expect(html).toContain('<strong>print 输出：</strong>')
+    expect(html).toContain('<code class="katex-inline-code">print(内容)</code>')
+    expect(html).toContain('<code class="katex-inline-code">print("总分", 95)</code>')
+    expect(html).toContain('<code class="katex-inline-code">总分 95</code>')
+    expect(html).not.toContain('`')
+    // 项目 CSP 禁运行时内联样式：代码标签只能挂 class
+    expect(html).not.toContain('<code style=')
+  })
+
+  it('同一段里多个代码跨度各自成标签', () => {
+    const html = renderMath('先 `a = 1` 再 `b = 2`，最后 `c = a + b`')
+    expect(html.match(/<code class="katex-inline-code">/g)).toHaveLength(3)
+    expect(html).toContain('<code class="katex-inline-code">a = 1</code>')
+    expect(html).toContain('<code class="katex-inline-code">b = 2</code>')
+    expect(html).toContain('<code class="katex-inline-code">c = a + b</code>')
+    expect(html).not.toContain('`')
+  })
+
+  it('代码内的 ** 与 == 保持字面量，不被转成 <strong> / <mark>', () => {
+    const html = renderMath('幂运算 `2 ** 3`，相等判断 `a == b`')
+    expect(html).toContain('<code class="katex-inline-code">2 ** 3</code>')
+    expect(html).toContain('<code class="katex-inline-code">a == b</code>')
+    expect(html).not.toContain('<strong>')
+    expect(html).not.toContain('<mark')
+  })
+
+  it('代码内的 < > & 保持已转义，不产生裸标签', () => {
+    const html = renderMath('标签 `<div>` 与 `<a & b>`')
+    expect(html).toContain('<code class="katex-inline-code">&lt;div&gt;</code>')
+    expect(html).toContain('<code class="katex-inline-code">&lt;a &amp; b&gt;</code>')
+    expect(html).not.toContain('<div>')
+    expect(html).not.toContain('<a &')
+  })
+
+  it('加粗标记跨在代码跨度两侧时仍生效（内容里的 `**`no shutdown` 忘写**`）', () => {
+    const html = renderMath('**`no shutdown` 忘写**')
+    expect(html).toBe('<strong><code class="katex-inline-code">no shutdown</code> 忘写</strong>')
+  })
+
+  it('高亮标记同样可以跨代码跨度（`==`ip routing`==`）', () => {
+    const html = renderMath('==`ip routing` 忘了开==')
+    expect(html).toContain('<mark class="katex-hl"><code class="katex-inline-code">ip routing</code> 忘了开</mark>')
+  })
+
+  it('代码内容不跨行（换行即止），两行各自成标签', () => {
+    const html = renderMath('第一行 `a`\n第二行 `b`')
+    expect(html).toContain('<code class="katex-inline-code">a</code><br>第二行 ')
+    expect(html).toContain('<code class="katex-inline-code">b</code>')
+    expect(html).not.toContain('`')
+  })
+
+  it('未配对的反引号按字面量保留，不生成半个 <code>', () => {
+    const html = renderMath('C 语言里的 `指针 用法')
+    expect(html).not.toContain('<code')
+    expect(html).toContain('`指针')
+  })
+
+  it('三反引号不会被切成空 <code></code>（围栏由 codeFence.js 单独切分）', () => {
+    // 即便围栏没被切分、整段降级进 processSegment，捕获组要求「非反引号 + 非换行」也匹配不上
+    const html = renderMath('示例：\n```python\nprint("总分", 95)\n```')
+    expect(html).not.toContain('<code')
+    expect(html).not.toContain('katex-inline-code')
+    expect(html).toContain('```python')
+  })
+
+  it('行内代码与围栏混排同段：正文段出 <code>，围栏段保持字面三反引号', () => {
+    const html = renderMath('保存为 `01.py` 后按 F5：\n```python\nprint("总分", 95)\n```')
+    expect(html).toContain('<code class="katex-inline-code">01.py</code>')
+    expect(html).toContain('```python')
+    expect(html).toContain('print("总分", 95)')
+    expect(html).not.toContain('<code class="katex-inline-code">python')
+  })
+
+  it('引擎未就绪的兜底路径同样出行内代码（冷启动深链也不闪反引号）', () => {
+    const html = renderPlainFallback('`print(x)` 输出，**重点**')
+    expect(html).toContain('<code class="katex-inline-code">print(x)</code>')
+    expect(html).toContain('<strong>重点</strong>')
+    expect(html).not.toContain('`')
+  })
+})

@@ -124,12 +124,65 @@ function processHighlight(text) {
 }
 
 /**
- * 处理普通文本段：HTML 转义 + 加粗 + 高亮 + 换行
+ * 行内代码正则：`code` → 捕获「至少 1 个非反引号、非换行字符」
+ *
+ * 两条约束直接决定安全性（内容侧 2026-10-24 转函：12 类字段共 739 处）：
+ *  - 捕获组非空 → ``` 三反引号（含成对出现）不会被切成空 <code></code>，
+ *    与 10-22 上线的三反引号围栏互不干扰（那 90 段由 utils/codeFence.js 切分，
+ *    根本不进这里；即便未闭合围栏降级成普通文本，也只会原样显示）
+ *  - 捕获组排除换行 → 跨行内容不会被吞进行内代码
+ */
+const INLINE_CODE_RE = /`([^`\n]+?)`/g
+
+/** 占位符哨兵：源码里几乎不可能出现 NUL，用它包住索引即可保证唯一 */
+const INLINE_CODE_SENTINEL = '\u0000'
+
+/**
+ * 处理 `行内代码` 标记为 <code class="katex-inline-code"> 标签
+ *
+ * 为什么不能简单一次 replace：加粗 / 高亮必须**跳过代码内部**，否则
+ * `2 ** 3`（幂运算）、`a == b`（相等判断）会被误转成 <strong> / <mark> ——
+ * 这类内容在题库里大量存在。反过来，加粗标记又常常**跨在**代码跨度两侧
+ * （如 `**`no shutdown` 忘写**`），所以也不能把代码段切出来单独处理。
+ *
+ * 解法是「先摘出来、后放回去」：
+ *   1. 按 INLINE_CODE_RE 把代码内容摘成占位符。此时文本已被 escapeHTML 转义过，
+ *      摘到的 `code` 是安全文本，**禁止二次转义**（否则 &lt; 会变成 &amp;lt; 原样显示）；
+ *   2. 让 decorate（加粗 + 高亮）在摘空后的文本上跑 —— 它看不见代码内容，
+ *      却能正常跨占位符匹配 `**...**` / `==...==`；
+ *   3. 把占位符换回 <code>。
+ *
+ * @param {string} text 已 escapeHTML 的文本
+ * @param {(plain: string) => string} [decorate] 非代码段的装饰函数（加粗 + 高亮）
+ * @returns {string} 含 <code class="katex-inline-code"> 的 HTML
+ */
+function processInlineCode(text, decorate = (plain) => plain) {
+  // 极端情况：源码自带 NUL 时占位符不再唯一，宁可不行内代码也不把正文搅乱
+  if (text.includes(INLINE_CODE_SENTINEL)) return decorate(text)
+
+  const codes = []
+  const masked = text.replace(INLINE_CODE_RE, (_match, code) => {
+    codes.push(code)
+    return `${INLINE_CODE_SENTINEL}katex-inline:${codes.length - 1}${INLINE_CODE_SENTINEL}`
+  })
+  if (codes.length === 0) return decorate(text)
+
+  const decorated = decorate(masked)
+  const restore = new RegExp(`${INLINE_CODE_SENTINEL}katex-inline:(\\d+)${INLINE_CODE_SENTINEL}`, 'g')
+  return decorated.replace(restore, (_match, index) =>
+    `<code class="katex-inline-code">${codes[Number(index)]}</code>`)
+}
+
+/**
+ * 处理普通文本段：HTML 转义 + 行内代码 + 加粗 + 高亮 + 换行
+ *
+ * 顺序即优先级：escapeHTML 之后**立刻**定型代码跨度（反引号内的 ** / == 保持字面量），
+ * 再让加粗 / 高亮处理剩余文本（它们可跨代码跨度匹配）。
+ * 行内代码不能挪到 escapeHTML 之前 —— 那会让代码内容里的 < > 破坏 HTML。
  */
 function processSegment(text) {
   let result = escapeHTML(text)
-  result = processBold(result)
-  result = processHighlight(result)
+  result = processInlineCode(result, (plain) => processHighlight(processBold(plain)))
   result = result.replace(/\n/g, '<br>')
   return result
 }

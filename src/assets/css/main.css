@@ -409,6 +409,21 @@ mark.katex-hl {
   font-weight: 600;
 }
 
+/* 行内代码（`code` 语法渲染结果，内容侧 12 类字段共 739 处）
+ * 视觉与 MathJaxRender 的 .code-fence 同款（等宽 + 微底色 + 圆角），但只做行内尺寸，
+ * 且**不做语法高亮** —— 学习场景里要的是「这是代码」的辨识度，不是 token 配色。
+ * 底色用 --surface-muted / 字体用 --font-mono，随主题联动，不写死色值。
+ * ⚠️ 只能以 CSS 类形式存在：项目 CSP 禁 unsafe-* 与运行时内联样式属性，
+ *    所以 useKatex 里只允许输出 class，不允许拼 style 属性。 */
+code.katex-inline-code {
+  font-family: var(--font-mono);
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
 /* 移动端阅读排版：适当放大正文字号与行高，标题随窄屏收敛 */
 @media (max-width: 600px) {
   body { font-size: 17px; line-height: 1.75; }

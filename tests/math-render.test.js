@@ -9,7 +9,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { splitCodeFences } from '@/utils/codeFence'
+
+/** 项目根（本文件位于 <root>/tests/ 下），供源码级样式契约读取 main.css */
+const ROOT = join(__dirname, '..')
 
 describe('MathJaxRender 引擎就绪前后', () => {
   beforeEach(() => {
@@ -93,5 +98,73 @@ describe('splitCodeFences', () => {
     expect(splitCodeFences('```python\r\nelse\r\n    ＿＿＿＿\r\n```')).toEqual([
       { type: 'code', content: 'else\r\n    ＿＿＿＿', language: 'python' }
     ])
+  })
+})
+
+/**
+ * 行内代码与围栏的混排（内容侧 2026-10-24 转函的验收项之一）
+ *
+ * 两条路径必须同时正确、互不干扰：
+ *  - 三反引号围栏：MathJaxRender 先用 splitCodeFences 切成 code 段走 <pre><code>
+ *  - 单反引号行内：留在 text 段里，由 useKatex 的 processSegment 转成 <code class="katex-inline-code">
+ */
+describe('行内代码与围栏混排', () => {
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
+  it('同段里正文行内代码与围栏都正确渲染', async () => {
+    const { default: MathJaxRender } = await import('@/components/MathJaxRender.vue')
+    const { warmKatex } = await import('@/composables/useKatex')
+
+    const text = '保存为 `01.py` 后按 F5 运行：\n```python\nprint("总分", 95)\n```'
+    const wrapper = mount(MathJaxRender, { props: { text } })
+    await warmKatex()
+    await nextTick()
+
+    // 行内代码：单反引号 → <code class="katex-inline-code">，反引号本身消失
+    const inline = wrapper.get('code.katex-inline-code')
+    expect(inline.text()).toBe('01.py')
+    // 围栏：仍是 <pre class="code-fence">，内容原样
+    expect(wrapper.get('pre.code-fence code').text()).toBe('print("总分", 95)')
+    expect(wrapper.text()).not.toContain('`')
+    wrapper.unmount()
+  })
+
+  it('围栏代码块里的反引号不被行内规则二次加工', async () => {
+    const { default: MathJaxRender } = await import('@/components/MathJaxRender.vue')
+    const text = '```python\ns = "`raw`"\n```'
+    const wrapper = mount(MathJaxRender, { props: { text } })
+    const code = wrapper.get('pre.code-fence code')
+
+    expect(code.text()).toBe('s = "`raw`"')
+    expect(code.html()).not.toContain('katex-inline-code')
+    wrapper.unmount()
+  })
+})
+
+/**
+ * 行内代码的样式契约（源码级）
+ *
+ * 为什么值得单独立用例：`code.katex-inline-code` 是本次新增的**唯一视觉落点**，
+ * 类名写在 useKatex 的模板字符串里、样式写在 main.css，两边跨文件耦合。
+ * 少了这条守卫，「反引号能转成 <code> 但没有任何样式」会以全绿测试收场。
+ *
+ * 同时锁住 CSP 红线：项目禁 unsafe-* / 运行时内联样式属性，所以只能有 CSS 类。
+ */
+describe('行内代码样式契约', () => {
+  const MAIN_CSS = readFileSync(join(ROOT, 'src/assets/css/main.css'), 'utf-8')
+
+  it('code.katex-inline-code 提供等宽字体 + 微底色（同 .code-fence 视觉，不做语法高亮）', () => {
+    const rule = MAIN_CSS.match(/code\.katex-inline-code\s*\{([^}]*)\}/)
+    expect(rule, 'main.css 缺少 code.katex-inline-code 规则').not.toBeNull()
+    const body = rule[1]
+    expect(body).toMatch(/font-family:\s*var\(--font-mono\)/)
+    expect(body).toMatch(/background:\s*var\(--surface-muted\)/)
+    expect(body).toMatch(/border-radius:/)
+    expect(body).toMatch(/padding:/)
+    expect(body).toMatch(/font-size:/)
+    // 行内代码不做语法高亮：不引入任何 token / 颜色高亮类
+    expect(body).not.toMatch(/color:/)
   })
 })
