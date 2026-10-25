@@ -32,7 +32,7 @@
 | **D16** | 手势归属 | **层级分开**：屏幕边缘 0-24px 的右滑**交系统返回**（应用不注册）；内容区右滑 = 上一页、左滑 = 下一页。手势**自写（Pointer Events），不引第三方手势库** | ①Android 10+ 手势导航的返回手势即"从左右边缘向内滑"（官方文档已核实），系统优先消费，应用申索需 `View.setSystemGestureExclusionRects()`（Tauri 侧能力 **待确认**）②项目 runtime deps 仅 7 个、无 @vueuse，且第三方库在 `script-src 'self'` 下的 eval 安全性未核实（§5.7.1） |
 | **D17** | 翻页路由 | **页内翻页用 `router.replace`（不入历史栈）**；跨单元进入（从 Tab 点进）仍 `push`（保证返回能回 Tab）。系统返回 = **直接离开单元回 Tab**；回看上一页由翻页手势承担（右滑 = 上一页，v4 已定）。**页眉 `[返回]` 按钮与边缘手势成为唯一返回通道**（R2 语义强化） | 用户拍板。①单元内连翻 12 页按 push 需 11 次返回才能离开——碎片场景的致命痛点；②回看需求已被翻页手势完整覆盖，返回键逐页回看是冗余；③业界阅读类 App（微信读书/小说）章节翻页普遍不入栈。落地：`goPrev/goNext` 内部改 `replace`（P4-T5） |
 | **D18** | 第 5 Tab「数据」 | **不设**，4 Tab 定案不变；Dashboard 洞察已并入「我的」 | 用户拍板（架构师此前已建议不设）。将来要加成本约 **0.5 天**（路由 meta + Tab 数组各加一项），架构零阻碍（§11-10 关闭） |
-| **D19** | 自动组卷 | **默认排除真题卷 + 留开关**：组卷池默认排除 `source === 'exam'` 的 **104 题**（口径以 P6-T1 建索引后实测为准），避免组出真题卷原题；组卷配置（PRD L2）留「**含真题卷题目**」开关，**默认关闭**；文案硬约束不变：自动组卷**禁止自称"真题"**，须作"自定义组卷" | 用户拍板；与 D12（支持自动组卷）叠加，收紧题源边界 |
+| **D19** | 自动组卷 | **默认排除真题卷 + 留开关**：组卷池默认排除 `source === 'exam'` 的 **245 题**（⚠️ 2026-10-26 实测修正：原写 104 题，实际 math 60 + chinese 32 + computer 153 = **245**，其中可判分 146）；组卷配置（PRD L2）留「**含真题卷题目**」开关，**默认关闭**；文案硬约束不变：自动组卷**禁止自称"真题"**，须作"自定义组卷" | 用户拍板；与 D12（支持自动组卷）叠加，收紧题源边界 |
 | **D20** | 桌面宽屏导航 | **≥1150px（`--bp-lg`）TabBar 退化为顶部玻璃导航条**（品牌左 / 4 Tab 水平居中 / 用户区右），与移动端**完全同构**（同图标、同激活色、同文案），底部液态 pill 不渲染；**<1150px** 底部液态 pill（已定）。**否决侧栏方案**：①与移动端同构心智零迁移（D2 自适应优先的本意）②导航侧栏会与内容页 `ContentSidebar` 形成**双竖栏并存冲突**（顶栏无此问题）③第 5 Tab 已决定不设（D18），侧栏的扩展性优势是伪需求。桌面激活态：`rgba(201,100,66,.10)` 底 + 橙字（与移动端 pill 内激活一致） | 用户拍板；落地并入 **P1-T2**（AppTabBar 双形态） |
 
 **CSP 硬约束**（贯穿所有选型）：`script-src 'self'`（禁 eval/内联脚本）；`style-src 'self' 'unsafe-inline'`（内联样式允许）；`font-src 'self' data:`（字体必须自托管）；`connect-src` 不含第三方域。
@@ -893,16 +893,16 @@ sequenceDiagram
 | 任务 | 内容 | 依赖 |
 |---|---|---|
 | P5-T1 工具链 | Android Studio + SDK + NDK + JDK 17；`ANDROID_HOME`/`NDK_HOME`；`rustup target add aarch64-linux-android`（环境，非代码） | — |
-| P5-T2 init 与配置 | `npm run tauri:android:init`（生成 `src-tauri/gen/android`，**纳入版本控制**）；`src-tauri/tauri.conf.json`（`bundle.android.minSdkVersion` 等）；keystore 签名 | P5-T1、P1-P3 |
+| P5-T2 init 与配置 | `npm run tauri:android:init`（生成 `src-tauri/gen/android`）；`src-tauri/tauri.conf.json`（`bundle.android.minSdkVersion` 等）；keystore 签名。⚠️ **规划写的「纳入版本控制」实际未执行、也不再执行**：`src-tauri/gen/` 下只有 `schemas/`，Tauri CLI 升级会产生大量无意义 diff，CI 每次跑 init 约 1 分钟可接受（precheck §3.6 建议）→ **此分歧已了结，不再作为待办** | P5-T1、P1-P3 |
 | P5-T3 真机验证 | 真机冒烟 + `chrome://inspect` Performance（§5.3 预算）+ CSP violation 扫描 + §8 妥协项（导图/表/画板）逐项确认。**v4 追加四项必测**：①边缘 24px 阈值与系统返回手势的实际边界（含三键导航老设备）②页脚与底部系统手势区是否抢触摸（定 `--sys-gesture-bottom`）③`overflow-x: clip` 对 fixed 子元素的裁剪行为（WebKit）④系统 WebView 版本（决定 VT 是否可用，仅影响备选方案） | P5-T2 |
 
 ### P6 练习聚合层（D11 强制自评 + D12 自动组卷）—— 新增阶段，依赖 PM 交互稿
 
 | 任务 | 内容与文件 | 依赖 |
 |---|---|---|
-| P6-T1 题源提取与索引 | 新增 `scripts/build-practice-index.mjs`（复用 `scripts/build-search-index.mjs` 的 blocks 遍历模式：聚合 quiz/exam 的 `items`，按 学科/单元/难度 建索引）。⚠️ 仅 **286/1393（20.5%）** 有 `options`+`correctIndex` 可机器判分，其余只有自由文本答案 → **索引必须区分「可判分 / 需自评」两类** | P0（blocks 结构稳定后） |
+| P6-T1 题源提取与索引 | 新增 `scripts/build-practice-index.mjs`（复用 `scripts/build-search-index.mjs` 的 blocks 遍历模式：聚合 quiz/exam 的 `items`，按 学科/单元/难度 建索引）。⚠️ 仅 **286/1393（20.5%）** 有 `options`+`correctIndex` 可机器判分，其余只有自由文本答案 → **索引必须区分「可判分 / 需自评」两类**。⚠️ **2026-10-26 实测：口径已变为 1488/2363（63.0%），需自评 875 题**——增幅来自 A-1 判断题构建期自动派生（518 题）+ example 例题入库 + 内容侧补题。落地文件为 `scripts/build-practice-bank.mjs` + `public/practice-bank/index.json`（见 §11-11） | P0（blocks 结构稳定后） |
 | P6-T2 做题会话 store | 新增 `src/stores/practice.js`（Pinia：会话队列、当前题、作答/自评状态）；自评结果写入既有 `studyDb` 的 `error_book`（**D11：自评是错题入库唯一触发器**） | P6-T1 |
-| P6-T3 自动组卷（D12 + **D19**） | 新增组卷器（按 难度/单元 从 P6-T1 索引抽题；**默认排除 `source === 'exam'` 的真题卷题目（104 题，实测口径以 P6-T1 为准）**；组卷配置留「**含真题卷题目**」开关，**默认关闭**）；文案硬约束：**禁止自称"真题"，须作"自定义组卷"**；复用 `ExamBlock` 的计时/计分语义 | P6-T1、P6-T2 |
+| P6-T3 自动组卷（D12 + **D19**） | 新增组卷器（按 难度/单元 从 P6-T1 索引抽题；**默认排除 `source === 'exam'` 的真题卷题目（⚠️ 104 → **245 题**，2026-10-26 实测）**；组卷配置留「**含真题卷题目**」开关，**默认关闭**）；文案硬约束：**禁止自称"真题"，须作"自定义组卷"**；复用 `ExamBlock` 的计时/计分语义 | P6-T1、P6-T2 |
 | P6-T4 会话页 + 结算页 UI | 新增 `src/views/practice/`（会话页全屏、结算页）；`src/router/index.js`（`/practice` 由占位转正）。**强制自评**：看答案后必须选「我会了/我还不会」才允许下一题（不可跳过） | P6-T2、P6-T3；**PM 交互稿** |
 
 ---
@@ -926,6 +926,12 @@ sequenceDiagram
     - **T4 会话页 + 结算页** → `src/views/practice/`（PracticeHome / PracticeConfig / PracticeSession / PracticeResult），`/practice` 路由已由占位转正
     - 测试：compose-paper 19 + compose-paper-kp 9 + practice-store 8 + practice-timed 15 + practice-metrics 8 + practice-bank 24 + practice-client 18 + batch-e-verify-practice 9 + batch-f0-verify-practice-explain 11 = **121 例**
     - 超出规划的交付：自评三档化 + 校准率（E-1）、限时仿真三档（D-1）、kp 粒度组卷权重（D-3）、例题解析入库可达（F0c5）
+    - **已知缺口 5 项（功能面无缺陷，均为后续项，2026-10-26 审计确认）**：
+      1. ⚠️ **518 道构建期派生的判断题零人工核验**（`index.json` 的 `verifiedDerived: 0`；`_derived-audit.json` 抽检清单已生成但无人过目）。这些题自动补选项+答案并直接计入「可判分」，**判错即误导学员，且 CI 不拦** —— 五项中优先级最高
+      2. 跨会话去重未接线：`composePaper` 有 `existingKeys` 参数，但 store 三处组卷（startFromDraft / startTimed / againSameConfig）**一处都没传** → 「再来一组」会重复抽到刚做过的题
+      3. exam 计分语义有意不复用：ExamBlock 走 score/totalScore 分制，practice 走 auto/self 二分 + selfTier 三档（store:50-52 注明「有意不三档化，勿顺手合并」）。两边都写 `error_book`，复习 Tab 的 SM-2 会吃到档位口径不一致的错题 —— **已知且有意，非缺陷**
+      4. 会话进度不持久化（内存态）：已答数逐题落库不丢，但「做到第 7 题」刷新即丢，Android 切后台被杀比 Web 更易触发
+      5. 限时仿真的「交卷」按钮可在未自评时结束会话（未答按未答计入）——限时语义所需，非缺陷，但意味着强制自评在限时档不是无条件强制
 12. ⬜ `tests/jsxgraph-eval-guard.test.js`（QA 已独立复核 PASS 并入库 `6427673`）：与 P0-P6 **无耦合**，不影响本设计实施
 13. ✅ **`docs/csp-guard-plan.md` 已更新对齐**（419 行，2026-10-07 提交 `3055bbc`）：失效段落清理（演练场回退相关）、L4 首轮预期改写（落实 D10 后 0 违规）、新增 §2.1 与 QA 守卫测试的分工边界。✅ **2026-10-18：P1-T5 已于批 E·E-0 落地，该文档归档至 `docs/archive/2026-10/plans/csp-guard-plan.md`**（未删除，详见 §13）
 14. ⬜ v2 风格参数**尚未真机验证**：玻璃 30-42% 不透明度、液态 pill 的 `backdrop-filter` 在滚动时的表现、圆角玻璃在 WebKit 的锯齿——三项均列为 **P5-T3 真机验证必测项**（低端安卓机优先）。**2026-10-24 拆分表述**：P5-T3 的**主路径真机验证已完成**（v0.3.2 APK 实测：启动不白屏、代码块等宽渲染与 Python 缩进正常、经 nginx 公网 health 200），但上述三项 v2 风格参数仍无专项验证记录 —— 需低端安卓机专项过一遍，故本条维持 ⬜
@@ -1014,3 +1020,4 @@ sequenceDiagram
 *v1.5 定档与定论：架构师（高见远），2026-10-07 —— 翻页口径定档 `overlap=100ms` / 总 380ms（唯一口径，调试改整档缩放）；新增 §5.7.7「标记已掌握」数据落点定论（`page_progress.masteredAt` 时间戳、`engine.js` 零改动、三语义命名表）；`data-kind` 映射定稿（§5.6.2 五值域，P4-T3 同批依赖）；§5.6.3 桌面端进度条渐变改纯色。**只改本文档，未开工写代码。***
 *v1.6 并入 D17-D20：架构师（高见远），2026-10-07 —— 翻页路由改 `replace`（D17，跨单元仍 push，§5.7.2/P4-T5）；第 5 Tab「数据」不设（D18，§11-10 关闭）；自动组卷默认排除真题卷 + 留开关（D19，P6-T3）；桌面 ≥1150px TabBar 退化顶部玻璃导航条、否决侧栏（D20，§2/§4.1/§4.4）；P1-T2 交付扩为 AppTabBar 双形态；§11-10/18 关闭。**只改本文档，未开工写代码。***
 *v1.7 状态更正（只改本文档，未动代码）：team-lead（齐活林），2026-10-24 —— 用户问「P6/P5 完成了吗」，逐条核对代码后发现 §11-5 / §11-11 的 ⬜ 已过期：**P6 四任务点全部落地**（文件名与规划不同、功能全覆盖，含 D19 真题卷隔离与 121 例测试），改 ✅ 并补「规划→落地」映射；§11-14 拆分：P5-T3 主路径真机验证已完成（v0.3.2），三项 v2 风格参数仍未专项验证，维持 ⬜。⚠️ 教训：本文档的状态栏不随代码自动更新，只能靠核对——已两次出现「文档说没做、代码早做了」。*
+*v1.8 数字更正与缺口登记（只改本文档，未动代码）：team-lead（齐活林）+ 工程师（寇豆码-2）P6 审计，2026-10-26 —— ① **D19 的「104 题」实测更正为 245 题**（math 60 / chinese 32 / computer 153，其中可判分 146），§2-D19 与 §10-P6-T3 同步；② P6-T1 的「286/1393（20.5%）」实测已变为 **1488/2363（63.0%）**、需自评 875 题，增幅来自 A-1 派生 518 题 + example 入库 + 内容侧补题；③ P5-T2 的「gen/android 纳入版本控制」实际未执行且不再执行（precheck §3.6 建议），分歧了结；④ §11-11 登记 5 项已知缺口，最该做的是 518 道派生判断题的人工核验。⚠️ 同一类问题第三次：文档里的「估算数字」不随实测更新，必须把规划基线与实测口径分开标注。*
