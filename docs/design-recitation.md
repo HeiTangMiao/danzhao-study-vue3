@@ -2,11 +2,11 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.0 |
+| 文档版本 | **v1.1**（v1.0 → v1.1 变更见附录 B） |
 | 作者 | Bob（软件架构师） |
-| 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚） |
+| 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚）；team-lead 2026-10-26 复核意见 |
 | 目标仓库 | `danzhao-study-vue3`（Vue 3.5 + Pinia + IndexedDB + Tauri 2） |
-| 状态 | 待任务实施；第 8 节 4 条需 team-lead / 用户拍板 |
+| 状态 | **可实施**。§8 为决策台账：7 条已拍板、1 条待工程验证（T03 内必须完成）、4 条信息性风险 |
 | 交付边界 | **只读调研 + 本文档**。不改任何源码，不提交实现代码 |
 
 本文所有数字、行号、文件名均为本机实测复核（复核命令见 §0）。
@@ -21,8 +21,10 @@
 | 排除 reveal 1 篇后的有效篇目 | 同上，`(b.mode\|\|'reveal')!=='input'` → 排除 | **73 篇** |
 | `role:'review'` | `title` 匹配 `/自测\|冲关/` 且 input | **6 篇**（5 × 综合自测 + 1 × 综合大冲关） |
 | `role:'lesson'` | 73 − 6 | **67 篇** |
-| 句数（`items.length`，PRD 的 120/1.79 口径） | 逐块累加 | 正课 120 / 复习 50 / reveal 5 = 175 |
-| **真空位数**（`{{...}}` 占位符个数） | 逐句正则计数 | **193**（≠ 175，见 §1 异议 4） |
+| 句数（`items.length`，PRD 的 1.79 口径） | 逐块累加 | 产物内 **170 句** = 正课 120 + 复习 50；另有 reveal 篇 5 句（排除）。全库 175 句 |
+| **真空位数**（`{{...}}` 占位符个数） | 逐句正则计数 | 产物内 **193 空** = 正课 **141** + 复习 **52**；另有 reveal 篇 11 空（排除）。全库 204 空 |
+| 正课空/篇均值 | 141 / 67 | **2.10 空/篇**（PRD 的 1.79 是「句/篇」，非空/篇 —— 见 §1 异议 4） |
+| 正课「仅 1 空」的篇 | 逐篇计数 | **27 / 67 = 40%**（PRD 写的 33 篇 / 49% 实为「仅 1 **句**」的篇数） |
 | `strict:true` 的句 | 全库扫描 | **仅 1 句**：`07-默写专项/01-先秦至魏晋名篇.js` · 《诗经》·关雎 · `求之不得，{{寤寐思服}}。悠哉悠哉，{{辗转反侧}}。` |
 | `alts` 非空的句 | 全库扫描 | 4 句（闻王昌龄…、念奴娇…、通假字专项 ×2） |
 | 文件 → 篇数分布 | 逐文件聚合 | `01`:15 正课 + 1 自测；`02`:13+1；`03`:11+1；`04`:15+1；`05`:10+1；`06`:3+大冲关 |
@@ -31,7 +33,9 @@
 | 换账号清理 | `src/stores/auth.js:86-91` → `studyDb.clearAllSyncedData()`（只清 `SYNC_STORE_NAMES`） | **新表不会被清**（见 §1 异议 8） |
 | CSP | `src-tauri/tauri.conf.json:23` | `script-src 'self'`；`connect-src 'self' ipc: http://ipc.localhost https://520305.top`；`style-src 'self' 'unsafe-inline'` |
 | 构建目标 | `vite.config.js:39` `target:'es2019'` | `?.` / `??` **会被 esbuild 降级**（既有源码已在用：`studyDb.js:896` `extra?.selfTier`）→ 本仓可写 |
-| `siteRoot()` 在 Tauri 下 | `src/utils/assetBase.js:13-25` | 返回**线上 origin**（`https://520305.top`），"首次打开且无缓存时离线不可用" |
+| `siteRoot()` 在 Tauri 下 | `src/utils/assetBase.js:13-25` | 返回**线上 origin**（`https://520305.top`）；相对模式返回 `'./'`。两源并存是 §1 异议 7 的设计基础 |
+| 版本权威 | `src/content/contentManifest.js:42` `CONTENT_VERSION = 4`；`:156-158` P-S51「版本口径只有 `manifest.contentVersion` 一个，子段不带版本号」 | 背诵产物只能**投影**这个号，禁新开 `RECITE_VERSION` |
+| `fetchJson` 默认超时 | `src/utils/fetchJson.js:17` `DEFAULT_TIMEOUT_MS = 8000` | 8 秒 —— 首屏不能直接阻塞在这个默认值上（§1 异议 7） |
 | 非页面模块登记 | `scripts/lib/load-content.mjs:37-49` `NON_PAGE_FILES` + `tests/content-style.test.js:50` | 新增 `src/content/*.js` 模块**必须**登记，否则测试失败 |
 
 ---
@@ -93,11 +97,20 @@ P0-1 同一条里写了三句：「产物含 **74 篇**」、「`role:'review'` 
 
 #### 异议 4（**口径陷阱，会造成 UI 错**）：`itemCount` ≠ 空位数
 
-PRD 的"120 空 / 均值 1.79"用的是 `items.length`（**句数**）。实测真实 `{{}}` 占位符是 **193 个**，即平均每句 1.10 个空 —— **有句子含 2 个以上空**（例：`{{会当凌绝顶}}，{{一览众山小}}。` 是 1 句 2 空）。
+PRD 的"120 空 / 均值 1.79"用的是 `items.length`（**句数**）。实测真空位（`{{}}` 占位符）分布（team-lead 已独立复核，数字一致）：
 
-若实现者拿 `itemCount` 渲染卡片上的「N 空」，学员会看到「关雎 · 1 空」实际要填 2 个格子。
+| 范围 | 句数 | 真空位 | 空/篇均值 |
+| --- | --- | --- | --- |
+| 正课 67 篇 | 120 | **141** | **2.10** |
+| 复习 6 篇 | 50 | 52 | 8.67 |
+| 产物合计 73 篇 | **170** | **193** | 2.64 |
+| （排除）reveal 篇 | 5 | 11 | — |
 
-**裁定**：产物**两个字段都给** —— `itemCount`（句数，对齐 PRD 验收口径）与 `blankCount`（真空位数，UI 显示唯一来源）。命名要让人不可能用错。
+即：**正课的"空"比"句"多 21 个**（141 vs 120），PRD 的 1.79 是「句/篇」，真「空/篇」是 **2.10**；PRD 的「33 篇仅 1 空 / 49%」实为「仅 1 **句**」，真正「仅 1 空」是 **27/67 = 40%**。
+
+若实现者拿 `itemCount` 渲染卡片上的「N 空」，就会在含 2 空的句子上直接错（如 `{{会当凌绝顶}}，{{一览众山小}}。` 是 1 句 2 空，显示「1 空」实际要填 2 格）。
+
+**裁定**：产物**两个字段都给** —— `itemCount`（句数，只用于与 PRD / 内容侧对账）与 `blankCount`（真空位数，**所有面向学员的「N 空」唯一来源**）。命名要让人不可能用错。
 
 #### 异议 5（**会造成进度条倒退**）：`stage>=1` 不能当「已背」
 
@@ -114,38 +127,82 @@ A7 要求「已背 X / 67」与 `recite_progress` 实际行数一致，P0-8 要�
 
 抽取完成后两侧调用的是**同一个函数**，一致性是构造性成立的；真正会出事的窗口是**抽取动作本身写错了**（比如把 `blank.strict ? undefined : {variantMap}` 写成 `{variantMap}`）。抽 10 篇手工对比有 90% 概率漏掉全库**唯一**的那 1 个 strict 句。
 
-**裁定**：A3 的主验收改为**自动 parity 测试**（74 块全量 × 固定输入集 × 逐空断言），手工抽检降为补充。测试必须显式覆盖 `关雎` 的「辗转反侧」：写「返」必须判错（strict 绕开 `CLOZE_VARIANTS` 的 `反→返`），同句之外写「返」判对。
+**裁定**：A3 的主验收改为**自动 parity 测试**（73 篇全量 × 固定输入集 × 逐空断言），手工抽检降为补充。测试必须显式覆盖 `关雎` 的「辗转反侧」：写「返」必须判错（strict 绕开 `CLOZE_VARIANTS` 的 `反→返`），同句之外写「返」判对。
 
-#### 异议 7（**A9 与既有资产基址冲突，会直接违反离线要求**）
+#### 异议 7（**v1.1 重写：初稿被 team-lead 否决，其理由成立，我接受并改设计**）：产物基址与新鲜度
 
-A9 要求"离线全程可用"。但 `assetBase.js:13-25` 明写：Tauri（绝对模式）下 `siteRoot()` 返回**线上 origin**，其后果是"Tauri 端搜索 / 题库 = 走远程 + IDB 缓存，**首次打开且无缓存时离线不可用**"。这是 practice bank 的既有取舍。
+**我的初稿（已废弃）**：`reciteBankClient` 只走 `fetchJson('./', ...)`，命中包内副本。它解决了 A9 离线首开，但漏了一个更长期、更严重的缺陷。下面三条是 team-lead 的反驳，我逐条复核后确认成立：
 
-背诵首页是**首屏依赖**，照抄 `practiceBankClient` 的基址 = 断网首开直接白屏，A9 当场不成立。
+1. **内容是在线更新的（content-remote），而 recite-bank 是从内容派生的清单。** 纯相对路径 = 包内冻结副本 → 内容侧新增或修正 cloze 后，装好的 App **永远看不到**，必须重发版本才生效。
+2. **更糟的是标注会与内容页互相矛盾。** `ClozeBlock` 渲染的区块来自 `loadPage()`（远程优先），而卡片上的「N 空」来自包内旧副本 —— 内容一改，同一篇目上两个数就对不上。这比"看不到新内容"更难排查：它不报错，只是数字错了。
+3. **我把备案当成了主方案。** `assetBase.js` 文件头（S5-6）原话是把"相对路径重试"写成 `loadAsset()` 兜底分支里的 6 行补丁 —— 那是**兜底手段**，不是主路径。我据此定主方案，属于把"备案"读成了"推荐"。
 
-**裁定**：`reciteBankClient` **只走相对路径**（`fetchJson('./', 'recite-bank/chinese.json')`），命中安装包内副本。
-- Web / dev：`./` = 站点根 → 就是 `public/` 那份产物，同一批文件；
-- Tauri：`./` = app 自身 origin → 包内副本，**零网络请求**；
-- 不做 IndexedDB 缓存层（产物 20 KB 量级且随包发布，加 `content_cache` 缓存只增复杂度、零收益）。
+**落地设计（v1.1）**
 
-⚠️ 验收 A9 **必须在 Tauri 断网环境测**（`npm run tauri:build` 后断网启动），不能在浏览器 dev 里测。若实测发现 Tauri 自定义协议不响应 JSON `fetch`，走 §8 的 Plan-B（产物改为构建期生成的 ESM 模块静态 import）。
+| 环节 | 规则 |
+| --- | --- |
+| 双源 | 远程 `fetchJson(siteRoot(), RECITE_BANK_PATH, { timeout: 2500 })`；包内 `fetchJson('./', RECITE_BANK_PATH, { timeout: 3000 })` |
+| **版本偏好** | **两份产物各自烘焙 `contentVersion`（值直接取 `CONTENT_VERSION` 常量），取较大者胜**；相同则沿用内存里那份（不重算队列） |
+| **版本权威** | **只有一个：`CONTENT_VERSION`**（`contentManifest.js:42`，当前 = 4）。产物里的 `contentVersion` 是它的**投影**，不是第二个号。**严禁**新开 `RECITE_VERSION` / `RECITE_BANK_VERSION` 之类独立版本线（`contentManifest.js:156-158` 的 P-S51：子段不带版本号） |
+| 版本比较 | **复用** `mergeContent.js:124` 的 `isNewer`（与 `contentClient.js` 同一闸门）。语义已实测：`remote > local` → true；**相等 → false**（不重算）；**更旧 → false**（前进式回滚，旧版一律不写）。**禁止**在 `reciteBankClient` 里内联 `a > b` 或写成 `>=` |
+| 缓存 | **只用进程内 `Map`**。**不用** `content_cache` / `readByKey` / 读时闸门 —— 那套依赖 `content_meta` 的 `readLocalMaxVersion`，是给 search / practice **分片**用的；给一个 20 KB、随包发布、每次进首页都读的文件再套一层 IDB 闸门是纯负债（`assetBase.js` 文件头警示的正是"包内旧副本与读时闸门并存，需另行评估"） |
+| 失败降级 | 远程失败/超时 → **静默用包内副本**（`console.warn`，不是 `error`，这不是异常）；包内也失败（仅 Web 静态托管缺文件的极端场景）→ `status:'error'` + 「重试」按钮 |
+
+**⚠️ 一处我调整了你指定的顺序，需确认**：你写的是「主路径 `siteRoot()` → 兜底 `'./'`」，即**远程先阻塞**。我改成 **stale-while-revalidate**：
+
+1. **先拉包内副本**（本地协议 / HTTP 缓存，通常 <50 ms）→ 立刻渲染首页，**离线与弱网都秒开**；
+2. **再拉远程**（超时 **2500 ms**，不是 `DEFAULT_TIMEOUT_MS` 的 8000）→ 成功且 `contentVersion` 更大 → 替换内存 bank 并重算队列。
+
+理由一条就够：`fetchJson` 默认超时 **8000 ms**（`fetchJson.js:17`），而背诵首页是**首屏**。远程先阻塞 = 弱网下最长白屏 8 秒才退回包内副本 —— A9 名义成立、体验上不成立。SWR 下"谁的数据胜出"**完全按你的要求**（`contentVersion` 取较大者），只是把"谁先渲染"换成永不阻塞。
+
+若要严格远程先阻塞，改动只是交换这两步（约 5 行）。我建议保留 SWR，并接受它唯一代价：**两版内容不同时，首页队列可能在 200 ms 内刷新一次**（罕见）。约束：刷新结果**只在首页 idle 态应用**（已进单篇作答则不替换，推迟到下次进首页），避免队列在学员作答途中变化。
+
+**其他已确认约束**
+
+- **CSP 无需改动**：生产 `connect-src` 已含 `https://520305.top`（`tauri.conf.json:23`），`devCsp` 亦含。**严禁**在代码里新增主机名字面量（`tests/csp-guard.test.js` L4 会扫）。
+- **dev / Web 下 `siteRoot()` 就是 `'./'`** → 两源同址，**必须跳过远程刷新**（`if (siteRoot() === './') return`），否则每进一次首页就多一次完全重复的 fetch。
+- 验收 A9 **必须在 Tauri 断网环境测**（`npm run tauri:build` 后断网启动）。**双向验证**（你要求）：① 把远程 `contentVersion` bump 后重建部署，确认联网时首页拿到新版；② 断网 / 远程不可达时退回包内副本。任一方向失败，PR 里必须写清降级陈述。
+- **Plan-B（仅当实测证明 Tauri 相对 `fetch` 不可用）**：产物改为构建期生成 `src/recite/bank.generated.js` 静态 `import`。它换到绝对可用，但**牺牲"内容在线更新"** —— 启用时必须连带写明"内容更新需重发版"这个回退代价。
 
 #### 异议 8（**PRD 完全没提：换账号会串号**）
 
-`clearAllSyncedData()`（`studyDb.js:356-361`）只遍历 `SYNC_STORE_NAMES`（7 个同步仓库）。一期若按 §8-Q2 决定**不同步**，`recite_progress` / `recite_state` 就**不在清理清单里** → 学员 A 登出、B 登录，B 会看到 A 的「已背 23 / 67 · 连续 7 天」。这是隐私问题，也是本项目已修过的"跨用户数据污染"（`studyDb.js:326` 的注释指向 `project-assessment-2026-10-17.md Top 1`）。
+`clearAllSyncedData()`（`studyDb.js:356-361`）只遍历 `SYNC_STORE_NAMES`（7 个同步仓库）。一期若按 §8.1 Q2 决定**不同步**，`recite_progress` / `recite_state` 就**不在清理清单里** → 学员 A 登出、B 登录，B 会看到 A 的「已背 23 / 67 · 连续 7 天」。这是隐私问题，也是本项目已修过的"跨用户数据污染"（`studyDb.js:326` 的注释指向 `project-assessment-2026-10-17.md Top 1`）。
 
-**裁定**：一期不同步（理由见 §8-Q2），但**必须**同步做两件事：
+**裁定**：一期不同步（team-lead 已拍板，见 §8.1 Q2），但**必须**同步做两件事：
 1. 新增 `DEVICE_LOCAL_STORES = ['recite_progress', 'recite_state']`，并在 `clearAllSyncedData()` 里一并 `dbClear`（保持方法名不变，避免动 `auth.js` 与既有测试）；
 2. `exportAllData` / `importAllData` 纳入这两张表 —— 否则「导出备份 → 换机恢复」会丢掉全部背诵进度。这两处目前**没有任何调用方**（`grep` 全库 0 命中），风险极低。
+
+> team-lead 已明确"这条不做就不能上线"，故它是 T03 的**准入项**，不是可选项。
+
+#### 异议 9（**双源引入的新失效模式，必须用守卫堵住**）：清单与内容页可能来自不同新鲜度层
+
+采纳双源后会出现**四象限错配**：bank 来自包内旧版、内容页来自远程新版（或反之）。此时 `blockIndex` 指向的可能**根本不是同一篇**。若不拦，作答结果会被写进错误的 `pieceKey` —— 学员的进度被记到另一篇上，且不报错。
+
+**裁定**：进入单篇作答前做一次 **identity 守卫**（便宜且强）：
+
+```js
+const clozeBlocks = page.blocks.filter(b => b.type === 'cloze')
+const block = clozeBlocks[piece.blockIndex]
+if (!block || block.title !== piece.title) {
+  // 坐标漂移：不渲染 ClozeBlock、不写任何 recite_progress、提示「内容已更新，正在刷新素材」
+  // 并触发一次 refresh() 后回首页
+}
+```
+
+- `title` 相等 → 同一篇，继续（`fp` 差异视为文本微调，允许写调度，`reconcile` 会更新 `fp`）；
+- `title` 不等 / 块不存在 → **坐标漂移**，按上面注释中止。
+
+**为什么用 `title` 而不是 `fp` 做这一步判据**：`title` 回答"是不是这一篇"，`fp` 回答"这一篇是否一字未动"。错位风险只关乎前者；用 `fp` 会把"改了个错别字"误判成错位，反而拦住正常作答。两个判据各管一件事，**不能混用**。
 
 ### 1.3 PRD §6.2 的成本论证验证（这段会被摘进给内容侧的回函，必须站得住）
 
 产品经理的论证是：「去掉四档自评 UI 之后，艾宾浩斯固定档与『只做答错重排』是同一量级，所以降级省不了成本」。我做真实实现量对比：
 
-| 方案 | 表字段 | 纯函数实现量 | 新增 UI | 能否复用 `useSpacedReview.js` | 能满足 [1,2,4,7,15] |
+| 方案 | 调度相关字段 | 纯函数实现量 | 新增 UI | 能否复用 `useSpacedReview.js` | 能满足 [1,2,4,7,15] |
 | --- | --- | --- | --- | --- | --- |
-| **A · 固定档**（PRD 主张） | 6 业务字段 | 档位推进 2 行 + 日期查表 1 行 + 队列/触发/streak ≈ 35 行 | **0** | 只复用日期工具 | ✅ 原生 |
-| **B · SM-2** | 9 业务字段（多 `repetitions` / `easeFactor` / `interval`） | 算法现成，但要**改它**才符合间隔序列 | 0（若坚持机器判分） | 算法层看起来能复用，**实测不能** | ❌ 间隔是 1/6/15.6/39… |
-| **C · 只做答错重排** | 5 业务字段 | A 减去「`stage` 字段 + `DELTA` 查表 + `min(stage+1,5)`」≈ 29 行 | 0 | 只复用日期工具 | ❌ 无曲线 |
+| **A · 固定档**（PRD 主张） | 6 | 档位推进 2 行 + 日期查表 1 行 + 队列/触发/streak ≈ 35 行 | **0** | 只复用日期工具 | ✅ 原生 |
+| **B · SM-2** | 9（多 `repetitions` / `easeFactor` / `interval`） | 算法现成，但要**改它**才符合间隔序列 | 0（若坚持机器判分） | 算法层看起来能复用，**实测不能** | ❌ 间隔是 1/6/15.6/39… |
+| **C · 只做答错重排** | 5 | A 减去「`stage` 字段 + `DELTA` 查表 + `min(stage+1,5)`」≈ 29 行 | 0 | 只复用日期工具 | ❌ 无曲线 |
 
 **关于 B 为什么"看似能复用、实际不能"（这是硬证据，不是判断）**：
 
@@ -184,7 +241,7 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 
 ## 2. 文件清单
 
-### 2.1 新增（13 个）
+### 2.1 新增（16 个：10 个实现文件 + 6 个测试）
 
 | 文件 | 职责（一句话） |
 | --- | --- |
@@ -192,7 +249,7 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 | `src/content/reciteBank.js` | 篇目产物形状定义（紧凑键 ↔ 运行时字段、`normalizePiece`、路径与常量），纯 ESM 零 import，构建脚本与浏览器两端共用 |
 | `scripts/build-recite-bank.mjs` | 扫描全库 `cloze` → 篇目索引产物；含断言与超限必报告 |
 | `public/recite-bank/chinese.json` | **构建产物**（入库，与 `public/practice-bank/*.json` 同款纪律） |
-| `src/utils/reciteBankClient.js` | 运行时加载产物（**相对路径** `fetch` + JSON.parse + 逐条清洗），离线优先 |
+| `src/utils/reciteBankClient.js` | 运行时加载产物：**双源 SWR**（包内副本先渲染 → 远程按 `contentVersion` 取大者热替换）+ JSON.parse + 逐条清洗；唯一基址派生处 |
 | `src/composables/useReciteSchedule.js` | 调度纯函数库：`INTERVALS` / `applyResult` / `isDue` / `buildQueue` / `deriveStats` / `syncReviewTriggers` / `bumpStreak` |
 | `src/stores/recite.js` | Pinia 编排层：产物 × DB 行 → 视图状态（队列 / 进度 / streak），唯一写库入口 |
 | `src/views/ReciteView.vue` | 背诵首页（进度条 / 今日新篇 / 今日待重默 / 连续天数 / 常驻大冲关） |
@@ -202,7 +259,7 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 | `tests/recite-bank.test.js` | 构建脚本纯函数单测（形状、`role`/`trigger`、`order` 单调、断言） |
 | `tests/recite-schedule.test.js` | 调度纯函数单测（覆盖 A4 / A5 / A6 / A7 全部构造） |
 | `tests/recite-db-v8.test.js` | DB v7→v8 迁移、换账号清理、导出/导入 |
-| `tests/recite-cloze-parity.test.js` | **A3 主验收**：74 块全量逐空 parity（含唯一 strict 句） |
+| `tests/recite-cloze-parity.test.js` | **A3 主验收**：73 篇全量逐空 parity（含唯一 strict 句）+ identity 守卫 |
 | `tests/recite-entry.test.js` | 两入口计数一致、无数据不占位、4 Tab 不变 |
 
 ### 2.2 修改（8 个）
@@ -218,7 +275,9 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 | `src/views/ReviewView.vue` | 顶部工具区插入 `<ReciteTaskCard variant="review" />`（N=0 时不渲染） |
 | `package.json` | 新增 `"build:recite": "node scripts/build-recite-bank.mjs"`，并串入 `build:index` 与 `prebuild` |
 
-> `src/sync/engine.js` **明确不改**（一期不同步，见 §8-Q2）。
+> `src/sync/engine.js` **明确不改**（一期不同步，见 §8.1 Q2）。
+> `src/content/contentManifest.js` / `scripts/build-content-remote.mjs` / `scripts/check-content-remote.mjs` **不改** —— 见 §3.4「为什么不把 recite-bank 注册成 manifest 子段」。
+> `src/utils/assetBase.js` / `src/utils/fetchJson.js` **不改**（双源基址派生本来就在 `assetBase`；`fetchJson(base, path, {timeout})` 签名现成可用）。
 
 ---
 
@@ -357,7 +416,13 @@ export function fingerprintOf(block) {
 /** 产物根 */
 interface ReciteBank {
   schemaVersion: 1                     // 形状版本；运行时不匹配 → 视为产物不可用
-  generatedAt: string                  // ISO 8601
+  /**
+   * 内容版本 —— **投影自 `contentManifest.js` 的 `CONTENT_VERSION`，不是独立版本号**。
+   * 用途只有一个：双源（包内 / 远程）比对，取较大者（§1 异议 7）。
+   * 构建脚本读 `CONTENT_VERSION` 常量写入，**禁止**另有 `RECITE_VERSION`。
+   */
+  contentVersion: number               // 当前 = 4（与 CONTENT_VERSION 同步）
+  generatedAt: string                  // ISO 8601（仅审计用，不参与任何比较）
   subject: 'chinese'
   counts: { all: 73; lesson: 67; review: 6 }   // 构建期断言值，运行时用于自检
   pieces: RecitePiece[]                // 按 order 升序
@@ -396,6 +461,7 @@ interface RecitePiece {
 ```json
 {
   "schemaVersion": 1,
+  "contentVersion": 4,
   "generatedAt": "2026-10-26T08:00:00.000Z",
   "subject": "chinese",
   "counts": { "all": 73, "lesson": 67, "review": 6 },
@@ -430,6 +496,16 @@ interface RecitePiece {
 ```
 
 > ⚠️ 5 篇综合自测的 `title` **完全相同**（`'综合自测（遮住上文，逐句默写）'`）。所以 UI 上"复习篇"必须显示 `fileTitle` 而非 `title`，否则列表里 5 行长得一模一样。取源：`RecitePiece.fileTitle`（如「默写专项 · 唐诗名篇（上）」）。这是实现者极易踩的坑。
+
+#### 为什么不把 recite-bank 注册成 `manifest` 的子段（已评估，一期不做）
+
+`contentManifest.js` 已有 `OPTIONAL_SECTIONS = ['search','practice']` 这套「指针表 + hash」idiom，按理 recite 应该是第三个子段。**一期刻意不走这条路**，理由三条：
+
+1. **`OPTIONAL_SECTIONS` 已被收紧为"必须非 null"**（`build-content-remote.mjs:207` 先置 `null`、`:293` 再断言非 null；`contentManifest.js:50-54` 记录了这次收紧的原因）。把 `recite` 加进去，就等于让 `build:recite` 成为 `build:content-remote` 的**硬前置** —— 任何只跑其中一个的构建/CI 场景都会自检失败，发布会更脆。
+2. **首屏收益为零**：manifest 本身也在远程（`content-remote/manifest.json`），离线时同样不可达 → 仍要兜底 → 等于给首屏多加一跳才能知道版本。
+3. **版本号不必借道 manifest**：`contentVersion` 直接投影 `CONTENT_VERSION` 常量即可，**权威仍然只有一个**（P-S51 的要求是"不要有第二个版本号"，不是"必须从 manifest 读"）。
+
+> 二期若 recite 产物因内容增长需要**按单元/文件分片**（届时单文件会显著变大），再迁移为 manifest 第三子段 —— 那时才值得付 1 的代价。迁移点写在这里，免得后人以为当初是漏了。
 
 ### 3.5 调度常量（唯一真相源，`useReciteSchedule.js` 导出）
 
@@ -470,7 +546,8 @@ sequenceDiagram
   U->>V1: 从学习 Tab「今日背诵」卡进入 /recite
   V1->>S: init()
   S->>C: loadReciteBank('chinese')
-  C-->>S: ReciteBank（相对路径 fetch + JSON.parse + 逐条清洗）
+  Note over C: ① 先拉包内副本 fetchJson('./') → 立即可渲染（离线/弱网秒开）
+  C-->>S: ReciteBank（bundled, contentVersion=N）
   S->>DB: getReciteProgressAll()
   DB-->>S: rows[]
   S->>SCH: reconcile(pieces, rows)
@@ -483,6 +560,16 @@ sequenceDiagram
   S-->>V1: 视图状态（进度条 / 新篇卡 / 待重默列表 / streak）
   V1-->>U: 渲染（无到期重默时该分区不占位）
 
+  Note over C,S: ② 后台刷新远程（timeout 2500ms，dev/Web 下 siteRoot()==='./' 直接跳过）
+  C->>C: fetchJson(siteRoot()) → contentVersion=M
+  alt M > N 且首页处于 idle 态
+    C-->>S: 新版 bank
+    S->>SCH: buildQueue / deriveStats 重算
+    S-->>V1: 热替换队列（学员正作答时不替换，推迟到下次进首页）
+  else M <= N 或远程不可达
+    C-->>S: 沿用包内副本（console.warn，不阻断）
+  end
+
   U->>V1: 点「开始默写」
   V1->>R: push /recite/:unitNum/:fileIndex/:blockIndex
   R->>V2: 挂载
@@ -490,9 +577,10 @@ sequenceDiagram
   S-->>V2: piece（坐标命中产物条目；未命中 → 提示"该篇已变更"）
   V2->>LP: loadPage(subject, unitNum, fileIndex)
   LP-->>V2: page（动态 import 单个内容 chunk，远程层异常静默回落内置）
-  V2->>V2: blocks.filter(b => b.type==='cloze')[blockIndex]
-  Note over V2: mode !== 'input' → 渲染"该篇不可默写"并阻止进入（防御，产物内不应出现）
-  V2->>CB: <ClozeBlock :block :context="{subject, unitNum, fileKey, fileTitle, unitTitle}" />
+  V2->>V2: clozeBlocks = blocks.filter(type==='cloze'); block = clozeBlocks[blockIndex]
+  Note over V2: identity 守卫（§1 异议 9）：block 缺失或 block.title !== piece.title → 中止，不渲染、不写库、提示"内容已更新"，refresh 后回首页
+  V2->>V2: mode !== 'input' → 渲染"该篇不可默写"并阻止进入（防御；产物内恒为 input，不应触发）
+  V2->>CB: 挂载 ClozeBlock（传 block + context = subject/unitNum/fileKey/fileTitle/unitTitle）
   U->>CB: 逐空输入 → 点「提交」
   CB->>J: gradeCloze(items, values)
   J-->>CB: { results[], correct, total, allCorrect }
@@ -643,8 +731,10 @@ classDiagram
   }
   class ReciteBankClient {
     <<module src/utils/reciteBankClient.js>>
-    +RECITE_BASE: './'
-    +loadReciteBank(subject) ReciteBank
+    +RECITE_BANK_PATH: string
+    +loadBundled() Promise
+    +refreshFromRemote() Promise
+    +loadReciteBank() ReciteBank
     +resetReciteBankCache() void
   }
 
@@ -702,6 +792,8 @@ classDiagram
 | I5 | 判分只在 `clozeJudge.gradeCloze` 一处，`RecitePieceView` 内**零**判分代码 | H7 |
 | I6 | `manual` 模式（大冲关手动入口）**不写任何 `recite_progress` 行** | P0-9 |
 | I7 | `src/content/**` 下**内容页数据文件**零改动（新增两个模块不算，见 §7.1） | 内容侧红线 |
+| I8 | 进单篇前 `block.title === piece.title`，不等则中止且**不写任何 `recite_progress`** | 双源错配时把作答记到错的篇上（§1 异议 9） |
+| I9 | 双源刷新只在**首页 idle 态**应用；版本比较只用 `isNewer`，比较键只能是 `contentVersion` | 队列在作答途中变化 / 出现第二套版本权威 |
 
 ---
 
@@ -751,16 +843,17 @@ classDiagram
 - 遍历与元信息**一律**来自 `scripts/lib/load-content.mjs`（`collectFiles` / `buildMetaIndex` / `importFresh` / `relPathOf`），`fileKey` 来自 `pageFileKeyOf` —— 照 `build-practice-bank.mjs:21-32` 的 import 写法。
 - 递归扫（`walkBlocks` 口径）**发现**所有 cloze，但**只接受顶层**（`page.blocks` 直接子项）；发现嵌套 cloze 就 `console.warn` 点名并跳过（运行时按顶层 cloze 流水号定位，嵌套的定位不到，宁可不收也不能收进来渲染失败）。
 - 排除 `(block.mode || 'reveal') !== 'input'`。
-- **断言（不满足即 `process.exit(1)`）**：`total(74) - excludedReveal(1) === pieces.length(73)`、`lesson === 67`、`review === 6`、`order` 为 `0..n-1` 连续、`key` 无重复、每篇 `blankCount > 0`。
+- **`contentVersion` 烘焙**：`import { CONTENT_VERSION } from '../src/content/contentManifest.js'`，直接写入产物根。**严禁**自定义版本常量（§1 异议 7 的版本权威纪律）。
+- **断言（不满足即 `process.exit(1)`）**：`total(74) - excludedReveal(1) === pieces.length(73)`、`lesson === 67`、`review === 6`、`totalBlank === 193`、`totalItem === 170`、`order` 为 `0..n-1` 连续、`key` 无重复、每篇 `blankCount > 0`、`contentVersion` 为有限数字。
 - 超限必报告（对齐 `build-practice-bank.mjs:344-361` 纪律）：断言失败、嵌套 cloze、未注册文件，三者都必须点名打印。
 - 导出 `collectReciteBank()` 纯函数（不落盘），供测试直接断言形状 —— 与 `build-practice-bank.mjs` 的 `if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)` 守卫同款。
 - **`trigger` 烘焙**：`role==='review'` 时，`title` 含「冲关」→ `'all'`，否则 `'file'`（只有这一处按 title 判定，且判定结果落进产物，运行时不猜）。
 
 **验收方式**
-- `node scripts/build-recite-bank.mjs` 打印类似 `[recite-bank] 73 篇（lesson 67 / review 6），排除 reveal 1，totalBlank 193，strict 1`。
+- `node scripts/build-recite-bank.mjs` 打印类似 `[recite-bank] 73 篇（lesson 67 / review 6），排除 reveal 1，item 170 / blank 193，strict 1，contentVersion 4`。
 - 故意把断言阈值改错 → 脚本必须 `exit 1`（手工验证一次）。
-- `npx vitest run tests/recite-bank.test.js`：形状齐全、`mode` 恒为 `input`、6 篇 review 的 `trigger` 正确（5 个 `file` + 1 个 `all`）、`order` 单调、`关雎` 的 `strictCount === 1`。
-- 产物入库后 `git status` 干净（重复跑脚本产出字节级一致：`generatedAt` 会让它变，故 `generatedAt` 用**文件内容哈希以外的固定策略**：保留时间戳但在测试里剔除该字段比较 —— 与 practice-bank 同款处理）。
+- `npx vitest run tests/recite-bank.test.js`：形状齐全、`mode` 恒为 `input`、`contentVersion === CONTENT_VERSION`（**断言两者相等，而不是硬编码 4**，否则下次 bump 内容版本就红）、6 篇 review 的 `trigger` 正确（5 个 `file` + 1 个 `all`）、`order` 单调、`关雎` 的 `strictCount === 1 && itemCount === 2 && blankCount === 2`。
+- 产物入库后 `git status` 干净（重复跑脚本产出字节级一致：`generatedAt` 会让它变，故测试里剔除该字段比较 —— 与 practice-bank 同款处理）。
 
 ### T03 · 数据层 + 调度纯函数 + 资产加载（P0，依赖 T01；**可与 T02 并行**）
 
@@ -806,11 +899,15 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 ```
 全部零 `import`（除 `getDateStr` 与 `STAGE_DELTA` 自身常量）→ 裸 Node 可直接单测。
 
-**`reciteBankClient.js` 要点**
-- `import { fetchJson } from '@/utils/fetchJson'`，base 写死 `'./'`（**不用 `siteRoot()`**，理由见 §1 异议 7）。
-- 进程内 `Map` 缓存（一次会话只拉一次），导出 `resetReciteBankCache()` 供测试。
-- 形态校验走 `reciteBank.normalizePiece` / `sanitizeBank`；产物形状不可用 → **抛错**（背诵不像练习有"少一题也能做"的退化空间），由 store 转成"素材加载失败，请重试"态。
-- 禁 `import()` 动态导入（`tests/csp-guard.test.js` L6 会扫）；禁写死主机名（L4 会扫）。
+**`reciteBankClient.js` 要点（v1.1：双源 SWR）**
+- `import { fetchJson } from '@/utils/fetchJson'` + `import { siteRoot } from '@/utils/assetBase'` + `import { isNewer } from '@/content/mergeContent'`。
+- `RECITE_BANK_PATH = 'recite-bank/chinese.json'`（单一定义，禁在别处手拼）。
+- `loadBundled()`：`fetchJson('./', RECITE_BANK_PATH, { timeout: 3000 })` → `sanitizeBank` → 存内存。**失败抛错**（这是主渲染路径）。
+- `refreshFromRemote()`：**先判 `if (siteRoot() === './') return null`**（dev/Web 两源同址，跳过）；否则 `fetchJson(siteRoot(), RECITE_BANK_PATH, { timeout: 2500 })` → `sanitizeBank` → `isNewer(remote.contentVersion, local.contentVersion)` 为真才替换内存并返回新 bank，否则返回 `null`。**任何异常吞掉返回 `null` + `console.warn`**（远程不可达不是异常，是常态）。
+- 进程内 `Map` 缓存；导出 `resetReciteBankCache()` 供测试。
+- 形态校验走 `reciteBank.normalizePiece` / `sanitizeBank`；**两个源的形状不可用都按"该源不可用"处理**（bundled 不可用才抛错）。
+- **不用** `content_cache` / `readByKey` / `readLocalMaxVersion`（§1 异议 7 已论证）。
+- 禁 `import()` 动态导入（`tests/csp-guard.test.js` L6 会扫）；禁写死主机名字面量（L4 会扫）。
 
 **验收方式**
 - `npx vitest run tests/recite-schedule.test.js` 必须覆盖 PRD 全部构造：
@@ -827,6 +924,16 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
   - `clearAllSyncedData()` 后 `getReciteProgressAll()` 为 `[]`、`getReciteState().streak === 0`；
   - `exportAllData()` 含两个新键且 `importAllData(导出结果)` 能完整还原。
 - `npx vitest run tests/sync-engine.test.js tests/review-due.test.js tests/review-consistency.test.js` 全绿（证明没碰坏既有复习链路）。
+- **双源客户端的单测**（可并入 `tests/recite-bank.test.js` 或单开，但**必须有**）：mock `fetchJson`
+  - bundled 成功、remote 版本更大 → 返回 remote 且内存被替换；
+  - bundled 成功、remote 版本**相同或更小** → 保留 bundled（**不得**替换）；
+  - remote 抛错/超时 → 保留 bundled，且**不抛异常**；
+  - `siteRoot() === './'` → **完全不发起 remote 请求**（断言 `fetchJson` 只被调用 1 次）；
+  - bundled 也失败 → 抛错（store 转 error 态）。
+- **⚠️ 真机双向验证（team-lead 要求，T03 期间就要做完，别拖到 T05）**：
+  1. `siteRoot()` 远程可达：`npm run tauri:build` 后联网启动，把线上 `recite-bank` 的 `contentVersion` 调高一版再部署，确认首页能拿到新版（可在 console 打一条 `[recite] bank source=remote v=N`）；
+  2. 相对路径可达：同一安装包**断网**启动，确认首页正常出队列（`source=bundled`）。
+  任一方向失败 → 在 PR 里写清降级陈述；只有"相对 fetch 完全不通"才启用 Plan-B（§1 异议 7）。
 
 ### T04 · 状态编排 + 两个页面（P0，依赖 T03）
 
@@ -840,13 +947,15 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 | `tests/recite-cloze-parity.test.js` | 新增 |
 
 **页面要点**
+- `recite store` 的 `init()` 分两步：`await loadBundled()`（必成功才渲染）→ **不 await** `refreshFromRemote()`（`.then` 里判断 `isNewer` 且 `phase==='idle'` 才重算队列）。**禁止**把远程刷新放在首屏 `await` 链上（§1 异议 7）。
 - `ReciteView`：进度条（`已背 X / 67`，分母来自 `bank.counts.lesson` **不硬编码**）、`连续 N 天`、今日新篇卡（无则显示"今日无新篇"）、今日待重默列表（**无到期时整个分区不渲染**，不留空白卡）、底部常驻「综合大冲关（12 句 · 模拟考场）」。加载中/失败各有独立态（失败给"重试"按钮，不白屏）。
 - 复习篇列表项显示 `fileTitle`（不是 `title`，见 §3.4 的坑）。
-- `RecitePieceView`：`loadPage` 后取第 `blockIndex` 个 cloze 块 → 挂 `ClozeBlock`；监听 `@submitted`；按 `allCorrect` 切动作条文案。**大冲关手动入口带 `?manual=1`**（或独立路由 meta），此分支 `submitResult(..., manual: true)` → 不写行、只提示"模拟完成，不计入进度"。
+- `RecitePieceView`：`loadPage` 后取第 `blockIndex` 个 cloze 块 → **identity 守卫（`block.title === piece.title`，不等则中止且不写库，§1 异议 9）** → 挂 `ClozeBlock`；监听 `@submitted`；按 `allCorrect` 切动作条文案。**大冲关手动入口带 `?manual=1`**（或独立路由 meta），此分支 `submitResult(..., manual: true)` → 不写行、只提示"模拟完成，不计入进度"。
 - 离开保护：沿用 `ExamBlock` 的三层思路（父级状态注入 / `beforeunload` / 路由守卫）**降级为两层**：因为每次作答都已即时落库（与 `ReviewView` 同款理由，"逐张已落库、随时可退"），所以**不做 `beforeunload`**，只做"输入框有内容且未提交时点返回"的二次确认。
 
 **验收方式**
 - `npx vitest run tests/recite-cloze-parity.test.js`（jsdom）—— **A3 主验收**：对产物中全部 73 篇，用固定的确定性输入集（主答案原样 / 全角化 / 加空格 / 空串 / 通假变体）分别走 `gradeCloze()` 与**挂载 `ClozeBlock` 后点提交**的 DOM 结果，断言**逐空完全相同**；再对 `关雎` 单独断言「辗转返侧」判错、「辗转反侧」判对。
+- **identity 守卫测试**：构造 `piece.title` 与内容页块 `title` 不一致 → 页面不渲染 `ClozeBlock`、`saveReciteProgress` **零调用**（用 spy 断言）、提示文案出现。
 - 路由：`/recite` 与 `/recite/07/0/0` 可达；`npx vitest run tests/route-params.test.js tests/batch-f0-verify-route.test.js` 全绿；`AppTabBar.vue` 仍为 4 项（B4）。
 - 手工：移动端视口下输入框 `16px`（不触发 iOS 聚焦缩放）、主按钮触控 ≥44×44px（B/A10）。
 
@@ -936,6 +1045,8 @@ git status --porcelain -- 'src/content/**'
 | `lastAt` / `createdAt` | 毫秒时间戳 `Date.now()` | 禁 Date 对象（IndexedDB 可存但破坏比较一致性） |
 | IndexedDB 仓库名 | `recite_progress` / `recite_state`（下划线，与既有 7 个仓库同风格） | 禁驼峰 |
 | 产物路径 | `public/recite-bank/chinese.json` | 禁放 `src/` 下 |
+| 产物路径常量 | `reciteBank.js` 的 `RECITE_BANK_PATH`（唯一） | 禁在 client / store / 测试里手拼字符串 |
+| 版本比较 | `mergeContent.isNewer(a, b)` | 禁内联 `a > b`；禁新开 `RECITE_VERSION`（版本权威只有 `CONTENT_VERSION`） |
 | 常量 | `CUMULATIVE_DAYS` / `STAGE_DELTA` / `DAILY_DUE_LIMIT` / `NEW_SUPPRESS_AT` / `DAILY_NEW_LIMIT` / `MAX_STAGE` | 禁在视图里出现魔法数字 `5` / `3` / `1` |
 
 ### 7.3 语法与平台约束（已实测确认，别再猜）
@@ -949,14 +1060,17 @@ git status --porcelain -- 'src/content/**'
 | 内联/动态脚本、`eval`、`new Function` | **绝对禁止**（`script-src 'self'`；`tests/csp-guard.test.js` L3 会扫全仓） |
 | 动态 `import()` | 新代码里**禁止**（L6 会扫）。取内容页一律经 `loadPage()`；取产物一律 `fetch` + `JSON.parse` |
 | `loadPage.js` 的 `@/content/` 模板前缀 | **不得改动**。它是 `import.meta.glob` 分包的唯一依据，一动全库内容压成巨型 chunk |
-| 主机名 | 新代码里禁出现裸主机字符串（L4 会扫）；`reciteBankClient` 只用相对路径 |
+| 主机名 | 新代码里禁出现裸主机字符串（L4 会扫）。远程基址**只能**来自 `siteRoot()`；该主机（`https://520305.top`）已在生产 + dev 的 `connect-src` 里，**无需改 CSP** |
 
 ### 7.4 错误处理约定
 
 | 场景 | 处理 | 不许 |
 | --- | --- | --- |
-| 产物加载失败（网络/JSON/形状） | 抛错 → store 转 `status:'error'` → 页面显示"素材加载失败 / 重试" | 静默返回空队列（学员会以为"今天没任务"） |
-| 产物条目坐标失效（`loadPage` 返 null 或块不存在） | 页面显示"该篇内容已调整，返回列表"，**并软删该行**（避免空转） | 白屏 |
+| **包内副本**加载失败 | 抛错 → store 转 `status:'error'` → 页面显示"素材加载失败 / 重试" | 静默返回空队列（学员会以为"今天没任务"） |
+| **远程刷新**失败/超时 | 静默保留包内副本，`console.warn` 一行，**不是错误态** | 报错弹窗、降级成 error 态（远程不可达是常态） |
+| 远程返回的版本**不更新** | 直接丢弃，不替换内存，不重算队列 | 无脑覆盖（会把新版回退成旧版） |
+| identity 守卫不通过（`title` 不符/块缺失） | 不渲染、**不写库**、提示"内容已更新"、`refresh()` 后回首页 | 照旧渲染（进度会记到错的篇上，§1 异议 9） |
+| 产物条目坐标失效（`loadPage` 返 null） | 同上（同一守卫分支） | 白屏 |
 | `loadPage` 远程层异常 | 由 `loadPage` 内部静默回落内置（既有行为），本节不做第二层 try | 重复包裹 |
 | 写 `recite_progress` 失败 | `console.error` + 页面提示"进度没保存成功，请重试"，**不静默** | 吞掉（学员做完却丢进度最伤） |
 | `recordError`（错题本）失败 | `ClozeBlock` 既有行为：`console.error` 不阻断判分展示（`ClozeBlock.vue:313-315`） | 改它 |
@@ -967,8 +1081,9 @@ git status --porcelain -- 'src/content/**'
 
 ```
 ClozeBlock            → 只 emit，不改任何进度（判分 UI + 错题本，职责不变）
-RecitePieceView       → 只调 store.submitResult，不碰 DB、不算调度
+RecitePieceView       → 只调 store.submitResult，不碰 DB、不算调度、不做 identity 之外的解析
 recite store          → 唯一调 DB 与纯函数的层；本身不实现任何公式
+reciteBankClient      → 唯一派生基址 / 发起 fetch / 做版本裁决的层
 useReciteSchedule     → 纯函数，零副作用，零 import（除 getDateStr）
 studyDb               → 唯一 IndexedDB 访问层
 ReciteView            → 只读 viewModel
@@ -983,65 +1098,70 @@ ReciteView            → 只读 viewModel
 
 ---
 
-## 8. 待明确事项
+## 8. 决策台账（v1.1：7 条已拍板，只剩 1 条工程验证 + 4 条信息性风险）
 
-> 标 **[我裁定]** 的是我给出结论、team-lead 只需确认；标 **[需拍板]** 的是我不能单方面决定。
+> 本节已从"待明确"改为**决策台账**。每条都写明「谁定的 / 定成什么 / 落进哪一节」，实现者按台账执行，不再有悬空问题。
 
-### Q1 · 考试日期是否可得（PRD §9-1）—— **技术影响评估，非我决策**
+### 8.1 已拍板（7 条，实现者直接执行）
+
+| # | 议题 | 决议 | 决策人 | 落在 |
+| --- | --- | --- | --- | --- |
+| **Q1** | 考试日期是否可得（PRD §9-1） | **一期不依赖**。P0 全部按产物 `order` 推进，不读任何日期 | team-lead | §8.3 技术影响评估（保留给 P1-1） |
+| **Q2** | `recite_progress` 是否纳入多设备同步（PRD §9-2） | **一期不同步**。不加入 `ENTITIES` / `SYNC_STORE_NAMES`。**但换账号清理（`DEVICE_LOCAL_STORES`）与 `exportAllData`/`importAllData` 纳入是准入项，不做不能上线**；"跨设备是一期硬需求则 +2 天"按**不做**处理 | team-lead（采纳我裁定） | §1 异议 8、T03 |
+| **Q3** | 句/篇重叠是否接受（PRD §9-3） | **接受，无隐藏成本**；`enqueueWrongSentences` 一行不改 | 我裁定 + team-lead 复核 | §7.6、§8.2 |
+| **Q4** | 学习 Tab 首屏容得下第三张卡（PRD §9-4） | **容得下，且不合并**「今日待复习」与「今日背诵」（不同队列/不同动作/不同表）；空间压缩做法见 §8.2 | 我裁定 | §8.2、T05 |
+| **Q5** | 每日新篇是否提到 2 篇（PRD §9-5） | **维持 1 篇/天**。理由：可持续性优先于单日效率，负载由重默补齐 | team-lead | `DAILY_NEW_LIMIT = 1` |
+| **Q6** | 无任务日 streak 怎么算（PRD §9-6 衍生） | **采用我的临时规则**：仅「当天有任务且未完成」归 0；**无任务日不判负也不推进**（`lastActiveDate` 不变）。否则 stage 全满等于惩罚"背得好" | team-lead | `bumpStreak`、T03 单测 |
+| **Q7** | 产物基址（我的异议 7 初稿） | **否决纯相对路径**，改为 **远程优先 + 取 `contentVersion` 较大者 + 相对兜底**；我进一步调成 SWR（包内先渲染、远程热替换），待 team-lead 二次确认顺序 | team-lead 定方向 / 我定顺序 | §1 异议 7、T03 |
+
+> **Q6 的已知代价（接受，不再讨论）**：streak 可能跨越空窗期（"连续 7 天"里夹了 2 个无任务日）。产品明确接受。
+
+### 8.2 Q3 / Q4 的落地细节
+
+**Q3 · 句/篇重叠（接受，逐项验证无隐藏成本）**
+- `ClozeBlock.enqueueWrongSentences`（:284-316）**一行不改**（T01 纪律明确禁止碰它）；
+- `error_book` 的去重键 `subject + question + fileKey` 与背诵无交集（背诵只写 `recite_progress`）；
+- 唯一可观测后果是 §7.6 的两条（句级错题卡 + 今日答题数含默写空数），已登记，**QA 别当缺陷报**；
+- **反向验证**：若要让"背诵答错不写错题本"，就必须给 `ClozeBlock` 加开关并改 `enqueueWrongSentences` —— 那才是真正的隐藏成本（要回归整条 B-4 链路）。**"不改"就是最便宜的选择。**
+
+**Q4 · 第三张卡（容得下，不合并）**
+- 现状实测（`HomeView.vue:26-53`）：`today-task`（今日待复习）+ `continue-card`（继续学习），都是单行 + 副标题的轻量卡，纵向排布；
+- 插入位置：`today-task` **之后**、`continue-card` **之前**（日课优先级高于"接着上次"，但"先复习"纪律仍在最上）；
+- 空间压缩：`ReciteTaskCard` 复用 `continue-card` 的**行高与内边距**（不新增视觉语言）；无任务时**整卡不渲染**（当前设计已如此）→ 实际最多 3 张有内容的卡。
+
+### 8.3 Q1 的技术影响评估（保留给 P1-1）
 
 - **一期无影响**：P0 全部按产物的 `order` 顺序推进，不读任何日期。
 - **若将来要接 P1-1（高频优先排序）**：改动面只有一处 —— 产物增加 `priority?: number` 字段（构建期烘焙），`buildQueue` 的 `fresh` 选择从"取最小 `order`"改为"取最小 `(priority, order)`"。**运行时零结构变更**，`recite_progress` 不需要新字段。
-- **[需拍板]** 考试日期来自用户手动输入（存哪里？`recite_state` 加一个 `examDate` 字段最省）还是完全不做 —— 属产品决策，非技术约束。
+- 若要做"考前解锁"：`recite_state` 加 `examDate` 字段最省（单行表，零迁移风险）—— 但那是 P1，一期不加。
 
-### Q2 · `recite_progress` 是否纳入多设备同步（PRD §9-2）—— **[我裁定：一期不同步]**
+### 8.4 仍需工程验证（1 条，**T03 期间必须完成**）
 
-**结论**：一期**不同步**。不加入 `sync/engine.js` 的 `ENTITIES`，也不加入 `studyDb.SYNC_STORE_NAMES`。
+**双源可达性双向验证**（§1 异议 7）：
+1. `siteRoot()` 远程可达：联网启动，把线上 `recite-bank` 的 `contentVersion` 调高一版再部署 → 首页应拿到新版；
+2. 相对路径可达：同一安装包**断网**启动 → 首页应正常出队列（`source=bundled`）。
 
-**理由（按重要性）**：
-1. **同步协议是整行 LWW**（`engine.js:98-111`）。两台设备各默一遍同一篇，`stage` 只会保留 `updatedAt` 更新的那一份 —— 不会产生损坏，但**会静默丢掉另一台的一次推进**。而背诵的产品承诺恰恰是"每次默都对记忆有贡献"。要正确同步必须改成"档位取 max / 日期取 min"的**字段级合并**，那是改同步引擎，一期做不完。
-2. **成本**：加同步要改 3 处（`engine.js` ENTITIES、`studyDb` SYNC_STORE_NAMES、`collectChanges` 的 switch 分支）+ 一次真实双设备验证。`question_attempt` 的先例说明"整行 LWW"能跑，但它的写入是**只增不改**（`engine.js:36-37` 注释），与本表的"反复改写同一行"性质不同。
+任一方向失败 → PR 里写清降级陈述；只有"相对 `fetch` 完全不通"才启用 Plan-B（产物改 `src/recite/bank.generated.js` 静态 import，代价 = 内容更新必须重发版）。**别拖到 T05 才发现。**
+
+### 8.5 信息性风险（不需决策，但要知道）
+
+1. **`07-默写专项` 的 6 个文件全部是 `unitNum:'07'`**。若将来内容侧拆到多个单元，`trigger:'file'` 仍成立（按 `fileKey` 分组），但「综合大冲关」的 `trigger:'all'` 会提前解锁 —— 已用产物字段烘焙规避，无需改代码。
+2. **只有 1 个 strict 句**（关雎「辗转反侧」）。若内容侧后续给更多句加 `strict`，是纯数据改动、本设计零影响；但请内容侧注意：`strict:true` 会**同时**禁用全局通假映射，加之前要想清"这句里有没有合法通假"。
+3. **手工别名映射表一期不做**（§3.2）。触发条件：内容侧要对 `07-默写专项` 做**整体重排**时必须先告知，我们重排前补一张 `scripts/recite-bank-aliases.json`。
+4. **recite-bank 未挂进 `manifest` 子段**（§3.4 末）。二期若产物需分片再迁移；迁移点已写在文档里，免得后人以为漏了。
+
+---
+
+### 8.6 备查：Q2「不同步」的技术论证（二期若要做同步，从这里起步）
+
+一期已定不做（§8.1），但论证留着，免得二期重新踩一遍：
+
+1. **同步协议是整行 LWW**（`engine.js:98-111`）。两台设备各默一遍同一篇，`stage` 只会保留 `updatedAt` 更新的那一份 —— 不损坏数据，但**会静默丢掉另一台的一次推进**。而背诵的产品承诺恰恰是"每次默都对记忆有贡献"。要正确同步必须改成「档位取 max / 日期取 min」的**字段级合并**，那是改同步引擎，不是加一行 `ENTITIES`。
+2. **成本**：加同步要改 3 处（`engine.js` ENTITIES、`studyDb` SYNC_STORE_NAMES、`collectChanges` 的 switch 分支）+ 一次真实双设备验证。`question_attempt` 的先例说明"整行 LWW"能跑，但它的写入是**只增不改**（`engine.js:36-37` 注释），与本表"反复改写同一行"的性质不同。
 3. **用户价值低**：背诵是"每天打开同一台手机"的高频动作；跨设备收益远小于风险。
+4. **若二期要做**，我建议的最小方案：「只同步 `learnedAt` + `doneCount`（累加类）+ `stage` 取 max」，自定义合并约 80 行 + 一次真实设备验证，工期 +2 天。
 
-**但不同步带来两个必须一并处理的副作用（PRD 未提，我判为本次设计的必做项）**：
-- **换账号串号**：`clearAllSyncedData()` 只清 `SYNC_STORE_NAMES` → 必须新增 `DEVICE_LOCAL_STORES`（§1 异议 8）。**不做就是隐私缺陷。**
-- **备份丢进度**：`exportAllData` / `importAllData` 必须纳入两张新表，否则"导出备份→换机恢复"会丢掉全部背诵进度（该功能目前零调用方，改动风险近零）。
-
-**[需拍板]** 若 team-lead 认为跨设备同步是一期硬需求，请明确告知 —— 那我建议改方案为"**只同步 `learnedAt` + `doneCount`（累加类）+ `stage` 取 max**"，代价是自定义合并逻辑约 80 行 + 一次真实设备验证，工期至少 +2 天。
-
-### Q3 · 句/篇重叠是否接受（PRD §9-3）—— **[我裁定：接受，且无隐藏成本]**
-
-复核结论：**确实没有隐藏成本**。逐项验证：
-- `ClozeBlock.enqueueWrongSentences`（:284-316）**一行不改**（T01 纪律明确禁止碰它）；
-- `error_book` 的去重键 `subject + question + fileKey` 与背诵无交集（背诵只写 `recite_progress`）；
-- 唯一可观测后果是 §7.6 的两条（句级错题卡 + 今日答题数），已登记；
-- **反向验证**：若要让背诵答错不写错题本，就必须给 `ClozeBlock` 加一个开关参数并改 `enqueueWrongSentences` —— 那才是真正的隐藏成本（要回归整个 B-4 链路）。**"不改"就是最便宜的选择。**
-
-### Q4 · 学习 Tab 首屏是否容得下第三张卡（PRD §9-4）—— **[我裁定：容得下，且不建议合并]**
-
-- 现状实测（`HomeView.vue:26-53`）：`today-task`（今日待复习）+ `continue-card`（继续学习），两张卡都是**单行 + 副标题**的轻量卡，纵向排布。
-- **[我裁定]** 加第三张 `ReciteTaskCard`，**不合并**「今日待复习」与「今日背诵」。理由：两者是**不同的队列、不同的动作**（翻面自评 vs 默写判分）、不同的落库表；合并成"今日任务"双行卡会让学员点进去才发现是两件事，且会让"计数一致"这条验收（P0-6）从"两个入口"变成"三层嵌套"，复杂度反升。
-- 空间压缩的具体做法（若实测过挤）：`ReciteTaskCard` 用**与 `continue-card` 完全一致的行高与内边距**（不新增视觉语言），无到期重默时只显示篇名一行（不显示状态角标）。
-- **[需拍板]** 若移动端负责人实测 320px 宽度下三卡仍需滚动才能看到学科列表，请告知 —— 我可以把「今日背诵」在**无任务时完全不渲染**（当前设计已如此），实际最多只有 3 张有内容的卡。
-
-### Q5 · 每日新篇是否提到 2 篇（PRD §9-5）—— **技术零影响，产品决策**
-
-`DAILY_NEW_LIMIT = 1` 是 `useReciteSchedule.js` 的一个常量，改 2 不影响任何结构（`buildQueue` 返回 `fresh[]` 本来就是数组）。**[需拍板]** 由 team-lead 问用户，我不给倾向。
-
-### Q6 · 整轮完成后做什么（PRD §9-6）—— **[我裁定：一期"空转态"即可，但 streak 规则需要产品确认]**
-
-- 67 篇全部 `stage>=1` 后：`fresh` 永为空 → 首页显示"整轮完成"文案 + 到期重默 + 常驻大冲关。零额外代码（`buildQueue` 天然返回空 `fresh`），与 P1-3 不冲突。
-- **⚠️ 需要产品拍板的细节（PRD 没写，我给了临时规则）**：**没有到期任务的日子，streak 怎么算？**
-  - 我的临时规则：`bumpStreak` 只在"当天有任务（`due.length + fresh.length > 0`）且当天未完成"时归 0；**无任务日不判负、也不推进**（`lastActiveDate` 保持不变）。
-  - 理由：全部 `stage=5` 时学员没有任何可做的事，判负等于惩罚"背得太好"。
-  - 代价：streak 可能跨越空窗期（"连续 7 天"里可能夹了 2 个无任务日）。
-  - **[需拍板]** 若产品要求"宁可断也不许跨空窗"，改成"无任务日也必须在当天打开 App 才算"，实现只多 3 行，但需要一次明确的产品签字。
-
-### Q7 · 其他需要 team-lead 知悉的技术风险（我已备 Plan-B）
-
-1. **Tauri 相对路径 `fetch` 未实测**（§1 异议 7）。若 `tauri://` 自定义协议不响应 JSON `fetch`，Plan-B：产物改为构建期生成 `src/recite/bank.generated.js`（`export default {...}`）并静态 `import` —— 代价 ~20 KB 进主 chunk，换来零 fetch、零 CSP 风险、绝对离线。**请在 T03 期间让工程同学先在真机上验证一次**（一条 `fetch('./recite-bank/chinese.json')` 即可），别等到 T05 才发现。
-2. **`07-默写专项` 的 6 个文件全部是 `unitNum:'07'`**，`unitTitle:'默写专项'`。若将来内容侧把这 6 个文件拆到多个单元，`trigger:'file'` 规则仍成立（按 `fileKey` 分组），但"综合大冲关"的 `trigger:'all'` 会提前解锁 —— 已用产物字段烘焙规避，无需改代码。
-3. **只有 1 个 strict 句**（关雎「辗转反侧」）。这意味着 strict 机制在默写专项里几乎没被"实战使用"。若内容侧后续要给更多句子加 `strict`，那是纯数据改动，本设计零影响；但请内容侧注意：`strict:true` 会**同时**禁用全局通假映射，加之前要想清"这句里有没有合法通假"。
-4. **手工别名映射表一期不做**（§3.2）。触发条件：内容侧要对 `07-默写专项` 做**整体重排**时必须先告知，我们重排前补一张 `scripts/recite-bank-aliases.json`。
+**但不同步的两个副作用现在就必须处理**（team-lead 已定为准入项）：换账号清理（`DEVICE_LOCAL_STORES`，§1 异议 8）、备份导出/导入（`exportAllData` / `importAllData`）。
 
 ---
 
@@ -1050,14 +1170,28 @@ ReciteView            → 只读 viewModel
 | # | PRD 位置 | PRD 说法 | 本设计 | 类型 |
 | --- | --- | --- | --- | --- |
 | 1 | P0-1 | 产物含 74 篇 | **73 篇**（6+67，74 是"全库 cloze 块数"） | 数字修正（自相矛盾） |
-| 2 | P0-1 | 每篇带 `itemCount` | 追加 `blankCount` / `strictCount` / `fp` / `order` / `trigger` | 补字段（§1 异议 4） |
+| 2 | P0-1 | 每篇带 `itemCount` | 追加 `blankCount` / `strictCount` / `fp` / `order` / `trigger`；产物根加 `contentVersion` | 补字段（§1 异议 4） |
 | 3 | P0-3 | 直接挂 `ClozeBlock` | **必须**再给组件加 `submitted` emit | 阻塞性缺口（§1 异议 1） |
 | 4 | 5.1 | 判分复用、零改动 | **必须**先把 `parseCloze`/`blankMatches` 抽到共享层 | 阻塞性缺口（§1 异议 2） |
 | 5 | P0-4 | 表 5 个字段 | **11 个**业务字段（新增 `fp`/`learnedAt`/`pieceTitle`/`createdAt`/`deleted`） | 补字段（§1 异议 5） |
 | 6 | A7 + P0-8 | 已背 X 与实际行数一致 | X 必须由 `learnedAt` 统计，**不能**用 `stage>=1` | 语义修正（会倒退） |
-| 7 | A3 | 手工抽 10 篇验证 | 改为 74 块全量自动 parity 测试 | 验收强化（§1 异议 6） |
-| 8 | A9 | 离线全程可用 | 必须走相对路径，**禁止**沿用 `siteRoot()` | 阻塞性缺口（§1 异议 7） |
+| 7 | A3 | 手工抽 10 篇验证 | 改为 **73 篇全量**自动 parity 测试 | 验收强化（§1 异议 6） |
+| 8 | A9 | 离线全程可用 | 双源 SWR：包内先渲染 + 远程按 `contentVersion` 取大者热替换（**不是**纯相对路径，也不是纯 `siteRoot()`） | v1.1 修订（§1 异议 7） |
 | 9 | — | 未提 | 换账号必须清两张新表；备份必须含两张新表 | 新增必做项（§1 异议 8） |
-| 10 | P0-6 | 学习 Tab 第三张卡 | 保留三卡、不合并，给出空间压缩做法 | 裁定（§Q4） |
-| 11 | — | 未提 | streak 在"无任务日"不判负（临时规则，待产品确认） | 新增规则（§Q6） |
-| 12 | §6.2 | 降级省不了成本 | **确认成立**，并给出 SM-2 `easeFactor` 退化为死字段的硬证据 | 验证通过（§1.3） |
+| 10 | — | 未提 | 单篇作答前 `title` identity 守卫，防双源错配把进度记到错的篇 | 新增必做项（§1 异议 9） |
+| 11 | — | 未提 | 1.79 / 49% 两个数分别是「句/篇」与「仅 1 句」；真值是 2.10 空/篇、40% 仅 1 空 | 数字更正（§0 / 异议 4） |
+| 12 | P0-6 | 学习 Tab 第三张卡 | 保留三卡、不合并，给出空间压缩做法 | 裁定（§8.2） |
+| 13 | — | 未提 | streak 在"无任务日"不判负（team-lead 已拍板） | 新增规则（§8.1 Q6） |
+| 14 | §9-5 | — | 维持 1 篇/天（team-lead 拍板） | 裁定（§8.1 Q5） |
+| 15 | §6.2 | 降级省不了成本 | **确认成立**，并给出 SM-2 `easeFactor` 退化为死字段的硬证据 | 验证通过（§1.3） |
+
+## 附录 B · v1.0 → v1.1 变更记录
+
+| 变更 | 触发 | 位置 |
+| --- | --- | --- |
+| 产物基址从"纯相对路径"改为"双源 SWR + `contentVersion` 取大者" | team-lead 否决，理由：内容在线更新，纯相对 = 冻结副本 + 标注与内容页矛盾 | §1 异议 7、§3.4、§4.1、T03 |
+| 新增异议 9（identity 守卫） | 双源带来的新失效模式：清单与内容页可能不同源 | §1 异议 9、§4.3 I8、T04 |
+| 新增"为什么不挂 manifest 子段" | 交代版本权威的落点，防止后人以为是漏了 | §3.4 末 |
+| §0 数字补正 | team-lead 独立复核：141/52/193 空、170 句、2.10 空/篇、40% 仅 1 空 | §0、异议 4 |
+| §8 从"待明确"改为"决策台账" | Q1/Q2/Q5/Q6 已由 team-lead 拍板 | §8 |
+| Reconcile 的 fp 用途从"迁移键"扩展为"一致性校验器" | 双源后 fp 还承担"清单与内容是否同源"的诊断 | §3.2、异议 9 |
