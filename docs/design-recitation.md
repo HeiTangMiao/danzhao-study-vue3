@@ -2,14 +2,16 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | **v1.4**（v1.0 → v1.4 变更见附录 B；v1.4 = 与 T01 实现对齐：`RECITE_BANK_PATH` 归属收口 + `subjectOfPiece` 入册 + 行号漂移 + 表格渲染修正） |
+| 文档版本 | **v1.5**（v1.0 → v1.5 变更见附录 B；v1.5 = T01 import 语句纠错 + 「入参归一」偏离的判据边界。**本文档至此冻结**） |
 | 作者 | Bob（软件架构师） |
 | 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚）；team-lead 2026-10-26 复核意见 |
 | 目标仓库 | `danzhao-study-vue3`（Vue 3.5 + Pinia + IndexedDB + Tauri 2） |
-| 状态 | **可实施**。§8 为决策台账：7 条已拍板、1 条待工程验证（T03 内必须完成）、4 条信息性风险 |
+| 状态 | **可实施，已冻结**。§8 为决策台账：**9 条已拍板**（Q1–Q9）、1 条待工程验证（T03 内必须完成）、4 条信息性风险 |
 | 交付边界 | **只读调研 + 本文档**。不改任何源码，不提交实现代码 |
 
 本文所有数字、行号、文件名均为本机实测复核（复核命令见 §0）。
+
+**冻结条款（v1.5 起）**：本文档不再接受"顺手改进"。后续只有两种改动会被接收 —— ① 实现中撞到**硬矛盾**（文档说的做不到，或做到会出错）；② **实现对而文档错**（如 import 列表、行号）。两种都必须记入附录 B 并说明"谁发现/为什么"，不写理由的改动一律回退。
 
 ---
 
@@ -842,8 +844,10 @@ classDiagram
 
 **抽取的三条零回归纪律（写进代码注释）**
 
-1. **逐字搬运，不"顺手优化"**。`parseCloze`（:90-102）与 `blankMatches`（:176-182）的字符（含正则 `/\{\{([\s\S]*?)\}\}/g`、`blank.strict ? undefined : { variantMap: CLOZE_VARIANTS }`）原样搬，连注释一起搬。`blankMatches` 头部的 D-0 长注释（解释为什么 strict 句不传 variantMap、为什么不能删 `反→返` 键）必须跟着走 —— 那是防未来有人"优化"掉的唯一护栏。
-2. **`ClozeBlock` 只改两处**：把 `function parseCloze` / `function blankMatches` 的**函数体删除**，改为 `import { parseCloze, buildClozeItems, flattenBlanks, blankMatches } from '@/content/clozeJudge'`；把 `items` / `blanks` 两个 `computed` 改为调用 `buildClozeItems(props.block)` / `flattenBlanks(items.value)`（**仍包在 `computed` 里**，保持响应性）。**`enqueueWrongSentences`、`submitDictation`、`retryAll`、`retryWrongSentences`、焦点管理、全部 `ref`/`watch`、模板与样式一行不动。**
+1. **逐字搬运，不"顺手优化"**。`parseCloze`（原 `:90-102`）与 `blankMatches`（原 `:176-182`）的字符（含正则 `/\{\{([\s\S]*?)\}\}/g`、`blank.strict ? undefined : { variantMap: CLOZE_VARIANTS }`）原样搬，连注释一起搬。`blankMatches` 头部的 D-0 长注释（解释为什么 strict 句不传 variantMap、为什么不能删 `反→返` 键）必须跟着走 —— 那是防未来有人"优化"掉的唯一护栏。
+   - **唯一允许的偏离（已落地，`1979844`）**：两个函数都带 `const t = typeof x === 'string' ? x : ''` 式的入参归一。要分清两件事：`blankMatches` 里那句**原本就有**（属逐字搬运范围，不是新增）；`parseCloze` 里那句**是新加的**（原版直接 `re.exec(text)`，非字符串在 `text.length` 处抛 `TypeError`）。它**不可达于组件路径** —— `buildClozeItems` 调 `parseCloze(String(it.text ?? ''))`，永远传字符串 —— 所以既有行为零变化；它只服务于**直接调用方**（T02 构建脚本要拿 `parseCloze` 处理任意 `it.text`）。**判据边界**：允许"入参归一"（把 `TypeError` 变成定义行为），**不允许**"判分语义调整"（改比较规则、加减 alts、绕过 strict）。若将来这层守卫落进判分主路径（有人不经 `buildClozeItems` 直接喂原始 `items` 给判分），必须重新评估。
+2. **`ClozeBlock` 只改两处**：把 `function parseCloze` / `function blankMatches` 的**函数体删除**，改为 `import { buildClozeItems, blankMatches, flattenBlanks } from '@/content/clozeJudge'`（**三个**，不是四个）；把 `items` / `blanks` 两个 `computed` 改为调用 `buildClozeItems(props.block)` / `flattenBlanks(items.value)`（**仍包在 `computed` 里**，保持响应性）。**`enqueueWrongSentences`、`submitDictation`、`retryAll`、`retryWrongSentences`、焦点管理、全部 `ref`/`watch`、模板与样式一行不动。**
+   - **`parseCloze` 不 import**：抽出后组件内没有任何地方直接调它（只被 `buildClozeItems` 内部调用）。**不要为"与文档对齐"留一个无意义引用** —— `npm run lint` 是 `--max-warnings 0`，一个 `no-unused-vars` 直接让 CI 失败。这是文档初稿写错的一处（原写四个函数），实现者按实际情况修正，正确。
 3. **新增 `emits: ['submitted']`**，在 `submitDictation()` 里 `await enqueueWrongSentences()` **之后** emit `{ total: blanks.length, correct: correctCount, allCorrect: correctCount === blanks.length && blanks.length > 0 }`。
    - 顺序很关键：先落库（错题本）再通知父级。若父级写调度失败，错题本已经记上了 —— 与"宁可多记一条，不可漏记"的既有取向一致。
    - 空篇（`blanks.length === 0`）不得 emit `allCorrect: true`，否则空篇会被判"全对"推进档位。
@@ -1326,7 +1330,16 @@ emit('submitted', {
 
 ## 附录 B · v1.0 → v1.4 变更记录
 
-### B.1 v1.3 → v1.4（与 T01 实现对齐，`1979844` 复核后）
+### B.1 v1.4 → v1.5
+
+| 变更 | 触发 | 位置 |
+| --- | --- | --- |
+| §5 T01 纪律 2 的 import 语句由 4 个函数改为 **3 个**（去掉 `parseCloze`），并加"不要为对齐文档留无意义引用"的说明 | team-lead：照文档写会 `no-unused-vars` → `--max-warnings 0` 直接挂 CI。**实现者按实际情况修正，是文档错、实现对** | §5 T01 纪律 2 |
+| 新增「唯一允许的偏离：入参归一」段落，明确判据边界 | 实现者给 `parseCloze` 加了 `typeof text === 'string' ? text : ''`。需入册，否则下一次"逐字搬运"复核会把它判为违规 | §5 T01 纪律 1 |
+| 该段落同时纠正一处事实：`blankMatches` 的守卫**原本就有**（属逐字搬运），只有 `parseCloze` 那句是新增；且新增那句**不可达于组件路径**（`buildClozeItems` 恒传 `String(...)`），只服务 T02 的直接调用 | 我复核 `1979844^` 原文件后确认 | §5 T01 纪律 1 |
+| （v1.4 已完成，此处仅备注）`RECITE_BANK_PATH` 归属与 `subjectOfPiece` 入册、`ClozeBlock.vue:258` 行号、表格渲染 | team-lead 这轮提的第 2/3 条与 v1.4 的改动**是同一件事**，v1.4 已落 | 见 B.2 |
+
+### B.2 v1.3 → v1.4（与 T01 实现对齐，`1979844` 复核后）
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
@@ -1337,13 +1350,13 @@ emit('submitted', {
 | `ClozeBlock.vue:286` → `:258`，并加"守卫请用语义描述、别用行号"的后缀 | T01 抽走 30 行后行号上移，逻辑未变 | §5.7 |
 | 修正两行表格的渲染（代码块内未转义的 `\|` 把 3 列表撑成 9 列） | 自查发现：`§7.2 篇主键`、`§8.1 Q9` 两行在 GFM 下渲染成多列 | §7.2、§8.1 |
 
-### B.2 v1.2 → v1.3
+### B.3 v1.2 → v1.3
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
 | 新增不变量 **I10**：全对判定只看 `allCorrect`、比率一律 `total > 0 ? correct/total : 0`；并明确定性为**算术约定、不是待测场景**（`total === 0` 当前不可达：`validateBlock` 拦截 + 全库 74 块实测最少 1 空） | team-lead：`0/0 = NaN` 分析成立，但不许升级成"现网隐患"（会给 T04/T05 招来死守卫与无用用例） | §4.3 |
 
-### B.3 v1.1 → v1.2（对齐 PRD `240a8c1` + 补 A3 落点 + §9.2 两问裁定）
+### B.4 v1.1 → v1.2（对齐 PRD `240a8c1` + 补 A3 落点 + §9.2 两问裁定）
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
@@ -1354,7 +1367,7 @@ emit('submitted', {
 | **Q9 裁定**：篇键一期就带 `subject` 前缀；`fp` 字段覆盖范围 + 错别字漂移的四种情形表 | PRD §9.2 遗留问题 | §3.2（新增小节）、§8.1 Q9、§8.7 |
 | **Q7 状态收口**：SWR 渲染顺序经 team-lead 二次确认通过（"远程优先"指数据优先级，非渲染阻塞） | team-lead 复核 | §8.1 Q7 |
 
-### B.4 v1.0 → v1.1
+### B.5 v1.0 → v1.1
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
