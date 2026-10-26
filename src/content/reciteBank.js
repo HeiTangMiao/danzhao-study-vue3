@@ -57,9 +57,19 @@ export const PIECE_TRIGGER = {
 export const CLOZE_MODE_INPUT = 'input'
 
 /**
- * 产物条目使用紧凑单字母键（键名瘦身换加载体积，与 `practiceBank.BANK_ITEM_KEYS` 同款）。
- * 此映射是「紧凑键 → 运行时字段名」的**唯一对照表**，`normalizePiece` 据此展开；
- * 产物也可以直接写长键（`normalizePiece` 两者都认）。
+ * **紧凑形态的兼容映射，不是产物的现行形态。**
+ * 产物自 T02 起一律使用 16 个长键（字段清单见 `PIECE_FIELDS`）；本表仅用于容错历史形态与单测。
+ *
+ * 为什么保留本表：`normalizePiece` 的双形态容错是已测过的能力，删表要连带改测试，收益为零。
+ *
+ * 为什么不再拿它当产物形态（team-lead 裁定，T01 复核）：原先的依据是「键名瘦身换加载体积」，
+ * 而该依据**已被实测证伪** —— practice-bank 是 1393 题 / ~75KB，键名高频重复、压缩有收益；
+ * 背诵产物只有 73 篇，实测紧凑键 21 251 B / gzip 3 384 B，长键 27 267 B / gzip 3 507 B，
+ * **gzip 只差 123 字节**。一个被证伪的前提不该继续支撑决策。
+ * 附带收益：文档 §3.4 / §5.7 的示例本来就是长键，产物改用长键后文档-产物-代码三处自然统一，
+ * 「有人直接 `JSON.parse` 产物再读 `piece.fileKey`」这一类错位从根上消失。
+ *
+ * 本表仍是「紧凑键 → 运行时字段名」的**唯一对照表**，`normalizePiece` 据此展开。
  */
 export const PIECE_KEYS = {
   k: 'key', // 主键 `${subject}|${fileKey}|${blockIndex}`

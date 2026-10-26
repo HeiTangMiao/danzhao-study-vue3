@@ -10,8 +10,10 @@
  *    importFresh / relPathOf），`fileKey` 来自 pageMeta.pageFileKeyOf —— 不在本脚本手拼路径或键。
  *  - 计数**不在本脚本重新解析**：句数 / 空数 / strict 数一律走 shared 层
  *    `clozeJudge.buildClozeItems` / `flattenBlanks`（H7：判分与解析单一真相源）。
- *  - 产物形状（紧凑键 / 主键格式 / 版本号归属）来自 `reciteBank.js`；`contentVersion` **投影**
- *    `contentManifest.CONTENT_VERSION`，严禁新开独立版本号（设计 §3.4 / §7.2）。
+ *  - 产物形状（**长键** / 主键格式 / 版本号归属）来自 `reciteBank.js`；每条篇目先经
+ *    `normalizePiece` 归一再按 `PIECE_FIELDS` 重排落盘 —— 产物形状 === 运行时形状，
+ *    「有人直接 `JSON.parse` 产物再读 `piece.fileKey`」这类错位从根上消失。
+ *    `contentVersion` **投影** `contentManifest.CONTENT_VERSION`，严禁新开独立版本号（设计 §3.4 / §7.2）。
  *  - 任何「跳过」都必须 console.warn 点名（嵌套 cloze / 未注册文件 / 加载失败 / 非语文学科），
  *    不允许静默少收 —— 少收一篇用户看得见，静默错收一篇用户看不见，两者都必须留痕。
  *  - 只读内容、只写 public/recite-bank/，不碰 src/content/ 数据页。
@@ -36,8 +38,10 @@ import {
   RECITE_BANK_PATH,
   PIECE_ROLE,
   PIECE_TRIGGER,
+  PIECE_FIELDS,
   CLOZE_MODE_INPUT,
   pieceKeyOf,
+  normalizePiece,
   deriveCounts,
   sanitizeBank
 } from '../src/content/reciteBank.js'
@@ -178,27 +182,46 @@ function sumOf(rows, field) {
 }
 
 /**
+ * 把归一化后的篇目按 `PIECE_FIELDS` 的顺序重排（**键集合的唯一权威是 PIECE_FIELDS，不手抄**）。
+ *
+ * 两个作用：
+ *  ① `normalizePiece` 把 `trigger` 追加在尾部（因为它是可选字段），而产物里希望它紧跟 `role`；
+ *  ② 产物条目的键集合被 PIECE_FIELDS **结构性**限定 —— 任何"顺手"加进来的字段进不了产物，
+ *     也就不会出现「产物有、运行时认不出」的旁路数据。
+ * @param {object} piece `normalizePiece` 的产出
+ * @returns {object} 键序与 PIECE_FIELDS 一致的新对象（未提供的可选字段不写）
+ */
+export function orderFields(piece) {
+  const src = piece && typeof piece === 'object' ? piece : {}
+  const out = {}
+  for (const field of PIECE_FIELDS) {
+    if (src[field] !== undefined) out[field] = src[field]
+  }
+  return out
+}
+
+/**
  * 计算汇总口径（纯函数，便于单测/断言复用）。
  * lesson / review 由 `deriveCounts` 从 pieces 派生（不第二次数），保证与运行时的口径同源。
- * @param {Array<object>} pieces 产物篇目（紧凑键）
- * @param {Array<object>} blockRows 全库顶层 cloze 块（含 reveal，诊断用）
+ * @param {Array<object>} pieces 产物篇目（长键，与运行时形状一致）
+ * @param {Array<object>} blockRows 全库顶层 cloze 块（含 reveal，诊断用，字段名与篇目对齐）
  * @returns {object} 汇总指标
  */
 export function summarize(pieces, blockRows) {
   const rows = Array.isArray(pieces) ? pieces : []
   const blocks = Array.isArray(blockRows) ? blockRows : []
-  const counts = deriveCounts(rows.map((p) => ({ role: p.r })))
+  const counts = deriveCounts(rows.map((p) => ({ role: p.role })))
   return {
     totalClozeBlocks: blocks.length,
     excludedReveal: blocks.filter((b) => b.mode !== CLOZE_MODE_INPUT).length,
     pieces: rows.length,
     lesson: counts.lesson,
     review: counts.review,
-    totalSentence: sumOf(rows, 'sc'),
-    totalBlank: sumOf(rows, 'bc'),
-    multiBlankPieces: rows.filter((p) => p.bc > p.sc).length,
-    multiBlankAllBlocks: blocks.filter((b) => b.bc > b.sc).length,
-    strictSentences: sumOf(rows, 'stc')
+    totalSentence: sumOf(rows, 'sentenceCount'),
+    totalBlank: sumOf(rows, 'blankCount'),
+    multiBlankPieces: rows.filter((p) => p.blankCount > p.sentenceCount).length,
+    multiBlankAllBlocks: blocks.filter((b) => b.blankCount > b.sentenceCount).length,
+    strictSentences: sumOf(rows, 'strictCount')
   }
 }
 
@@ -206,35 +229,43 @@ export function summarize(pieces, blockRows) {
 function breakdownByFile(rows) {
   const map = new Map()
   for (const r of rows) {
-    const cur = map.get(r.fk) || { fk: r.fk, ft: r.ft, n: 0, sc: 0, bc: 0, reveal: 0 }
+    const cur = map.get(r.fileKey) || {
+      fileKey: r.fileKey,
+      fileTitle: r.fileTitle,
+      n: 0,
+      sentences: 0,
+      blanks: 0,
+      reveal: 0
+    }
     cur.n += 1
-    cur.sc += Number.isFinite(r.sc) ? r.sc : 0
-    cur.bc += Number.isFinite(r.bc) ? r.bc : 0
+    cur.sentences += Number.isFinite(r.sentenceCount) ? r.sentenceCount : 0
+    cur.blanks += Number.isFinite(r.blankCount) ? r.blankCount : 0
     if (r.mode && r.mode !== CLOZE_MODE_INPUT) cur.reveal += 1
-    map.set(r.fk, cur)
+    map.set(r.fileKey, cur)
   }
   return [...map.values()].map(
     (g) =>
-      `${g.ft || g.fk}（${g.fk}）：${g.n} 篇 / ${g.sc} 句 / ${g.bc} 空${g.reveal ? `（含已排除 reveal ${g.reveal}）` : ''}`
+      `${g.fileTitle || g.fileKey}（${g.fileKey}）：${g.n} 篇 / ${g.sentences} 句 / ${g.blanks} 空` +
+      `${g.reveal ? `（含已排除 reveal ${g.reveal}）` : ''}`
   )
 }
 
 /** 「一句多空」清单（证明该字段不是摆设：这些篇的 blankCount > sentenceCount） */
 function multiBlankLines(rows) {
   return rows
-    .filter((r) => r.bc > r.sc)
-    .map((r) => `${r.ft || r.fk} · ${r.ti}（${r.sc} 句 / ${r.bc} 空）`)
+    .filter((r) => r.blankCount > r.sentenceCount)
+    .map((r) => `${r.fileTitle || r.fileKey} · ${r.title}（${r.sentenceCount} 句 / ${r.blankCount} 空）`)
 }
 
 /** 「有正文却零空位」清单（运行时会渲染不出任何输入框，必须点名） */
 function emptyBlankLines(rows) {
-  return rows.filter((r) => !(r.bc > 0)).map((r) => `${r.k}（${r.ft || r.fk} · ${r.ti}）`)
+  return rows.filter((r) => !(r.blankCount > 0)).map((r) => `${r.key}（${r.fileTitle || r.fileKey} · ${r.title}）`)
 }
 
 /** 重复主键清单 */
 function duplicateLines(rows) {
   const seen = new Map()
-  for (const r of rows) seen.set(r.k, (seen.get(r.k) || 0) + 1)
+  for (const r of rows) seen.set(r.key, (seen.get(r.key) || 0) + 1)
   return [...seen.entries()].filter(([, n]) => n > 1).map(([k, n]) => `${k}（出现 ${n} 次）`)
 }
 
@@ -242,7 +273,7 @@ function duplicateLines(rows) {
 function orderMismatchLines(rows) {
   const out = []
   rows.forEach((r, i) => {
-    if (r.o !== i) out.push(`第 ${i} 位：期望 order=${i} / 实际 order=${r.o}（${r.k}）`)
+    if (r.order !== i) out.push(`第 ${i} 位：期望 order=${i} / 实际 order=${r.order}（${r.key}）`)
   })
   return out
 }
@@ -418,15 +449,16 @@ export async function collectReciteBank() {
       const { sentenceCount, blankCount, strictCount } = countBlock(block)
 
       // 全库统计：用于汇总行的「全库 N」与 reveal 计数（含被排除的块）
+      // 字段名与产物篇目对齐（sentenceCount / blankCount），差异清单才能一行两用
       blockRows.push({
-        fk: fileKey,
-        ft: info.title,
+        fileKey,
+        fileTitle: info.title,
         rel,
-        ti: title,
+        title,
         mode,
-        sc: sentenceCount,
-        bc: blankCount,
-        stc: strictCount
+        sentenceCount,
+        blankCount,
+        strictCount
       })
 
       // 排除 reveal 篇（不可默写；设计 §T02 实现要点）
@@ -438,28 +470,37 @@ export async function collectReciteBank() {
       }
 
       const role = REVIEW_TITLE_RE.test(title) ? PIECE_ROLE.REVIEW : PIECE_ROLE.LESSON
-      const piece = {
-        k: pieceKeyOf(info.subject, fileKey, blockIndex),
-        // order 在排序后统一回填（此处占位，保持产物键序稳定）
-        o: 0,
-        r: role,
-        u: info.unitNum,
-        fi: info.fileIndex,
-        bi: blockIndex,
-        fk: fileKey,
-        ft: info.title,
-        ut: info.unitTitle,
-        ti: title,
-        m: CLOZE_MODE_INPUT,
-        sc: sentenceCount,
-        bc: blankCount,
-        stc: strictCount,
-        fp: fingerprintOf(block)
-      }
-      if (role === PIECE_ROLE.REVIEW) {
-        // 只有这一处按 title 判定 trigger，判定结果落进产物（运行时不猜）
-        piece.tg = title.indexOf(CHALLENGE_KEYWORD) >= 0 ? PIECE_TRIGGER.ALL : PIECE_TRIGGER.FILE
-      }
+      // 先组装长键原文 → `normalizePiece` 归一并补默认值（lesson 剥 trigger / review 补 'file'）
+      // → `orderFields` 按 PIECE_FIELDS 重排。落盘的就是运行时形状，不是第二套形态。
+      // `subject` **刻意不写进条目**：学科由产物根 `subject` 给出（T01 裁定），
+      // 条目里塞一个 subject 只会让「用空 subject 拼出无人认领的 key」这条静默错误有缝可钻。
+      const piece = orderFields(
+        normalizePiece({
+          key: pieceKeyOf(info.subject, fileKey, blockIndex),
+          // order 在排序后统一回填（此处占位，顺序确定后覆盖）
+          order: 0,
+          role,
+          // 只有这一处按 title 判定 trigger，判定结果落进产物（运行时不猜）
+          trigger:
+            role === PIECE_ROLE.REVIEW
+              ? title.indexOf(CHALLENGE_KEYWORD) >= 0
+                ? PIECE_TRIGGER.ALL
+                : PIECE_TRIGGER.FILE
+              : undefined,
+          unitNum: info.unitNum,
+          fileIndex: info.fileIndex,
+          blockIndex,
+          fileKey,
+          fileTitle: info.title,
+          unitTitle: info.unitTitle,
+          title,
+          mode: CLOZE_MODE_INPUT,
+          sentenceCount,
+          blankCount,
+          strictCount,
+          fp: fingerprintOf(block)
+        })
+      )
       candidates.push({ info, fileKey, blockIndex, piece })
     })
   }
@@ -473,11 +514,11 @@ export async function collectReciteBank() {
   })
 
   const pieces = candidates.map((c, i) => {
-    c.piece.o = i
+    c.piece.order = i
     return c.piece
   })
 
-  const counts = deriveCounts(pieces.map((p) => ({ role: p.r })))
+  const counts = deriveCounts(pieces.map((p) => ({ role: p.role })))
   const bank = {
     schemaVersion: BANK_SCHEMA_VERSION,
     contentVersion: CONTENT_VERSION,
@@ -530,7 +571,7 @@ async function build() {
   // 2) 产物必须能被运行时 sanitizeBank 认出（形状/版本契约的往返验证）
   const roundTripped = sanitizeBank(JSON.parse(JSON.stringify(bank)))
   const keptKeys = new Set(roundTripped ? roundTripped.pieces.map((p) => p.key) : [])
-  const droppedKeys = pieces.map((p) => p.k).filter((k) => !keptKeys.has(k))
+  const droppedKeys = pieces.map((p) => p.key).filter((k) => !keptKeys.has(k))
 
   // 3) 快照基线断言（全部通过才落盘）
   const summary = summarize(pieces, blockRows)

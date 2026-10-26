@@ -4,8 +4,10 @@
  * 被测对象：`scripts/build-recite-bank.mjs`（构建脚本）+ 入库的 `public/recite-bank/chinese.json`。
  *
  * 三层断言，各管一件事（别把三者混成一个 it，红了要能定位到层）：
- *  1. **形状**：产出的每条篇目必须能被运行时 `reciteBank.normalizePiece` 完整还原
- *     （紧凑键齐全、无多余字段、lesson 不带 trigger、mode 恒 input）。
+ *  1. **形状**：产出的每条篇目必须是**长键**（`PIECE_FIELDS`，与运行时形状一致）、无多余字段、
+ *     **无残留紧凑键**、lesson 不带 trigger、mode 恒 input。
+ *     为什么钉「无残留紧凑键」：`PIECE_KEYS` 双形态容错让 `k` 与 `key` 并存时两边都"能用"，
+ *     改一处漏另一处就会静默分叉 —— 这种错不报错，只在某天首页显示错的分母。
  *  2. **内容基线快照**：73 篇 / 170 句 / 193 空 / 16 篇一句多空 / strict 1 —— 与构建脚本的
  *     `BASELINE` **同一个常量**比对，内容侧一改 cloze 就红（有意设计，见 design §0）。
  *     这里刻意**不写第二份数字**：断言用 `BASELINE`，避免"脚本改了常量、测试还钉死旧数"。
@@ -50,7 +52,7 @@ import {
 const ARTIFACT_PATH = fileURLToPath(new URL(`../public/${RECITE_BANK_PATH}`, import.meta.url))
 const PKG_PATH = fileURLToPath(new URL('../package.json', import.meta.url))
 
-/** 全部紧凑键（`tg` 只属于 review 篇，单独判） */
+/** 紧凑形态的键名清单（`PIECE_KEYS` 的键）—— 仅用于「不得残留紧凑键」的反向断言 */
 const COMPACT_KEYS = Object.keys(PIECE_KEYS)
 
 let collected = null
@@ -66,7 +68,7 @@ function pieces() {
 
 /** 按标题找篇（标题在内容侧唯一；找不到直接失败而不是返回 undefined 让下游报奇怪的错） */
 function pieceByTitle(title) {
-  const hit = pieces().find((p) => p.ti === title)
+  const hit = pieces().find((p) => p.title === title)
   expect(hit, `产物中找不到标题为「${title}」的篇目`).toBeDefined()
   return hit
 }
@@ -75,100 +77,115 @@ describe('产物形状（collectReciteBank，不读盘）', () => {
   it('篇目数与 counts 自洽（counts 由 deriveCounts 派生，不第二次数）', () => {
     const list = pieces()
     expect(list.length).toBe(BASELINE.pieces)
-    const counts = deriveCounts(list.map((p) => ({ role: p.r })))
+    const counts = deriveCounts(list.map((p) => ({ role: p.role })))
     expect(counts).toEqual({ all: list.length, lesson: BASELINE.lesson, review: BASELINE.review })
     expect(collected.bank.counts).toEqual(counts)
   })
 
-  it('每条篇目：紧凑键齐全、无多余字段、类型正确', () => {
-    const numberKeys = new Set(['o', 'fi', 'bi', 'sc', 'bc', 'stc'])
+  it('每条篇目：长键齐全（= PIECE_FIELDS）、无多余字段、无残留紧凑键、类型正确', () => {
+    const numberKeys = new Set(['order', 'fileIndex', 'blockIndex', 'sentenceCount', 'blankCount', 'strictCount'])
+    // 残留紧凑键清单：除 fp（紧凑键与长键同名）外，任何一个出现都说明「两套形态混写」。
+    // 混写的危害不是报错，而是 `k` 与 `key` 并存时两边都"能用"，改一处漏另一处 → 静默分叉。
+    const residualCompact = COMPACT_KEYS.filter((compact) => PIECE_KEYS[compact] !== compact)
+
     for (const p of pieces()) {
-      // ① 恰好是「PIECE_KEYS 的子集」—— 多出字段即形状漂移（运行时会静默忽略，最难查）
-      for (const key of Object.keys(p)) {
-        expect(COMPACT_KEYS.includes(key), `篇目 ${p.k} 出现未登记字段 ${key}`).toBe(true)
+      // ① 键集合 ⊆ PIECE_FIELDS —— 多出字段即形状漂移（运行时会静默忽略，最难查）
+      for (const field of Object.keys(p)) {
+        expect(PIECE_FIELDS.includes(field), `篇目 ${p.key} 出现未登记字段 ${field}`).toBe(true)
       }
-      // ② 除 tg（review 专属）外，全部紧凑键必须存在
-      for (const key of COMPACT_KEYS) {
-        if (key === 'tg') continue
-        expect(p[key], `篇目 ${p.k} 缺字段 ${key}`).toBeDefined()
+      // ② 除 trigger（review 专属可选字段）外，全部长键必须存在
+      for (const field of PIECE_FIELDS) {
+        if (field === 'trigger') continue
+        expect(p[field], `篇目 ${p.key} 缺字段 ${field}`).toBeDefined()
       }
-      // ③ 类型：计数字段必须是非负整数，其余是字符串
-      for (const key of COMPACT_KEYS) {
-        if (key === 'tg') continue
-        if (numberKeys.has(key)) {
-          expect(Number.isInteger(p[key]), `篇目 ${p.k} 的 ${key} 不是整数：${p[key]}`).toBe(true)
-          expect(p[key], `篇目 ${p.k} 的 ${key} 为负`).toBeGreaterThanOrEqual(0)
+      // ③ 不得残留任何紧凑键
+      for (const compact of residualCompact) {
+        expect(p[compact], `篇目 ${p.key} 残留紧凑键 ${compact}（应写作 ${PIECE_KEYS[compact]}）`).toBeUndefined()
+      }
+      // ④ 学科**不进条目**：学科由产物根 `subject` 给出（T01 裁定）。带空 subject 拼出来的 key
+      //    语法合法但没有任何行会认领 → 作答记到不存在的篇上，是静默错源。
+      expect(p.subject, `篇目 ${p.key} 不应带 subject（学科在产物根）`).toBeUndefined()
+      // ⑤ 类型：计数字段必须是非负整数，其余是字符串
+      for (const field of PIECE_FIELDS) {
+        if (field === 'trigger') continue
+        if (numberKeys.has(field)) {
+          expect(Number.isInteger(p[field]), `篇目 ${p.key} 的 ${field} 不是整数：${p[field]}`).toBe(true)
+          expect(p[field], `篇目 ${p.key} 的 ${field} 为负`).toBeGreaterThanOrEqual(0)
         } else {
-          expect(typeof p[key], `篇目 ${p.k} 的 ${key} 不是字符串`).toBe('string')
+          expect(typeof p[field], `篇目 ${p.key} 的 ${field} 不是字符串`).toBe('string')
         }
       }
+      // ⑥ 键序 === PIECE_FIELDS 顺序（产物逐字节幂等依赖稳定键序；乱序会让 diff 无谓变大）
+      expect(Object.keys(p)).toEqual(PIECE_FIELDS.filter((f) => f !== 'trigger' || 'trigger' in p))
     }
   })
 
-  it('每条篇目都能被运行时 normalizePiece 完整还原（字段契约往返）', () => {
+  it('每条篇目都能被运行时 normalizePiece 完整还原（字段契约往返，sanitizeBank 对它是幂等的）', () => {
     for (const p of pieces()) {
       const normalized = normalizePiece(p)
       for (const field of PIECE_FIELDS) {
         // trigger 是可选字段（仅 review 有，设计 §3.4 `trigger?`）→ lesson 篇跳过
-        if (field === 'trigger' && p.r === PIECE_ROLE.LESSON) continue
+        if (field === 'trigger' && p.role === PIECE_ROLE.LESSON) continue
         const value = normalized[field]
-        expect(value, `篇目 ${p.k} 经 normalizePiece 后 ${field} 为空`).not.toBe('')
-        expect(value, `篇目 ${p.k} 经 normalizePiece 后 ${field} 为 undefined`).toBeDefined()
+        expect(value, `篇目 ${p.key} 经 normalizePiece 后 ${field} 为空`).not.toBe('')
+        expect(value, `篇目 ${p.key} 经 normalizePiece 后 ${field} 为 undefined`).toBeDefined()
       }
       // 主键与坐标必须原样穿过（键里含中文，任何"顺手 trim/encode"都会让进度记到别的篇上）
-      expect(normalized.key).toBe(p.k)
-      expect(normalized.blockIndex).toBe(p.bi)
-      expect(normalized.fileKey).toBe(p.fk)
+      expect(normalized.key).toBe(p.key)
+      expect(normalized.blockIndex).toBe(p.blockIndex)
+      expect(normalized.fileKey).toBe(p.fileKey)
+      // 产物形状 === 运行时形状：归一化后逐字段相等（不是"字段齐但值不同"）
+      expect(normalized).toEqual(p)
     }
   })
 
   it('mode 恒为 input（reveal 篇构建期即排除）', () => {
-    const modes = [...new Set(pieces().map((p) => p.m))]
+    const modes = [...new Set(pieces().map((p) => p.mode))]
     expect(modes).toEqual([CLOZE_MODE_INPUT])
   })
 
   it('role 只有 lesson / review；lesson 不带 trigger，review 必带合法 trigger', () => {
     for (const p of pieces()) {
-      expect([PIECE_ROLE.LESSON, PIECE_ROLE.REVIEW]).toContain(p.r)
-      if (p.r === PIECE_ROLE.LESSON) {
-        expect('tg' in p, `lesson 篇 ${p.k} 不应带 tg`).toBe(false)
+      expect([PIECE_ROLE.LESSON, PIECE_ROLE.REVIEW]).toContain(p.role)
+      if (p.role === PIECE_ROLE.LESSON) {
+        expect('trigger' in p, `lesson 篇 ${p.key} 不应带 trigger`).toBe(false)
       } else {
-        expect([PIECE_TRIGGER.FILE, PIECE_TRIGGER.ALL]).toContain(p.tg)
+        expect([PIECE_TRIGGER.FILE, PIECE_TRIGGER.ALL]).toContain(p.trigger)
       }
     }
   })
 
   it('6 篇 review 的 trigger = 5 个 file + 1 个 all（按 title 含「冲关」烘焙）', () => {
-    const review = pieces().filter((p) => p.r === PIECE_ROLE.REVIEW)
+    const review = pieces().filter((p) => p.role === PIECE_ROLE.REVIEW)
     expect(review.length).toBe(BASELINE.review)
-    expect(review.filter((p) => p.tg === PIECE_TRIGGER.FILE).length).toBe(5)
-    const all = review.filter((p) => p.tg === PIECE_TRIGGER.ALL)
+    expect(review.filter((p) => p.trigger === PIECE_TRIGGER.FILE).length).toBe(5)
+    const all = review.filter((p) => p.trigger === PIECE_TRIGGER.ALL)
     expect(all.length).toBe(1)
-    expect(all[0].ti).toContain('冲关')
+    expect(all[0].title).toContain('冲关')
     // 5 篇综合自测的 title 完全相同 → UI 必须显示 fileTitle（设计 §3.4 的坑），此处确认 title 确实重名
-    const selfTest = review.filter((p) => p.tg === PIECE_TRIGGER.FILE)
-    expect(new Set(selfTest.map((p) => p.ti)).size).toBe(1)
-    expect(new Set(selfTest.map((p) => p.ft)).size).toBe(5)
+    const selfTest = review.filter((p) => p.trigger === PIECE_TRIGGER.FILE)
+    expect(new Set(selfTest.map((p) => p.title)).size).toBe(1)
+    expect(new Set(selfTest.map((p) => p.fileTitle)).size).toBe(5)
   })
 
   it('order 为 0..n-1 单调连续；key 唯一；学科前缀可由 subjectOfPiece 反解', () => {
     const list = pieces()
     list.forEach((p, i) => {
-      expect(p.o, `第 ${i} 位的 order 不连续`).toBe(i)
+      expect(p.order, `第 ${i} 位的 order 不连续`).toBe(i)
     })
-    expect(new Set(list.map((p) => p.k)).size).toBe(list.length)
+    expect(new Set(list.map((p) => p.key)).size).toBe(list.length)
     for (const p of list) {
-      // subjectOfPiece 读的是**长键** `key`（紧凑键 `k` 须先经 normalizePiece 展开）
-      expect(subjectOfPiece(normalizePiece(p))).toBe(SUBJECT)
+      // subjectOfPiece 读的是长键 `key`（产物已是长键形态，无需先 normalizePiece）
+      expect(subjectOfPiece(p)).toBe(SUBJECT)
       // 主键格式 `${subject}|${fileKey}|${blockIndex}`（设计 §7.2，禁把 title/text 放进键）
-      expect(p.k).toBe(`${SUBJECT}|${p.fk}|${p.bi}`)
+      expect(p.key).toBe(`${SUBJECT}|${p.fileKey}|${p.blockIndex}`)
     }
   })
 
   it('每篇都有可默写内容：sentenceCount > 0 且 blankCount > 0', () => {
     for (const p of pieces()) {
-      expect(p.sc, `篇目 ${p.k} 没有句子`).toBeGreaterThan(0)
-      expect(p.bc, `篇目 ${p.k} 没有空位（渲染层会输出空白页）`).toBeGreaterThan(0)
+      expect(p.sentenceCount, `篇目 ${p.key} 没有句子`).toBeGreaterThan(0)
+      expect(p.blankCount, `篇目 ${p.key} 没有空位（渲染层会输出空白页）`).toBeGreaterThan(0)
     }
   })
 })
@@ -180,18 +197,18 @@ describe('内容基线快照（73 篇 / 170 句 / 193 空 / 16 篇一句多空�
 
   it('关雎：strict 句 1 / 2 句 / 4 空（strictCount 是句数，不是空位数）', () => {
     const guanJu = pieceByTitle('《诗经》 · 关雎')
-    expect(guanJu.stc).toBe(1)
-    expect(guanJu.sc).toBe(2)
-    expect(guanJu.bc).toBe(4)
+    expect(guanJu.strictCount).toBe(1)
+    expect(guanJu.sentenceCount).toBe(2)
+    expect(guanJu.blankCount).toBe(4)
     // 该校验同时也是「strictCount 按句而非按空」的锚点：该 strict 句含 2 个空，若按空计会是 2
-    expect(guanJu.bc).toBeGreaterThan(guanJu.stc)
+    expect(guanJu.blankCount).toBeGreaterThan(guanJu.strictCount)
   })
 
   it('一句多空 16 篇，且确实存在 blankCount > sentenceCount 的篇（该字段不是摆设）', () => {
-    const multi = pieces().filter((p) => p.bc > p.sc)
+    const multi = pieces().filter((p) => p.blankCount > p.sentenceCount)
     expect(multi.length).toBe(BASELINE.multiBlankPieces)
     expect(multi.length).toBeGreaterThan(0)
-    for (const p of multi) expect(p.bc).toBeGreaterThan(p.sc)
+    for (const p of multi) expect(p.blankCount).toBeGreaterThan(p.sentenceCount)
     // 全库口径（含被排除的 reveal 篇）= 17，比产物内多 1 —— 汇总行的「全库 N」据此得出
     expect(summarize(pieces(), collected.blockRows).multiBlankAllBlocks).toBe(BASELINE.multiBlankAllBlocks)
   })
@@ -210,7 +227,7 @@ describe('内容基线快照（73 篇 / 170 句 / 193 空 / 16 篇一句多空�
 })
 
 describe('入库产物 public/recite-bank/chinese.json', () => {
-  it('存在且能被运行时 sanitizeBank 完整接受（schemaVersion / 篇数 / 计数）', () => {
+  it('存在且能被运行时 sanitizeBank 完整接受（schemaVersion / contentVersion / 不丢条）', () => {
     expect(existsSync(ARTIFACT_PATH), `产物缺失：${RECITE_BANK_PATH}（请跑 node scripts/build-recite-bank.mjs）`).toBe(
       true
     )
@@ -220,8 +237,37 @@ describe('入库产物 public/recite-bank/chinese.json', () => {
     const bank = sanitizeBank(raw)
     expect(bank, 'sanitizeBank 判定产物不可用（运行时会导致「素材加载失败」）').not.toBeNull()
     expect(bank.pieces.length, 'sanitizeBank 丢弃了条目 → 产物字段不满足运行时契约').toBe(raw.pieces.length)
-    expect(bank.counts).toEqual(raw.counts)
     expect(raw.pieces.length).toBe(BASELINE.pieces)
+  })
+
+  it('产物声明的 counts 必须与 deriveCounts(pieces) 逐键相等（运行时不用它，但它错了说明构建期算错了）', () => {
+    const raw = JSON.parse(readFileSync(ARTIFACT_PATH, 'utf-8'))
+    const bank = sanitizeBank(raw)
+    expect(bank).not.toBeNull()
+    // ⚠️ 运行时**不读**产物的 counts（T01 起 sanitizeBank 一律用 deriveCounts(pieces) 现算，
+    // 声明值只作构建期校验），所以这条断言守的**不是**「运行时采信声明值」，而是
+    // 「构建期没算错、也没写占位值」—— 首页分母 `已背 X / 67` 与队列上限都出自这个数，
+    // 错了不会报错、只会显示错的分母。这是唯一挡它的守卫，别当冗余删掉。
+    expect(raw.counts).toEqual(deriveCounts(bank.pieces))
+    // 同时钉住「声明的 counts 与构建期基线一致」：与 BASELINE 同源，避免此处硬编码 73/67/6
+    expect(raw.counts).toEqual({
+      all: BASELINE.pieces,
+      lesson: BASELINE.lesson,
+      review: BASELINE.review
+    })
+  })
+
+  it('盘上产物逐条是长键形态（不是紧凑键，也不混写）', () => {
+    const raw = JSON.parse(readFileSync(ARTIFACT_PATH, 'utf-8'))
+    const residualCompact = COMPACT_KEYS.filter((compact) => PIECE_KEYS[compact] !== compact)
+    for (const p of raw.pieces) {
+      expect(Object.keys(p).some((f) => residualCompact.includes(f)), `产物篇目 ${p.key} 残留紧凑键`).toBe(false)
+      // 长键必备字段直接可读 —— 这正是「直接 JSON.parse 再读 piece.fileKey」那一类消费方的前提
+      for (const field of PIECE_FIELDS) {
+        if (field === 'trigger' && p.role !== PIECE_ROLE.REVIEW) continue
+        expect(p[field], `产物篇目 ${p.key} 缺长键 ${field}`).toBeDefined()
+      }
+    }
   })
 
   it('入库产物与现场扫库一致（剔除 generatedAt）→ 改了内容却没重建会红', () => {
@@ -321,8 +367,8 @@ describe('assertBaseline 的失败信息必须可操作（不是只 exit 1）', 
   })
 
   it('结构性不变量失败时点名具体条目（order / 重复键 / 零空位 / 非法版本）', () => {
-    const broken = pieces().map((p, i) => (i === 0 ? { ...p, o: 99, bc: 0 } : { ...p, o: i }))
-    const dup = { ...broken[1], k: broken[0].k }
+    const broken = pieces().map((p, i) => (i === 0 ? { ...p, order: 99, blankCount: 0 } : { ...p, order: i }))
+    const dup = { ...broken[1], key: broken[0].key }
     const rows = [broken[0], dup, ...broken.slice(2)]
     const failures = assertBaseline(summarize(rows, collected.blockRows), rows, collected.blockRows, {
       contentVersion: NaN,
