@@ -53,8 +53,15 @@ export const REVIEW_SESSION_LIMIT = 25
  */
 export const CARD_KINDS = { ERROR: 'error', STUCK: 'stuck' }
 
-/** 获取日期字符串 YYYY-MM-DD */
-function getDateStr(d = new Date()) {
+/**
+ * 获取日期字符串 YYYY-MM-DD（**本地时区**，禁 `toISOString().slice(0,10)`：那是 UTC，会错一天）
+ * 导出说明（每日背诵 T03）：本仓已有两份同款实现（此处的 + `studyDb.js:292`），
+ * 拒绝第三份 → 背诵侧改为 `import { getDateStr } from '@/composables/useSpacedReview'`。
+ * 纯加 `export`，零语义变化。
+ * ⚠️ 唯一例外：`src/composables/useReciteSchedule.js` 因"零 import、裸 Node 可单测"的硬约束
+ *    仍保留一份**逐字镜像**，由 `tests/recite-schedule.test.js` 与本函数对拍钉死（防漂移）。
+ */
+export function getDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 

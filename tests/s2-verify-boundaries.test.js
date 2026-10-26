@@ -79,9 +79,11 @@ describe('S2 · 攻点⑨ 缓存不进同步引擎 / DB 仍 v7', () => {
     expect(block).not.toContain("'content_meta'")
   })
 
-  it('DB_VERSION 仍为 7；S2 未新增建表', () => {
+  it('DB_VERSION 当前为 8（S2 本批未抬版，T03 背诵合法升到 v8）；S2 未新增建表', () => {
     const db = readFileSync(join(ROOT, 'src/stores/studyDb.js'), 'utf8')
-    expect(db).toMatch(/const DB_VERSION = 7\b/)
+    // 历史：S2 当时锚 7；T03（每日背诵 P0-4）合法升到 v8，锚值随当前版本前移。
+    // 本用例的其余部分（BASE..HEAD 的 S2 批次 diff）不受影响 —— 那是固定 sha 区间。
+    expect(db).toMatch(/const DB_VERSION = 8\b/)
     const diff = gitOut(['diff', BASE, HEAD, '--', 'src/stores/studyDb.js'])
     if (diff) {
       const added = diff.split('\n').filter((l) => l.startsWith('+') && !l.startsWith('+++'))

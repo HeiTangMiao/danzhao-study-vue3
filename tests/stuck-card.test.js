@@ -168,13 +168,15 @@ describe('stuck-card —— 存储与队列（C-2-1）', () => {
     w.unmount()
   })
 
-  it('⑦ 零迁移：recordStuck 可读回；engine.js 无新实体；DB 仍 v7', async () => {
+  it('⑦ 零迁移：recordStuck 可读回；engine.js 无新实体；DB 版本锚为当前 v8', async () => {
     const r = await db.recordStuck('PS 图层面板', '自由变换', 'Ctrl+T')
     expect((await db.getAllErrors()).some((e) => e.id === r.id)).toBe(true)
     const engineSrc = fs.readFileSync(path.join(process.cwd(), 'src/sync/engine.js'), 'utf8')
     expect(engineSrc).not.toContain('stuck')
     const dbSrc = fs.readFileSync(path.join(process.cwd(), 'src/stores/studyDb.js'), 'utf8')
-    expect(dbSrc).toContain('const DB_VERSION = 7')
+    // 历史：本用例当时锚 7；T03（每日背诵 P0-4）合法升到 v8，锚值随当前版本前移。
+    // 「零迁移」的实质断言是上面两条（card 可读回、engine 无新实体），版本锚只是防私抬版。
+    expect(dbSrc).toContain('const DB_VERSION = 8')
   })
 
   // 防退化：kind 过滤必须发生在 limit 截断之前。若顺序颠倒（先 slice 再 filter），

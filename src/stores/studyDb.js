@@ -15,6 +15,9 @@
  *  - user_progress：统一学习进度（completed 映射 + 最近学习时间戳）
  *  - question_attempt：单题作答记录（elapsedMs 等，v7 新增，P0-3）
  *  - content_cache / content_meta：S2 内容双轨预留空表（v7 建、当前不含数据）
+ *  - recite_progress / recite_state：每日背诵的篇级调度与连续天数（v8 新增，见 v8 迁移块）。
+ *    ⚠️ 这两张表**不参与多设备同步**（一期裁定），但**必须**随换账号清空 —— 见
+ *    `DEVICE_LOCAL_STORES` 的 JSDoc。
  *
  * 版本历史：
  *  - v1~v3：曾在 daily_stats/study_log 等仓库记录 xp/checkin/成就等游戏字段
@@ -25,14 +28,15 @@
  *        同时新增软删墓碑（deleted 字段），删除可跨设备传播
  *  - v7：新增 question_attempt（单题作答记录，P0-3 本次消费）；同时**预留** S2 内容双轨
  *        content_cache / content_meta 两表（形状已定稿，空表零成本，避免 S2 再升 v8）
+ *  - v8：新增 recite_progress / recite_state（每日背诵，P0-4）
  */
 import { defineStore } from 'pinia'
 import * as notesDb from './db/notes'
 import * as bookmarksDb from './db/bookmarks'
 
-// IndexedDB 配置（库名保持兼容；版本号 v7 收敛单题作答记录 + S2 预留表）
+// IndexedDB 配置（库名保持兼容；版本号 v8 = 每日背诵两表）
 const DB_NAME = 'study_game_db'
-const DB_VERSION = 7
+const DB_VERSION = 8
 
 // 单例数据库连接
 let dbInstance = null
@@ -193,6 +197,27 @@ function openDB() {
           d.createObjectStore('content_meta', { keyPath: 'key' })
         }
       }
+
+      // v8：每日背诵（P0-4）—— 篇级调度表 + 单行状态表。
+      // **必须是"升版迁移"而不是"只建表"**：`if (oldVersion < 8)` 守卫保证
+      // ① 已有 v7 库升级时**只**补这两张表，其余仓库数据一条不动；
+      // ② 全新库（oldVersion=0）也会建出来；
+      // ③ 已是 v8 的库不会再进这里（重复 open 不重建、不丢数据）。
+      if (oldVersion < 8) {
+        if (!d.objectStoreNames.contains('recite_progress')) {
+          // keyPath 'key' = 业务主键 `${subject}|${fileKey}|${blockIndex}`，**无自增**
+          // （与 error_book / study_log 的 v6 纪律一致：主键由业务层给定）
+          const s = d.createObjectStore('recite_progress', { keyPath: 'key' })
+          // P0-7 文件级触发要按文件分组 → fileKey 索引
+          s.createIndex('fileKey', 'fileKey', { unique: false })
+          // 出「今日到期」队列 → nextDate 索引
+          s.createIndex('nextDate', 'nextDate', { unique: false })
+        }
+        if (!d.objectStoreNames.contains('recite_state')) {
+          // 单行状态表（全表只有 key='main' 一行），无索引
+          d.createObjectStore('recite_state', { keyPath: 'key' })
+        }
+      }
     }
   })
 }
@@ -335,6 +360,22 @@ const SYNC_STORE_NAMES = [
   'question_attempt'
 ]
 
+/**
+ * **设备本地**（不参与同步）但**必须随换账号清空**的仓库名。
+ *
+ * 为什么需要一张单独的清单（设计 §1 异议 8 / §8.1 Q2）：
+ *  - `recite_progress` / `recite_state` 一期**不进** `ENTITIES` / `SYNC_STORE_NAMES`（不同步）；
+ *  - 但它们保存的是**具体学员的**背诵进度与连续天数。若只清 `SYNC_STORE_NAMES`，
+ *    学员 A 登出、B 登录后，B 会看到 A 的「已背 23 / 67 · 连续 7 天」——
+ *    既是隐私问题，也是本仓已修过的「跨用户数据污染」（见
+ *    `project-assessment-2026-10-17.md` Top 1）。
+ *  - 故：**不同步 ≠ 不用清**。这两张表随换账号一并 `dbClear`。
+ *
+ * ⚠️ 只加在这里，`SYNC_STORE_NAMES` **不动**（`src/sync/engine.js` 的 ENTITIES
+ *    与 `tests/sync-engine.test.js` 都依赖它那 7 项）。
+ */
+const DEVICE_LOCAL_STORES = ['recite_progress', 'recite_state']
+
 export const useStudyDbStore = defineStore('studyDb', {
   actions: {
     // ===== 初始化 =====
@@ -352,10 +393,19 @@ export const useStudyDbStore = defineStore('studyDb', {
      *   ② 用户已明确知晓并同意。
      * 不清 content_cache / content_meta：那是设备本地派生数据（远程快照镜像），
      * 与账号无关，且 engine.js 的 ENTITIES 本就不含它们。
+     *
+     * ⚠️ 方法名 / 签名 / `SYNC_STORE_NAMES` **一律不变**（`src/stores/auth.js` 与
+     * `tests/sync-engine.test.js` 依赖它们）；每日背诵的两张**设备本地表**
+     * （`DEVICE_LOCAL_STORES`）在这里**追加**清除：
+     * 它们不同步，但**必须**随换账号清空，否则 B 登录后会看到 A 的「已背 X / 连续 N 天」。
      */
     async clearAllSyncedData() {
       await this.init()
       for (const name of SYNC_STORE_NAMES) {
+        await dbClear(name)
+      }
+      // 设备本地表（不同步，但换账号必须清 —— 见 DEVICE_LOCAL_STORES 的 JSDoc）
+      for (const name of DEVICE_LOCAL_STORES) {
         await dbClear(name)
       }
     },
@@ -994,22 +1044,120 @@ export const useStudyDbStore = defineStore('studyDb', {
       return { subjects, totalVisited, totalQuestions, todayStat, errorsCount: allErrors.length, allErrors }
     },
 
+    // ===== 每日背诵（v8：recite_progress / recite_state） =====
+    //
+    // 形状见 docs/design-recitation.md §3.1 / §3.3。三个不可动摇的约定：
+    //  ① 主键 `key = ${subject}|${fileKey}|${blockIndex}`（业务键，无自增）；
+    //  ② `nextDate` / `learnedAt` / `lastActiveDate` 是**本地时区** `YYYY-MM-DD` 字符串，
+    //     调度比较一律字符串比大小，绝不用时间戳（避时区/夏令时错位）；
+    //  ③ 这两张表**不同步**，但换账号必须清（`DEVICE_LOCAL_STORES`）。
+    //
+    // 本层只做「存取」，不含任何调度公式 —— 公式全在 `useReciteSchedule.js`（H7）。
+
+    /**
+     * 取全部背诵进度行（含软删墓碑；调用方按 `deleted` 过滤）。
+     * @returns {Promise<Array<Object>>} recite_progress 行数组
+     */
+    async getReciteProgressAll() {
+      await this.init()
+      return dbGetAll('recite_progress')
+    },
+
+    /**
+     * 按篇主键取一行
+     * @param {string} key `${subject}|${fileKey}|${blockIndex}`
+     * @returns {Promise<Object|null>} 行；不存在 → null
+     */
+    async getReciteProgress(key) {
+      await this.init()
+      return dbGet('recite_progress', key)
+    },
+
+    /**
+     * 写入 / 覆盖一行背诵进度（走 `dbPut`，自动盖 `updatedAt`）。
+     * @param {Object} row 完整行（必须含 `key`）
+     * @returns {Promise<void>}
+     */
+    async saveReciteProgress(row) {
+      if (!row || typeof row !== 'object' || typeof row.key !== 'string' || row.key === '') {
+        throw new Error('saveReciteProgress: 行缺少 key')
+      }
+      await this.init()
+      return dbPut('recite_progress', row)
+    },
+
+    /**
+     * 软删一行背诵进度（写 `deleted:true` 墓碑，不物理删除）——
+     * 形状与既有仓库一致，为 P1-3「重开一轮」预留。
+     * @param {string} key 篇主键
+     * @returns {Promise<boolean>} 是否命中并写入墓碑
+     */
+    async deleteReciteProgressSoft(key) {
+      await this.init()
+      const row = await dbGet('recite_progress', key)
+      if (!row) return false
+      await dbPut('recite_progress', { ...row, deleted: true })
+      return true
+    },
+
+    /**
+     * 取背诵状态（单行表）。**缺行返回零值结构**，不返回 null ——
+     * 让调用方无需再判空（streak 显示 0 天）。
+     * @returns {Promise<{key: string, streak: number, maxStreak: number, lastActiveDate: string}>}
+     */
+    async getReciteState() {
+      await this.init()
+      const row = await dbGet('recite_state', 'main')
+      if (!row) return { key: 'main', streak: 0, maxStreak: 0, lastActiveDate: '' }
+      return {
+        key: 'main',
+        streak: row.streak || 0,
+        maxStreak: row.maxStreak || 0,
+        lastActiveDate: typeof row.lastActiveDate === 'string' ? row.lastActiveDate : ''
+      }
+    },
+
+    /**
+     * 写入背诵状态（单行表，主键恒为 `'main'`）。
+     * @param {Object} row 状态行（缺字段按 0 / 空串兜底）
+     * @returns {Promise<void>}
+     */
+    async saveReciteState(row) {
+      const src = row && typeof row === 'object' ? row : {}
+      const next = {
+        key: 'main',
+        streak: src.streak || 0,
+        maxStreak: src.maxStreak || 0,
+        lastActiveDate: typeof src.lastActiveDate === 'string' ? src.lastActiveDate : ''
+      }
+      await this.init()
+      return dbPut('recite_state', next)
+    },
+
     // ===== 数据导出 / 导入 =====
 
     /**
      * 导出全部数据（IndexedDB + localStorage）
      * 用于数据备份或迁移
+     *
+     * ⚠️ `recite_progress` / `recite_state` 虽然**不同步**，也必须纳入导出 ——
+     *    否则「导出备份 → 换机恢复」会丢掉全部背诵进度（设计 §1 异议 8 第 2 条）。
+     *    两者都是**数组形式**（与 `localStorage` 那种 `{ key: string }` 字段区分开）：
+     *    `recite_state` 因为只有一行，长得像对象，但它仍然是 `[row]`。
      */
     async exportAllData() {
       await this.init()
-      const [studyLogs, dailyStats, pageProgress, errors, notes, bookmarks, attempts] = await Promise.all([
+      const [studyLogs, dailyStats, pageProgress, errors, notes, bookmarks, attempts,
+        reciteProgress, reciteState] = await Promise.all([
         this.getAllStudyLogs(),
         this.getAllDailyStats(),
         this.getAllPageProgress(),
         this.getAllErrors(),
         this.getAllNotes(),
         this.getAllBookmarks(),
-        this.getAllAttempts()
+        this.getAllAttempts(),
+        this.getReciteProgressAll(),
+        dbGetAll('recite_state')
       ])
 
       // 收集 localStorage 中与应用相关的数据（仅仍实际写入的键，避免备份历史残留键）
@@ -1033,6 +1181,8 @@ export const useStudyDbStore = defineStore('studyDb', {
         notes,
         bookmarks,
         question_attempt: attempts,
+        recite_progress: reciteProgress,
+        recite_state: reciteState,
         localStorage: lsData
       }
     },
@@ -1045,7 +1195,8 @@ export const useStudyDbStore = defineStore('studyDb', {
       if (!data || typeof data !== 'object') throw new Error('无效的数据格式')
 
       // 参与导入的业务仓库（user_progress 已退役：完成状态由 page_progress 推导）
-      const stores = ['study_log', 'daily_stats', 'page_progress', 'error_book', 'notes', 'bookmarks', 'question_attempt']
+      // recite_progress / recite_state：v8 新增，形状同数组仓库（keyPath 为 'key'，无需补 id）
+      const stores = ['study_log', 'daily_stats', 'page_progress', 'error_book', 'notes', 'bookmarks', 'question_attempt', 'recite_progress', 'recite_state']
 
       // 数据格式校验（数组类仓库要求为数组）
       for (const key of stores) {

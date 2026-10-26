@@ -121,9 +121,9 @@ describe('R2 · 攻点[4] · WorkCardBlock 三勾', () => {
     w.unmount()
   })
 
-  it('DB 停 v7（源码 + Fc5 未触 studyDb）', () => {
+  it('DB 版本锚为当前版本 v8（Fc5 未触 studyDb；v8 由 T03 背诵合法引入）', () => {
     const src = readFileSync(join(process.cwd(), 'src/stores/studyDb.js'), 'utf8')
-    expect(src).toMatch(/const DB_VERSION = 7\b/)
+    expect(src).toMatch(/const DB_VERSION = 8\b/)
   })
 })
 

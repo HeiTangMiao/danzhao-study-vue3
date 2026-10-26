@@ -155,12 +155,14 @@ describe('B2 · 缓存键隔离（P-S52 / R-10：4 键互不串号 + 不撞内�
   })
 })
 
-describe('B3 · DB 仍为 v7、不新增 object store（S5-2 契约 3 / R-10）', () => {
-  it('★ studyDb.js 未进入本批改动面（git diff 应为空）', () => {
-    // 关键结论一律用脚本复核；此处直接断言「文件里 DB_VERSION 仍写死为 7」
+describe('B3 · DB 当前为 v8、不新增 object store（S5-2 契约 3 / R-10）', () => {
+  it('★ studyDb.js 未进入本批改动面（DB 版本锚 = 当前版本，S5 未再抬版）', () => {
+    // 关键结论一律用脚本复核；此处直接断言「文件里 DB_VERSION 写死为当前版本」。
+    // 历史：S5 当时锚 7；T03（每日背诵 P0-4）**合法**升到 v8 并同步前移本锚 ——
+    // 锚的语义是「本批没有抬版」，所以锚值随全局当前版本一起前移，同时仍禁止越过它（禁止 v9）。
     const src = readFileSync(join(ROOT, 'src/stores/studyDb.js'), 'utf-8')
-    expect(/const\s+DB_VERSION\s*=\s*7\b/.test(src)).toBe(true)
-    expect(/const\s+DB_VERSION\s*=\s*8\b/.test(src)).toBe(false)
+    expect(/const\s+DB_VERSION\s*=\s*8\b/.test(src)).toBe(true)
+    expect(/const\s+DB_VERSION\s*=\s*9\b/.test(src)).toBe(false)
   })
 
   it('★ 不新增 object store：两表仍在 v7 分支里创建且 keyPath 为 key', () => {
