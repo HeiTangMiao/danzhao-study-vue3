@@ -269,7 +269,8 @@ export const useReciteStore = defineStore('recite', () => {
    * 调用点**只有三处**，且都必须走本函数（禁止各处手写一次取时间）：
    *  ① `doInit()` —— 初次加载落地产物后；
    *  ② `init()` 命中「已加载」的**提前 return 分支** —— 隔夜重进首页时纠正快照；
-   *  ③ `submitResult()` 入口（`manual` 早退之后）—— 作答是「今天确实做了事」的唯一事实来源。
+   *  ③ `submitResult()` 入口（**在 `manual` 早退之前**）—— 作答是「今天确实做了事」的唯一事实来源；
+   *    手动（模拟考场）也刷：这样「`today` 在任何入口都不陈旧」是无条件不变量（team-lead 裁定）。
    * 并发加载期间（`inFlight` 已存在）不刷新：那时多刷一次没有意义（T03 复核点 ②）。
    *
    * ⚠️ I4：本文件取时间的字面调用只有 2 处 —— `today` 的 `ref` 初值（构造兜底）与本函数。
@@ -383,7 +384,8 @@ export const useReciteStore = defineStore('recite', () => {
    *
    * ⚠️ **仅用于测试构造「陈旧 `today`」现场**：先 `setToday('2020-01-01')` 装作页面是那天打开的，
    *    再断言 `init()` / `submitResult()` 会把它纠正回真实日期。**生产路径不需要它** ——
-   *    `doInit()` / `init()` 的已加载分支 / `submitResult()` 都会调 `syncToday()` 覆盖成本地今天。
+   *    `doInit()` / `init()` 的已加载分支 / `submitResult()`（含 `manual` 早退之前的那次）
+   *    都会调 `syncToday()` 覆盖成本地今天。
    *    任何视图都不许调用本函数（在 `.vue` 里指定"今天"= 第二个时间源，正是 I4 禁止的）。
    * @param {string} day `YYYY-MM-DD`
    */
@@ -432,19 +434,23 @@ export const useReciteStore = defineStore('recite', () => {
    * ⚠️ 跨零点（team-lead 裁定必修）：入口先 `syncToday()`，再把值**一次性**取进局部 `day`，
    *    下面三处消费（`applyResult` / `syncReviewTriggers` / `bumpStreak`）**必须共用这个 `day`** ——
    *    混用 `today.value` 会让三处拿到不同基准（改到一半最容易出的错正是这处漏一个）。
-   *    `syncToday()` 放在 `manual` 早退**之后**：手动路径与修复前逐字一致（不写行、也不动 `today`）。
+   *    `syncToday()` 放在 `manual` 早退**之前**（team-lead 最终裁定）：这样一来
+   *    「`today` 在任何入口都不陈旧」是**无条件**不变量，不依赖「manual 分支永不写库」这个当前事实 ——
+   *    P1 若给模拟考场加成绩记录，也不会让这个 bug 静默复活。I6 的实质契约是「不写库」，
+   *    不是「不碰 `today` 这个 ref」。
    *
    * @param {{pieceKey: string, allCorrect?: boolean, manual?: boolean}} params
    * @returns {Promise<{ok: boolean, manual: boolean, row?: object, reviewRows?: Array<object>}>}
    * @throws {Error} 未知篇目 / 主进度落库失败
    */
   async function submitResult({ pieceKey, allCorrect = false, manual = false } = {}) {
-    // I6：手动入口不写任何 `recite_progress` 行（P0-9）
+    // 跨零点：作答前先把「今天」拉回真实今天（三处消费共用同一个 day）。
+    // 放在 manual 早退**之前**：让「today 在任何入口都不陈旧」成为无条件不变量（见上方 ⚠️）。
+    syncToday()
+    // I6：手动入口不写任何 `recite_progress` 行（P0-9）—— 早退之后一行代码都不跑
     if (manual === true || manualOnly.value === true) {
       return { ok: true, manual: true }
     }
-    // 跨零点：作答前先把「今天」拉回真实今天（三处消费共用同一个 day）
-    syncToday()
     const day = today.value
     const piece = pieceByKey.value.get(pieceKey)
     if (!piece) throw new Error(`[recite] 未知篇目：${pieceKey}`)

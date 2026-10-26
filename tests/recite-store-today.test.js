@@ -176,8 +176,8 @@ describe('② 重进页面刷新 today（init 命中"已加载"的提前 return 
   })
 })
 
-describe('③ 手动模式（I6）与修复前逐字一致', () => {
-  it('manual=true：不写 recite_progress、不写 recite_state，且不动 today', async () => {
+describe('③ 手动模式（I6）的不写库契约 + today 刷新已无条件化', () => {
+  it('manual=true：不写 recite_progress、不写 recite_state，但 today 同样被刷新', async () => {
     const db = useStudyDbStore()
     const store = useReciteStore()
     await store.init()
@@ -186,10 +186,14 @@ describe('③ 手动模式（I6）与修复前逐字一致', () => {
     const result = await store.submitResult({ pieceKey: KEY_1, allCorrect: true, manual: true })
 
     expect(result).toEqual({ ok: true, manual: true })
+    // I6 的实质契约是「不写库」——
     expect(await db.getReciteProgressAll()).toEqual([])
     expect((await db.getReciteState()).lastActiveDate).toBe('')
-    // `syncToday()` 刻意放在 manual 早退**之后**：手动路径连 ref 都不该被改
-    expect(store.today).toBe(STALE_DAY)
+    // ……而不是「不碰 today 这个 ref」。`syncToday()` 放在 manual 早退**之前**（team-lead 裁定）：
+    // 让「today 在任何入口都不陈旧」成为**无条件**不变量，不依赖「manual 分支永不写库」这个当前事实
+    // （P1 若给模拟考场加成绩记录，早退之后的刷新会让同一个 bug 静默复活）。
+    expect(store.today).toBe(getDateStr())
+    expect(store.today).not.toBe(STALE_DAY)
   })
 })
 
