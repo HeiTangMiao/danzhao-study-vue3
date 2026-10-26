@@ -5,6 +5,7 @@
 import { createApp } from './app.js'
 import { initDB, closeDB, query } from './db.js'
 import { createDbStore, parseRateLimitConfig, resolveRateLimitEnabled } from './rateLimit.js'
+import { parseAiConfig, describeMissingCredential } from './ai/config.js'
 
 const PORT = Number(process.env.PORT || 3000)
 const NODE_ENV = process.env.NODE_ENV || 'development'
@@ -20,6 +21,16 @@ if (NODE_ENV === 'production' && !process.env.JWT_SECRET) {
   process.exit(1)
 }
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
+
+// AI 网关配置（反向隧道）。全部走环境变量 —— 容器 CMD 是 `node src/index.js`，
+// 依赖 `env_file: ./server/.env` 注入，代码里不得出现端点地址或 token。
+const aiConfig = parseAiConfig(process.env, { log: console })
+// 与 JWT_SECRET 同款护栏：隧道端点是**公网入口**，生产缺凭据等于免鉴权，必须拒绝启动
+const aiCredentialError = describeMissingCredential(aiConfig, NODE_ENV)
+if (aiCredentialError) {
+  console.error(aiCredentialError)
+  process.exit(1)
+}
 
 // 允许的跨域来源（逗号分隔），完全由环境变量 ALLOWED_ORIGIN 驱动。
 // 未设置时只回退到「本地开发地址」，代码中不含任何硬编码域名 ——
@@ -69,7 +80,8 @@ const app = await createApp({
         config: parseRateLimitConfig(process.env),
         trustProxy
       }
-    : null
+    : null,
+  aiConfig
 })
 
 // 启动前初始化数据库（自动建表，幂等）

@@ -10,6 +10,7 @@ import { authRoutes } from './auth.js'
 import { syncRoutes } from './sync.js'
 import { adminRoutes } from './admin.js'
 import { createRateLimiter, tooManyRequestsBody } from './rateLimit.js'
+import { createAiPlugin } from './ai/index.js'
 
 /**
  * IP 维度白名单：路径 → 端点名（端点名即限流阈值表的 key）
@@ -45,13 +46,18 @@ const IP_GUARDED_PATHS = new Map([
  *   ⚠️ 默认关闭是为了测试：`node --test` 用 `app.inject()`，请求没有真实来源 IP，
  *      `request.ip` 为空；若默认开启，`api.test.js` 里连续 register 会撞上 10 次/小时
  *      而被无辜变红。生产由 `index.js` **显式**传入。
+ * @param {object|null} [opts.aiConfig=null] AI 网关配置（`./ai/config.js` 的 parseAiConfig 产出）。
+ *   **`null` = 不注册 AI 插件**（默认值）。
+ *   ⚠️ 与 rateLimit 同一条理由：既有测试与本地开发调用 `createApp()` 时不带它，
+ *      行为必须**完全不变**（不多路由、不多依赖副作用）。生产由 `index.js` 显式传入。
  */
 export async function createApp({
   logger = false,
   jwtSecret = 'dev-secret-change-me',
   allowedOrigins = null,
   trustProxy = false,
-  rateLimit = null
+  rateLimit = null,
+  aiConfig = null
 } = {}) {
   const app = Fastify({ logger, trustProxy })
 
@@ -114,6 +120,10 @@ export async function createApp({
   await app.register(authRoutes)
   await app.register(syncRoutes)
   await app.register(adminRoutes)
+  // AI 网关（反向隧道）：仅在显式配置且开启时挂载，见 @param aiConfig 的理由
+  if (aiConfig && aiConfig.enable) {
+    await app.register(createAiPlugin({ aiConfig }))
+  }
 
   return app
 }
