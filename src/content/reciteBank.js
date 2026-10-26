@@ -250,7 +250,8 @@ export function deriveCounts(pieces) {
  * 清洗规则：
  *  - 逐条 `normalizePiece`，丢掉不可用的（缺 fileKey / title）
  *  - 按 `order` 升序稳定排序（同等 order 保持产物原序）
- *  - `counts` 优先取产物声明值，声明值不全时由篇目派生
+ *  - `counts` **恒由篇目派生**（`deriveCounts`）；产物里声明的 `counts` **运行时一律不读**，
+ *    它只服务两个用途：构建期断言对象 + 人工阅读。
  *
  * @param {unknown} raw 产物 JSON.parse 的结果
  * @returns {{
@@ -282,19 +283,20 @@ export function sanitizeBank(raw) {
   // 稳定排序：Array.prototype.sort 在 ES2019+ 已是稳定排序，同等 order 保持产物原序
   pieces.sort((a, b) => a.order - b.order)
 
-  const derived = deriveCounts(pieces)
-  const rawCounts = raw.counts && typeof raw.counts === 'object' ? raw.counts : null
-  const declared = rawCounts
-    ? {
-        all: toIndex(rawCounts.all, -1),
-        lesson: toIndex(rawCounts.lesson, -1),
-        review: toIndex(rawCounts.review, -1)
-      }
-    : null
-  const counts =
-    declared && declared.all >= 0 && declared.lesson >= 0 && declared.review >= 0
-      ? declared
-      : derived
+  /**
+   * `counts` **一律由篇目派生**，不读产物里声明的值（team-lead 裁定，T01 复核后反转优先级）。
+   *
+   * 为什么不是「声明值优先、不全才派生」：
+   *   声明值与派生值一旦**可以**不一致，就必然会有不一致的那一天。而它不一致时，
+   *   运行时不会报错、也没有任何东西会报警 —— 只会把首页分母（「已背 3 / 67」里的 67）
+   *   静默显示成错的数。派生 73 条篇目的成本可以忽略，所以让这条失效路径从根上不存在。
+   *
+   * 产物里的 `counts` 仍然要烘焙，但只服务两个用途：
+   *   ① 构建期的断言对象（T02 的 `assertCounts` 拿它跟真实统计对账）；
+   *   ② 人工打开 JSON 时的可读性。
+   *   **运行时不用它。** 想让这里重新采用声明值，先回答："声明值与派生值不一致时谁报警？"
+   */
+  const counts = deriveCounts(pieces)
 
   const subject = toText(raw.subject, '')
   return {
