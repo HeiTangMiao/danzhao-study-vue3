@@ -2,7 +2,7 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | **v1.3**（v1.0 → v1.3 变更见附录 B；v1.3 = I10 空篇算术约定，v1.2 = 对齐 PRD `240a8c1` 口径 + A3 落点 + §9.2 两问裁定） |
+| 文档版本 | **v1.4**（v1.0 → v1.4 变更见附录 B；v1.4 = 与 T01 实现对齐：`RECITE_BANK_PATH` 归属收口 + `subjectOfPiece` 入册 + 行号漂移 + 表格渲染修正） |
 | 作者 | Bob（软件架构师） |
 | 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚）；team-lead 2026-10-26 复核意见 |
 | 目标仓库 | `danzhao-study-vue3`（Vue 3.5 + Pinia + IndexedDB + Tauri 2） |
@@ -513,6 +513,10 @@ interface RecitePiece {
 
 > ⚠️ 5 篇综合自测的 `title` **完全相同**（`'综合自测（遮住上文，逐句默写）'`）。所以 UI 上"复习篇"必须显示 `fileTitle` 而非 `title`，否则列表里 5 行长得一模一样。取源：`RecitePiece.fileTitle`（如「默写专项 · 唐诗名篇（上）」）。这是实现者极易踩的坑。
 
+#### 形态校验的一条硬纪律：**不猜，宁可丢**
+
+`sanitizeBank` 遇到**缺 `key`** 的条目一律**丢弃**，`normalizePiece` 也**刻意不派生**缺失的 `key`。原因：产物条目里没有独立的 `subject` 字段（学科由产物根 `subject` 给出），用空 subject 拼出来的 key（`|chinese_07_01-…|0`）语法上合法、但**没有任何行会认领它** —— 作答会记到一篇"不存在"的篇上，进度条与队列都不会报错，这是最难查的一类静默错误。**宁可不收这一条（少一篇，用户看得见），也不收一条错的（记错进度，用户看不见）。** 同一条纪律也适用于其它必需字段：`sanitizeBank` 的返回值只保证"每条都是可用条目"，不保证"条目数与 JSON 里一样多"—— 产物构建期的 `assertCounts`（T02）才是数量守门人。
+
 #### 为什么不把 recite-bank 注册成 `manifest` 的子段（已评估，一期不做）
 
 `contentManifest.js` 已有 `OPTIONAL_SECTIONS = ['search','practice']` 这套「指针表 + hash」idiom，按理 recite 应该是第三个子段。**一期刻意不走这条路**，理由三条：
@@ -637,9 +641,12 @@ classDiagram
     <<module src/content/reciteBank.js>>
     +BANK_DIR: string
     +BANK_FILE: string
+    +RECITE_BANK_PATH: string
     +PIECE_KEYS: Record
     +pieceKeyOf(subject, fileKey, blockIndex) string
+    +subjectOfPiece(piece) string
     +normalizePiece(raw) RecitePiece
+    +deriveCounts(pieces) Counts
     +sanitizeBank(raw) ReciteBank/null
   }
   class ClozeJudge {
@@ -747,12 +754,12 @@ classDiagram
   }
   class ReciteBankClient {
     <<module src/utils/reciteBankClient.js>>
-    +RECITE_BANK_PATH: string
     +loadBundled() Promise
     +refreshFromRemote() Promise
     +loadReciteBank() ReciteBank
     +resetReciteBankCache() void
   }
+  note for ReciteBankClient "RECITE_BANK_PATH 从 reciteBank.js import，本模块不定义路径常量"
 
   %% ── UI ──
   class ReciteView {
@@ -921,7 +928,7 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 
 **`reciteBankClient.js` 要点（v1.1：双源 SWR）**
 - `import { fetchJson } from '@/utils/fetchJson'` + `import { siteRoot } from '@/utils/assetBase'` + `import { isNewer } from '@/content/mergeContent'`。
-- `RECITE_BANK_PATH = 'recite-bank/chinese.json'`（单一定义，禁在别处手拼）。
+- `import { RECITE_BANK_PATH, sanitizeBank } from '@/content/reciteBank'` —— **路径常量不在本文件定义**（唯一真相源在 `reciteBank.js`，§7.2）。
 - `loadBundled()`：`fetchJson('./', RECITE_BANK_PATH, { timeout: 3000 })` → `sanitizeBank` → 存内存。**失败抛错**（这是主渲染路径）。
 - `refreshFromRemote()`：**先判 `if (siteRoot() === './') return null`**（dev/Web 两源同址，跳过）；否则 `fetchJson(siteRoot(), RECITE_BANK_PATH, { timeout: 2500 })` → `sanitizeBank` → `isNewer(remote.contentVersion, local.contentVersion)` 为真才替换内存并返回新 bank，否则返回 `null`。**任何异常吞掉返回 `null` + `console.warn`**（远程不可达不是异常，是常态）。
 - 进程内 `Map` 缓存；导出 `resetReciteBankCache()` 供测试。
@@ -1065,7 +1072,7 @@ export function variantsOf(block) { /* → [{ name, values, expect }] */ }
 2. **变体预期**：`all` / `fullWidth` 全 `true`；`wrongOne` 恰好第 1 空为 `false`。
 3. **strict 红线专项**（全库仅此 1 句）：`关雎` 第 2 句写「辗转返侧」→ **判错**；写「辗转反侧」→ 判对。断言方式：直接对该 piece 走 `gradeCloze`，并在 `strictCount>0` 的篇上断言 DOM 也标 `is-wrong`（防止 `variantMap` 被谁"优化"回全局）。
 4. **两个入口不会漂移**（把 team-lead 的"逐空一致"落到可执行处）：
-   `RecitePieceView` 与 `UnitView` 挂的是**同一个组件、同一份 props 形状**，所以入口间一致性在结构上已成立 —— 真正的风险是有人给背诵页传 `context` 时漏字段（`ClozeBlock` 的 `enqueueWrongSentences` 在缺 `fileKey` 时会**静默不入错题本**，`ClozeBlock.vue:286`）。
+   `RecitePieceView` 与 `UnitView` 挂的是**同一个组件、同一份 props 形状**，所以入口间一致性在结构上已成立 —— 真正的风险是有人给背诵页传 `context` 时漏字段（`ClozeBlock` 的 `enqueueWrongSentences` 在缺 `fileKey` 时会**静默不入错题本**，`ClozeBlock.vue:258`；T01 抽取后行号由原 `:286` 上移至 `:258`，逻辑未变 —— **引用守卫请用语义描述而不是行号**，行号会随重构漂移）。
    因此断言：`buildReciteContext(piece)` 产出的键集合 **严格等于** `['subject','unitNum','fileKey','fileTitle','unitTitle']`（`ClozeBlock` 实际消费的 5 个键），不多不少。
 
 > **一句话**：A3 的可执行形式不是"抽 10 篇人工对比"，而是「**73 篇 × 3 组变体 × 逐空**，判分路径 A（组件 DOM）≡ 判分路径 B（共享纯函数）」，外加 strict 红线与 context 形状两条专项断言。全绿即 A3 通过。
@@ -1127,14 +1134,15 @@ git status --porcelain -- 'src/content/**'
 
 | 概念 | 唯一格式 | 禁止 |
 | --- | --- | --- |
-| 篇主键 | `` `${subject}|${fileKey}|${blockIndex}` ``，例 `chinese|chinese_07_01-先秦至魏晋名篇|0` | 禁把 `title`/`text` 放进键 |
+| 篇主键 | `` `${subject}\|${fileKey}\|${blockIndex}` ``，例 `chinese\|chinese_07_01-先秦至魏晋名篇\|0` | 禁把 `title`/`text` 放进键 |
 | `fileKey` | `pageFileKeyOf(meta)` = `` `${subject}_${unitNum}_${name}` `` | 禁手拼（含单元标题） |
 | `blockIndex` | **页内 cloze 流水号**（0 起） | 禁 `page.blocks` 原始下标 |
 | `nextDate` / `lastActiveDate` / `learnedAt` | `YYYY-MM-DD`（**本地时区**，用 `getDateStr`） | 禁 `toISOString().slice(0,10)`（UTC，跨时区错一天） |
 | `lastAt` / `createdAt` | 毫秒时间戳 `Date.now()` | 禁 Date 对象（IndexedDB 可存但破坏比较一致性） |
 | IndexedDB 仓库名 | `recite_progress` / `recite_state`（下划线，与既有 7 个仓库同风格） | 禁驼峰 |
 | 产物路径 | `public/recite-bank/chinese.json` | 禁放 `src/` 下 |
-| 产物路径常量 | `reciteBank.js` 的 `RECITE_BANK_PATH`（唯一） | 禁在 client / store / 测试里手拼字符串 |
+| 产物路径常量 | `reciteBank.js` 的 `RECITE_BANK_PATH`（**全仓唯一定义**；client / store / 测试一律 `import`） | 禁在 client / store / 测试里手拼字符串，**禁在 client 里重新定义一份** |
+| 篇的学科 | `subjectOfPiece(piece)`（`reciteBank.js`，`pieceKeyOf` 的逆运算，同源） | 禁 `piece.key.split('\|')[0]` 手拆键 |
 | 版本比较 | `mergeContent.isNewer(a, b)` | 禁内联 `a > b`；禁新开 `RECITE_VERSION`（版本权威只有 `CONTENT_VERSION`） |
 | 常量 | `CUMULATIVE_DAYS` / `STAGE_DELTA` / `DAILY_DUE_LIMIT` / `NEW_SUPPRESS_AT` / `DAILY_NEW_LIMIT` / `MAX_STAGE` | 禁在视图里出现魔法数字 `5` / `3` / `1` |
 
@@ -1203,7 +1211,7 @@ ReciteView            → 只读 viewModel
 | **Q6** | 无任务日 streak 怎么算（PRD §9-6 衍生） | **采用我的临时规则**：仅「当天有任务且未完成」归 0；**无任务日不判负也不推进**（`lastActiveDate` 不变）。否则 stage 全满等于惩罚"背得好" | team-lead | `bumpStreak`、T03 单测 |
 | **Q7** | 产物基址（我的异议 7 初稿） | **否决纯相对路径**，改为 **远程优先 + 取 `contentVersion` 较大者 + 相对兜底**；渲染顺序我进一步调成 SWR（包内先渲染、远程热替换），**team-lead 二次确认已通过**（"远程优先"指数据优先级，不是渲染阻塞顺序） | team-lead 定方向 / 我定顺序 | §1 异议 7、T03 |
 | **Q8** | `submitted` 是否顺带 `perBlank`（PRD §9.2） | **不带**，载荷冻结 `{ total, correct, allCorrect }`。P1-2 若需逐空数据，自行调纯函数重算，不在组件内预计算 | team-lead（采纳我的收敛） | §5 T01 纪律 3、§8.7 |
-| **Q9** | 篇键是否带 `subject` 前缀（PRD §9.2） | **一期就带**，`${subject}|${fileKey}|${blockIndex}`。为 P1-6 的计算机词汇/数学公式预留，防撞键与全表迁移 | 我裁定 | §3.2、§7.2 |
+| **Q9** | 篇键是否带 `subject` 前缀（PRD §9.2） | **一期就带**，`${subject}\|${fileKey}\|${blockIndex}`。为 P1-6 的计算机词汇/数学公式预留，防撞键与全表迁移 | 我裁定 | §3.2、§7.2 |
 
 > **Q6 的已知代价（接受，不再讨论）**：streak 可能跨越空窗期（"连续 7 天"里夹了 2 个无任务日）。产品明确接受。
 
@@ -1316,15 +1324,26 @@ emit('submitted', {
 | 17 | §9.2 | 篇键是否需要 `subject` 前缀 | **一期就带**；为 P1-6 跨学科预留，后补成本 = 全表迁移 | 裁定（§8.7 Q9） |
 | 18 | P0-1 口径 | 「一句多空 17 篇」 | **产物内 16 篇**（正课 15 + 复习 1），全库 74 块含 reveal 篇为 17 —— 两种数法都对，脚本断言 16 并注释说明 | 口径澄清（§1 异议 4） |
 
-## 附录 B · v1.0 → v1.3 变更记录
+## 附录 B · v1.0 → v1.4 变更记录
 
-### B.1 v1.2 → v1.3
+### B.1 v1.3 → v1.4（与 T01 实现对齐，`1979844` 复核后）
+
+| 变更 | 触发 | 位置 |
+| --- | --- | --- |
+| **`RECITE_BANK_PATH` 归属收口**：唯一定义在 `src/content/reciteBank.js`；T03 的 `reciteBankClient.js` 改为 `import`，不得再定义一份 | T01 发现 §7.2 与 §5 T03 互相矛盾（两份常量 = 两份真相）。裁定按 §7.2：路径是**产物形状**的一部分（`BANK_DIR`/`BANK_FILE` 已在那），放 client 会让 store 与测试跨模块取路径 | §5 T03、§7.2 |
+| `subjectOfPiece(piece)` 入册（§4.2 类图 + §7.2 + §3.4 佐证） | T01 判定它是 `pieceKeyOf` 的逆运算、必须同源，否则 T03 只能 `key.split('\|')[0]` 手拆键（§7.2 明禁） | §4.2、§7.2 |
+| 补 `deriveCounts(pieces)` 进类图 | T01 实际导出、原设计漏列 | §4.2 |
+| 新增「形态校验：不猜，宁可丢」小节 | T01 冻结决定：`normalizePiece` 不派生缺失 `key`，`sanitizeBank` 丢弃之。原文档只写"形态校验"，未写丢弃语义 | §3.4 |
+| `ClozeBlock.vue:286` → `:258`，并加"守卫请用语义描述、别用行号"的后缀 | T01 抽走 30 行后行号上移，逻辑未变 | §5.7 |
+| 修正两行表格的渲染（代码块内未转义的 `\|` 把 3 列表撑成 9 列） | 自查发现：`§7.2 篇主键`、`§8.1 Q9` 两行在 GFM 下渲染成多列 | §7.2、§8.1 |
+
+### B.2 v1.2 → v1.3
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
 | 新增不变量 **I10**：全对判定只看 `allCorrect`、比率一律 `total > 0 ? correct/total : 0`；并明确定性为**算术约定、不是待测场景**（`total === 0` 当前不可达：`validateBlock` 拦截 + 全库 74 块实测最少 1 空） | team-lead：`0/0 = NaN` 分析成立，但不许升级成"现网隐患"（会给 T04/T05 招来死守卫与无用用例） | §4.3 |
 
-### B.2 v1.1 → v1.2（对齐 PRD `240a8c1` + 补 A3 落点 + §9.2 两问裁定）
+### B.3 v1.1 → v1.2（对齐 PRD `240a8c1` + 补 A3 落点 + §9.2 两问裁定）
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
@@ -1335,7 +1354,7 @@ emit('submitted', {
 | **Q9 裁定**：篇键一期就带 `subject` 前缀；`fp` 字段覆盖范围 + 错别字漂移的四种情形表 | PRD §9.2 遗留问题 | §3.2（新增小节）、§8.1 Q9、§8.7 |
 | **Q7 状态收口**：SWR 渲染顺序经 team-lead 二次确认通过（"远程优先"指数据优先级，非渲染阻塞） | team-lead 复核 | §8.1 Q7 |
 
-### B.3 v1.0 → v1.1
+### B.4 v1.0 → v1.1
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
