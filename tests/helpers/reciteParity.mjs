@@ -76,8 +76,14 @@ export function loadPieces() {
   if (!bank) throw new Error(`产物不可用（sanitizeBank 返回 null），先跑 npm run build:recite：${RECITE_BANK_PATH}`)
   if (bank.pieces.length !== EXPECTED_PIECE_COUNT) {
     throw new Error(
-      `产物清洗后篇数不符：期望 ${EXPECTED_PIECE_COUNT}（scripts/build-recite-bank.mjs 的 BASELINE.pieces），` +
-        `实际 ${bank.pieces.length}。若内容侧确实增减了默写篇目，请按流程更新 BASELINE 后重建产物。`
+      `产物篇数与 BASELINE 不一致：期望 ${EXPECTED_PIECE_COUNT} / 实际 ${bank.pieces.length} / ` +
+        `差 ${bank.pieces.length - EXPECTED_PIECE_COUNT}（基线 = scripts/build-recite-bank.mjs 的 BASELINE.pieces）。\n` +
+        '两种可能，按分支处理：\n' +
+        '  ① 内容侧有意增删了默写篇目 → 先更新 BASELINE.pieces 并重建产物（node scripts/build-recite-bank.mjs），' +
+        '再复核 A3 的逐空等式是否仍成立（新增篇自动进入 describe.each，覆盖率只增不减）；\n' +
+        '  ② 没人动过内容 → 说明产物损坏或被截断（缺失 key / fileKey / title 的条目会被 sanitizeBank 静默丢弃），' +
+        '请重建后重跑；若重建仍不符，查 src/content 的 cloze 区块是否被误删。\n' +
+        `产物：${RECITE_BANK_PATH}`
     )
   }
   return bank.pieces
