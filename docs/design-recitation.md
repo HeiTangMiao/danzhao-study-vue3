@@ -2,7 +2,7 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | **v1.1**（v1.0 → v1.1 变更见附录 B） |
+| 文档版本 | **v1.2**（v1.0 → v1.2 变更见附录 B；v1.2 = 对齐 PRD `240a8c1` 口径 + A3 落点 + §9.2 两问裁定） |
 | 作者 | Bob（软件架构师） |
 | 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚）；team-lead 2026-10-26 复核意见 |
 | 目标仓库 | `danzhao-study-vue3`（Vue 3.5 + Pinia + IndexedDB + Tauri 2） |
@@ -24,7 +24,8 @@
 | 句数（`items.length`，PRD 的 1.79 口径） | 逐块累加 | 产物内 **170 句** = 正课 120 + 复习 50；另有 reveal 篇 5 句（排除）。全库 175 句 |
 | **真空位数**（`{{...}}` 占位符个数） | 逐句正则计数 | 产物内 **193 空** = 正课 **141** + 复习 **52**；另有 reveal 篇 11 空（排除）。全库 204 空 |
 | 正课空/篇均值 | 141 / 67 | **2.10 空/篇**（PRD 的 1.79 是「句/篇」，非空/篇 —— 见 §1 异议 4） |
-| 正课「仅 1 空」的篇 | 逐篇计数 | **27 / 67 = 40%**（PRD 写的 33 篇 / 49% 实为「仅 1 **句**」的篇数） |
+| 正课「仅 1 空」的篇 | 逐篇计数 | **27 / 67 = 40%**（PRD 的 33 篇 / 49% 实为「仅 1 **句**」的篇数） |
+| **「一句多空」的篇** | `blankCount > sentenceCount` | 产物内 **16 篇**（正课 15 + 复习 1）；全库 74 块 **17 篇**（含被排除的 reveal 篇）。两种数法都对，见 §1 异议 4 |
 | `strict:true` 的句 | 全库扫描 | **仅 1 句**：`07-默写专项/01-先秦至魏晋名篇.js` · 《诗经》·关雎 · `求之不得，{{寤寐思服}}。悠哉悠哉，{{辗转反侧}}。` |
 | `alts` 非空的句 | 全库扫描 | 4 句（闻王昌龄…、念奴娇…、通假字专项 ×2） |
 | 文件 → 篇数分布 | 逐文件聚合 | `01`:15 正课 + 1 自测；`02`:13+1；`03`:11+1；`04`:15+1；`05`:10+1；`06`:3+大冲关 |
@@ -95,22 +96,27 @@ P0-1 同一条里写了三句：「产物含 **74 篇**」、「`role:'review'` 
 
 **裁定：产物 = 73 篇**（lesson 67 + review 6）。P0-1 里的"74"判为笔误（那是"全库 cloze 块数"，不是"产物篇数"）。构建脚本把这条写成**断言**并打印：`total=74 → 排除 reveal=1 → 产物 73 (lesson 67 / review 6)`，任何一项不等就 `process.exit(1)`。
 
-#### 异议 4（**口径陷阱，会造成 UI 错**）：`itemCount` ≠ 空位数
+#### 异议 4（**口径陷阱，会造成 UI 错**）：`sentenceCount` ≠ 空位数
 
-PRD 的"120 空 / 均值 1.79"用的是 `items.length`（**句数**）。实测真空位（`{{}}` 占位符）分布（team-lead 已独立复核，数字一致）：
+> **已与 PRD `240a8c1` 对齐。** PRD 现在同时给出 73 篇 / 170 句 / 193 空，并把字段拆成 `sentenceCount` + `blankCount` —— 本设计与之一致，不再有分歧。下面是"为什么必须拆"的证据，供实现者理解语义。
 
-| 范围 | 句数 | 真空位 | 空/篇均值 |
-| --- | --- | --- | --- |
-| 正课 67 篇 | 120 | **141** | **2.10** |
-| 复习 6 篇 | 50 | 52 | 8.67 |
-| 产物合计 73 篇 | **170** | **193** | 2.64 |
-| （排除）reveal 篇 | 5 | 11 | — |
+实测分布（本机复核；team-lead 已独立复核，数字一致）：
 
-即：**正课的"空"比"句"多 21 个**（141 vs 120），PRD 的 1.79 是「句/篇」，真「空/篇」是 **2.10**；PRD 的「33 篇仅 1 空 / 49%」实为「仅 1 **句**」，真正「仅 1 空」是 **27/67 = 40%**。
+| 范围 | 句数 `sentenceCount` | 真空位 `blankCount` | 空/篇均值 | 「一句多空」的篇 |
+| --- | --- | --- | --- | --- |
+| 正课 67 篇 | 120 | **141** | **2.10** | **15** |
+| 复习 6 篇 | 50 | 52 | 8.67 | 1 |
+| **产物合计 73 篇** | **170** | **193** | 2.64 | **16** |
+| （排除）reveal 篇 | 5 | 11 | — | 1 |
+| 全库 74 块 | 175 | 204 | — | **17** |
 
-若实现者拿 `itemCount` 渲染卡片上的「N 空」，就会在含 2 空的句子上直接错（如 `{{会当凌绝顶}}，{{一览众山小}}。` 是 1 句 2 空，显示「1 空」实际要填 2 格）。
+**⚠️ 「17 篇」的两种数法，别打架**：PRD 说「一句多空全库 17 篇（正课 15 篇）」——「全库」= 74 块（含被排除的那篇 reveal「填空自测」5 句 11 空）；**产物内是 16 篇**（15 正课 + 1 复习）。两个数都对，口径不同。构建脚本断言用 **16（产物内）**，打印日志时两者都报，避免后人以为某一方算错。
 
-**裁定**：产物**两个字段都给** —— `itemCount`（句数，只用于与 PRD / 内容侧对账）与 `blankCount`（真空位数，**所有面向学员的「N 空」唯一来源**）。命名要让人不可能用错。
+即：**正课的"空"比"句"多 21 个**（141 vs 120），PRD 的 1.79 是「句/篇」，真「空/篇」是 **2.10**；「33 篇仅 1 空 / 49%」实为「仅 1 **句**」，真正「仅 1 空」是 **27/67 = 40%**。
+
+「一句多空」的 16 篇里最典型的是 `关雎`（**2 句 4 空**，不是 2 空）与 `综合自测`（6 句 8 空）。若实现者拿 `sentenceCount` 渲染卡片上的「N 空」，`关雎` 会显示「2 空」实际要填 **4 格** —— 这是本设计最容易被误用的一个字段。
+
+**裁定**：产物两个字段都给 —— **`sentenceCount`（句数，只用于与 PRD / 内容侧对账）** 与 **`blankCount`（真空位数，所有面向学员的「N 空」唯一来源）**。命名要让人不可能用错：任何 UI 里出现 `sentenceCount` 都是缺陷。
 
 #### 异议 5（**会造成进度条倒退**）：`stage>=1` 不能当「已背」
 
@@ -241,7 +247,7 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 
 ## 2. 文件清单
 
-### 2.1 新增（16 个：10 个实现文件 + 6 个测试）
+### 2.1 新增（17 个：10 个实现文件 + 7 个测试/测试辅助）
 
 | 文件 | 职责（一句话） |
 | --- | --- |
@@ -259,7 +265,8 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 | `tests/recite-bank.test.js` | 构建脚本纯函数单测（形状、`role`/`trigger`、`order` 单调、断言） |
 | `tests/recite-schedule.test.js` | 调度纯函数单测（覆盖 A4 / A5 / A6 / A7 全部构造） |
 | `tests/recite-db-v8.test.js` | DB v7→v8 迁移、换账号清理、导出/导入 |
-| `tests/recite-cloze-parity.test.js` | **A3 主验收**：73 篇全量逐空 parity（含唯一 strict 句）+ identity 守卫 |
+| `tests/recite-cloze-parity.test.js` | **A3 主验收落点**：73 篇全量 × 3 组变体 × 逐空 parity（含唯一 strict 句）—— 见 §5.7 |
+| `tests/helpers/reciteParity.mjs` | A3 的 harness：读产物 → 按坐标取真实块 → 造确定性输入 → 双路径判分 |
 | `tests/recite-entry.test.js` | 两入口计数一致、无数据不占位、4 Tab 不变 |
 
 ### 2.2 修改（8 个）
@@ -340,6 +347,15 @@ pieceKey = `${subject}|${fileKey}|${blockIndex}`
 ```
 - `fileKey = pageFileKeyOf(meta)`（`src/content/pageMeta.js:63`），形如 `chinese_07_01-先秦至魏晋名篇`；
 - `blockIndex` = **页内 `cloze` 区块流水号**（不是 `page.blocks` 下标）。理由：运行时定位靠 `page.blocks.filter(b => b.type === 'cloze')[blockIndex]`，用 cloze 流水号可以直接对上；用 raw 下标则要在运行时重算一遍过滤后映射，多一处可漂移的转换。
+
+#### 为什么一期就带 `subject` 前缀（它现在看起来"多余"）
+
+一期只有语文，`subject` 恒为 `'chinese'`，这一节不是可选项，是**防后补**：
+
+- **P1-6 会把「计算机词汇」「数学公式」也接进同一张 `recite_progress`**。那时若主键不含学科，`chinese_07_01-先秦至魏晋名篇` 与未来同名的计算机单元会撞在同一个 `fileKey` 上（`pageFileKeyOf` 只保证"同学科内唯一"）。撞键的后果不是报错，是**进度静默串篇**——最难查的一类缺陷。
+- **后补前缀 = 全表迁移**：升级时要遍历每一行、改写主键（IndexedDB 主键改名只能"读全表→删→写"，无 `UPDATE keyPath`）。而一期带前缀的成本是**常量**：一个字段、一次模板字符串。
+- 因此：**一期就带，不许"先省掉、以后再加"**。这是本设计里少数"为未来多写 3 个字符"的地方，理由是移除成本不对称，不是过度设计。
+- 与之对照：`fp` **不进主键**（§3.2 下文），因为它回答的是"是否一字未动"，一旦进键每次修错别字都会换主键 → 进度全丢。两个字段各管一件事，**不得混用**。
 
 #### 两种内容变更的后果（这是本节的核心取舍）
 
@@ -449,7 +465,7 @@ interface RecitePiece {
   // ── 展示与校验 ──
   title: string        // '李白 · 行路难（其一）'
   mode: 'input'        // 产物内恒为 'input'（reveal 篇构建期即排除）
-  itemCount: number    // 句数（对齐 PRD 的 120 / 1.79 口径）
+  sentenceCount: number // 句数（对齐 PRD 的 120 句 / 1.79 句每篇口径）
   blankCount: number   // 真空位数（`{{}}` 个数）—— UI「N 空」唯一来源
   strictCount: number  // strict:true 的句数（A3 需要能筛出含红线句的篇）
   fp: string           // 内容指纹（§3.2）
@@ -475,7 +491,7 @@ interface RecitePiece {
       "fileTitle": "默写专项 · 先秦至魏晋名篇", "unitTitle": "默写专项",
       "title": "《诗经》 · 关雎",
       "mode": "input",
-      "itemCount": 2, "blankCount": 2, "strictCount": 1,
+      "sentenceCount": 2, "blankCount": 4, "strictCount": 1,
       "fp": "1x9f3ab"
     },
     {
@@ -488,7 +504,7 @@ interface RecitePiece {
       "fileTitle": "默写专项 · 先秦至魏晋名篇", "unitTitle": "默写专项",
       "title": "综合自测（遮住上文，逐句默写）",
       "mode": "input",
-      "itemCount": 6, "blankCount": 6, "strictCount": 0,
+      "sentenceCount": 6, "blankCount": 8, "strictCount": 0,
       "fp": "0k2m7dz"
     }
   ]
@@ -658,7 +674,7 @@ classDiagram
     +unitTitle: string
     +title: string
     +mode: 'input'
-    +itemCount: number
+    +sentenceCount: number
     +blankCount: number
     +strictCount: number
     +fp: string
@@ -821,6 +837,7 @@ classDiagram
 3. **新增 `emits: ['submitted']`**，在 `submitDictation()` 里 `await enqueueWrongSentences()` **之后** emit `{ total: blanks.length, correct: correctCount, allCorrect: correctCount === blanks.length && blanks.length > 0 }`。
    - 顺序很关键：先落库（错题本）再通知父级。若父级写调度失败，错题本已经记上了 —— 与"宁可多记一条，不可漏记"的既有取向一致。
    - 空篇（`blanks.length === 0`）不得 emit `allCorrect: true`，否则空篇会被判"全对"推进档位。
+   - **载荷冻结为三个键，禁止"顺手"加 `perBlank`（逐空对错数组）**。这不是漏了，是裁定（§8.7）。`results.value` 就在手边，加进去只要一行 —— 但那会把"emit 处只读既有结果"变成"emit 处要为未来消费方准备数据结构"，下一个改这块的人就会顺着往里塞 `blankText`、`strictFlag`、`durationMs`，`ClozeBlock` 从"判分 UI"扩成"作答数据管道"，H7 的单点判据随之失守。**P1-2 需要篇级 5 档进度点时，做法是让它在自己的 store 里重算（`gradeCloze` 是纯函数，重算成本 0），而不是让组件替它预计算。**
 
 **验收方式**
 - `npx vitest run tests/cloze-input.test.js tests/cloze-strict.test.js tests/cloze-variants.test.js tests/cloze-enqueue.test.js` **全绿且零用例改动**（这是"单元页行为零回归"的硬证据；不许为了让它们过而改测试）。
@@ -844,15 +861,15 @@ classDiagram
 - 递归扫（`walkBlocks` 口径）**发现**所有 cloze，但**只接受顶层**（`page.blocks` 直接子项）；发现嵌套 cloze 就 `console.warn` 点名并跳过（运行时按顶层 cloze 流水号定位，嵌套的定位不到，宁可不收也不能收进来渲染失败）。
 - 排除 `(block.mode || 'reveal') !== 'input'`。
 - **`contentVersion` 烘焙**：`import { CONTENT_VERSION } from '../src/content/contentManifest.js'`，直接写入产物根。**严禁**自定义版本常量（§1 异议 7 的版本权威纪律）。
-- **断言（不满足即 `process.exit(1)`）**：`total(74) - excludedReveal(1) === pieces.length(73)`、`lesson === 67`、`review === 6`、`totalBlank === 193`、`totalItem === 170`、`order` 为 `0..n-1` 连续、`key` 无重复、每篇 `blankCount > 0`、`contentVersion` 为有限数字。
+- **断言（不满足即 `process.exit(1)`）**：`total(74) - excludedReveal(1) === pieces.length(73)`、`lesson === 67`、`review === 6`、`totalBlank === 193`、`totalSentence === 170`、`multiBlankPieces === 16`（产物内口径）、`order` 为 `0..n-1` 连续、`key` 无重复、每篇 `blankCount > 0`、`contentVersion` 为有限数字。
 - 超限必报告（对齐 `build-practice-bank.mjs:344-361` 纪律）：断言失败、嵌套 cloze、未注册文件，三者都必须点名打印。
 - 导出 `collectReciteBank()` 纯函数（不落盘），供测试直接断言形状 —— 与 `build-practice-bank.mjs` 的 `if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)` 守卫同款。
 - **`trigger` 烘焙**：`role==='review'` 时，`title` 含「冲关」→ `'all'`，否则 `'file'`（只有这一处按 title 判定，且判定结果落进产物，运行时不猜）。
 
 **验收方式**
-- `node scripts/build-recite-bank.mjs` 打印类似 `[recite-bank] 73 篇（lesson 67 / review 6），排除 reveal 1，item 170 / blank 193，strict 1，contentVersion 4`。
+- `node scripts/build-recite-bank.mjs` 打印类似 `[recite-bank] 73 篇（lesson 67 / review 6），排除 reveal 1；sentence 170 / blank 193；一句多空 16（全库 17）；strict 1；contentVersion 4`。
 - 故意把断言阈值改错 → 脚本必须 `exit 1`（手工验证一次）。
-- `npx vitest run tests/recite-bank.test.js`：形状齐全、`mode` 恒为 `input`、`contentVersion === CONTENT_VERSION`（**断言两者相等，而不是硬编码 4**，否则下次 bump 内容版本就红）、6 篇 review 的 `trigger` 正确（5 个 `file` + 1 个 `all`）、`order` 单调、`关雎` 的 `strictCount === 1 && itemCount === 2 && blankCount === 2`。
+- `npx vitest run tests/recite-bank.test.js`：形状齐全、`mode` 恒为 `input`、`contentVersion === CONTENT_VERSION`（**断言两者相等，而不是硬编码 4**，否则下次 bump 内容版本就红）、6 篇 review 的 `trigger` 正确（5 个 `file` + 1 个 `all`）、`order` 单调、`关雎` 的 `strictCount === 1 && sentenceCount === 2 && blankCount === 4`。
 - 产物入库后 `git status` 干净（重复跑脚本产出字节级一致：`generatedAt` 会让它变，故测试里剔除该字段比较 —— 与 practice-bank 同款处理）。
 
 ### T03 · 数据层 + 调度纯函数 + 资产加载（P0，依赖 T01；**可与 T02 并行**）
@@ -944,7 +961,8 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 | `src/views/ReciteView.vue` | 新增 |
 | `src/views/RecitePieceView.vue` | 新增 |
 | `src/router/index.js` | 改（2 条路由，**均无 `meta.tab`**） |
-| `tests/recite-cloze-parity.test.js` | 新增 |
+| `tests/recite-cloze-parity.test.js` | 新增（A3 主验收，见 §5.7） |
+| `tests/helpers/reciteParity.mjs` | 新增（A3 harness，见 §5.7） |
 
 **页面要点**
 - `recite store` 的 `init()` 分两步：`await loadBundled()`（必成功才渲染）→ **不 await** `refreshFromRemote()`（`.then` 里判断 `isNewer` 且 `phase==='idle'` 才重算队列）。**禁止**把远程刷新放在首屏 `await` 链上（§1 异议 7）。
@@ -990,6 +1008,74 @@ T01（地基，唯一串行门槛）
 ```
 - T02 与 T03 **无相互依赖**：T02 只消费 `clozeJudge.parseCloze` 与 `reciteBank.PIECE_KEYS`；T03 只消费 `reciteBank` 的常量与访问器契约，**不读产物文件**（单测自带 fixture）。两人可同时开工。
 - 唯一的握手点：`src/content/reciteBank.js`（T01 产出，两方都 import）。T01 完成即冻结该文件，改动需双方确认。
+
+### 5.7 A3 验收的落点与自动化（team-lead 要求补齐，否则 A3 等于没有）
+
+#### 落在哪个文件
+
+| 文件 | 类型 | 职责 |
+| --- | --- | --- |
+| `tests/recite-cloze-parity.test.js` | **新建** | A3 主验收本体（73 篇全量 × 3 组输入 × 逐空比对） |
+| `tests/helpers/reciteParity.mjs` | **新建** | harness：读产物 → 按坐标取真实块 → 造确定性输入 → 双路径判分 |
+
+**为什么不塞进既有 cloze 测试**（`tests/cloze-input.test.js` / `cloze-strict.test.js` / `cloze-variants.test.js` / `cloze-enqueue.test.js`）：
+1. 那四个文件是**"组件行为零回归"的证据**（T01 明确要求"零用例改动"）。往里加 73 篇全库遍历，会让"回归证据"和"新功能验收"混在一个文件里，一旦红了分不清是谁的问题。
+2. 它们用**固定小 fixture**（手写 block），不依赖文件系统；A3 必须读真实产物 + 真实内容页，依赖面完全不同（Node 读盘 + jsdom 挂载）。
+3. 混在一起会让那四个文件的运行时间从毫秒级涨到秒级，日常回归变慢。
+
+#### 怎么自动化（3 步，全脚本化，零手工）
+
+```js
+// tests/helpers/reciteParity.mjs 的骨架
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { buildMetaIndex, importFresh, CONTENT_DIR } from '../scripts/lib/load-content.mjs'
+import { gradeCloze, buildClozeItems, flattenBlanks } from '@/content/clozeJudge'
+
+/** ① 读**产物**，不现场扫库 —— 保证被测对象就是即将发布的那份清单 */
+export function loadPieces() {
+  return JSON.parse(readFileSync(join(process.cwd(), 'public/recite-bank/chinese.json'), 'utf-8'))
+}
+
+/**
+ * ② 按产物坐标取**真实内容块**（复用运行时同一条定位规则）
+ * ⚠️ 这一步本身就在验「构建期 cloze 流水号」与「运行时 filter 后下标」是同一条规则 ——
+ *    这是全设计里最容易静默错位、且肉眼绝对看不出来的一个点。
+ */
+export async function blockOf(piece, metaByRel) { /* meta → importFresh → blocks.filter(type==='cloze')[blockIndex] */ }
+
+/**
+ * ③ 每组变体的确定性输入（不做任何"猜哪个字像错字"的启发式）
+ *  - all      ：每空填主答案原文               → 期望全对
+ *  - wrongOne ：仅第 1 空追加一个「错」字        → 期望该空判错、其余全对
+ *  - fullWidth：把 all 里的 ASCII 转全角        → 期望仍全对（验 foldWidth 链路）
+ */
+export function variantsOf(block) { /* → [{ name, values, expect }] */ }
+```
+
+**为什么用"追加一个错字"而不是"改成形近字"**：形近字需要一份映射表（等于再造一份判据），而"追加字符"在 `answerMatches` 的 exact 比对下**必然不命中**，且对数值型答案同样成立（`parseNumeric` 失败 → 落 exact → 不等）。判定 100% 确定，不引入任何猜测。
+
+#### 断言什么（4 条，逐空而非逐篇）
+
+1. **判分路径一致性（A3 的实质）**：对每篇 × 每组变体，
+   `gradeCloze(items, values).results` ≡ 挂载 `ClozeBlock` 后点提交、读 `.cloze-input` 的 `classList`（`is-correct`→`true`、`is-wrong`→`false`）得到的数组，**长度与每一项逐一相等**。
+2. **变体预期**：`all` / `fullWidth` 全 `true`；`wrongOne` 恰好第 1 空为 `false`。
+3. **strict 红线专项**（全库仅此 1 句）：`关雎` 第 2 句写「辗转返侧」→ **判错**；写「辗转反侧」→ 判对。断言方式：直接对该 piece 走 `gradeCloze`，并在 `strictCount>0` 的篇上断言 DOM 也标 `is-wrong`（防止 `variantMap` 被谁"优化"回全局）。
+4. **两个入口不会漂移**（把 team-lead 的"逐空一致"落到可执行处）：
+   `RecitePieceView` 与 `UnitView` 挂的是**同一个组件、同一份 props 形状**，所以入口间一致性在结构上已成立 —— 真正的风险是有人给背诵页传 `context` 时漏字段（`ClozeBlock` 的 `enqueueWrongSentences` 在缺 `fileKey` 时会**静默不入错题本**，`ClozeBlock.vue:286`）。
+   因此断言：`buildReciteContext(piece)` 产出的键集合 **严格等于** `['subject','unitNum','fileKey','fileTitle','unitTitle']`（`ClozeBlock` 实际消费的 5 个键），不多不少。
+
+> **一句话**：A3 的可执行形式不是"抽 10 篇人工对比"，而是「**73 篇 × 3 组变体 × 逐空**，判分路径 A（组件 DOM）≡ 判分路径 B（共享纯函数）」，外加 strict 红线与 context 形状两条专项断言。全绿即 A3 通过。
+
+#### 三条实现约束（不遵守测试会假绿或假红）
+
+| 约束 | 原因 |
+| --- | --- |
+| 文件首行 `// @vitest-environment jsdom` | 组件挂载需要 DOM |
+| **`vi.mock('@/stores/studyDb')`** 成 no-op 桩（`recordError`/`recordAnswered` 直接 resolve） | 否则 73 篇 × 提交会写 73 次 IndexedDB；A3 验的是判分，不是落库。落库由 `tests/cloze-enqueue.test.js` 单独负责 |
+| 每篇一个 `it`（`describe.each(pieces)`），不要堆在单个 `it` 里 | 单篇失败要能定位到篇名；也让 vitest 的单测超时按篇计算（73 次 jsdom 挂载约 3–5s，分散后无压力） |
+
+**预算**：73 篇 × 3 变体 = 219 次挂载 + 438 次 `gradeCloze`，预期 3–6s。若超过 10s，优先砍 `fullWidth` 变体（它是"顺带验的"，不是 A3 的必需项），**不要**砍篇数。
 
 ---
 
@@ -1098,11 +1184,11 @@ ReciteView            → 只读 viewModel
 
 ---
 
-## 8. 决策台账（v1.1：7 条已拍板，只剩 1 条工程验证 + 4 条信息性风险）
+## 8. 决策台账（v1.2：9 条已拍板，只剩 1 条工程验证 + 4 条信息性风险）
 
 > 本节已从"待明确"改为**决策台账**。每条都写明「谁定的 / 定成什么 / 落进哪一节」，实现者按台账执行，不再有悬空问题。
 
-### 8.1 已拍板（7 条，实现者直接执行）
+### 8.1 已拍板（9 条，实现者直接执行）
 
 | # | 议题 | 决议 | 决策人 | 落在 |
 | --- | --- | --- | --- | --- |
@@ -1112,7 +1198,9 @@ ReciteView            → 只读 viewModel
 | **Q4** | 学习 Tab 首屏容得下第三张卡（PRD §9-4） | **容得下，且不合并**「今日待复习」与「今日背诵」（不同队列/不同动作/不同表）；空间压缩做法见 §8.2 | 我裁定 | §8.2、T05 |
 | **Q5** | 每日新篇是否提到 2 篇（PRD §9-5） | **维持 1 篇/天**。理由：可持续性优先于单日效率，负载由重默补齐 | team-lead | `DAILY_NEW_LIMIT = 1` |
 | **Q6** | 无任务日 streak 怎么算（PRD §9-6 衍生） | **采用我的临时规则**：仅「当天有任务且未完成」归 0；**无任务日不判负也不推进**（`lastActiveDate` 不变）。否则 stage 全满等于惩罚"背得好" | team-lead | `bumpStreak`、T03 单测 |
-| **Q7** | 产物基址（我的异议 7 初稿） | **否决纯相对路径**，改为 **远程优先 + 取 `contentVersion` 较大者 + 相对兜底**；我进一步调成 SWR（包内先渲染、远程热替换），待 team-lead 二次确认顺序 | team-lead 定方向 / 我定顺序 | §1 异议 7、T03 |
+| **Q7** | 产物基址（我的异议 7 初稿） | **否决纯相对路径**，改为 **远程优先 + 取 `contentVersion` 较大者 + 相对兜底**；渲染顺序我进一步调成 SWR（包内先渲染、远程热替换），**team-lead 二次确认已通过**（"远程优先"指数据优先级，不是渲染阻塞顺序） | team-lead 定方向 / 我定顺序 | §1 异议 7、T03 |
+| **Q8** | `submitted` 是否顺带 `perBlank`（PRD §9.2） | **不带**，载荷冻结 `{ total, correct, allCorrect }`。P1-2 若需逐空数据，自行调纯函数重算，不在组件内预计算 | team-lead（采纳我的收敛） | §5 T01 纪律 3、§8.7 |
+| **Q9** | 篇键是否带 `subject` 前缀（PRD §9.2） | **一期就带**，`${subject}|${fileKey}|${blockIndex}`。为 P1-6 的计算机词汇/数学公式预留，防撞键与全表迁移 | 我裁定 | §3.2、§7.2 |
 
 > **Q6 的已知代价（接受，不再讨论）**：streak 可能跨越空窗期（"连续 7 天"里夹了 2 个无任务日）。产品明确接受。
 
@@ -1165,12 +1253,49 @@ ReciteView            → 只读 viewModel
 
 ---
 
+### 8.7 Q8 / Q9 的落地细节（PRD §9.2 遗留两问）
+
+#### Q8 · `submitted` 不带 `perBlank`（载荷冻死在三键）
+
+```js
+emit('submitted', {
+  total: blanks.value.length,
+  correct: correctCount.value,
+  allCorrect: correctCount.value === blanks.value.length && blanks.value.length > 0,
+})
+```
+
+**裁定：不带。** 三个键到此为止，`ClozeBlock` 的公开契约就是这一行。
+
+- **不破坏"只读取既有结果"定性？** 不是"会不会破坏"的问题，而是**带了就开始破坏**：`results.value` 是既有判分结果，把它直接搬出去本身不算新增判据；但一旦载荷里出现"逐空数组"，组件就得为**未来的消费方**决定数组的形状与语义（未提交是 `null` 还是 `false`？被跳过的空算不算？空篇是 `[]` 还是 `[false]`？），这些决定本身就是**新增判据**，而且写在最不该做判断的地方。
+- **P1-2 不受影响**：篇级 5 档进度点需要的是"哪几个空错了"，而 `gradeCloze(block, answers)` 是**纯函数**（T01 已抽出），P1-2 在自己的 store 里重算一次即可 —— 成本 0，且不需要任何跨模块协议变更。**为省一次纯函数调用而把组件改成数据管道，是不划算的交易。**
+- **向后兼容方向是对的**：将来真要加，是**增量加键**（消费方只解构自己认识的键，不破）；而"现在就带上"会让实现者在 emit 处开始做计算，那才是不可逆的。
+- 守卫写进 T01 纪律 3（**载荷冻结**）与 `tests/cloze-input.test.js` 的既有断言（单元页无监听者 → 行为零变化）。
+
+#### Q9 · 篇键带 `subject` 前缀（并交代指纹的边界）
+
+- **一期就带**，`${subject}|${fileKey}|${blockIndex}`。理由见 §3.2「为什么一期就带 `subject` 前缀」：P1-6 接计算机词汇/数学公式时 `fileKey` 会跨学科撞名，撞键的后果是**静默串篇**；而后补前缀要做**全表主键迁移**（IndexedDB 无 `UPDATE keyPath`）。移除成本不对称 → 现在就带。
+- **指纹 `fp` 覆盖哪些字段**：`title` + 每句 `text` + 每句 `alts`，FNV-1a 32 位、base36 输出 6-7 字符。**不取** `mode`（改渲染方式不改内容同一性）、**不取** `strict`（红线标记翻转不是内容变更）。
+- **内容侧修正错别字导致 `fp` 漂移时，进度怎么办** —— 分四种情形，只有第三种会"丢"且是自动恢复的：
+
+| 内容侧动作 | `key` | `fp` | 进度 |
+| --- | --- | --- | --- |
+| 改 `text` 里的错别字 / 改 `alts` / 改 `title` | 不变 | 变 | ✅ **完整保留**。`reconcile` 命中情形 ①，只把 `row.fp` 更新为新值，`stage`/`nextDate`/`learnedAt`/`doneCount` 一个字节不动 |
+| 同文件内插入/删除一篇（后续 `blockIndex` 位移） | 变 | 变 | ✅ 按 `fp` 认领（情形 ②），整行迁到新键、旧行软删 |
+| 内容被改**且**同时搬家 | 变 | 变 | ⚠️ 两边都匹配不上 → 情形 ③：**保留原行不动 + `console.warn` 点名**，不删数据。最坏后果 = 该篇重默一次（约 30 秒） |
+| 内容一字未动 | 不变 | 不变 | ✅ 无事发生 |
+
+- **一期不做手工别名映射表**（§3.2 末），触发条件：内容侧要对 `07-默写专项` 做**整体重排**时必须先告知，我们重排前补 `scripts/recite-bank-aliases.json`。
+- **两个判据各管一件事，不得混用**：`title` 判"是不是这一篇"（identity 守卫，§1 异议 9）；`fp` 判"这一篇是否一字未动"（迁移与诊断）。用 `fp` 做守卫会把"改了个错别字"误判成错位、拦住正常作答 —— 那是把可用性问题伪装成安全问题。
+
+---
+
 ## 附录 A · 本文档与 PRD 的差异索引（供 team-lead 逐条核对）
 
 | # | PRD 位置 | PRD 说法 | 本设计 | 类型 |
 | --- | --- | --- | --- | --- |
 | 1 | P0-1 | 产物含 74 篇 | **73 篇**（6+67，74 是"全库 cloze 块数"） | 数字修正（自相矛盾） |
-| 2 | P0-1 | 每篇带 `itemCount` | 追加 `blankCount` / `strictCount` / `fp` / `order` / `trigger`；产物根加 `contentVersion` | 补字段（§1 异议 4） |
+| 2 | P0-1 | 每篇带 `itemCount` | 改名为 **`sentenceCount`** 并追加 `blankCount` / `strictCount` / `fp` / `order` / `trigger`；产物根加 `contentVersion` | 补字段 + 改名（§1 异议 4） |
 | 3 | P0-3 | 直接挂 `ClozeBlock` | **必须**再给组件加 `submitted` emit | 阻塞性缺口（§1 异议 1） |
 | 4 | 5.1 | 判分复用、零改动 | **必须**先把 `parseCloze`/`blankMatches` 抽到共享层 | 阻塞性缺口（§1 异议 2） |
 | 5 | P0-4 | 表 5 个字段 | **11 个**业务字段（新增 `fp`/`learnedAt`/`pieceTitle`/`createdAt`/`deleted`） | 补字段（§1 异议 5） |
@@ -1184,8 +1309,24 @@ ReciteView            → 只读 viewModel
 | 13 | — | 未提 | streak 在"无任务日"不判负（team-lead 已拍板） | 新增规则（§8.1 Q6） |
 | 14 | §9-5 | — | 维持 1 篇/天（team-lead 拍板） | 裁定（§8.1 Q5） |
 | 15 | §6.2 | 降级省不了成本 | **确认成立**，并给出 SM-2 `easeFactor` 退化为死字段的硬证据 | 验证通过（§1.3） |
+| 16 | §9.2 | `submitted` 是否带 `perBlank`（PM 倾向带） | **不带**，载荷冻结 `{ total, correct, allCorrect }`；P1-2 自行重算 | 裁定（§8.7 Q8） |
+| 17 | §9.2 | 篇键是否需要 `subject` 前缀 | **一期就带**；为 P1-6 跨学科预留，后补成本 = 全表迁移 | 裁定（§8.7 Q9） |
+| 18 | P0-1 口径 | 「一句多空 17 篇」 | **产物内 16 篇**（正课 15 + 复习 1），全库 74 块含 reveal 篇为 17 —— 两种数法都对，脚本断言 16 并注释说明 | 口径澄清（§1 异议 4） |
 
-## 附录 B · v1.0 → v1.1 变更记录
+## 附录 B · v1.0 → v1.2 变更记录
+
+### B.1 v1.1 → v1.2（对齐 PRD `240a8c1` + 补 A3 落点 + §9.2 两问裁定）
+
+| 变更 | 触发 | 位置 |
+| --- | --- | --- |
+| 产物字段 `itemCount` 拆为 `sentenceCount` + `blankCount`，示例值改用真实数据（关雎 2 句 4 空、综合自测 6 句 8 空） | PRD `240a8c1` 口径修正 | §1 异议 4、§3.4、§7.2、T02 |
+| 异议 4 重写为「`sentenceCount` ≠ 空位数」，补 16 vs 17 双口径表 | 同上（PRD 说 17 篇、产物内是 16 篇） | §0、§1 异议 4、附录 A #18 |
+| **A3 验收落点补全**：`tests/recite-cloze-parity.test.js` + `tests/helpers/reciteParity.mjs`，三步 harness + 四条断言 + 三条实现约束 + 性能预算 | team-lead：「不落到具体文件等于没有」 | §5.7（新增）、§2.1（新增文件数 17） |
+| **Q8 裁定**：`submitted` 不带 `perBlank`，载荷冻结，并给出"带了就开始破坏定性"的论证 | PRD §9.2 遗留问题 | §8.1 Q8、§8.7、T01 纪律 3 |
+| **Q9 裁定**：篇键一期就带 `subject` 前缀；`fp` 字段覆盖范围 + 错别字漂移的四种情形表 | PRD §9.2 遗留问题 | §3.2（新增小节）、§8.1 Q9、§8.7 |
+| **Q7 状态收口**：SWR 渲染顺序经 team-lead 二次确认通过（"远程优先"指数据优先级，非渲染阻塞） | team-lead 复核 | §8.1 Q7 |
+
+### B.2 v1.0 → v1.1
 
 | 变更 | 触发 | 位置 |
 | --- | --- | --- |
