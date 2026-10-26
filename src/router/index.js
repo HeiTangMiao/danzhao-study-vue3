@@ -75,6 +75,22 @@ const routes = [
     component: () => import('@/views/GuideView.vue')
   },
   {
+    // 每日背诵（T04）：首页队列。**无 `meta.tab`** —— 一级导航仍是 4 个 Tab（B4），
+    // 背诵是「学习」Tab 下的二级入口（与 /plan、/guide 同款：进入即隐藏底部 pill，
+    // 避免与页面自己的底部动作条同屏）。
+    path: '/recite',
+    name: 'recite',
+    component: () => import('@/views/ReciteView.vue')
+  },
+  {
+    // 单篇默写作答（T04）：坐标 = 产物条目里的 unitNum / fileIndex / blockIndex。
+    // `?manual=1` 是「综合大冲关 · 模拟考场」手动入口（该分支不写任何 recite_progress 行）。
+    // 同样**无 `meta.tab`**。
+    path: '/recite/:unitNum/:fileIndex/:blockIndex',
+    name: 'recite-piece',
+    component: () => import('@/views/RecitePieceView.vue')
+  },
+  {
     // 错题本
     path: '/error-book',
     name: 'error-book',
@@ -123,9 +139,13 @@ const router = createRouter({
  * 未登录时 `/login?redirect=` 携带的是**规范形**路径（不会把 `5` 带进回跳地址）。
  *
  * 规范形返回 true（不重定向）—— 站内导航（恒用规范形）与翻页转场零影响。
+ *
+ * 每日背诵单篇页（T04）共用本守卫：`/recite/7/0/0` 与 `/recite/07/0/0` 必须等价，
+ * 因为篇目坐标里的 `unitNum` 恒为零填充字符串（产物由 `site.js` 推导）。
+ * 补零规则仍只有 `normalizeUnitNum` 一份，本守卫只负责「在哪收口」。
  */
 router.beforeEach((to) => {
-  if (to.name !== 'unit') return true
+  if (to.name !== 'unit' && to.name !== 'recite-piece') return true
   const norm = normalizeUnitNum(to.params.unitNum)
   if (norm === to.params.unitNum) return true
   return { ...to, params: { ...to.params, unitNum: norm }, replace: true }
