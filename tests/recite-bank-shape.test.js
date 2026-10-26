@@ -175,4 +175,15 @@ describe('形状常量（顺带锚定，防止后人改路径造成双份真相�
     expect(sanitizeBank({ ...ok, pieces: {} })).toBeNull()
     expect(sanitizeBank(ok)).not.toBeNull()
   })
+
+  it('schemaVersion 与 contentVersion 同口径严格：字符串一律退货，不做 Number() 强转', () => {
+    const ok = bankOf([pieceOf(0, 'lesson')])
+    // 这条钉的是一个曾经存在的不对称：schemaVersion 走 toIndex（内部 Number(v) 会把 '1' 转成 1
+    // 而放行），contentVersion 严格。两个相邻版本字段两种口径 = 后人的陷阱。
+    // 字符串版本号本身就是构建期类型 bug，宽松放行等于让它无声通过。
+    expect(sanitizeBank({ ...ok, schemaVersion: String(BANK_SCHEMA_VERSION) })).toBeNull()
+    expect(sanitizeBank({ ...ok, schemaVersion: `${BANK_SCHEMA_VERSION}.0` })).toBeNull()
+    // 真数字且等于常量 → 通过（证明上面两条不是把所有输入都拒了）
+    expect(sanitizeBank({ ...ok, schemaVersion: BANK_SCHEMA_VERSION })).not.toBeNull()
+  })
 })

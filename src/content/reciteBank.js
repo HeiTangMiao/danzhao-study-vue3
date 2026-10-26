@@ -267,7 +267,12 @@ export function sanitizeBank(raw) {
   if (!raw || typeof raw !== 'object') return null
   if (Array.isArray(raw)) return null
 
-  const schemaVersion = toIndex(raw.schemaVersion, -1)
+  // 两个版本字段**同一严格口径**：必须是 number，字符串 `"1"` / `"4"` 一律退货。
+  // 为什么不用 `toIndex` 强转：`toIndex` 内部 `Number(v)` 会把 `"1"` 变成 1 而放行。
+  // 版本是「形状代际」与「双源裁决」的判据，**判据必须严格**——用宽松强转去容错
+  // 一个本不该出现的类型错误，等于把构建期 bug 变成一次无声的通过。
+  // 两个相邻字段一个严格一个强转，是留给下一个读者的陷阱，故显式对齐。
+  const schemaVersion = typeof raw.schemaVersion === 'number' ? raw.schemaVersion : NaN
   if (schemaVersion !== BANK_SCHEMA_VERSION) return null
 
   const contentVersion = typeof raw.contentVersion === 'number' ? raw.contentVersion : NaN
