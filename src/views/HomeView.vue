@@ -41,6 +41,10 @@
       </div>
     </section>
 
+    <!-- 每日背诵任务卡（日课优先级高于「接着上次」，但「先复习」纪律仍在最上）。
+         无任务时组件自身不渲染任何节点，不会留占位空卡。 -->
+    <ReciteTaskCard variant="home" />
+
     <!-- 继续学习卡片：上次学习位置一键直达 -->
     <section v-if="lastStudy" class="continue-card card">
       <button class="continue-card__main" @click="continueStudy">
@@ -162,6 +166,7 @@ import { useStudyDbStore } from '@/stores/studyDb'
 import { countDue } from '@/composables/useSpacedReview'
 import { SUBJECT_LIST, SUBJECT_META, getSubjectConfig } from '@/content/index'
 import SearchPanel from '@/components/SearchPanel.vue'
+import ReciteTaskCard from '@/components/ReciteTaskCard.vue'
 import AppIcon from '@/components/AppIcon.vue'
 
 const router = useRouter()

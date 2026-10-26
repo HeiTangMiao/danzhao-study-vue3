@@ -17,6 +17,8 @@
         <AppIcon name="square-pen" :size="15" /> 记一个卡点
       </button>
     </div>
+    <!-- 每日背诵次级入口：只关心「今天还有几篇要重默」，无到期时组件自身不渲染 -->
+    <ReciteTaskCard variant="review" />
     <StuckCardComposer :open="composerOpen" @saved="onStuckSaved" @close="composerOpen = false" />
 
     <!-- 顶栏：退出 + 进度条 + 计数 -->
@@ -113,6 +115,7 @@ import MathJaxRender from '@/components/MathJaxRender.vue'
 import GradeButtons from '@/components/GradeButtons.vue'
 import StuckCard from '@/components/StuckCard.vue'
 import StuckCardComposer from '@/components/StuckCardComposer.vue'
+import ReciteTaskCard from '@/components/ReciteTaskCard.vue'
 import { useReviewStore } from '@/stores/review'
 import { useStudyDbStore } from '@/stores/studyDb'
 import { useSpacedReview, isMastered, countDue, CARD_KINDS } from '@/composables/useSpacedReview'
