@@ -257,6 +257,29 @@ export const useReciteStore = defineStore('recite', () => {
   }
 
   /**
+   * 把「今天」刷成**真实今天** —— 全 store 唯一的「刷新时间」实现（跨零点修复，team-lead 裁定）。
+   *
+   * 为什么必须修（不是「显示小瑕疵」）：
+   *  - `bumpStreak` 的幂等判据是 `lastActiveDate === today`。陈旧 `today` 会把「凌晨那次作答」
+   *    误判成**昨天那天的第二笔**而直接吞掉（`lastActiveDate` 停在旧日），
+   *    次日正常作答时便被判为断更、`streak` 重置为 1 —— 断签是首页头号数字，不可接受；
+   *  - `applyResult` 按旧日算 `nextDate`：整篇排期早一天，刚背完的篇**立刻又回到待重默**；
+   *    `learnedAt` 也会记成旧的那天（`learnedAt` 只写不撤，计数不受影响但日期偏一天）。
+   *
+   * 调用点**只有三处**，且都必须走本函数（禁止各处手写一次取时间）：
+   *  ① `doInit()` —— 初次加载落地产物后；
+   *  ② `init()` 命中「已加载」的**提前 return 分支** —— 隔夜重进首页时纠正快照；
+   *  ③ `submitResult()` 入口（`manual` 早退之后）—— 作答是「今天确实做了事」的唯一事实来源。
+   * 并发加载期间（`inFlight` 已存在）不刷新：那时多刷一次没有意义（T03 复核点 ②）。
+   *
+   * ⚠️ I4：本文件取时间的字面调用只有 2 处 —— `today` 的 `ref` 初值（构造兜底）与本函数。
+   *    队列/统计/调度全部只读 `today.value`，任何地方再取一次时间都是第二个时间源。
+   */
+  function syncToday() {
+    today.value = getDateStr()
+  }
+
+  /**
    * 真正执行一轮加载（`init()` 的唯一实现）。
    * @param {{force?: boolean}} opts `force` = 清内存缓存后重读
    * @returns {Promise<void>}
@@ -278,7 +301,7 @@ export const useReciteStore = defineStore('recite', () => {
       return
     }
     applyBank(bundled)
-    today.value = getDateStr()
+    syncToday()
 
     // ② 读库 + 指纹协调（`reconcile` 纯函数；只写「需要迁移的行」，不碰其它行）
     try {
@@ -311,11 +334,17 @@ export const useReciteStore = defineStore('recite', () => {
   /**
    * 初始化（幂等）：首屏由 `ReciteView`/`RecitePieceView` 调用。
    * 并发调用共享同一个 Promise；已加载过则直接 resolve（`force` 除外）。
+   *
+   * ⚠️ 「已加载」分支虽然跳过读盘/读库，**仍必须刷新 `today`**：内存产物可复用，
+   *    但「今天」不能复用 —— 隔夜重进首页时它停在昨天，队列会少一天、
+   *    且后续作答的记账基准全是旧的（见 `syncToday` 注释）。
+   *    刷新放在 `inFlight` 判据**之后**：并发加载期间多刷一次没有意义（T03 复核点 ②）。
    * @param {{force?: boolean}} [opts]
    * @returns {Promise<void>}
    */
   function init(opts = {}) {
     if (inFlight) return inFlight
+    syncToday()
     const force = opts && opts.force === true
     if (loaded.value && phase.value !== RECITE_PHASE.ERROR && !force) return Promise.resolve()
     inFlight = doInit({ force }).finally(() => {
@@ -349,7 +378,15 @@ export const useReciteStore = defineStore('recite', () => {
     }
   }
 
-  /** 设置「今天」（I4：可注入，供测试与跨日刷新用） */
+  /**
+   * 设置「今天」（I4 的注入点）。
+   *
+   * ⚠️ **仅用于测试构造「陈旧 `today`」现场**：先 `setToday('2020-01-01')` 装作页面是那天打开的，
+   *    再断言 `init()` / `submitResult()` 会把它纠正回真实日期。**生产路径不需要它** ——
+   *    `doInit()` / `init()` 的已加载分支 / `submitResult()` 都会调 `syncToday()` 覆盖成本地今天。
+   *    任何视图都不许调用本函数（在 `.vue` 里指定"今天"= 第二个时间源，正是 I4 禁止的）。
+   * @param {string} day `YYYY-MM-DD`
+   */
   function setToday(day) {
     if (typeof day === 'string' && day !== '') today.value = day
   }
@@ -392,6 +429,11 @@ export const useReciteStore = defineStore('recite', () => {
    *  - §7.4：主进度写失败 → `console.error` + **抛出**（页面提示「进度没保存成功，请重试」），
    *    不静默；复习触发/连续天数写失败只记日志，不阻断已成立的主进度。
    *
+   * ⚠️ 跨零点（team-lead 裁定必修）：入口先 `syncToday()`，再把值**一次性**取进局部 `day`，
+   *    下面三处消费（`applyResult` / `syncReviewTriggers` / `bumpStreak`）**必须共用这个 `day`** ——
+   *    混用 `today.value` 会让三处拿到不同基准（改到一半最容易出的错正是这处漏一个）。
+   *    `syncToday()` 放在 `manual` 早退**之后**：手动路径与修复前逐字一致（不写行、也不动 `today`）。
+   *
    * @param {{pieceKey: string, allCorrect?: boolean, manual?: boolean}} params
    * @returns {Promise<{ok: boolean, manual: boolean, row?: object, reviewRows?: Array<object>}>}
    * @throws {Error} 未知篇目 / 主进度落库失败
@@ -401,6 +443,9 @@ export const useReciteStore = defineStore('recite', () => {
     if (manual === true || manualOnly.value === true) {
       return { ok: true, manual: true }
     }
+    // 跨零点：作答前先把「今天」拉回真实今天（三处消费共用同一个 day）
+    syncToday()
+    const day = today.value
     const piece = pieceByKey.value.get(pieceKey)
     if (!piece) throw new Error(`[recite] 未知篇目：${pieceKey}`)
 
@@ -409,7 +454,7 @@ export const useReciteStore = defineStore('recite', () => {
       prevRow,
       piece,
       allCorrect: allCorrect === true,
-      today: today.value
+      today: day
     })
 
     try {
@@ -424,7 +469,7 @@ export const useReciteStore = defineStore('recite', () => {
     // 复习篇条件触发（P0-7）：幂等，只返回「本次新满足」的行
     let reviewRows = []
     try {
-      reviewRows = syncReviewTriggers({ pieces: pieces.value, rows: mergedRows, today: today.value })
+      reviewRows = syncReviewTriggers({ pieces: pieces.value, rows: mergedRows, today: day })
       for (const row of reviewRows) await db.saveReciteProgress(row)
       if (reviewRows.length) mergedRows = mergedRows.concat(reviewRows)
     } catch (err) {
@@ -435,7 +480,7 @@ export const useReciteStore = defineStore('recite', () => {
 
     // 连续天数（Q6 临时规则；无任务日不判负不推进）
     try {
-      const nextState = bumpStreak({ state: state.value, today: today.value, hasTaskToday: true })
+      const nextState = bumpStreak({ state: state.value, today: day, hasTaskToday: true })
       await db.saveReciteState(nextState)
       state.value = nextState
     } catch (err) {
