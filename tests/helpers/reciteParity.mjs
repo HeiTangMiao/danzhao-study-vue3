@@ -29,10 +29,24 @@ import ClozeBlock from '@/components/blocks/ClozeBlock.vue'
 import { RECITE_BANK_PATH, sanitizeBank } from '@/content/reciteBank'
 import { buildClozeItems, flattenBlanks } from '@/content/clozeJudge'
 import { pageFileKeyOf } from '@/content/pageMeta'
+import { BASELINE } from '../../scripts/build-recite-bank.mjs'
 import { CONTENT_DIR, buildMetaIndex, importFresh } from '../../scripts/lib/load-content.mjs'
 
-/** 产物基线篇数（内容快照式断言；变了一律要有人重新核验 A3 是否仍成立） */
-export const EXPECTED_PIECE_COUNT = 73
+/**
+ * 产物基线篇数。
+ *
+ * ⚠️ **不写数字**：唯一填写处是 `scripts/build-recite-bank.mjs` 的 `BASELINE.pieces`
+ *    （该文件用 `import.meta.url === pathToFileURL(process.argv[1]).href` 守卫 `build()`，
+ *    被 import 时**只暴露纯函数、不写 public/**，故这里引用它零副作用）。
+ *
+ * 为什么不在这里再写一个 `73`：`BASELINE` 是**内容快照基线**，内容侧增删默写篇目时的
+ * 正确流程是「有意识地更新 BASELINE → 重建产物 → 复核 A3 预算与复习触发」。
+ * 如果本文件另写一份 73，那次**正确变更**会让这里变红、报错信息还是「期望 73，实际 74」，
+ * 看起来像产物坏了 —— 假红会训练人去改数字直到变绿，这比不设防更糟。
+ * 引用 BASELINE 后：忘更新 → 这里变红（绊线照旧生效）；按流程更新 → 这里自动跟随，
+ * 且 A3 的 `describe.each` 会**自动覆盖新增的篇**（覆盖率只增不减，绝不静默缩小）。
+ */
+export const EXPECTED_PIECE_COUNT = BASELINE.pieces
 
 /** 本仓库会渲染的最大空位数（用于「空位数与 DOM 输入框数一致」的交叉校验上限） */
 export const MAX_BLANKS_PER_PIECE = 64
@@ -62,8 +76,8 @@ export function loadPieces() {
   if (!bank) throw new Error(`产物不可用（sanitizeBank 返回 null），先跑 npm run build:recite：${RECITE_BANK_PATH}`)
   if (bank.pieces.length !== EXPECTED_PIECE_COUNT) {
     throw new Error(
-      `产物清洗后篇数不符：期望 ${EXPECTED_PIECE_COUNT}，实际 ${bank.pieces.length}。` +
-        '若内容侧确实增减了默写篇目，请复核 A3 后同步本常量。'
+      `产物清洗后篇数不符：期望 ${EXPECTED_PIECE_COUNT}（scripts/build-recite-bank.mjs 的 BASELINE.pieces），` +
+        `实际 ${bank.pieces.length}。若内容侧确实增减了默写篇目，请按流程更新 BASELINE 后重建产物。`
     )
   }
   return bank.pieces
