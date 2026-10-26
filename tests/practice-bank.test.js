@@ -98,16 +98,46 @@ describe('题库覆盖与形状（验收 5.7-1 + A-1 派生）', () => {
   )
 
   it(
+    'A-1 派生题题型恒为 judge：所有 dv 条目的 it 必须显式回填为 judge（禁止 it 为空串）',
+    async () => {
+      const { shards } = await getBank()
+      const derived = flat(shards).filter((it) => it.dv)
+      // 防空转：派生集合为空时下面的 every 恒真，必须显式断言非空
+      expect(derived.length).toBeGreaterThan(0)
+      // 内容侧写判断题普遍省略 type → 构建期 itemType 取到 ''，派生分支必须覆盖回 'judge'。
+      // 否则 it:'' 会让下游 isFillItem 退到题干形态兜底（`_{3,}`），把派生判断题误判成填空题。
+      for (const it of derived) {
+        expect(it.it).toBe('judge')
+      }
+    },
+    60000
+  )
+
+  it(
     'A-1 派生自洽：可派生且非「原生可判」者必打 dv；打了 dv 者必可派生（抓派生逻辑回归）',
     async () => {
       const { shards } = await getBank()
       for (const it of flat(shards)) {
-        const rederived = deriveJudge({ type: it.it, question: it.q, answer: it.a })
         if (it.dv) {
-          expect(rederived).toBeTruthy()
-        } else if (rederived) {
-          // 未打 dv 的派生候选，只可能是「原生可判题」（有 options 且有 correctIndex）
-          expect(Array.isArray(it.o) && it.o.length > 0 && it.ci !== undefined).toBe(true)
+          // 刻意传空 type，否则 isJudgeItem 会因 `type==='judge'` 短路，使本断言失去形态校验作用。
+          const byForm = isJudgeItem({ type: '', question: it.q })
+          if (byForm) {
+            // 形态路：题干自带「判断：」→ 必须**仅凭题干形态**即可重建（真正咬住形态判据 + 答案前缀）
+            expect(deriveJudge({ type: '', question: it.q, answer: it.a })).toBeTruthy()
+          } else {
+            // 显式题型路：内容侧大量判断题（语文/数学）写作陈述句 + 显式 type:'judge'，题干无「判断：」
+            // 标记 → 形态判据天然无法识别，这类题只能靠显式题型重建。故此处要求两件事：
+            //   ① 题库里必须已显式标 judge（构建期回填，避免 it:'' 让下游走题干兜底误判）
+            //   ② 即便走显式题型，答案仍须命中加粗「正确。/错误。」前缀（派生不只靠标签、答案口径未退化）
+            expect(it.it).toBe('judge')
+            expect(deriveJudge({ type: 'judge', question: it.q, answer: it.a })).toBeTruthy()
+          }
+        } else {
+          // 未打 dv 的条目沿用原口径（题型透传 it.it）：若可派生却不派生，只可能是「原生可判题」
+          const rederived = deriveJudge({ type: it.it, question: it.q, answer: it.a })
+          if (rederived) {
+            expect(Array.isArray(it.o) && it.o.length > 0 && it.ci !== undefined).toBe(true)
+          }
         }
       }
     },

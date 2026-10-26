@@ -254,6 +254,11 @@ export async function collectBank() {
           entry.o = derived.options
           entry.ci = derived.correctIndex
           entry.dv = true
+          // 派生题题型恒为 judge（派生入口 deriveJudge 只产出 ['正确','错误'] 两选项）。
+          // 显式回填，避免内容侧普遍省略 type 时 `it:''` 落到下游 —— check-fill-gradable 的
+          // isFillItem 在「无显式 type」时会退到题干 `_{3,}` 形态判断，一旦派生判断题题干里出现
+          // 空格占位（如讲 Python 格式符），就会被误判成填空题送进填空校验，产生假警报。
+          entry.it = 'judge'
           gradable = true
         }
         entry.g = gradable
