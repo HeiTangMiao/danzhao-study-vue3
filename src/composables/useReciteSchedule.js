@@ -7,6 +7,7 @@
  *  - 复习篇的条件触发（`syncReviewTriggers`）
  *  - 内容指纹自动迁移（`reconcile`）
  *  - 进度统计（`deriveStats`）与连续天数（`bumpStreak`）
+ *  - 逾期天数（`overdueDays`，首页待重默卡的「逾期 N 天」唯一来源）
  *
  * ⚠️ **本文件禁止 import 任何东西**（含 `@/` 别名、Vue、Pinia、IndexedDB）。
  *    理由不是洁癖，而是**可测性**：本文件承载 A4/A4'/A5/A6/A7 全部验收，
@@ -299,6 +300,71 @@ export function isDue(row, today) {
   const nd = typeof row.nextDate === 'string' ? row.nextDate : ''
   if (nd === '') return true
   return nd <= day
+}
+
+/** 一天的毫秒数（`overdueDays` 的整数基准；UTC 下恒等于这个值，不受夏令时影响） */
+const DAY_MS = 86400000
+
+/** `YYYY-MM-DD` 严格形态（不接受 `2026-1-1` 之类，也不接受带时间的串） */
+const DAY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
+
+/**
+ * 把 `YYYY-MM-DD` 解析成 **UTC 毫秒**（非法输入 → `NaN`）。
+ *
+ * 为什么用 `Date.UTC` 而不是 `new Date('…T00:00:00')`（即 `addDays` 的做法）：
+ *  - `new Date('2026-03-08T00:00:00')` 是**本地午夜**；在有夏令时的时区里，
+ *    「本地午夜到本地午夜」可能是 23 或 25 小时，用 `(b - a) / 86400000` 求天数差
+ *    会得到 0.958 / 1.042 这类**非整数**，跨过夏令时切换的多日差还会累积误差；
+ *  - `Date.UTC` 下每一天**恒为** 86 400 000 ms，天数差是干净的整数除法
+ *    （`Math.round` 只是兜住浮点表示，不承担纠错职责）。
+ *  - 两者对同一 `YYYY-MM-DD` 串给出的"日期"完全一致，只是**计量口径**不同：
+ *    `addDays` 面向"从某天推 N 天后的本地日期"，`overdueDays` 面向"两个日期之间隔了几天"。
+ *
+ * ⚠️ 往返校验不可省：`Date.UTC(2026, 1, 31)` 会被静默滚到 3 月 3 日。
+ *    不校验就会把「非法日期」算成一个 3 天的逾期 —— 宁可返 `NaN`（调用方回落 0）。
+ * @param {unknown} dateStr `YYYY-MM-DD`
+ * @returns {number} UTC 毫秒；非法 → `NaN`
+ */
+function utcDayMs(dateStr) {
+  if (typeof dateStr !== 'string') return NaN
+  const m = DAY_PATTERN.exec(dateStr)
+  if (!m) return NaN
+  const year = Number(m[1])
+  const month = Number(m[2])
+  const day = Number(m[3])
+  const ms = Date.UTC(year, month - 1, day)
+  const d = new Date(ms)
+  if (d.getUTCFullYear() !== year || d.getUTCMonth() !== month - 1 || d.getUTCDate() !== day) {
+    return NaN
+  }
+  return ms
+}
+
+/**
+ * 该篇**逾期天数**（首页待重默卡上的「逾期 N 天」来源）。
+ *
+ * 语义（非负整数，绝不返回负数/小数）：
+ *  - `nextDate` 早在今天之前 → 相隔的天数（`2026-10-20` 对 `2026-10-26` → **6**）；
+ *  - `nextDate` 就是今天 → **0**（今天到期 ≠ 逾期）；
+ *  - `nextDate` 在未来 / `nextDate === null`（已毕业）/ 缺排期 / 软删行 / 任何非法日期
+ *    → **0**（调用方可以无条件渲染「逾期 {{n}} 天」而不必先判空）。
+ *
+ * 为什么与 `isDue` 分成两个函数：`isDue` 回答"要不要今天做"，`overdueDays` 回答"拖了几天"。
+ * 合成一个就会在调用点各写一次 `(a - b) / 86400000`，本仓最忌讳的正是判据散写（H7）。
+ * @param {object|null|undefined} row `recite_progress` 行
+ * @param {string} [today] `YYYY-MM-DD`（可注入，默认本地今天）
+ * @returns {number} 逾期天数（非负整数）
+ */
+export function overdueDays(row, today) {
+  if (!isLiveRow(row)) return 0
+  if (row.nextDate === null) return 0 // 已毕业，永不逾期
+  const nd = typeof row.nextDate === 'string' ? row.nextDate : ''
+  if (nd === '') return 0 // 缺排期：算不出天数（是否该做由 isDue 决定）
+  const dueAt = utcDayMs(nd)
+  const nowAt = utcDayMs(normalizeDay(today))
+  if (Number.isNaN(dueAt) || Number.isNaN(nowAt)) return 0
+  const diff = Math.round((nowAt - dueAt) / DAY_MS)
+  return diff > 0 ? diff : 0
 }
 
 // ─────────────────────────────── 3. 今日队列 ───────────────────────────────

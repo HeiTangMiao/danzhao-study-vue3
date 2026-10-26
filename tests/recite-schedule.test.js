@@ -42,7 +42,8 @@ import {
   syncReviewTriggers,
   reconcile,
   deriveStats,
-  bumpStreak
+  bumpStreak,
+  overdueDays
 } from '@/composables/useReciteSchedule'
 import { getDateStr as spacedGetDateStr } from '@/composables/useSpacedReview'
 import { subjectOfPiece, PIECE_ROLE, PIECE_TRIGGER } from '@/content/reciteBank'
@@ -577,6 +578,69 @@ describe('bumpStreak（Q6：无任务日不判负不推进）', () => {
     const s = bumpStreak({ state: base, today: TODAY, hasTaskToday: true })
     expect(s.streak).toBe(13)
     expect(s.maxStreak).toBe(13)
+  })
+})
+
+// ──────────────────────── overdueDays（首页卡「逾期 N 天」） ────────────────────────
+
+describe('overdueDays · 逾期天数（非负整数，非法输入返 0）', () => {
+  it('① 排期在今天之前 → 相隔天数（跨月/跨年按日历算，不受夏令时影响）', () => {
+    const piece = mkPiece(0)
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-20' }), TODAY)).toBe(6)
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-25' }), TODAY)).toBe(1)
+    // 跨月：9-26 → 10-26 = 30 天
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-09-26' }), TODAY)).toBe(30)
+    // 跨年：2025-10-26 → 2026-10-26 = 365 天（2026 非闰年）
+    expect(overdueDays(mkRow(piece, { nextDate: '2025-10-26' }), TODAY)).toBe(365)
+    // 闰日参与：2024-02-29 → 2026-10-26
+    expect(overdueDays(mkRow(piece, { nextDate: '2024-02-29' }), TODAY)).toBe(970)
+  })
+
+  it('② 今天到期 / 未来排期 → 0（今天到期的卡不该显示「逾期 1 天」）', () => {
+    const piece = mkPiece(0)
+    expect(overdueDays(mkRow(piece, { nextDate: TODAY }), TODAY)).toBe(0)
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-27' }), TODAY)).toBe(0)
+    expect(overdueDays(mkRow(piece, { nextDate: '2027-01-01' }), TODAY)).toBe(0)
+  })
+
+  it('③ 毕业（nextDate=null）/ 缺排期 / 软删行 / 非行对象 → 一律 0', () => {
+    const piece = mkPiece(0)
+    expect(overdueDays(mkRow(piece, { nextDate: null, stage: MAX_STAGE }), TODAY)).toBe(0)
+    expect(overdueDays({ ...mkRow(piece), nextDate: undefined }, TODAY)).toBe(0)
+    expect(overdueDays({ ...mkRow(piece), nextDate: '' }, TODAY)).toBe(0)
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-01', deleted: true }), TODAY)).toBe(0)
+    expect(overdueDays(null, TODAY)).toBe(0)
+    expect(overdueDays(undefined, TODAY)).toBe(0)
+  })
+
+  it('④ 非法日期串 → 0（不猜、不静默算成某个天数）', () => {
+    const piece = mkPiece(0)
+    // Date.UTC(2026, 1, 31) 会静默滚到 3 月 3 日 —— 往返校验必须把它判为非法
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-02-31' }), TODAY)).toBe(0)
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-1-5' }), TODAY)).toBe(0) // 非零填充
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-20T00:00:00Z' }), TODAY)).toBe(0) // 带时间
+    expect(overdueDays(mkRow(piece, { nextDate: 'not-a-date' }), TODAY)).toBe(0)
+    expect(overdueDays(mkRow(piece, { nextDate: 20261020 }), TODAY)).toBe(0) // 非字符串
+    // today 非法 → 同样 0（而不是 NaN 冒到 UI）
+    expect(overdueDays(mkRow(piece, { nextDate: '2026-10-20' }), '2026-13-01')).toBe(0)
+  })
+
+  it('⑤ 返回值恒为非负整数（与 isDue 同源：到期才可能 > 0）', () => {
+    const piece = mkPiece(0)
+    const cases = [
+      mkRow(piece, { nextDate: '2026-10-18' }),
+      mkRow(piece, { nextDate: TODAY }),
+      mkRow(piece, { nextDate: '2026-12-31' }),
+      mkRow(piece, { nextDate: null })
+    ]
+    for (const row of cases) {
+      const n = overdueDays(row, TODAY)
+      expect(Number.isInteger(n)).toBe(true)
+      expect(n).toBeGreaterThanOrEqual(0)
+      // 只有到期行才可能 > 0；且「逾期 1 天」必须同时 isDue=true
+      if (n > 0) expect(isDue(row, TODAY)).toBe(true)
+    }
+    expect(overdueDays(cases[0], TODAY)).toBe(8)
   })
 })
 
