@@ -77,13 +77,17 @@ function makePiece({ key, blockIndex, title, order, fp }) {
   }
 }
 
-/** 造一份两篇的产物（`counts.lesson` 与篇数一致 —— `totalLesson` 取的就是它） */
+/** 造一份两篇的产物（`counts` 形状照 `sanitizeBank` 的契约 `{all, lesson, review}` 写） */
 function makeBank() {
   return {
     version: 1,
     contentVersion: 1,
     generatedAt: '2026-01-01T00:00:00.000Z',
-    counts: { lesson: 2, review: 0, total: 2 },
+    // ⚠️ 字段名必须是 `all` 而不是 `total`：`sanitizeBank` 恒用 `deriveCounts` 派生
+    //    `{all, lesson, review}`（产物里声明的 `counts` 运行时不读）。本用例走
+    //    `vi.mock('@/utils/reciteBankClient')` 绕过了产物加载，但把测试产物写成同一个形状，
+    //    将来若有人改成走真实 `loadBundled`，才不会靠「恰好都是 2」蒙过口径分叉。
+    counts: { all: 2, lesson: 2, review: 0 },
     pieces: [
       makePiece({ key: KEY_1, blockIndex: 0, title: '《诗经》 · 关雎', order: 1, fp: 'fp-1' }),
       makePiece({ key: KEY_2, blockIndex: 1, title: '《诗经》 · 蒹葭', order: 2, fp: 'fp-2' })
