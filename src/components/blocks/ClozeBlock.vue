@@ -69,8 +69,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import BlockShell from './BlockShell.vue'
 import MathJaxRender from '@/components/MathJaxRender.vue'
-import { answerMatches } from '@/content/answerNorm'
-import { CLOZE_VARIANTS } from '@/content/clozeVariants'
+import { buildClozeItems, blankMatches, flattenBlanks } from '@/content/clozeJudge'
 import { useStudyDbStore } from '@/stores/studyDb'
 
 const props = defineProps({
@@ -80,39 +79,27 @@ const props = defineProps({
   context: { type: Object, default: () => ({}) }
 })
 
+/**
+ * 新增事件（每日背诵 T01）：提交判分完成 → 上抛本次判分结果。
+ * 契约：`{ total: 空位数, correct: 对空数, allCorrect: total > 0 && correct === total }`
+ * 为什么需要：父级（RecitePieceView）只由 `allCorrect` 这一个布尔驱动背诵档位推进，
+ *   而判分结果此前全部私有在 `<script setup>` 内、父级无从得知；父级若自己再判一次
+ *   = 第二份判据 = 破 H7。所以这里只**读取既有判分结果**上抛，不新增任何判据。
+ * 为什么空篇不算全对：`allCorrect` 会推进档位，空篇若返回 true 就等于白送一次通过。
+ * 单元页没有监听者 → 行为零变化（tests/cloze-input.test.js 钉死这点）。
+ */
+const emit = defineEmits(['submitted'])
+
 /** 交互模式：缺省（字段缺失）= 'reveal'，存量内容渲染路径完全不变 */
 const isInput = computed(() => props.block.mode === 'input')
 
 /**
- * 把一段文本切成「普通文字」与「空位」两种片段
- * 未闭合的 {{ 原样保留为文字（校验器会拦下，渲染层只负责不炸）
+ * 句子展开（普通文字 / 空位片段 + 该句 alts / strict）
+ * 实现已抽到 `@/content/clozeJudge`（H7 单一真相源）：背诵构建期要算句/空数、
+ * 首页要算「N 空」、parity 测试要逐空比对，三处必须与这里同一份解析。
+ * 仍包在 computed 里 → `props.block` 变化时照旧重算（响应性不变）。
  */
-function parseCloze(text) {
-  const segs = []
-  const re = /\{\{([\s\S]*?)\}\}/g
-  let last = 0
-  let m
-  while ((m = re.exec(text)) !== null) {
-    if (m.index > last) segs.push({ text: text.slice(last, m.index) })
-    segs.push({ blank: true, answer: m[1].trim() })
-    last = m.index + m[0].length
-  }
-  if (last < text.length) segs.push({ text: text.slice(last) })
-  return segs
-}
-
-const items = computed(() =>
-  (Array.isArray(props.block.items) ? props.block.items : [])
-    .filter((it) => it && typeof it === 'object')
-    .map((it) => ({
-      text: String(it.text ?? ''),
-      segments: parseCloze(String(it.text ?? '')),
-      // 该句空位的其他可接受答案（与主答案并列判对；通假/异体字走 clozeVariants，勿写这里）
-      alts: Array.isArray(it.alts) ? it.alts.filter((a) => typeof a === 'string' && a) : [],
-      // 句级 strict（D-0）：true → 该句禁用全局通假映射（红线句专用，见 blankMatches 注释）
-      strict: it.strict === true
-    }))
-)
+const items = computed(() => buildClozeItems(props.block))
 
 // ===== reveal 模式：已揭晓的空位，键为「第几项-第几段」 =====
 const revealed = ref(new Set())
@@ -126,16 +113,11 @@ function toggle(i, si) {
 }
 
 // ===== input 模式（B-3）：空位平铺（跨句连续编号） =====
-/** 全局空位表：gi 全局序号；main 主答案；alts 该句可接受别名；strict 该句是否禁通假映射（D-0） */
-const blanks = computed(() => {
-  const list = []
-  items.value.forEach((it, i) => {
-    it.segments.forEach((seg, si) => {
-      if (seg.blank) list.push({ gi: list.length, i, si, main: seg.answer, alts: it.alts, strict: it.strict })
-    })
-  })
-  return list
-})
+/**
+ * 全局空位表：gi 全局序号；main 主答案；alts 该句可接受别名；strict 该句是否禁通假映射（D-0）
+ * 实现已抽到 `@/content/clozeJudge`（同 `items`）；仍包在 computed 里保持响应性。
+ */
+const blanks = computed(() => flattenBlanks(items.value))
 
 const blankIndexMap = computed(() => {
   const m = new Map()
@@ -162,24 +144,6 @@ watch(
   },
   { immediate: true }
 )
-
-/**
- * 单空比对：主答案命中或任一 alts 命中即算对（判分唯一入口 answerMatches，H7）。
- *
- * strict 句（D-0）：**不传 variantMap** → 只按正解 + 本句 alts 比对。
- * 为什么：全局通假表把「反→返」当作等价组，会把红线句「辗转反侧」里用户写的「返」
- * 折成「反」而误判对；strict 句绕开这张表即可判错。
- * 为什么不干脆删掉全局「反→返」键：该键是「寒暑易节，始一反焉」的合法通假，
- * 由 tests/cloze-variants.test.js 键锚定，删键会连带破坏合法通假 → 只能用句级开关解决。
- * 返回契约不变（仍返回布尔，内部读 answerMatches(...).matched）。
- */
-function blankMatches(typed, blank) {
-  const t = typeof typed === 'string' ? typed : ''
-  if (!t.trim()) return false
-  const opts = blank.strict ? undefined : { variantMap: CLOZE_VARIANTS }
-  if (answerMatches(t, blank.main, opts).matched) return true
-  return blank.alts.some((a) => answerMatches(t, a, opts).matched)
-}
 
 /** 某句是否含错空（句粒度：整句是语文默写的学习单位） */
 function sentenceHasWrong(i) {
@@ -247,6 +211,14 @@ async function submitDictation() {
   results.value = blanks.value.map((b) => blankMatches(values.value[b.gi], b))
   submitted.value = true
   await enqueueWrongSentences()
+  // 判分结果上抛（每日背诵 T01）：**必须**在 `enqueueWrongSentences()` 之后 ——
+  // 先落库（错题本）再通知父级。若父级写调度失败，错题本已经记上了，
+  // 与「宁可多记一条，不可漏记」的既有取向一致。
+  emit('submitted', {
+    total: blanks.value.length,
+    correct: correctCount.value,
+    allCorrect: correctCount.value === blanks.value.length && blanks.value.length > 0
+  })
 }
 
 /** 全部重默：清空所有输入与判定，焦点回第一空 */
