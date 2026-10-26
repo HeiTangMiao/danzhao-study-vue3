@@ -135,14 +135,27 @@ describe('R2 · 攻点[2] · 生产 CSP 未被放宽', () => {
   })
 })
 
-describe('R2 · 攻点[2] · L6 懒加载计数锚点 10→11', () => {
-  it('router 的 @/views/*.vue 懒加载实数 == 11，且 csp-guard 断言 11', () => {
+/**
+ * 懒加载计数锚点（历史：10 → 11 → 13）
+ *
+ * 这个数字的实质作用不是「记数量」，而是**强制任何新增路由被人显式确认一次**：
+ * 生产 CSP 是 `script-src 'self'`，路由懒加载必须全是字面量字符串（构建期可静态分包），
+ * 而 `src/router/index.js` 是唯一可能引入「运行时拼接 import()」形态的入口 ——
+ * 新路由出现的那一刻，正是最该有人确认「它不是 `import(name)`」的时刻。
+ *
+ * 13 = 上一批的 11 + T04 背诵功能新增的两条（`/recite`、`/recite/:unitNum/:fileIndex/:blockIndex`）。
+ * 本块与 `tests/csp-guard.test.js` 的「附加锚」是一条锚的两端：这里**回读** csp-guard 源码做交叉校验，
+ * 故两处的数字与正则必须同步改 —— 只改一边会变成「新文件 vs 旧正则」，红法还会伪装成对方没改。
+ */
+describe('R2 · 攻点[2] · L6 懒加载计数锚点 10→11→13', () => {
+  it('router 的 @/views/*.vue 懒加载实数 == 13，且 csp-guard 断言 13', () => {
     const routerSrc = readFileSync(join(ROOT, 'src/router/index.js'), 'utf8')
     const args = [...routerSrc.matchAll(/import\(\s*(['"`])([^'"`]+)\1\s*\)/g)].map((m) => m[2])
     const viewLazy = args.filter((a) => /^@\/views\/.+\.vue$/.test(a))
-    expect(viewLazy.length).toBe(11)
-    expect(new Set(viewLazy).size).toBe(11)
-    expect(guardSrc).toMatch(/11 处路由懒加载/)
-    expect(guardSrc).toMatch(/toHaveLength\(11\)/)
+    expect(viewLazy.length).toBe(13)
+    // 13 条路由各自指向不同视图（若两条路由复用同一视图，这里会先红 —— 显式更好过静默复用）
+    expect(new Set(viewLazy).size).toBe(13)
+    expect(guardSrc).toMatch(/13 处路由懒加载/)
+    expect(guardSrc).toMatch(/toHaveLength\(13\)/)
   })
 })

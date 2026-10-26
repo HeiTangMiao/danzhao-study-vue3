@@ -330,11 +330,26 @@ describe('L6 · 无「运行时拼接」import()（H1）', () => {
     expect(violations, '运行时拼接 import() 违反 H1（生产 CSP 无 unsafe-eval，且无法构建期分包）').toEqual([])
   })
 
-  it('附加锚：router 的 11 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
+  /**
+   * ⚠️ 这个「13」不是记数字，是**强制任何新增路由被人显式确认一次**的绊线。
+   *
+   * 为什么需要它：CSP 是 `script-src 'self'`（无 `unsafe-eval`），页面必须能被构建期
+   * 静态分包 —— 所以路由懒加载**只能写字面量字符串**，不能改成变量拼接。
+   * 而 `src/router/index.js` 是「新增一个动态 import 形态」的唯一入口（其它地方的
+   * `import()` 都由 `import.meta.glob` 或既有工厂包住），因此新增路由那一刻正是
+   * 最该有人过一眼「这是不是一个 `import(name)`」的时刻。数字变了就要人来改，
+   * 改的人会被强制读这段注释。
+   *
+   * 历史：11 → 13（T04 背诵功能新增 `/recite` 与 `/recite/:unitNum/:fileIndex/:blockIndex`
+   * 两条，均指向新视图）。**改动方向只允许「跟着路由数走」**，绝不许为了让断言变绿
+   * 把路由改成非懒加载（那等于拿掉 H1 的保护）。成对锚点：`tests/batch-f-verify-r2-csp-meta.test.js`
+   * 会回读本文件交叉校验，两处必须同步改。
+   */
+  it('附加锚：router 的 13 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
     const routerSrc = readFileSync(join(ROOT, 'src/router/index.js'), 'utf-8')
     const args = extractImportArgs(routerSrc)
     const viewLazy = args.filter((a) => /^['"]@\/views\/.+\.vue['"]$/.test(a.trim()))
-    expect(viewLazy, 'router 应为 11 处 @/views/*.vue 懒加载').toHaveLength(11)
+    expect(viewLazy, 'router 应为 13 处 @/views/*.vue 懒加载').toHaveLength(13)
     // 其余（如 main.js 预热 useKatex 的动态 import）同样必须静态可分析
     for (const a of args) {
       expect(isStaticImportArg(a), `import(${a.trim()}) 必须静态可分析`).toBe(true)
