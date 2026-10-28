@@ -215,6 +215,13 @@ jobs:
           #   而 --delete 会在「新清单已上线、仍有旧客户端在飞」的窗口里删掉它们正在请求的文件。
           rsync -avz --exclude manifest.json -e "ssh $SSH_ARGS" ./dist/content-remote/ "$USER@$HOST:/var/www/danzhao-study/content-remote/"
           rsync -avz -e "ssh $SSH_ARGS" ./dist/practice-bank/ "$USER@$HOST:/var/www/danzhao-study/practice-bank/"
+          # 背诵产物（2026-10-29 补齐，与 content-remote / practice-bank 同一类缺口）：
+          #   每日背诵的篇目数据 public/recite-bank/{subject}.json 由 prebuild 的 build:recite 生成。
+          #   此前清单里没有它 → **代码上线了、数据没上线**：ReciteTaskCard 加载失败时按设计
+          #   整体不渲染（不是报错），于是学员侧表现为「背诵入口凭空消失」，且没有报错可查。
+          #   ⚠️ 这里刻意**裸跑不加 `if [ -d ]` 守卫**：产物缺失必须让部署失败并暴露，
+          #   而不是静默跳过上线一个「有界面、没数据」的假绿版本——这正是本次故障的成因。
+          rsync -avz -e "ssh $SSH_ARGS" ./dist/recite-bank/ "$USER@$HOST:/var/www/danzhao-study/recite-bank/"
           # 提交点：manifest 单独最后切（此刻它指向的 content-remote 分片与 practice-bank 分片均已就位）
           rsync -avz -e "ssh $SSH_ARGS" ./dist/content-remote/manifest.json "$USER@$HOST:/var/www/danzhao-study/content-remote/manifest.json"
 
