@@ -1,15 +1,17 @@
 /**
- * `reciteBank.sanitizeBank` 的三条归一化契约（每日背诵 T01 复核裁定）
+ * `reciteBank.sanitizeBank` 的归一化契约（每日背诵 T01 复核裁定；2026-10-30 方案变更后适配 ④）
  *
  * 背景：T01 交付时 `sanitizeBank` 有 6 处行为是我自己的实现决定、规格里没写。
  * team-lead 逐条复核后 5 条采纳、1 条推翻并反转优先级。本文件把**会产生行为差异**的
- * 那三条钉死，防止后人"顺手"改回去：
+ * 那几条钉死，防止后人"顺手"改回去：
  *
  *  - ① `counts` **一律由篇目派生**，产物声明的值运行时**不读**（本轮唯一改码项，优先级被反转）
  *  - ② `pieces` 由本函数按 `order` **升序排好**（升格为运行时保证，T03 不再自己排）
  *  - ③ lesson 篇携带的 `trigger` 被**剥除**（运行时不留无人读取的垃圾字段；该错由 T02 构建期断言抓）
+ *  - ④ **无正文的篇一律丢弃**（T02 方案变更后 `isUsablePiece` 新增的门槛：缺 `paragraphs` 的篇
+ *      渲染出来是空白页且**不报错** —— 必须是硬性丢弃而不是"先收进来再说"）
  *
- * 为什么这三条值得单独立测：它们都是「静默生效」的行为 —— 错了不报错、不抛异常，
+ * 为什么这几条值得单独立测：它们都是「静默生效」的行为 —— 错了不报错、不抛异常，
  * 只会在首页显示错的分母、错的队列顺序，或让下一个人误以为 lesson 也认 `trigger`。
  *
  * ⚠️ 本文件**不加** `@vitest-environment jsdom`：`reciteBank.js` 零 import、纯数据形状，
@@ -36,9 +38,13 @@ function bankOf(pieces, extra) {
   }
 }
 
-/** 造一条可用篇目（key / fileKey / title 三者齐全才不会被 sanitizeBank 丢弃） */
+/**
+ * 造一条可用篇目（key / fileKey / title / paragraphs 四者齐全才不会被 sanitizeBank 丢弃）。
+ *
+ * `paragraphs` 给**两段且字数不同**：任何只数第一段的调用方都会被用例抓出来，
+ * 不让「该带几段」变成一个可以含糊的口径。
+ */
 function pieceOf(order, role) {
-  const isReview = role === 'review'
   return {
     key: `chinese|chinese_07_case_${order}|0`,
     order,
@@ -50,10 +56,7 @@ function pieceOf(order, role) {
     fileTitle: `用例页 ${order}`,
     unitTitle: '默写专项',
     title: `用例篇 ${order}`,
-    mode: 'input',
-    sentenceCount: 2,
-    blankCount: isReview ? 8 : 2,
-    strictCount: 0,
+    paragraphs: [`用例正文 ${order}（yòng lì）`, `用例第二段 ${order}`],
     fp: '0abc123'
   }
 }
@@ -157,6 +160,60 @@ describe('③ lesson 篇的 trigger 被剥除，review 篇保留', () => {
     expect('trigger' in lesson).toBe(false)
     expect(normalizePiece(pieceOf(9, 'review')).trigger).toBe('file')
     expect(normalizePiece({ ...pieceOf(9, 'review'), trigger: '乱写' }).trigger).toBe('file')
+  })
+})
+
+describe('④ 无正文的篇一律丢弃（isUsablePiece 在 2026-10-30 方案变更后新增的门槛）', () => {
+  it('paragraphs 缺失 / 空数组 → 该篇整条不收（不进队列，也不进分母）', () => {
+    const ok = pieceOf(0, 'lesson')
+    const bank = sanitizeBank(
+      bankOf([
+        { ...ok, key: 'chinese|f|0', title: 'A 缺 paragraphs', paragraphs: undefined },
+        { ...ok, key: 'chinese|f|1', title: 'B 空数组', paragraphs: [] },
+        { ...ok, key: 'chinese|f|3', title: 'D 有正文' }
+      ])
+    )
+    expect(bank.pieces.map((p) => p.key)).toEqual(['chinese|f|3'])
+    // 分母同步被排除 —— 首页不许把无正文的篇算进「已背 X / N」
+    expect(bank.counts).toEqual({ all: 1, lesson: 1, review: 0 })
+  })
+
+  /**
+   * ⚠️ 已知缺口 K1（**不是契约，是当前行为**，待源侧修复后本用例必须跟着改）：
+   * `paragraphs: ['', '']`（数组非空、但每段都是空串）**仍然会被收**。
+   * 根因在 `src/content/reciteBank.js:208` 的 `isUsablePiece`：它只判 `paragraphs.length === 0`，
+   * 不判「字符串非空」，于是 `['']` / `['  ']` 能通过，页面渲染出一个真正空白的正文区。
+   * 构建期同一口径：`scripts/build-recite-bank.mjs:208` 的 `emptyBodyLines` 也只数
+   * `paragraphs.length > 0`，所以「无正文的篇数」那条断言同样点不出这种篇。
+   * 本用例把当前行为钉住并点名修什么：源侧一旦收紧 `isUsablePiece`，这里会红 →
+   * 改成「一律丢弃」即可（不要删用例）。
+   */
+  it('K1 缺口：paragraphs 为「全是空串」的数组时当前仍被收（渲染出空白正文，见用例注释）', () => {
+    const ok = pieceOf(0, 'lesson')
+    const kept = sanitizeBank(
+      bankOf([{ ...ok, key: 'chinese|f|2', title: 'C 全空串', paragraphs: ['', ''] }])
+    )
+    expect(kept.pieces.map((p) => p.key)).toEqual(['chinese|f|2'])
+    // 退化形态：`['  ']`（纯空白串）同样被收 —— 缺口同根，见上方 K1 说明
+    const blank = sanitizeBank(
+      bankOf([{ ...ok, key: 'chinese|f|4', title: 'E 纯空白串', paragraphs: ['  '] }])
+    )
+    expect(blank.pieces).toHaveLength(1)
+  })
+
+  it('退化成 0 篇时 bank 仍然可用（不返回 null），但不虚构内容', () => {
+    const bank = sanitizeBank(bankOf([{ ...pieceOf(0, 'lesson'), paragraphs: [] }]))
+    expect(bank).not.toBeNull()
+    expect(bank.pieces).toEqual([])
+    expect(bank.counts).toEqual({ all: 0, lesson: 0, review: 0 })
+  })
+
+  it('normalizePiece 的历史容错仍有效：单字符串按一段收，非数组/噪声一律空数组', () => {
+    expect(normalizePiece({ ...pieceOf(0, 'lesson'), paragraphs: '整篇一段' }).paragraphs).toEqual([
+      '整篇一段'
+    ])
+    expect(normalizePiece({ ...pieceOf(0, 'lesson'), paragraphs: '' }).paragraphs).toEqual([])
+    expect(normalizePiece({ ...pieceOf(0, 'lesson'), paragraphs: 42 }).paragraphs).toEqual([])
   })
 })
 

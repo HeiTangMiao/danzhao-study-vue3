@@ -135,12 +135,26 @@ function dueRow(overrides = {}) {
   }
 }
 
+/**
+ * 到期篇的正文（两段、注音内联 —— 与真实产物同形态）。
+ *
+ * 为什么给**两段**：`charCount` 的契约是「全部段落拼接后的字数」。只数第一段的实现会
+ * 让下面的 `${DUE_CHAR_COUNT} 字` 断言落空 —— 一个 "字数是假的" 的 bug 不该从这条用例底下溜过去。
+ */
+const DUE_PARAGRAPHS = [
+  '关关雎鸠（guān guān jū jiū），在河之洲（zài hé zhī zhōu）。',
+  '窈窕淑女（yǎo tiǎo shū nǚ），君子好逑（jūn zǐ hǎo qiú）。'
+]
+
+/** 卡片应当显示的字数（契约值 = 全部段落拼接后的字符数） */
+const DUE_CHAR_COUNT = DUE_PARAGRAPHS.join('').length
+
 function duePiece(title, overrides = {}) {
   return {
     key: 'chinese|x|0',
     title,
     fileTitle: '默写专项 · 测试文件',
-    blankCount: 3,
+    paragraphs: DUE_PARAGRAPHS,
     ...overrides
   }
 }
@@ -223,7 +237,7 @@ describe('ReciteTaskCard · 无任务时不留占位空卡', () => {
 })
 
 describe('ReciteTaskCard · 内容与角标', () => {
-  it('到期条目：显示篇名、出处、第 N 次重默、空数', async () => {
+  it('到期条目：显示篇名、出处、第 N 次重默、字数', async () => {
     resetState({
       due: [{ piece: duePiece('关雎'), row: dueRow({ stage: 1 }) }],
       dueCount: 1,
@@ -235,7 +249,11 @@ describe('ReciteTaskCard · 内容与角标', () => {
     expect(text).toContain('关雎')
     expect(text).toContain('默写专项 · 测试文件')
     expect(text).toContain('第 2 次重默') // stage 1 → 第 2 次
-    expect(text).toContain('3 空')
+    // 篇幅 label 已从「N 空」改为「N 字」（2026-10-30 起不再挖空，所以没有"空"可报）
+    expect(text).toContain(`${DUE_CHAR_COUNT} 字`)
+    // 负断言：卡片不许退回 cloze 时代的「N 空」口径 —— 「空位」概念已随方案一并作废，
+    // 这里一旦命中 '空'，说明有人把挖空/判分的产物字段接回了这张卡。
+    expect(text).not.toContain('空')
     wrapper.unmount()
   })
 
