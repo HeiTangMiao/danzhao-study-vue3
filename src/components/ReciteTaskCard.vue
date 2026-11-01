@@ -56,7 +56,7 @@ const main = computed(() => {
     return {
       title: piece.title || '',
       fileTitle: piece.fileTitle || '',
-      blankCount: Number.isFinite(piece.blankCount) ? piece.blankCount : 0,
+      charCount: Array.isArray(piece.paragraphs) ? piece.paragraphs.join('').length : 0,
       tag: `第 ${stage + 1} 次重默`,
       // 0 同时覆盖「今天到期 / 排期在未来 / 已毕业 / 算不出来」→ 正好等于「不显示角标」
       overdue: overdueDays(row, store.today)
@@ -67,7 +67,7 @@ const main = computed(() => {
     return {
       title: fresh.title || '',
       fileTitle: fresh.fileTitle || '',
-      blankCount: Number.isFinite(fresh.blankCount) ? fresh.blankCount : 0,
+      charCount: Array.isArray(fresh.paragraphs) ? fresh.paragraphs.join('').length : 0,
       tag: '新篇',
       overdue: 0
     }
@@ -104,7 +104,7 @@ const countText = computed(() => {
       <span v-if="main.fileTitle" class="rtc-home__from">{{ main.fileTitle }}</span>
       <span class="rtc-home__meta">
         <span class="rtc-tag">{{ main.tag }}</span>
-        <span class="rtc-home__blanks">{{ main.blankCount }} 空</span>
+        <span class="rtc-home__blanks">{{ main.charCount }} 字</span>
         <span v-if="main.overdue > 0" class="rtc-tag rtc-tag--overdue">逾期 {{ main.overdue }} 天</span>
       </span>
     </span>

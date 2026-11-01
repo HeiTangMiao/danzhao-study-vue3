@@ -1,7 +1,7 @@
 <!--
   RecitePieceView —— 单篇默写作答页（T04；设计 §4.1 时序图 ② / §1 异议 9）
 
-  流程：坐标命中产物 → `loadPage` → 取第 `blockIndex` 个 cloze 块 → **identity 守卫** → 挂 `ClozeBlock`
+  流程：坐标命中产物 → `loadPage` → 取第 `blockIndex` 个 knowledge 块 → **identity 守卫** → 展示整篇
 
   ★ identity 守卫（I8，本页最重要的一段）：
     双源（包内产物 + 在线内容页）可能来自**不同新鲜度层**，此时 `blockIndex` 指向的可能
@@ -11,10 +11,11 @@
     而 `fp` 回答「这一篇是否一字未动」—— 用 `fp` 会把「改了个错别字」误判成错位、
     反而拦住正常作答（§1 异议 9 末段 / §8.7 Q9）。
 
-  ★ 判分零代码（I5）：本页**不 import 任何判分函数**，只监听 `ClozeBlock` 的 `@submitted`
+  ★ 判分零代码（I5）：本页**不 import 任何判分函数**（2026-10-30 起本功能根本不判分，
+    只有底部二元自评「已能背诵 / 还需练习」）
     三键载荷 `{ total, correct, allCorrect }`，并**只由 `allCorrect` 布尔**驱动档位（I10 ①）。
 
-  ★ 大冲关手动入口（`?manual=1`，I6/P0-9）：`submitResult(..., manual: true)` → 一行都不写，
+  ★ 自测入口（`?manual=1`，I6/P0-9）：`submitResult(..., manual: true)` → 一行都不写，
     只提示「模拟完成，不计入进度」。
 
   ★ 离开保护降级为两层（§5 T04）：**不做 `beforeunload`**（每次作答已即时落库，
@@ -22,7 +23,7 @@
     二次确认 —— 一层在页面返回按钮，一层在路由离开守卫。
 -->
 <template>
-  <div ref="rootEl" class="rp">
+  <div class="rp">
     <header class="rp-top">
       <button class="rp-back" aria-label="返回背诵首页" @click="onBack">
         <AppIcon name="chevron-left" :size="20" />
@@ -62,29 +63,27 @@
       </div>
     </section>
 
-    <!-- 防御：产物内恒为 input，不应触发（§4.1 时序图） -->
-    <section v-else-if="state === 'unsupported'" class="card rp-notice">
-      <div class="rp-notice__icon"><AppIcon name="circle-help" :size="24" /></div>
-      <h2 class="rp-notice__title">该篇不可默写</h2>
-      <p class="rp-notice__msg">这一篇是「点击揭晓」形态，没有可填入的空位。</p>
-      <div class="rp-notice__actions">
-        <button class="rp-btn rp-btn--primary" @click="goHome">返回背诵首页</button>
-      </div>
-    </section>
-
-    <!-- 正常作答：挂 ClozeBlock（context 形状见 `buildReciteContext`，键恰好 5 个） -->
+    <!-- 正常展示：整篇原文（含注音）+ 底部自评。
+         2026-10-30 方案变更：不再挖空、不再判分，学员只读与自评。 -->
     <template v-else-if="state === 'ready'">
       <main class="rp-stage">
-        <p v-if="isManual" class="rp-manual">
-          模拟考场：本次作答只判分，不计入背诵进度
-        </p>
-        <ClozeBlock :block="block" :context="context" @submitted="onSubmitted" />
+        <p v-if="isManual" class="rp-manual">自测模式：本次不计入背诵进度</p>
+        <article class="rp-passage">
+          <p v-for="(para, i) in paragraphs" :key="i" class="rp-passage__para">{{ para }}</p>
+        </article>
+
+        <!-- 自评：二元打卡（内容侧定义「已能背诵 / 还需练习」），纯打卡、不进判分口径 -->
+        <div v-if="!submitted" class="rp-selfcheck">
+          <p class="rp-selfcheck__hint">看完了，能背下来吗？</p>
+          <div class="rp-selfcheck__btns">
+            <button class="rp-btn rp-btn--primary" @click="onSelfCheck(true)">已能背诵</button>
+            <button class="rp-btn" @click="onSelfCheck(false)">还需练习</button>
+          </div>
+        </div>
       </main>
 
-      <!-- 动作条：**随文档流**，不做 fixed/sticky ——
-           `ClozeBlock` 自带「提交 / 全部重默 / 只看错的那句」的底部 sticky 操作条（T01 冻结契约，
-           本页不得改它），再叠一条 fixed 底栏会与之同屏重叠。两层底栏互斥是本仓既有纪律
-           （对照 App.vue：移动 pill 与 ContentSidebar 底栏不可同屏）。 -->
+      <!-- 动作条：**随文档流**，不做 fixed/sticky（两层底栏互斥是本仓既有纪律，
+           对照 App.vue：移动 pill 与 ContentSidebar 底栏不可同屏）。 -->
       <div class="rp-actions" data-no-swipe>
         <button v-if="!submitted" class="rp-btn" @click="onBack">先不背了</button>
         <template v-else>
@@ -99,10 +98,10 @@
     <transition name="rp-fade">
       <div v-if="confirmOpen" class="rp-overlay" @click.self="confirmOpen = false">
         <div class="card rp-confirm">
-          <div class="rp-confirm__title">放弃本次作答？</div>
-          <p class="rp-confirm__msg">已填的内容不会保存；这一篇下次进来还在队列里。</p>
+          <div class="rp-confirm__title">不评这一篇了？</div>
+          <p class="rp-confirm__msg">还没自评，这一篇不会记进度；下次进来它还在队列里。</p>
           <div class="rp-confirm__actions">
-            <button class="rp-btn rp-btn--ghost" @click="confirmOpen = false">继续默写</button>
+            <button class="rp-btn rp-btn--ghost" @click="confirmOpen = false">继续背诵</button>
             <button class="rp-btn rp-btn--danger" @click="confirmLeave">离开</button>
           </div>
         </div>
@@ -115,7 +114,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
-import ClozeBlock from '@/components/blocks/ClozeBlock.vue'
 import { loadPage as loadContentPage } from '@/content/loadPage'
 import { RECITE_HOME_PATH, RECITE_PHASE, buildReciteContext, useReciteStore } from '@/stores/recite'
 
@@ -123,7 +121,7 @@ const route = useRoute()
 const router = useRouter()
 const store = useReciteStore()
 
-/** 页面状态：loading | ready | stale | error | unsupported */
+/** 页面状态：loading | ready | stale | error（`unsupported` 已随 2026-10-30 方案变更删除）*/
 const state = ref('loading')
 const block = ref(null)
 const piece = ref(null)
@@ -137,7 +135,6 @@ const resultMeta = ref({ total: 0, correct: 0, allCorrect: false })
 const allowLeave = ref(false)
 const confirmOpen = ref(false)
 /** 根节点（读输入框内容做离开确认，无需给 ClozeBlock 加任何接口） */
-const rootEl = ref(null)
 /** 被守卫拦下的目标地址 */
 let pendingTarget = ''
 
@@ -148,25 +145,29 @@ const loadError = computed(() => store.loadError)
 
 const headTitle = computed(() => {
   if (piece.value) return piece.value.title
-  return '单篇默写'
+  return '单篇背诵'
 })
+
+/** 正文段落（产物唯一正文来源；注音以括号内联在文本里，原样渲染） */
+const paragraphs = computed(() => {
+  const p = piece.value
+  return p && Array.isArray(p.paragraphs) ? p.paragraphs : []
+})
+
+/** 正文字数（不含"空"的概念——本方案不挖空；用于头部「N 字」让读者知道篇幅） */
+const charCount = computed(() => paragraphs.value.join('').length)
 
 const headSource = computed(() => {
   if (!piece.value) return ''
-  const blanks = piece.value.blankCount ? ` · ${piece.value.blankCount} 空` : ''
-  return `${piece.value.fileTitle}${blanks}`
+  const n = charCount.value
+  return n > 0 ? `${piece.value.fileTitle} · ${n} 字` : piece.value.fileTitle
 })
 
 /**
  * 得分文案：**比率一律 `total > 0 ? correct / total : 0`**（I10 ②，禁止裸除法 ——
  * `total === 0` 时裸除法出 `NaN`，在 CSS/字符串里静默失效、测试抓不到）。
  */
-const scoreText = computed(() => {
-  const { total, correct, allCorrect } = resultMeta.value
-  if (allCorrect === true) return '全部正确'
-  const pct = total > 0 ? Math.round((correct / total) * 100) : 0
-  return `${correct}/${total} 空正确（${pct}%）`
-})
+const scoreText = computed(() => (resultMeta.value.allCorrect === true ? '已能背诵' : '还需练习'))
 
 /** 动作条文案：只按 `allCorrect` 布尔切换（I10 ①） */
 const actionText = computed(() => {
@@ -175,28 +176,17 @@ const actionText = computed(() => {
 })
 
 /**
- * 是否有未提交的输入（离开确认的唯一判据）。
- * 读 DOM 而不是给 `ClozeBlock` 加 prop：`ClozeBlock` 的公开契约是「三键 emit」，
- * 为父级的一次确认再开一个状态出口，等于把「判分 UI 组件」改成数据管道（§8.7 Q8 的同一取舍）。
+ * 是否需要二次确认：非自测模式、且**还没自评**。
+ *
+ * 旧实现是靠读 DOM 里的 `.cloze-input` 判断「填了没填」——本方案已无输入框，
+ * 判据改为「自评了没」：没自评就离开 = 这一篇白看且不记进度，值得拦一次。
  * @returns {boolean}
  */
-function hasInput() {
-  const root = rootEl.value
-  if (!root || typeof root.querySelectorAll !== 'function') return false
-  const inputs = root.querySelectorAll('.cloze-input')
-  for (let i = 0; i < inputs.length; i++) {
-    const value = inputs[i] && typeof inputs[i].value === 'string' ? inputs[i].value : ''
-    if (value.trim()) return true
-  }
-  return false
-}
-
-/** 是否需要二次确认：非手动模式、尚未提交、且输入框里有内容 */
 function needsConfirm() {
   if (allowLeave.value) return false
   if (isManual.value) return false
   if (submitted.value) return false
-  return hasInput()
+  return true
 }
 
 /**
@@ -228,12 +218,6 @@ async function load() {
   }
   piece.value = found
 
-  // ② 防御分支：产物内恒为 'input'（reveal 篇构建期即排除）
-  if (found.mode !== 'input') {
-    state.value = 'unsupported'
-    return
-  }
-
   // I9：作答期间不接受 bank 热替换（远程新版推迟到 endAnswering 后应用）
   store.beginAnswering()
 
@@ -251,14 +235,16 @@ async function load() {
     return
   }
 
-  // ④ 取第 blockIndex 个 cloze 块：定位规则与构建期**完全一致**
-  //    （`page.blocks.filter(type==='cloze')[blockIndex]`，见 §3.2 / §7.2）
+  // ④ 取第 blockIndex 个 knowledge 块：定位规则与构建期**完全一致**
+  //    （`page.blocks.filter(type==='knowledge')[blockIndex]`，见 §3.2 / §7.2）
+  //    ⚠️ 2026-10-30 起数据源由 cloze 改为 knowledge；两边必须同步，否则 identity 守卫
+  //    会拿 cloze 的 title 去比对 knowledge 的 title，整页恒为 stale（且不报错）。
   const blocks = Array.isArray(page.blocks) ? page.blocks : []
-  const clozeBlocks = blocks.filter((b) => b && b.type === 'cloze')
-  const target = clozeBlocks[found.blockIndex]
+  const reciteBlocks = blocks.filter((b) => b && b.type === 'knowledge')
+  const target = reciteBlocks[found.blockIndex]
 
   // ★★ identity 守卫（I8）：块不存在 或 title 不符 → 中止
-  //    → 不渲染 ClozeBlock（因此不可能 emit submitted）
+  //    → 不渲染正文（因此不可能自评）
   //    → 不写任何 recite_progress
   //    → 提示「内容已更新」并给返回
   if (!target || target.title !== found.title) {
@@ -278,27 +264,33 @@ async function load() {
 }
 
 /**
- * `ClozeBlock` 提交回调（本页唯一的判分消费点，只读三键）。
- * @param {{total: number, correct: number, allCorrect: boolean}} payload 提交载荷（契约冻结在三键）
+ * 自评提交（本页唯一的进度写入点）。
+ *
+ * ★ 自评 → 调度的映射（2026-10-30 方案）：
+ *   「已能背诵」= `allCorrect: true`  → 按艾宾浩斯 1/2/4/7/15 天推进，stage +1；
+ *   「还需练习」= `allCorrect: false` → stage 归 0，明天重新出现。
+ *   调度层不关心这个布尔来自判分还是自评 —— 它只吃布尔，所以**不需要改动调度代码**。
+ *
+ * `resultMeta` 仍用三键形状（total=1 / correct=0 或 1），让既有的
+ * `scoreText` / `actionText` / 完成态渲染保持单一口径，不为自评再开一套状态。
+ *
+ * @param {boolean} canRecite 学员自评「已能背诵」为真
  * @returns {Promise<void>}
  */
-async function onSubmitted(payload) {
-  const src = payload && typeof payload === 'object' ? payload : {}
-  const total = Number.isFinite(Number(src.total)) ? Number(src.total) : 0
-  const correct = Number.isFinite(Number(src.correct)) ? Number(src.correct) : 0
+async function onSelfCheck(canRecite) {
+  const ok = canRecite === true
   submitted.value = true
-  resultMeta.value = { total, correct, allCorrect: src.allCorrect === true }
+  resultMeta.value = { total: 1, correct: ok ? 1 : 0, allCorrect: ok }
   saveError.value = ''
   if (!piece.value) return
   try {
     await store.submitResult({
       pieceKey: piece.value.key,
-      // I10 ①：判「是否全对」只看这个布尔，永不 `correct === total` 反推
-      allCorrect: src.allCorrect === true,
+      allCorrect: ok,
       manual: isManual.value
     })
   } catch (e) {
-    console.error('[RecitePieceView] 提交落库失败:', e)
+    console.error('[RecitePieceView] 自评落库失败:', e)
     saveError.value = e && e.message ? e.message : '进度没保存成功，请重试'
   }
 }
@@ -476,4 +468,44 @@ onUnmounted(() => {
 
 .rp-fade-enter-active, .rp-fade-leave-active { transition: opacity 160ms ease; }
 .rp-fade-enter-from, .rp-fade-leave-to { opacity: 0; }
+/* ── 整篇正文（含内联注音）──────────────────────────────────────────── */
+.rp-passage {
+  padding: 14px 16px;
+  background: var(--surface, #fff);
+  border-radius: 12px;
+}
+.rp-passage__para {
+  margin: 0 0 12px;
+  /* 注音以全角括号内联在正文里，行高放宽避免上下行粘连 */
+  font-size: 17px;
+  line-height: 2;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rp-passage__para:last-child {
+  margin-bottom: 0;
+}
+
+/* ── 底部自评 ───────────────────────────────────────────────────────── */
+.rp-selfcheck {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--surface, #fff);
+  border-radius: 12px;
+  text-align: center;
+}
+.rp-selfcheck__hint {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+}
+.rp-selfcheck__btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.rp-selfcheck__btns .rp-btn {
+  flex: 1;
+  max-width: 160px;
+}
 </style>

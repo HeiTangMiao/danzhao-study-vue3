@@ -2,11 +2,18 @@
  * 每日背诵 · 篇目产物（recite-bank）的形状定义（纯 ESM，**零 import** ——
  * 构建脚本与浏览器两端共用）
  *
- * 背景（每日背诵 T01）：背诵要按「篇」调度，而 `cloze` 区块**没有 id / key 字段**
+ * 背景（每日背诵 T01）：背诵要按「篇」调度，而内容区块**没有 id / key 字段**
  * （内容侧红线也禁止新增字段），所以篇主键只能由坐标派生：
  *   pieceKey = `${subject}|${fileKey}|${blockIndex}`
  * 其中 `fileKey` = `pageFileKeyOf(meta)`（`src/content/pageMeta.js:63`），
- * `blockIndex` = **页内 cloze 区块流水号**（不是 `page.blocks` 原始下标）。
+ * `blockIndex` = **页内篇目区块流水号**（不是 `page.blocks` 原始下标）。
+ *
+ * ⚠️ 2026-10-30 方案变更（内容侧 10-29 变更通知）：数据源由「07-默写专项的 cloze 挖空」
+ *    改为「**08-背诵专项的 knowledge 区块**」—— 每篇是**完整诗词原文 + 注音**，
+ *    **不挖空、不判分**，学员只看与自评（「已能背诵 / 还需练习」）。
+ *    因此产物不再有 `mode` / `sentenceCount` / `blankCount` / `strictCount` 这些 cloze 概念字段，
+ *    改为 `paragraphs`（正文段落数组，注音以括号内联在文本里）。
+ *    调度层（艾宾浩斯 1/2/4/7/15 天）不受影响：`submitResult({ allCorrect })` 由自评结果映射。
  *
  * 这个文件是「构建产物形状」的**唯一真相源**：构建脚本（`scripts/build-recite-bank.mjs`）、
  * 运行时加载器（`src/utils/reciteBankClient.js`）、store 与测试三方必须看同一份定义 ——
@@ -53,9 +60,6 @@ export const PIECE_TRIGGER = {
   ALL: 'all'
 }
 
-/** 可默写模式（产物内恒为 'input'：reveal 篇构建期即排除） */
-export const CLOZE_MODE_INPUT = 'input'
-
 /**
  * **紧凑形态的兼容映射，不是产物的现行形态。**
  * 产物自 T02 起一律使用 16 个长键（字段清单见 `PIECE_FIELDS`）；本表仅用于容错历史形态与单测。
@@ -64,8 +68,10 @@ export const CLOZE_MODE_INPUT = 'input'
  *
  * 为什么不再拿它当产物形态（team-lead 裁定，T01 复核）：原先的依据是「键名瘦身换加载体积」，
  * 而该依据**已被实测证伪** —— practice-bank 是 1393 题 / ~75KB，键名高频重复、压缩有收益；
- * 背诵产物只有 73 篇，实测紧凑键 21 251 B / gzip 3 384 B，长键 27 267 B / gzip 3 507 B，
- * **gzip 只差 123 字节**。一个被证伪的前提不该继续支撑决策。
+ * 背诵产物只有几十篇（2026-10-30 方案变更后为 64 篇），旧 73 篇时实测紧凑键 gzip 3 384 B
+ * 对长键 gzip 3 507 B，**只差 123 字节**。一个被证伪的前提不该继续支撑决策。
+ * （注：方案改带正文后产物体积会上升——正文比坐标卡片大得多——但 gzip 差值同理可忽略，
+ *   结论不变：键名不是体积的主要项。）
  * 附带收益：文档 §3.4 / §5.7 的示例本来就是长键，产物改用长键后文档-产物-代码三处自然统一，
  * 「有人直接 `JSON.parse` 产物再读 `piece.fileKey`」这一类错位从根上消失。
  *
@@ -76,17 +82,14 @@ export const PIECE_KEYS = {
   o: 'order', // 全局顺序：文件顺序 × 块顺序
   r: 'role', // 'lesson' | 'review'
   tg: 'trigger', // 仅 review：'file' | 'all'
-  u: 'unitNum', // '07'
+  u: 'unitNum', // '08'
   fi: 'fileIndex', // 0 起（site.js files[] 下标）
-  bi: 'blockIndex', // 页内 cloze 流水号（0 起）
-  fk: 'fileKey', // 'chinese_07_01-先秦至魏晋名篇'
-  ft: 'fileTitle', // '默写专项 · 先秦至魏晋名篇'
-  ut: 'unitTitle', // '默写专项'
-  ti: 'title', // '《诗经》 · 关雎'
-  m: 'mode', // 恒为 'input'
-  sc: 'sentenceCount', // 句数（与 PRD / 内容侧对账用）
-  bc: 'blankCount', // 真空位数（UI「N 空」唯一来源）
-  stc: 'strictCount', // strict:true 的句数（A3 筛红线句用）
+  bi: 'blockIndex', // 页内篇目区块流水号（0 起）
+  fk: 'fileKey', // 'chinese_08_01-背诵篇目'
+  ft: 'fileTitle', // '背诵专项 · 背诵篇目'
+  ut: 'unitTitle', // '背诵专项'
+  ti: 'title', // '登幽州台歌 · 陈子昂'
+  pl: 'paragraphs', // 正文段落数组（**唯一正文来源**；注音以括号内联在文本中）
   fp: 'fp' // 内容指纹（诊断 + 自动迁移，**不是主键的一部分**）
 }
 
@@ -142,6 +145,28 @@ function toText(v, fallback) {
 }
 
 /**
+ * 正文段落规整：产物**唯一**的正文形态是「字符串数组」（与内容页 `knowledge.paragraphs` 同形）。
+ *
+ * 为什么不做「拼接成一段 / 拆句」：
+ *  ① 段落是内容侧给定的**语义单位**（诗词的分阕、古文的自然段），运行时照序渲染即可，
+ *     自己再切一次就多出一个可能与内容侧不一致的口径；
+ *  ② 「每句几空 / 句数」这类统计随方案变更**整体消失**（不再挖空、不再判分），
+ *     也就没有理由在产物里保留切句结果。
+ *
+ * 单字符串按「一段」收（容错历史形态），其它类型一律回落空数组 ——
+ * 宁可让该篇因「无正文」被丢弃并点名，也不要把对象塞进渲染层。
+ * @param {*} v 原值
+ * @returns {string[]}
+ */
+function toParagraphs(v) {
+  if (Array.isArray(v)) {
+    return v.map((p) => (typeof p === 'string' ? p : p === undefined || p === null ? '' : String(p)))
+  }
+  if (typeof v === 'string') return v ? [v] : []
+  return []
+}
+
+/**
  * 篇主键（**唯一格式**，设计 §7.2）：
  * `` `${subject}|${fileKey}|${blockIndex}` ``
  * @param {string} subject 学科 key（chinese / math / computer）
@@ -178,7 +203,30 @@ function isUsablePiece(piece) {
   if (!piece.key) return false
   if (!piece.fileKey) return false
   if (!piece.title) return false
+  // 无正文的篇：页面渲染出来是空白且**不报错**（与「缺 title」同类的静默失败）。
+  // 构建期会点名这些篇（`assertBaseline` 的「无正文的篇数」），这里只负责不让它进队列。
+  if (!hasReadableBody(piece.paragraphs)) return false
   return true
+}
+
+/**
+ * 正文是否**真的有东西可读**（「可用」的判定口径之一）。
+ *
+ * 为什么不只判 `paragraphs.length`：**数组非空、但每段都是空串 / 纯空白**时
+ * （内容侧写了 `paragraphs: ['']`，或正文被清理成 `'   '`），`length > 0` 成立，
+ * 页面因此渲染出一个**真正空白的正文区，且完全不报错** —— 正是本仓最防的那类静默失败。
+ * 故判据是「至少有一段 `trim()` 后非空」，而不是「数组里有元素」。
+ *
+ * ⚠️ **构建期必须同口径**：`scripts/build-recite-bank.mjs` 的 `emptyBodyLines` 直接 import 本函数
+ *    （不另写一份），否则「构建期点名的篇」与「运行时丢弃的篇」会不一致 ——
+ *    两边各判一半，结果是既有人报警、又有人放行，等于没设防。
+ *
+ * @param {Array<string>} paragraphs 正文段落数组（`normalizePiece` 的产出形态）
+ * @returns {boolean} 至少有一段含非空白字符时为真
+ */
+export function hasReadableBody(paragraphs) {
+  if (!Array.isArray(paragraphs) || paragraphs.length === 0) return false
+  return paragraphs.some((p) => typeof p === 'string' && p.trim().length > 0)
 }
 
 /**
@@ -192,9 +240,7 @@ function isUsablePiece(piece) {
  *   key: string, order: number, role: string, trigger?: string,
  *   unitNum: string, fileIndex: number, blockIndex: number,
  *   fileKey: string, fileTitle: string, unitTitle: string,
- *   title: string, mode: string,
- *   sentenceCount: number, blankCount: number, strictCount: number,
- *   fp: string
+ *   title: string, paragraphs: string[], fp: string
  * }} 规范化后的篇目
  */
 export function normalizePiece(raw) {
@@ -218,10 +264,7 @@ export function normalizePiece(raw) {
     fileTitle: toText(pick(src, 'fileTitle', ''), ''),
     unitTitle: toText(pick(src, 'unitTitle', ''), ''),
     title: toText(pick(src, 'title', ''), ''),
-    mode: toText(pick(src, 'mode', CLOZE_MODE_INPUT), CLOZE_MODE_INPUT),
-    sentenceCount: toIndex(pick(src, 'sentenceCount', 0), 0),
-    blankCount: toIndex(pick(src, 'blankCount', 0), 0),
-    strictCount: toIndex(pick(src, 'strictCount', 0), 0),
+    paragraphs: toParagraphs(pick(src, 'paragraphs', [])),
     fp: toText(pick(src, 'fp', ''), '')
   }
 

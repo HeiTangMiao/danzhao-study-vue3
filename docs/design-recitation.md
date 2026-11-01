@@ -1,8 +1,28 @@
-# 每日背诵（一期 · 语文默写）· 系统设计
+# 每日背诵（一期 · 语文背诵）· 系统设计
+
+> ## ⚠️ 2026-10-30 方案变更（v1.6）：本文**大部分内容已作废**，保留仅为追溯
+>
+> 内容侧 2026-10-29 发来《变更通知：每日背诵方案调整（不再复用 cloze，改为完整诗词 + 注音）》，
+> **原「复用 cloze 挖空做默写 + 判分」的一期方案作废**。新方案：
+>
+> | 项 | 旧（本文所写，已作废） | 新（现行） |
+> | --- | --- | --- |
+> | 数据源 | 07-默写专项的 `cloze` 挖空 | **08-背诵专项的 `knowledge`**（完整诗词 + 注音） |
+> | 粒度 | 挖空句（名句选段） | **完整全篇** |
+> | 判分 | 复用 cloze 判分 | **不判分**，仅二元自评「已能背诵 / 还需练习」 |
+> | 篇数 | 73 篇（lesson 67 / review 6） | **64 篇（lesson 64 / review 0）** |
+>
+> **仍然有效**的部分：调度层（§3.1 表结构、§3.5 调度常量、艾宾浩斯 1/2/4/7/15 天）、
+> 双源 SWR 加载、内容指纹协调、identity 守卫、`DB_VERSION` 8、CSP 与构建目标等**技术事实**。
+> 自评结果映射为 `submitResult({ allCorrect })`，调度层只吃布尔，**因此调度与存储一行未改**。
+>
+> **已作废**的部分：一切关于「挖空 / 句数 / 空位 / strict 红线 / 判分 parity」的论述与基线
+> （§0 的 cloze 行、§5.7 A3 判分 parity、§1 中关于判分成本的论证）。
+> 变更依据：`协同交流/01_内容侧来件/2026-10-29_变更通知：每日背诵方案调整（不再复用cloze，改为完整诗词+注音）.md`。
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | **v1.5**（v1.0 → v1.5 变更见附录 B；v1.5 = T01 import 语句纠错 + 「入参归一」偏离的判据边界。**本文档至此冻结**） |
+| 文档版本 | **v1.6**（v1.5 → v1.6 = 上述方案变更：数据源 cloze→knowledge、不判分、基线 73→64。**v1.6 起本文不再作为实现依据**，仅作历史追溯；新事实以 §0 的现行口径与代码为准） |
 | 作者 | Bob（软件架构师） |
 | 上游输入 | `docs/prd-recitation.md` v1.0（产品经理 许清楚）；team-lead 2026-10-26 复核意见 |
 | 目标仓库 | `danzhao-study-vue3`（Vue 3.5 + Pinia + IndexedDB + Tauri 2） |
@@ -19,19 +39,14 @@
 
 | 事实 | 复核方式 / 位置 | 结果 |
 | --- | --- | --- |
-| 全库 `cloze` 区块 | 遍历 `src/content/**` 逐页 `import` | **74 块** = `mode:'input'` 73 + `mode` 缺省(reveal) 1 |
-| 排除 reveal 1 篇后的有效篇目 | 同上，`(b.mode\|\|'reveal')!=='input'` → 排除 | **73 篇** |
-| `role:'review'` | `title` 匹配 `/自测\|冲关/` 且 input | **6 篇**（5 × 综合自测 + 1 × 综合大冲关） |
-| `role:'lesson'` | 73 − 6 | **67 篇** |
-| 句数（`items.length`，PRD 的 1.79 口径） | 逐块累加 | 产物内 **170 句** = 正课 120 + 复习 50；另有 reveal 篇 5 句（排除）。全库 175 句 |
-| **真空位数**（`{{...}}` 占位符个数） | 逐句正则计数 | 产物内 **193 空** = 正课 **141** + 复习 **52**；另有 reveal 篇 11 空（排除）。全库 204 空 |
-| 正课空/篇均值 | 141 / 67 | **2.10 空/篇**（PRD 的 1.79 是「句/篇」，非空/篇 —— 见 §1 异议 4） |
-| 正课「仅 1 空」的篇 | 逐篇计数 | **27 / 67 = 40%**（PRD 的 33 篇 / 49% 实为「仅 1 **句**」的篇数） |
-| **「一句多空」的篇** | `blankCount > sentenceCount` | 产物内 **16 篇**（正课 15 + 复习 1）；全库 74 块 **17 篇**（含被排除的 reveal 篇）。两种数法都对，见 §1 异议 4 |
-| `strict:true` 的句 | 全库扫描 | **仅 1 句**：`07-默写专项/01-先秦至魏晋名篇.js` · 《诗经》·关雎 · `求之不得，{{寤寐思服}}。悠哉悠哉，{{辗转反侧}}。` |
-| `alts` 非空的句 | 全库扫描 | 4 句（闻王昌龄…、念奴娇…、通假字专项 ×2） |
-| 文件 → 篇数分布 | 逐文件聚合 | `01`:15 正课 + 1 自测；`02`:13+1；`03`:11+1；`04`:15+1；`05`:10+1；`06`:3+大冲关 |
-| `DB_NAME` / `DB_VERSION` | `src/stores/studyDb.js:34-35` | `study_game_db` / **7** |
+| ~~全库 `cloze` 74 块 / 73 篇 / 170 句 / 193 空 / 16 篇一句多空~~ | —— | **已随 v1.6 方案变更作废**（这些口径服务于「挖空默写 + 判分」，新方案不挖空、不判分） |
+| 背诵数据源 | `src/content/chinese/08-背诵专项/01-背诵篇目.js` 的**顶层** `knowledge` 区块 | **64 个**（与默写专项 64 篇正课一一对应；不含 3 篇「易错字专项」——它们不是篇目） |
+| 产物篇目数 / 角色 | `node scripts/build-recite-bank.mjs` | **64 篇** = lesson **64** + review **0**（08 单元无「自测/冲关」块） |
+| 正文形态 | `knowledge.paragraphs` | 字符串数组；**注音以全角括号内联**在正文里 —— `前不见古人（qián bù jiàn gǔ rén）` |
+| 篇幅 | 逐篇统计 | 产物正文共 **64 段**；最长篇《短歌行 · 曹操》**713 字**；产物 **60.4 KB** |
+| 内容单元限定 | `scripts/build-recite-bank.mjs` `RECITE_UNIT_NUM` | ⚠️ **学科与单元必须同时限定**：`unitNum==='08'` 在三个学科都存在（computer_08 是数据库、math_08 是计数原理），只判单元会多收 24 篇（实测 88 而非 64） |
+| 是否判分 | 内容侧 2026-10-29 变更通知 | **不判分**。自评「已能背诵」→ `allCorrect:true`（stage+1，按 1/2/4/7/15 天推进）；「还需练习」→ `false`（stage 归 0，明天重现） |
+| `DB_NAME` / `DB_VERSION` | `src/stores/studyDb.js:34-35` | `study_game_db` / **8**（v8 新增 `recite_progress` / `recite_state` 两表；二者属 `DEVICE_LOCAL_STORES`，不进同步） |
 | 同步实体清单 | `src/sync/engine.js:29-38` `ENTITIES`（7 项）；`src/stores/studyDb.js:328-336` `SYNC_STORE_NAMES` 同 7 项 | 两处必须同步维护 |
 | 换账号清理 | `src/stores/auth.js:86-91` → `studyDb.clearAllSyncedData()`（只清 `SYNC_STORE_NAMES`） | **新表不会被清**（见 §1 异议 8） |
 | CSP | `src-tauri/tauri.conf.json:23` | `script-src 'self'`；`connect-src 'self' ipc: http://ipc.localhost https://520305.top`；`style-src 'self' 'unsafe-inline'` |
@@ -267,7 +282,7 @@ PRD §6.3 把触发条件拆成两条：「文件内正课全完成 → 推该�
 | `tests/recite-bank.test.js` | 构建脚本纯函数单测（形状、`role`/`trigger`、`order` 单调、断言） |
 | `tests/recite-schedule.test.js` | 调度纯函数单测（覆盖 A4 / A5 / A6 / A7 全部构造） |
 | `tests/recite-db-v8.test.js` | DB v7→v8 迁移、换账号清理、导出/导入 |
-| `tests/recite-cloze-parity.test.js` | **A3 主验收落点**：73 篇全量 × 3 组变体 × 逐空 parity（含唯一 strict 句）—— 见 §5.7 |
+| `tests/recite-content-parity.test.js` | **同源主验收落点**（原 A3；2026-10-30 方案变更后改口径）：64 篇正文与内容页 `knowledge` 区块**逐字 / 逐段 / 按序**一致、`fp` 同源、覆盖完整性（每块恰好被用一次）、title 单射 —— 见 §5.7 |
 | `tests/helpers/reciteParity.mjs` | A3 的 harness：读产物 → 按坐标取真实块 → 造确定性输入 → 双路径判分 |
 | `tests/recite-entry.test.js` | 两入口计数一致、无数据不占位、4 Tab 不变 |
 
@@ -975,7 +990,7 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 | `src/views/ReciteView.vue` | 新增 |
 | `src/views/RecitePieceView.vue` | 新增 |
 | `src/router/index.js` | 改（2 条路由，**均无 `meta.tab`**） |
-| `tests/recite-cloze-parity.test.js` | 新增（A3 主验收，见 §5.7） |
+| `tests/recite-content-parity.test.js` | 新增（A3 主验收，见 §5.7） |
 | `tests/helpers/reciteParity.mjs` | 新增（A3 harness，见 §5.7） |
 
 **页面要点**
@@ -986,7 +1001,7 @@ export function bumpStreak({ state, today, hasTaskToday })           // → Reci
 - 离开保护：沿用 `ExamBlock` 的三层思路（父级状态注入 / `beforeunload` / 路由守卫）**降级为两层**：因为每次作答都已即时落库（与 `ReviewView` 同款理由，"逐张已落库、随时可退"），所以**不做 `beforeunload`**，只做"输入框有内容且未提交时点返回"的二次确认。
 
 **验收方式**
-- `npx vitest run tests/recite-cloze-parity.test.js`（jsdom）—— **A3 主验收**：对产物中全部 73 篇，用固定的确定性输入集（主答案原样 / 全角化 / 加空格 / 空串 / 通假变体）分别走 `gradeCloze()` 与**挂载 `ClozeBlock` 后点提交**的 DOM 结果，断言**逐空完全相同**；再对 `关雎` 单独断言「辗转返侧」判错、「辗转反侧」判对。
+- `npx vitest run tests/recite-content-parity.test.js` —— **同源主验收**（2026-10-30 起，本功能不再判分）：断言 64 篇 `paragraphs` 与内容页 `knowledge` 区块逐字逐段按序一致、`fp` 与 `fingerprintOf(内容页区块)` 相同、每个 knowledge 块的 `blockIndex` 恰好被用一次且连续、64 篇 title 非空且两两不同（identity 守卫的鉴别力前提）。**判分 parity 已随方案变更作废**，不再有 `gradeCloze` / 变体输入集 / 「辗转反侧」红线断言。
 - **identity 守卫测试**：构造 `piece.title` 与内容页块 `title` 不一致 → 页面不渲染 `ClozeBlock`、`saveReciteProgress` **零调用**（用 spy 断言）、提示文案出现。
 - 路由：`/recite` 与 `/recite/07/0/0` 可达；`npx vitest run tests/route-params.test.js tests/batch-f0-verify-route.test.js` 全绿；`AppTabBar.vue` 仍为 4 项（B4）。
 - 手工：移动端视口下输入框 `16px`（不触发 iOS 聚焦缩放）、主按钮触控 ≥44×44px（B/A10）。
@@ -1029,7 +1044,7 @@ T01（地基，唯一串行门槛）
 
 | 文件 | 类型 | 职责 |
 | --- | --- | --- |
-| `tests/recite-cloze-parity.test.js` | **新建** | A3 主验收本体（73 篇全量 × 3 组输入 × 逐空比对） |
+| `tests/recite-content-parity.test.js` | **新建** | A3 主验收本体（73 篇全量 × 3 组输入 × 逐空比对） |
 | `tests/helpers/reciteParity.mjs` | **新建** | harness：读产物 → 按坐标取真实块 → 造确定性输入 → 双路径判分 |
 
 **为什么不塞进既有 cloze 测试**（`tests/cloze-input.test.js` / `cloze-strict.test.js` / `cloze-variants.test.js` / `cloze-enqueue.test.js`）：
@@ -1368,7 +1383,7 @@ emit('submitted', {
 | --- | --- | --- |
 | 产物字段 `itemCount` 拆为 `sentenceCount` + `blankCount`，示例值改用真实数据（关雎 2 句 4 空、综合自测 6 句 8 空） | PRD `240a8c1` 口径修正 | §1 异议 4、§3.4、§7.2、T02 |
 | 异议 4 重写为「`sentenceCount` ≠ 空位数」，补 16 vs 17 双口径表 | 同上（PRD 说 17 篇、产物内是 16 篇） | §0、§1 异议 4、附录 A #18 |
-| **A3 验收落点补全**：`tests/recite-cloze-parity.test.js` + `tests/helpers/reciteParity.mjs`，三步 harness + 四条断言 + 三条实现约束 + 性能预算 | team-lead：「不落到具体文件等于没有」 | §5.7（新增）、§2.1（新增文件数 17） |
+| **A3 验收落点补全**：`tests/recite-content-parity.test.js` + `tests/helpers/reciteParity.mjs`，三步 harness + 四条断言 + 三条实现约束 + 性能预算 | team-lead：「不落到具体文件等于没有」 | §5.7（新增）、§2.1（新增文件数 17） |
 | **Q8 裁定**：`submitted` 不带 `perBlank`，载荷冻结，并给出"带了就开始破坏定性"的论证 | PRD §9.2 遗留问题 | §8.1 Q8、§8.7、T01 纪律 3 |
 | **Q9 裁定**：篇键一期就带 `subject` 前缀；`fp` 字段覆盖范围 + 错别字漂移的四种情形表 | PRD §9.2 遗留问题 | §3.2（新增小节）、§8.1 Q9、§8.7 |
 | **Q7 状态收口**：SWR 渲染顺序经 team-lead 二次确认通过（"远程优先"指数据优先级，非渲染阻塞） | team-lead 复核 | §8.1 Q7 |

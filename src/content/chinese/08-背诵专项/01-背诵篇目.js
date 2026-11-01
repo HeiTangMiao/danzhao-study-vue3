@@ -1,0 +1,493 @@
+/**
+ * 内容页面数据（content-schema 的实例）
+ * 页面：背诵篇目
+ * 说明：每日背诵素材库 —— 完整诗词原文 + 注音，供朗读背诵。
+ *
+ * 形式约定（与 07-默写专项 刻意区分）：
+ *   - 不做 cloze 挖空：背诵是「看着全篇诵读记忆」，不是「填空默写」
+ *   - 诗词（诗/词/曲）逐字全注：注音随句标注，覆盖每字
+ *   - 文言文与长篇（>150 字）只注难字：多音字、生僻字、通假字
+ *
+ * 已核验：2026-10-29 第一批（6 篇诗词 + 2 首样张）
+ */
+export default {
+  blocks: [
+    {
+      type: "layout",
+      as: "hero",
+      props: { align: "start", tone: "accent" },
+      children: [
+        {
+          type: "objectives",
+          title: "背诵目标",
+          items: [
+            "能借助注音准确朗读全篇，读准多音字、生僻字与通假字",
+            "能在理解句意的基础上熟读成诵，逐篇打卡自评"
+          ]
+        }
+      ]
+    },
+
+    // ===== 样张（形式已验收）=====
+    {
+      type: "knowledge",
+      title: "登幽州台歌 · 陈子昂",
+      paragraphs: [
+        "前不见古人（qián bù jiàn gǔ rén），后不见来者（hòu bù jiàn lái zhě）。\n念天地之悠悠（niàn tiān dì zhī yōu yōu），独怆然而涕下（dú chuàng rán ér tì xià）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "泊秦淮 · 杜牧",
+      paragraphs: [
+        "烟笼寒水月笼沙（yān lǒng hán shuǐ yuè lǒng shā），夜泊秦淮近酒家（yè bó qín huái jìn jiǔ jiā）。\n商女不知亡国恨（shāng nǚ bù zhī wáng guó hèn），隔江犹唱后庭花（gé jiāng yóu chàng hòu tíng huā）。"
+      ]
+    },
+
+    // ===== 第一批：先秦至魏晋 6 篇（诗词，逐字全注）=====
+    {
+      type: "knowledge",
+      title: "《诗经》 · 关雎",
+      paragraphs: [
+        "关关雎鸠（guān guān jū jiū），在河之洲（zài hé zhī zhōu）。\n窈窕淑女（yǎo tiǎo shū nǚ），君子好逑（jūn zǐ hǎo qiú）。\n参差荇菜（cēn cī xìng cài），左右流之（zuǒ yòu liú zhī）。\n窈窕淑女（yǎo tiǎo shū nǚ），寤寐求之（wù mèi qiú zhī）。\n求之不得（qiú zhī bù dé），寤寐思服（wù mèi sī fú）。\n悠哉悠哉（yōu zāi yōu zāi），辗转反侧（zhǎn zhuǎn fǎn cè）。\n参差荇菜（cēn cī xìng cài），左右采之（zuǒ yòu cǎi zhī）。\n窈窕淑女（yǎo tiǎo shū nǚ），琴瑟友之（qín sè yǒu zhī）。\n参差荇菜（cēn cī xìng cài），左右芼之（zuǒ yòu mào zhī）。\n窈窕淑女（yǎo tiǎo shū nǚ），钟鼓乐之（zhōng gǔ lè zhī）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "《诗经》 · 蒹葭",
+      paragraphs: [
+        "蒹葭苍苍（jiān jiā cāng cāng），白露为霜（bái lù wéi shuāng）。\n所谓伊人（suǒ wèi yī rén），在水一方（zài shuǐ yī fāng）。\n溯洄从之（sù huí cóng zhī），道阻且长（dào zǔ qiě cháng）。\n溯游从之（sù yóu cóng zhī），宛在水中央（wǎn zài shuǐ zhōng yāng）。\n蒹葭萋萋（jiān jiā qī qī），白露未晞（bái lù wèi xī）。\n所谓伊人（suǒ wèi yī rén），在水之湄（zài shuǐ zhī méi）。\n溯洄从之（sù huí cóng zhī），道阻且跻（dào zǔ qiě jī）。\n溯游从之（sù yóu cóng zhī），宛在水中坻（wǎn zài shuǐ zhōng chí）。\n蒹葭采采（jiān jiā cǎi cǎi），白露未已（bái lù wèi yǐ）。\n所谓伊人（suǒ wèi yī rén），在水之涘（zài shuǐ zhī sì）。\n溯洄从之（sù huí cóng zhī），道阻且右（dào zǔ qiě yòu）。\n溯游从之（sù yóu cóng zhī），宛在水中沚（wǎn zài shuǐ zhōng zhǐ）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "观沧海 · 曹操",
+      paragraphs: [
+        "东临碣石（dōng lín jié shí），以观沧海（yǐ guān cāng hǎi）。\n水何澹澹（shuǐ hé dàn dàn），山岛竦峙（shān dǎo sǒng zhì）。\n树木丛生（shù mù cóng shēng），百草丰茂（bǎi cǎo fēng mào）。\n秋风萧瑟（qiū fēng xiāo sè），洪波涌起（hóng bō yǒng qǐ）。\n日月之行（rì yuè zhī xíng），若出其中（ruò chū qí zhōng）。\n星汉灿烂（xīng hàn càn làn），若出其里（ruò chū qí lǐ）。\n幸甚至哉（xìng shèn zhì zāi），歌以咏志（gē yǐ yǒng zhì）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "龟虽寿 · 曹操",
+      paragraphs: [
+        "神龟虽寿（shén guī suī shòu），犹有竟时（yóu yǒu jìng shí）。\n腾蛇乘雾（téng shé chéng wù），终为土灰（zhōng wéi tǔ huī）。\n老骥伏枥（lǎo jì fú lì），志在千里（zhì zài qiān lǐ）。\n烈士暮年（liè shì mù nián），壮心不已（zhuàng xīn bù yǐ）。\n盈缩之期（yíng suō zhī qī），不但在天（bù dàn zài tiān）。\n养怡之福（yǎng yí zhī fú），可得永年（kě dé yǒng nián）。\n幸甚至哉（xìng shèn zhì zāi），歌以咏志（gē yǐ yǒng zhì）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "饮酒（其五） · 陶渊明",
+      paragraphs: [
+        "结庐在人境（jié lú zài rén jìng），而无车马喧（ér wú chē mǎ xuān）。\n问君何能尔（wèn jūn hé néng ěr）？心远地自偏（xīn yuǎn dì zì piān）。\n采菊东篱下（cǎi jú dōng lí xià），悠然见南山（yōu rán jiàn nán shān）。\n山气日夕佳（shān qì rì xī jiā），飞鸟相与还（fēi niǎo xiāng yǔ huán）。\n此中有真意（cǐ zhōng yǒu zhēn yì），欲辨已忘言（yù biàn yǐ wàng yán）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "归园田居（其一） · 陶渊明",
+      paragraphs: [
+        "少无适俗韵（shào wú shì sú yùn），性本爱丘山（xìng běn ài qiū shān）。\n误落尘网中（wù luò chén wǎng zhōng），一去三十年（yī qù sān shí nián）。\n羁鸟恋旧林（jī niǎo liàn jiù lín），池鱼思故渊（chí yú sī gù yuān）。\n开荒南野际（kāi huāng nán yě jì），守拙归园田（shǒu zhuō guī yuán tián）。\n方宅十余亩（fāng zhái shí yú mǔ），草屋八九间（cǎo wū bā jiǔ jiān）。\n榆柳荫后檐（yú liǔ yīn hòu yán），桃李罗堂前（táo lǐ luó táng qián）。\n暧暧远人村（ài ài yuǎn rén cūn），依依墟里烟（yī yī xū lǐ yān）。\n狗吠深巷中（gǒu fèi shēn xiàng zhōng），鸡鸣桑树颠（jī míng sāng shù diān）。\n户庭无尘杂（hù tíng wú chén zá），虚室有余闲（xū shì yǒu yú xián）。\n久在樊笼里（jiǔ zài fán lóng lǐ），复得返自然（fù dé fǎn zì rán）。"
+      ]
+    },
+
+    // ===== 第二批：唐诗（上）8 篇（诗词，逐字全注）=====
+    {
+      type: "knowledge",
+      title: "送杜少府之任蜀州 · 王勃",
+      paragraphs: [
+        "城阙辅三秦（chéng què fǔ sān qín），风烟望五津（fēng yān wàng wǔ jīn）。\n与君离别意（yǔ jūn lí bié yì），同是宦游人（tóng shì huàn yóu rén）。\n海内存知己（hǎi nèi cún zhī jǐ），天涯若比邻（tiān yá ruò bǐ lín）。\n无为在歧路（wú wéi zài qí lù），儿女共沾巾（ér nǚ gòng zhān jīn）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "闻王昌龄左迁龙标遥有此寄 · 李白",
+      paragraphs: [
+        "杨花落尽子规啼（yáng huā luò jǐn zǐ guī tí），闻道龙标过五溪（wén dào lóng biāo guò wǔ xī）。\n我寄愁心与明月（wǒ jì chóu xīn yǔ míng yuè），随君直到夜郎西（suí jūn zhí dào yè láng xī）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "望岳 · 杜甫",
+      paragraphs: [
+        "岱宗夫如何（dài zōng fú rú hé）？齐鲁青未了（qí lǔ qīng wèi liǎo）。\n造化钟神秀（zào huà zhōng shén xiù），阴阳割昏晓（yīn yáng gē hūn xiǎo）。\n荡胸生曾云（dàng xiōng shēng céng yún），决眦入归鸟（jué zì rù guī niǎo）。\n会当凌绝顶（huì dāng líng jué dǐng），一览众山小（yī lǎn zhòng shān xiǎo）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "春望 · 杜甫",
+      paragraphs: [
+        "国破山河在（guó pò shān hé zài），城春草木深（chéng chūn cǎo mù shēn）。\n感时花溅泪（gǎn shí huā jiàn lèi），恨别鸟惊心（hèn bié niǎo jīng xīn）。\n烽火连三月（fēng huǒ lián sān yuè），家书抵万金（jiā shū dǐ wàn jīn）。\n白头搔更短（bái tóu sāo gèng duǎn），浑欲不胜簪（hún yù bù shèng zān）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "使至塞上 · 王维",
+      paragraphs: [
+        "单车欲问边（dān chē yù wèn biān），属国过居延（shǔ guó guò jū yán）。\n征蓬出汉塞（zhēng péng chū hàn sài），归雁入胡天（guī yàn rù hú tiān）。\n大漠孤烟直（dà mò gū yān zhí），长河落日圆（cháng hé luò rì yuán）。\n萧关逢候骑（xiāo guān féng hòu qí），都护在燕然（dū hù zài yān rán）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "次北固山下 · 王湾",
+      paragraphs: [
+        "客路青山外（kè lù qīng shān wài），行舟绿水前（xíng zhōu lǜ shuǐ qián）。\n潮平两岸阔（cháo píng liǎng àn kuò），风正一帆悬（fēng zhèng yī fān xuán）。\n海日生残夜（hǎi rì shēng cán yè），江春入旧年（jiāng chūn rù jiù nián）。\n乡书何处达（xiāng shū hé chù dá）？归雁洛阳边（guī yàn luò yáng biān）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "黄鹤楼 · 崔颢",
+      paragraphs: [
+        "昔人已乘黄鹤去（xī rén yǐ chéng huáng hè qù），此地空余黄鹤楼（cǐ dì kōng yú huáng hè lóu）。\n黄鹤一去不复返（huáng hè yī qù bù fù fǎn），白云千载空悠悠（bái yún qiān zǎi kōng yōu yōu）。\n晴川历历汉阳树（qíng chuān lì lì hàn yáng shù），芳草萋萋鹦鹉洲（fāng cǎo qī qī yīng wǔ zhōu）。\n日暮乡关何处是（rì mù xiāng guān hé chù shì）？烟波江上使人愁（yān bō jiāng shàng shǐ rén chóu）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "行路难（其一） · 李白",
+      paragraphs: [
+        "金樽清酒斗十千（jīn zūn qīng jiǔ dǒu shí qiān），玉盘珍羞直万钱（yù pán zhēn xiū zhí wàn qián）。\n停杯投箸不能食（tíng bēi tóu zhù bù néng shí），拔剑四顾心茫然（bá jiàn sì gù xīn máng rán）。\n欲渡黄河冰塞川（yù dù huáng hé bīng sè chuān），将登太行雪满山（jiāng dēng tài háng xuě mǎn shān）。\n闲来垂钓碧溪上（xián lái chuí diào bì xī shàng），忽复乘舟梦日边（hū fù chéng zhōu mèng rì biān）。\n行路难（xíng lù nán），行路难（xíng lù nán），多歧路（duō qí lù），今安在（jīn ān zài）？\n长风破浪会有时（cháng fēng pò làng huì yǒu shí），直挂云帆济沧海（zhí guà yún fān jì cāng hǎi）。"
+      ]
+    }
+,
+    // ===== 第三批：短歌行 + 唐诗（下）7 篇（诗词，逐字全注）=====
+    {
+      type: "knowledge",
+      title: "短歌行 · 曹操",
+      paragraphs: [
+        "对酒当歌（duì jiǔ dāng gē），人生几何（rén shēng jǐ hé）！\n譬如朝露（pì rú zhāo lù），去日苦多（qù rì kǔ duō）。\n慨当以慷（kǎi dāng yǐ kāng），忧思难忘（yōu sī nán wàng）。\n何以解忧（hé yǐ jiě yōu）？唯有杜康（wéi yǒu dù kāng）。\n青青子衿（qīng qīng zǐ jīn），悠悠我心（yōu yōu wǒ xīn）。\n但为君故（dàn wèi jūn gù），沉吟至今（chén yín zhì jīn）。\n呦呦鹿鸣（yōu yōu lù míng），食野之苹（shí yě zhī píng）。\n我有嘉宾（wǒ yǒu jiā bīn），鼓瑟吹笙（gǔ sè chuī shēng）。\n明明如月（míng míng rú yuè），何时可掇（hé shí kě duō）？\n忧从中来（yōu cóng zhōng lái），不可断绝（bù kě duàn jué）。\n越陌度阡（yuè mò dù qiān），枉用相存（wǎng yòng xiāng cún）。\n契阔谈讌（qì kuò tán yàn），心念旧恩（xīn niàn jiù ēn）。\n月明星稀（yuè míng xīng xī），乌鹊南飞（wū què nán fēi）。\n绕树三匝（rào shù sān zā），何枝可依（hé zhī kě yī）？\n山不厌高（shān bù yàn gāo），海不厌深（hǎi bù yàn shēn）。\n周公吐哺（zhōu gōng tǔ bǔ），天下归心（tiān xià guī xīn）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "赤壁 · 杜牧",
+      paragraphs: [
+        "折戟沉沙铁未销（zhé jǐ chén shā tiě wèi xiāo），自将磨洗认前朝（zì jiāng mó xǐ rèn qián cháo）。\n东风不与周郎便（dōng fēng bù yǔ zhōu láng biàn），铜雀春深锁二乔（tóng què chūn shēn suǒ èr qiáo）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "钱塘湖春行 · 白居易",
+      paragraphs: [
+        "孤山寺北贾亭西（gū shān sì běi jiǎ tíng xī），水面初平云脚低（shuǐ miàn chū píng yún jiǎo dī）。\n几处早莺争暖树（jǐ chù zǎo yīng zhēng nuǎn shù），谁家新燕啄春泥（shuí jiā xīn yàn zhuó chūn ní）。\n乱花渐欲迷人眼（luàn huā jiàn yù mí rén yǎn），浅草才能没马蹄（qiǎn cǎo cái néng mò mǎ tí）。\n最爱湖东行不足（zuì ài hú dōng xíng bù zú），绿杨阴里白沙堤（lǜ yáng yīn lǐ bái shā dī）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "酬乐天扬州初逢席上见赠 · 刘禹锡",
+      paragraphs: [
+        "巴山楚水凄凉地（bā shān chǔ shuǐ qī liáng dì），二十三年弃置身（èr shí sān nián qì zhì shēn）。\n怀旧空吟闻笛赋（huái jiù kōng yín wén dí fù），到乡翻似烂柯人（dào xiāng fān sì làn kē rén）。\n沉舟侧畔千帆过（chén zhōu cè pàn qiān fān guò），病树前头万木春（bìng shù qián tóu wàn mù chūn）。\n今日听君歌一曲（jīn rì tīng jūn gē yī qǔ），暂凭杯酒长精神（zàn píng bēi jiǔ zhǎng jīng shén）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "雁门太守行 · 李贺",
+      paragraphs: [
+        "黑云压城城欲摧（hēi yún yā chéng chéng yù cuī），甲光向日金鳞开（jiǎ guāng xiàng rì jīn lín kāi）。\n角声满天秋色里（jiǎo shēng mǎn tiān qiū sè lǐ），塞上燕脂凝夜紫（sài shàng yān zhī níng yè zǐ）。\n半卷红旗临易水（bàn juǎn hóng qí lín yì shuǐ），霜重鼓寒声不起（shuāng zhòng gǔ hán shēng bù qǐ）。\n报君黄金台上意（bào jūn huáng jīn tái shàng yì），提携玉龙为君死（tí xié yù lóng wèi jūn sǐ）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "出塞 · 王昌龄",
+      paragraphs: [
+        "秦时明月汉时关（qín shí míng yuè hàn shí guān），万里长征人未还（wàn lǐ cháng zhēng rén wèi huán）。\n但使龙城飞将在（dàn shǐ lóng chéng fēi jiàng zài），不教胡马度阴山（bù jiào hú mǎ dù yīn shān）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "夜雨寄北 · 李商隐",
+      paragraphs: [
+        "君问归期未有期（jūn wèn guī qī wèi yǒu qī），巴山夜雨涨秋池（bā shān yè yǔ zhǎng qiū chí）。\n何当共剪西窗烛（hé dāng gòng jiǎn xī chuāng zhú），却话巴山夜雨时（què huà bā shān yè yǔ shí）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "无题 · 李商隐",
+      paragraphs: [
+        "相见时难别亦难（xiāng jiàn shí nán bié yì nán），东风无力百花残（dōng fēng wú lì bǎi huā cán）。\n春蚕到死丝方尽（chūn cán dào sǐ sī fāng jìn），蜡炬成灰泪始干（là jù chéng huī lèi shǐ gān）。\n晓镜但愁云鬓改（xiǎo jìng dàn chóu yún bìn gǎi），夜吟应觉月光寒（yè yín yīng jué yuè guāng hán）。\n蓬山此去无多路（péng shān cǐ qù wú duō lù），青鸟殷勤为探看（qīng niǎo yīn qín wèi tàn kàn）。"
+      ]
+    },
+    // ===== 第四批：宋代诗词与元曲（前 8 篇，诗词，逐字全注）=====
+    {
+      type: "knowledge",
+      title: "念奴娇 · 赤壁怀古 · 苏轼",
+      paragraphs: [
+        "大江东去（dà jiāng dōng qù），浪淘尽（làng táo jìn），千古风流人物（qiān gǔ fēng liú rén wù）。\n故垒西边（gù lěi xī biān），人道是（rén dào shì），三国周郎赤壁（sān guó zhōu láng chì bì）。\n乱石穿空（luàn shí chuān kōng），惊涛拍岸（jīng tāo pāi àn），卷起千堆雪（juǎn qǐ qiān duī xuě）。\n江山如画（jiāng shān rú huà），一时多少豪杰（yī shí duō shǎo háo jié）。\n遥想公瑾当年（yáo xiǎng gōng jǐn dāng nián），小乔初嫁了（xiǎo qiáo chū jià liǎo），雄姿英发（xióng zī yīng fā）。\n羽扇纶巾（yǔ shàn guān jīn），谈笑间（tán xiào jiān），樯橹灰飞烟灭（qiáng lǔ huī fēi yān miè）。\n故国神游（gù guó shén yóu），多情应笑我（duō qíng yīng xiào wǒ），早生华发（zǎo shēng huá fà）。\n人生如梦（rén shēng rú mèng），一尊还酹江月（yī zūn huán lèi jiāng yuè）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "水调歌头 · 明月几时有 · 苏轼",
+      paragraphs: [
+        "明月几时有（míng yuè jǐ shí yǒu）？把酒问青天（bǎ jiǔ wèn qīng tiān）。\n不知天上宫阙（bù zhī tiān shàng gōng què），今夕是何年（jīn xī shì hé nián）。\n我欲乘风归去（wǒ yù chéng fēng guī qù），又恐琼楼玉宇（yòu kǒng qióng lóu yù yǔ），高处不胜寒（gāo chù bù shèng hán）。\n起舞弄清影（qǐ wǔ nòng qīng yǐng），何似在人间（hé sì zài rén jiān）。\n转朱阁（zhuǎn zhū gé），低绮户（dī qǐ hù），照无眠（zhào wú mián）。\n不应有恨（bù yīng yǒu hèn），何事长向别时圆（hé shì cháng xiàng bié shí yuán）？\n人有悲欢离合（rén yǒu bēi huān lí hé），月有阴晴圆缺（yuè yǒu yīn qíng yuán quē），此事古难全（cǐ shì gǔ nán quán）。\n但愿人长久（dàn yuàn rén cháng jiǔ），千里共婵娟（qiān lǐ gòng chán juān）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "江城子 · 密州出猎 · 苏轼",
+      paragraphs: [
+        "老夫聊发少年狂（lǎo fū liáo fā shào nián kuáng），左牵黄（zuǒ qiān huáng），右擎苍（yòu qíng cāng），锦帽貂裘（jǐn mào diāo qiú），千骑卷平冈（qiān qí juǎn píng gāng）。\n为报倾城随太守（wèi bào qīng chéng suí tài shǒu），亲射虎（qīn shè hǔ），看孙郎（kàn sūn láng）。\n酒酣胸胆尚开张（jiǔ hān xiōng dǎn shàng kāi zhāng）。鬓微霜（bìn wēi shuāng），又何妨（yòu hé fáng）！\n持节云中（chí jié yún zhōng），何日遣冯唐（hé rì qiǎn féng táng）？\n会挽雕弓如满月（huì wǎn diāo gōng rú mǎn yuè），西北望（xī běi wàng），射天狼（shè tiān láng）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "破阵子 · 为陈同甫赋壮词以寄之 · 辛弃疾",
+      paragraphs: [
+        "醉里挑灯看剑（zuì lǐ tiǎo dēng kàn jiàn），梦回吹角连营（mèng huí chuī jiǎo lián yíng）。\n八百里分麾下炙（bā bǎi lǐ fēn huī xià zhì），五十弦翻塞外声（wǔ shí xián fān sài wài shēng），沙场秋点兵（shā chǎng qiū diǎn bīng）。\n马作的卢飞快（mǎ zuò dí lú fēi kuài），弓如霹雳弦惊（gōng rú pī lì xián jīng）。\n了却君王天下事（liǎo què jūn wáng tiān xià shì），赢得生前身后名（yíng dé shēng qián shēn hòu míng）。可怜白发生（kě lián bái fà shēng）！"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "青玉案 · 元夕 · 辛弃疾",
+      paragraphs: [
+        "东风夜放花千树（dōng fēng yè fàng huā qiān shù）。更吹落（gèng chuī luò）、星如雨（xīng rú yǔ）。\n宝马雕车香满路（bǎo mǎ diāo chē xiāng mǎn lù）。\n凤箫声动（fèng xiāo shēng dòng），玉壶光转（yù hú guāng zhuǎn），一夜鱼龙舞（yī yè yú lóng wǔ）。\n蛾儿雪柳黄金缕（é ér xuě liǔ huáng jīn lǚ）。笑语盈盈暗香去（xiào yǔ yíng yíng àn xiāng qù）。\n众里寻他千百度（zhòng lǐ xún tā qiān bǎi dù）。\n蓦然回首（mò rán huí shǒu），那人却在（nà rén què zài），灯火阑珊处（dēng huǒ lán shān chù）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "永遇乐 · 京口北固亭怀古 · 辛弃疾",
+      paragraphs: [
+        "千古江山（qiān gǔ jiāng shān），英雄无觅孙仲谋处（yīng xióng wú mì sūn zhòng móu chù）。\n舞榭歌台（wǔ xiè gē tái），风流总被雨打风吹去（fēng liú zǒng bèi yǔ dǎ fēng chuī qù）。\n斜阳草树（xié yáng cǎo shù），寻常巷陌（xún cháng xiàng mò），人道寄奴曾住（rén dào jì nú céng zhù）。\n想当年（xiǎng dāng nián），金戈铁马（jīn gē tiě mǎ），气吞万里如虎（qì tūn wàn lǐ rú hǔ）。\n元嘉草草（yuán jiā cǎo cǎo），封狼居胥（fēng láng jū xū），赢得仓皇北顾（yíng dé cāng huáng běi gù）。\n四十三年（sì shí sān nián），望中犹记（wàng zhōng yóu jì），烽火扬州路（fēng huǒ yáng zhōu lù）。\n可堪回首（kě kān huí shǒu），佛狸祠下（bì lí cí xià），一片神鸦社鼓（yī piàn shén yā shè gǔ）。\n凭谁问（píng shuí wèn）：廉颇老矣（lián pō lǎo yǐ），尚能饭否（shàng néng fàn fǒu）？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "如梦令 · 李清照",
+      paragraphs: [
+        "常记溪亭日暮（cháng jì xī tíng rì mù），沉醉不知归路（chén zuì bù zhī guī lù）。\n兴尽晚回舟（xìng jìn wǎn huí zhōu），误入藕花深处（wù rù ǒu huā shēn chù）。\n争渡（zhēng dù），争渡（zhēng dù），惊起一滩鸥鹭（jīng qǐ yī tān ōu lù）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "渔家傲 · 李清照",
+      paragraphs: [
+        "天接云涛连晓雾（tiān jiē yún tāo lián xiǎo wù），星河欲转千帆舞（xīng hé yù zhuǎn qiān fān wǔ）。\n仿佛梦魂归帝所（fǎng fú mèng hún guī dì suǒ）。闻天语（wén tiān yǔ），殷勤问我归何处（yīn qín wèn wǒ guī hé chù）。\n我报路长嗟日暮（wǒ bào lù cháng jiē rì mù），学诗谩有惊人句（xué shī màn yǒu jīng rén jù）。\n九万里风鹏正举（jiǔ wàn lǐ fēng péng zhèng jǔ）。风休住（fēng xiū zhù），蓬舟吹取三山去（péng zhōu chuī qǔ sān shān qù）！"
+      ]
+    },
+    // ===== 第四批（续）：宋代诗词与元曲 后 7 篇 =====
+    {
+      type: "knowledge",
+      title: "一剪梅 · 李清照",
+      paragraphs: [
+        "红藕香残玉簟秋（hóng ǒu xiāng cán yù diàn qiū）。轻解罗裳（qīng jiě luó cháng），独上兰舟（dú shàng lán zhōu）。\n云中谁寄锦书来（yún zhōng shuí jì jǐn shū lái）？雁字回时（yàn zì huí shí），月满西楼（yuè mǎn xī lóu）。\n花自飘零水自流（huā zì piāo líng shuǐ zì liú）。一种相思（yī zhǒng xiāng sī），两处闲愁（liǎng chù xián chóu）。\n此情无计可消除（cǐ qíng wú jì kě xiāo chú），才下眉头（cái xià méi tóu），却上心头（què shàng xīn tóu）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "雨霖铃 · 柳永",
+      paragraphs: [
+        "寒蝉凄切（hán chán qī qiè），对长亭晚（duì cháng tíng wǎn），骤雨初歇（zhòu yǔ chū xiē）。\n都门帐饮无绪（dū mén zhàng yǐn wú xù），留恋处（liú liàn chù），兰舟催发（lán zhōu cuī fā）。\n执手相看泪眼（zhí shǒu xiāng kàn lèi yǎn），竟无语凝噎（jìng wú yǔ níng yē）。\n念去去（niàn qù qù），千里烟波（qiān lǐ yān bō），暮霭沉沉楚天阔（mù ǎi chén chén chǔ tiān kuò）。\n多情自古伤离别（duō qíng zì gǔ shāng lí bié），更那堪（gèng nǎ kān），冷落清秋节（lěng luò qīng qiū jié）！\n今宵酒醒何处（jīn xiāo jiǔ xǐng hé chù）？杨柳岸（yáng liǔ àn），晓风残月（xiǎo fēng cán yuè）。\n此去经年（cǐ qù jīng nián），应是良辰好景虚设（yīng shì liáng chén hǎo jǐng xū shè）。\n便纵有千种风情（biàn zòng yǒu qiān zhǒng fēng qíng），更与何人说（gèng yǔ hé rén shuō）？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "泊船瓜洲 · 王安石",
+      paragraphs: [
+        "京口瓜洲一水间（jīng kǒu guā zhōu yī shuǐ jiān），钟山只隔数重山（zhōng shān zhǐ gé shù chóng shān）。\n春风又绿江南岸（chūn fēng yòu lǜ jiāng nán àn），明月何时照我还（míng yuè hé shí zhào wǒ huán）？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "游山西村 · 陆游",
+      paragraphs: [
+        "莫笑农家腊酒浑（mò xiào nóng jiā là jiǔ hún），丰年留客足鸡豚（fēng nián liú kè zú jī tún）。\n山重水复疑无路（shān chóng shuǐ fù yí wú lù），柳暗花明又一村（liǔ àn huā míng yòu yī cūn）。\n箫鼓追随春社近（xiāo gǔ zhuī suí chūn shè jìn），衣冠简朴古风存（yī guān jiǎn pǔ gǔ fēng cún）。\n从今若许闲乘月（cóng jīn ruò xǔ xián chéng yuè），拄杖无时夜叩门（zhǔ zhàng wú shí yè kòu mén）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "过零丁洋 · 文天祥",
+      paragraphs: [
+        "辛苦遭逢起一经（xīn kǔ zāo féng qǐ yī jīng），干戈寥落四周星（gān gē liáo luò sì zhōu xīng）。\n山河破碎风飘絮（shān hé pò suì fēng piāo xù），身世浮沉雨打萍（shēn shì fú chén yǔ dǎ píng）。\n惶恐滩头说惶恐（huáng kǒng tān tóu shuō huáng kǒng），零丁洋里叹零丁（líng dīng yáng lǐ tàn líng dīng）。\n人生自古谁无死（rén shēng zì gǔ shuí wú sǐ）？留取丹心照汗青（liú qǔ dān xīn zhào hàn qīng）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "天净沙 · 秋思 · 马致远",
+      paragraphs: [
+        "枯藤老树昏鸦（kū téng lǎo shù hūn yā），小桥流水人家（xiǎo qiáo liú shuǐ rén jiā），古道西风瘦马（gǔ dào xī fēng shòu mǎ）。\n夕阳西下（xī yáng xī xià），断肠人在天涯（duàn cháng rén zài tiān yá）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "山坡羊 · 潼关怀古 · 张养浩",
+      paragraphs: [
+        "峰峦如聚（fēng luán rú jù），波涛如怒（bō tāo rú nù），山河表里潼关路（shān hé biǎo lǐ tóng guān lù）。\n望西都（wàng xī dū），意踌躇（yì chóu chú）。\n伤心秦汉经行处（shāng xīn qín hàn jīng xíng chù），宫阙万间都做了土（gōng què wàn jiān dōu zuò le tǔ）。\n兴（xīng），百姓苦（bǎi xìng kǔ）；亡（wáng），百姓苦（bǎi xìng kǔ）。"
+      ]
+    },
+    // ===== 第五批：唐诗（上）剩余 4 篇 + 唐诗（下）3 篇 + 先秦长篇 2 篇 =====
+    // 长篇（>150 字）按约定只注难字
+    {
+      type: "knowledge",
+      title: "将进酒 · 李白（长篇，只注难字）",
+      paragraphs: [
+        "君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽（zūn）空对月。天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。钟鼓馔（zhuàn）玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。陈王昔时宴平乐，斗酒十千恣（zì）欢谑（xuè）。主人何为言少钱，径须沽（gū）取对君酌。五花马，千金裘（qiú），呼儿将出换美酒，与尔同销万古愁。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "宣州谢朓楼饯别校书叔云 · 李白",
+      paragraphs: [
+        "弃我去者（qì wǒ qù zhě），昨日之日不可留（zuó rì zhī rì bù kě liú）；\n乱我心者（luàn wǒ xīn zhě），今日之日多烦忧（jīn rì zhī rì duō fán yōu）。\n长风万里送秋雁（cháng fēng wàn lǐ sòng qiū yàn），对此可以酣高楼（duì cǐ kě yǐ hān gāo lóu）。\n蓬莱文章建安骨（péng lái wén zhāng jiàn ān gǔ），中间小谢又清发（zhōng jiān xiǎo xiè yòu qīng fā）。\n俱怀逸兴壮思飞（jù huái yì xìng zhuàng sī fēi），欲上青天览明月（yù shàng qīng tiān lǎn míng yuè）。\n抽刀断水水更流（chōu dāo duàn shuǐ shuǐ gèng liú），举杯销愁愁更愁（jǔ bēi xiāo chóu chóu gèng chóu）。\n人生在世不称意（rén shēng zài shì bù chèn yì），明朝散发弄扁舟（míng cháo sàn fà nòng piān zhōu）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "茅屋为秋风所破歌 · 杜甫（长篇，只注难字）",
+      paragraphs: [
+        "八月秋高风怒号，卷我屋上三重茅。茅飞渡江洒江郊，高者挂罥（juàn）长林梢，下者飘转沉塘坳（ào）。南村群童欺我老无力，忍能对面为盗贼。公然抱茅入竹去，唇焦口燥呼不得，归来倚仗自叹息。俄顷风定云墨色，秋天漠漠向昏黑。布衾（qīn）多年冷似铁，娇儿恶卧踏里裂。床头屋漏无干处，雨脚如麻未断绝。自经丧乱少睡眠，长夜沾湿何由彻！安得广厦（shà）千万间，大庇（bì）天下寒士俱欢颜，风雨不动安如山。呜呼！何时眼前突兀（wù）见此屋，吾庐独破受冻死亦足！"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "登高 · 杜甫",
+      paragraphs: [
+        "风急天高猿啸哀（fēng jí tiān gāo yuán xiào āi），渚清沙白鸟飞回（zhǔ qīng shā bái niǎo fēi huí）。\n无边落木萧萧下（wú biān luò mù xiāo xiāo xià），不尽长江滚滚来（bù jìn cháng jiāng gǔn gǔn lái）。\n万里悲秋常作客（wàn lǐ bēi qiū cháng zuò kè），百年多病独登台（bǎi nián duō bìng dú dēng tái）。\n艰难苦恨繁霜鬓（jiān nán kǔ hèn fán shuāng bìn），潦倒新停浊酒杯（liáo dǎo xīn tíng zhuó jiǔ bēi）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "白雪歌送武判官归京 · 岑参（长篇，只注难字）",
+      paragraphs: [
+        "北风卷地白草折，胡天八月即飞雪。忽如一夜春风来，千树万树梨花开。散入珠帘湿罗幕，狐裘（qiú）不暖锦衾（qīn）薄。将军角弓不得控，都护铁衣冷难着。瀚（hàn）海阑（lán）干百丈冰，愁云惨淡万里凝。中军置酒饮归客，胡琴琵琶与羌（qiāng）笛。纷纷暮雪下辕门，风掣（chè）红旗冻不翻。轮台东门送君去，去时雪满天山路。山回路转不见君，雪上空留马行处。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "卖炭翁 · 白居易（长篇，只注难字）",
+      paragraphs: [
+        "卖炭翁，伐薪烧炭南山中。满面尘灰烟火色，两鬓（bìn）苍苍十指黑。卖炭得钱何所营？身上衣裳口中食。可怜身上衣正单，心忧炭贱愿天寒。夜来城外一尺雪，晓驾炭车辗（niǎn）冰辙（zhé）。牛困人饥日已高，市南门外泥中歇。翩翩（piān）两骑来是谁？黄衣使者白衫儿。手把文书口称敕（chì），回车叱（chì）牛牵向北。一车炭，千余斤，宫使驱将惜不得。半匹红绡（xiāo）一丈绫（líng），系向牛头充炭直（zhí，同“值”）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "琵琶行（节选） · 白居易（长篇，只注难字）",
+      paragraphs: [
+        "浔阳江头夜送客，枫叶荻（dí）花秋瑟瑟（sè）。主人下马客在船，举酒欲饮无管弦。醉不成欢惨将别，别时茫茫江浸月。忽闻水上琵琶声，主人忘归客不发。……大弦嘈嘈（cáo）如急雨，小弦切切如私语。嘈嘈切切错杂弹，大珠小珠落玉盘。……银瓶乍（zhà）破水浆迸（bèng），铁骑突出刀枪鸣。曲终收拨当心画，四弦一声如裂帛。东船西舫（fǎng）悄无言，唯见江心秋月白。……同是天涯沦落人，相逢何必曾相识。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "木兰诗（长篇，只注难字）",
+      paragraphs: [
+        "唧唧复唧唧，木兰当户织。不闻机杼（zhù）声，惟闻女叹息。问女何所思，问女何所忆。女亦无所思，女亦无所忆。昨夜见军帖，可汗（kè hán）大点兵，军书十二卷，卷卷有爷名。阿爷无大儿，木兰无长兄，愿为市鞍（ān）马，从此替爷征。东市买骏马，西市买鞍鞯（jiān），南市买辔（pèi）头，北市买长鞭。旦辞爷娘去，暮宿黄河边。不闻爷娘唤女声，但闻黄河流水鸣溅溅（jiān）。旦辞黄河去，暮至黑山头，不闻爷娘唤女声，但闻燕山胡骑（jì）鸣啾啾（jiū）。万里赴戎机，关山度若飞。朔（shuò）气传金柝（tuò），寒光照铁衣。将军百战死，壮士十年归。归来见天子，天子坐明堂。策勋（xūn）十二转，赏赐百千强。可汗问所欲，木兰不用尚书郎，愿驰千里足，送儿还故乡。爷娘闻女来，出郭相扶将；阿姊闻妹来，当户理红妆；小弟闻姊来，磨刀霍霍（huò）向猪羊。开我东阁门，坐我西阁床，脱我战时袍，著（zhuó）我旧时裳。当窗理云鬓（bìn），对镜帖（tiē）花黄。出门看火伴，火伴皆惊忙：同行十二年，不知木兰是女郎。雄兔脚扑朔（shuò），雌兔眼迷离；双兔傍地走，安能辨我是雄雌？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "三峡 · 郦道元（长篇，只注难字）",
+      paragraphs: [
+        "自三峡七百里中，两岸连山，略无阙（quē）处。重岩叠嶂（zhàng），隐天蔽日。自非亭午夜分，不见曦（xī）月。至于夏水襄（xiāng）陵，沿溯（sù）阻绝。或王命急宣，有时朝发白帝，暮到江陵，其间千二百里，虽乘奔御风，不以疾也。春冬之时，则素湍（tuān）绿潭，回清倒影。绝巘（yǎn）多生怪柏，悬泉瀑布，飞漱（shù）其间。清荣峻茂，良多趣味。每至晴初霜旦，林寒涧肃，常有高猿长啸，属（zhǔ）引凄异，空谷传响，哀转久绝。故渔者歌曰：“巴东三峡巫峡长，猿鸣三声泪沾裳（cháng）。”"
+      ]
+    },
+    // ===== 第六批：先秦文言 + 古文名篇（前 8 篇）=====
+    {
+      type: "knowledge",
+      title: "陋室铭 · 刘禹锡",
+      paragraphs: [
+        "山不在高（shān bù zài gāo），有仙则名（yǒu xiān zé míng）。水不在深（shuǐ bù zài shēn），有龙则灵（yǒu lóng zé líng）。\n斯是陋室（sī shì lòu shì），惟吾德馨（wéi wú dé xīn）。\n苔痕上阶绿（tái hén shàng jiē lǜ），草色入帘青（cǎo sè rù lián qīng）。\n谈笑有鸿儒（tán xiào yǒu hóng rú），往来无白丁（wǎng lái wú bái dīng）。\n可以调素琴（kě yǐ tiáo sù qín），阅金经（yuè jīn jīng）。\n无丝竹之乱耳（wú sī zhú zhī luàn ěr），无案牍之劳形（wú àn dú zhī láo xíng）。\n南阳诸葛庐（nán yáng zhū gě lú），西蜀子云亭（xī shǔ zǐ yún tíng）。\n孔子云（kǒng zǐ yún）：何陋之有（hé lòu zhī yǒu）？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "爱莲说 · 周敦颐",
+      paragraphs: [
+        "水陆草木之花（shuǐ lù cǎo mù zhī huā），可爱者甚蕃（kě ài zhě shèn fán）。\n晋陶渊明独爱菊（jìn táo yuān míng dú ài jú）。自李唐来（zì lǐ táng lái），世人甚爱牡丹（shì rén shèn ài mǔ dan）。\n予独爱莲之出淤泥而不染（yǔ dú ài lián zhī chū yū ní ér bù rǎn），濯清涟而不妖（zhuó qīng lián ér bù yāo），\n中通外直（zhōng tōng wài zhí），不蔓不枝（bù màn bù zhī），香远益清（xiāng yuǎn yì qīng），亭亭净植（tíng tíng jìng zhí），\n可远观而不可亵玩焉（kě yuǎn guān ér bù kě xiè wán yān）。\n予谓菊（yǔ wèi jú），花之隐逸者也（huā zhī yǐn yì zhě yě）；牡丹（mǔ dan），花之富贵者也（huā zhī fù guì zhě yě）；莲（lián），花之君子者也（huā zhī jūn zǐ zhě yě）。\n噫（yī）！菊之爱（jú zhī ài），陶后鲜有闻（táo hòu xiǎn yǒu wén）。\n莲之爱（lián zhī ài），同予者何人（tóng yǔ zhě hé rén）？牡丹之爱（mǔ dan zhī ài），宜乎众矣（yí hū zhòng yǐ）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "记承天寺夜游 · 苏轼",
+      paragraphs: [
+        "元丰六年十月十二日夜（yuán fēng liù nián shí yuè shí èr rì yè），解衣欲睡（jiě yī yù shuì），月色入户（yuè sè rù hù），欣然起行（xīn rán qǐ xíng）。\n念无与为乐者（niàn wú yǔ wéi lè zhě），遂至承天寺寻张怀民（suì zhì chéng tiān sì xún zhāng huái mín）。\n怀民亦未寝（huái mín yì wèi qǐn），相与步于中庭（xiāng yǔ bù yú zhōng tíng）。\n庭下如积水空明（tíng xià rú jī shuǐ kōng míng），水中藻（zǎo）、荇交横（xìng jiāo héng），盖竹柏影也（gài zhú bǎi yǐng yě）。\n何夜无月（hé yè wú yuè）？何处无竹柏（hé chù wú zhú bǎi）？但少闲人如吾两人者耳（dàn shǎo xián rén rú wú liǎng rén zhě ěr）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "马说 / 师说 · 韩愈（长篇，只注难字）",
+      paragraphs: [
+        "《马说》：世有伯乐，然后有千里马。千里马常有，而伯乐不常有。故虽有名马，祗（zhǐ）辱于奴隶人之手，骈（pián）死于槽枥（cáo lì）之间，不以千里称也。马之千里者，一食或尽粟（sù）一石（dàn）。食（sì，同“饲”）马者不知其能千里而食也。是马也，虽有千里之能，食不饱，力不足，才美不外见（xiàn，同“现”），且欲与常马等不可得，安求其能千里也？策之不以其道，食之不能尽其材，鸣之而不能通其意，执策而临之，曰：“天下无马！”呜呼！其真无马邪（yé）？其真不知马也！\n《师说》（节选）：古之学者必有师。师者，所以传道受（shòu，同“授”）业解惑也。人非生而知之者，孰（shú）能无惑？惑而不从师，其为惑也，终不解矣。……是故无贵无贱，无长无少，道之所存，师之所存也。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "劝学（节选） · 荀子（长篇，只注难字）",
+      paragraphs: [
+        "君子曰：学不可以已。青，取之于蓝，而青于蓝；冰，水为之，而寒于水。木直中绳，輮（róu）以为轮，其曲中规。虽有槁暴（gǎo pù），不复挺者，輮使之然也。故木受绳则直，金就砺（lì）则利，君子博学而日参省（cān xǐng）乎己，则知（zhì，同“智”）明而行无过矣。……故不积跬（kuǐ）步，无以至千里；不积小流，无以成江海。骐骥（qí jì）一跃，不能十步；驽（nú）马十驾，功在不舍。锲（qiè）而舍之，朽木不折；锲而不舍，金石可镂（lòu）。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "邹忌讽齐王纳谏 · 《战国策》（长篇，只注难字）",
+      paragraphs: [
+        "邹忌修八尺有余，而形貌昳（yì）丽。朝（zhāo）服衣冠，窥（kuī）镜，谓其妻曰：“我孰与城北徐公美？”其妻曰：“君美甚，徐公何能及君也？”……明日徐公来，孰（shú，同“熟”）视之，自以为不如；窥镜而自视，又弗（fú）如远甚。暮寝（qǐn）而思之，曰：“吾妻之美我者，私我也；妾之美我者，畏我也；客之美我者，欲有求于我也。”于是入朝见威王，曰：“……今齐地方千里，百二十城，宫妇左右莫不私王，朝廷之臣莫不畏王，四境之内莫不有求于王：由此观之，王之蔽（bì）甚矣。”"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "曹刿论战 · 《左传》（长篇，只注难字）",
+      paragraphs: [
+        "十年春，齐师伐我。公将战，曹刿（guì）请见。其乡人曰：“肉食者谋之，又何间（jiàn）焉？”刿曰：“肉食者鄙（bǐ），未能远谋。”乃入见。问：“何以战？”……公曰：“小大之狱，虽不能察，必以情。”对曰：“忠之属也。可以一战。战则请从。”……既克，公问其故。对曰：“夫战，勇气也。一鼓作气，再而衰，三而竭。彼竭我盈，故克之。夫大国，难测也，惧有伏焉。吾视其辙（zhé）乱，望其旗靡（mǐ），故逐之。”"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "桃花源记 · 陶渊明（长篇，只注难字）",
+      paragraphs: [
+        "晋太元中，武陵人捕鱼为业。缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤（bīn）纷。渔人甚异之。复前行，欲穷其林。林尽水源，便得一山，山有小口，仿佛若有光。便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。土地平旷，屋舍俨（yǎn）然，有良田、美池、桑竹之属。阡陌（qiān mò）交通，鸡犬相闻。其中往来种作，男女衣着，悉如外人。黄发垂髫（tiáo），并怡（yí）然自乐。"
+      ]
+    },
+    // ===== 第七批（收尾）：先秦文言 3 篇 + 长古文 5 篇（均按约定只注难字）=====
+    {
+      type: "knowledge",
+      title: "《论语》十二章（只注难字）",
+      paragraphs: [
+        "子曰：“学而时习之，不亦说（yuè，通“悦”）乎？有朋自远方来，不亦乐乎？人不知而不愠（yùn），不亦君子乎？”\n曾子曰：“吾日三省（xǐng）吾身：为人谋而不忠乎？与朋友交而不信乎？传不习乎？”\n子曰：“吾十有五而志于学，三十而立，四十而不惑，五十而知天命，六十而耳顺，七十而从心所欲，不逾矩。”\n子曰：“温故而知新，可以为师矣。”\n子曰：“学而不思则罔（wǎng），思而不学则殆（dài）。”\n子曰：“贤哉，回也！一箪（dān）食，一瓢饮，在陋巷，人不堪其忧，回也不改其乐。贤哉，回也！”\n子曰：“知之者不如好之者，好之者不如乐之者。”\n子曰：“饭疏食，饮水，曲肱（gōng）而枕之，乐亦在其中矣。不义而富且贵，于我如浮云。”\n子曰：“三人行，必有我师焉。择其善者而从之，其不善者而改之。”\n子在川上曰：“逝者如斯夫，不舍昼夜。”\n子曰：“三军可夺帅也，匹夫不可夺志也。”\n子夏曰：“博学而笃（dǔ）志，切问而近思，仁在其中矣。”"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "《老子》四章（节选，只注难字）",
+      paragraphs: [
+        "上善若水。水善利万物而不争，处众人之所恶（wù），故几（jī）于道。居善地，心善渊，与善仁，言善信，正善治，事善能，动善时。夫唯不争，故无尤（yóu）。\n曲则全，枉（wǎng）则直，洼（wā）则盈，敝（bì）则新，少则得，多则惑。是以圣人抱一为天下式。不自见，故明；不自是，故彰；不自伐，故有功；不自矜（jīn），故长。夫唯不争，故天下莫能与之争。\n企（qǐ）者不立，跨者不行，自见者不明，自是者不彰，自伐者无功，自矜者不长。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "《孟子》· 鱼我所欲也 / 生于忧患（节选，只注难字）",
+      paragraphs: [
+        "鱼，我所欲也；熊掌，亦我所欲也。二者不可得兼，舍鱼而取熊掌者也。生，亦我所欲也；义，亦我所欲也。二者不可得兼，舍生而取义者也。生亦我所欲，所欲有甚于生者，故不为苟得也；死亦我所恶（wù），所恶有甚于死者，故患有所不辟（bì，通“避”）也。……是故所欲有甚于生者，所恶有甚于死者。非独贤者有是心也，人皆有之，贤者能勿丧耳。\n故天将降大任于是人也，必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂（fú）乱其所为，所以动心忍性，曾（zēng，同“增”）益其所不能。……然后知生于忧患而死于安乐也。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "答谢中书书 · 陶弘景 / 与朱元思书 · 吴均（一短一长，短者逐字全注）",
+      paragraphs: [
+        "《答谢中书书》：山川之美（shān chuān zhī měi），古来共谈（gǔ lái gòng tán）。高峰入云（gāo fēng rù yún），清流见底（qīng liú jiàn dǐ）。两岸石壁（liǎng àn shí bì），五色交辉（wǔ sè jiāo huī）。青林翠竹（qīng lín cuì zhú），四时俱备（sì shí jù bèi）。晓雾将歇（xiǎo wù jiāng xiē），猿鸟乱鸣（yuán niǎo luàn míng）；夕日欲颓（xī rì yù tuí），沉鳞竞跃（chén lín jìng yuè）。实是欲界之仙都（shí shì yù jiè zhī xiān dū）。自康乐以来（zì kāng lè yǐ lái），未复有能与其奇者（wèi fù yǒu néng yǔ qí qí zhě）。\n《与朱元思书》（节选，只注难字）：风烟俱净，天山共色。从流飘荡，任意东西。自富阳至桐庐一百许里，奇山异水，天下独绝。水皆缥（piǎo）碧，千丈见底。游鱼细石，直视无碍。急湍（tuān）甚箭，猛浪若奔。……鸢（yuān）飞戾（lì）天者，望峰息心；经纶（lún）世务者，窥谷忘反。横柯（kē）上蔽，在昼犹昏；疏条交映，有时见日。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "岳阳楼记 · 范仲淹（长篇，只注难字）",
+      paragraphs: [
+        "庆历四年春，滕子京谪（zhé）守巴陵郡。越明年，政通人和，百废具兴。乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上。属（zhǔ）予作文以记之。\n予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤（shāng），横无际涯（yá）；朝晖（huī）夕阴，气象万千。此则岳阳楼之大观也，前人之述备矣。然则北通巫峡，南极潇湘，迁客骚（sāo）人，多会于此，览物之情，得无异乎？\n……嗟（jiē）夫！予尝求古仁人之心，或异二者之为，何哉？不以物喜，不以己悲；居庙堂之高则忧其民；处江湖之远则忧其君。是进亦忧，退亦忧。然则何时而乐耶？其必曰“先天下之忧而忧，后天下之乐而乐”乎！噫！微斯人，吾谁与归？"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "醉翁亭记 · 欧阳修（长篇，只注难字）",
+      paragraphs: [
+        "环滁（chú）皆山也。其西南诸峰，林壑（hè）尤美，望之蔚（wèi）然而深秀者，琅琊（láng yá）也。山行六七里，渐闻水声潺潺（chán）而泻出于两峰之间者，酿泉也。峰回路转，有亭翼然临于泉上者，醉翁亭也。作亭者谁？山之僧智仙也。名之者谁？太守自谓也。\n……醉翁之意不在酒，在乎山水之间也。山水之乐，得之心而寓之酒也。\n……已而夕阳在山，人影散乱，太守归而宾客从也。树林阴翳（yì），鸣声上下，游人去而禽鸟乐也。然而禽鸟知山林之乐，而不知人之乐；人知从太守游而乐，而不知太守之乐其乐也。醉能同其乐，醒能述以文者，太守也。太守谓谁？庐陵欧阳修也。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "出师表 · 诸葛亮（长篇，只注难字）",
+      paragraphs: [
+        "先帝创业未半而中道崩殂（cú），今天下三分，益州疲弊，此诚危急存亡之秋也。然侍卫之臣不懈于内，忠志之士忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气，不宜妄自菲（fěi）薄，引喻失义，以塞忠谏之路也。\n……亲贤臣，远小人，此先汉所以兴隆也；亲小人，远贤臣，此后汉所以倾颓（tuí）也。先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。\n……臣本布衣，躬耕于南阳，苟全性命于乱世，不求闻达于诸侯。先帝不以臣卑鄙，猥（wěi）自枉屈，三顾臣于草庐之中，咨（zī）臣以当世之事，由是感激，遂许先帝以驱驰。后值倾覆，受任于败军之际，奉命于危难之间，尔来二十有一年矣。\n……愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。……今当远离，临表涕（tì）零，不知所言。"
+      ]
+    },
+    {
+      type: "knowledge",
+      title: "赤壁赋 · 苏轼（长篇，只注难字）",
+      paragraphs: [
+        "壬戌（rén xū）之秋，七月既望，苏子与客泛舟游于赤壁之下。清风徐来，水波不兴。举酒属（zhǔ）客，诵明月之诗，歌窈窕（yǎo tiǎo）之章。少焉，月出于东山之上，徘徊于斗牛之间。白露横江，水光接天。纵一苇之所如，凌万顷之茫然。浩浩乎如冯（píng，通“凭”）虚御风，而不知其所止；飘飘乎如遗世独立，羽化而登仙。\n……寄蜉蝣（fú yóu）于天地，渺沧海之一粟（sù）。哀吾生之须臾（yú），羡长江之无穷。挟飞仙以遨（áo）游，抱明月而长终。知不可乎骤得，托遗响于悲风。\n……且夫天地之间，物各有主，苟非吾之所有，虽一毫而莫取。惟江上之清风，与山间之明月，耳得之而为声，目遇之而成色，取之无禁，用之不竭。是造物者之无尽藏（zàng）也，而吾与子之所共适。"
+      ]
+    }
+  ]
+}

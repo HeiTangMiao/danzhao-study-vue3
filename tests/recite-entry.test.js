@@ -202,9 +202,13 @@ describe('ReciteTaskCard · 两个入口读数同源（P0-6 验收）', () => {
 
     expect(home.text()).toContain('待重默 2 篇')
     expect(review.text()).toContain('重默 2 篇')
-    // 关键负断言：页面上不许出现被截断掉的 5
-    expect(home.text()).not.toContain('5')
-    expect(review.text()).not.toContain('5')
+    // 关键负断言：计数必须用 `dueCount`（今日可作 2 篇），**不许**把 `dueTotal` 的原始总数
+    // （夹具里是 5，被 DAILY_DUE_LIMIT 截断）显示出来。
+    // ⚠️ 原先写的是 `expect(home.text()).not.toContain('5')` —— 扫整页文本，会被页面上任何
+    //    含 "5" 的数字误伤（实测：正文字数从 88 变成 45 就会假红）。收紧到计数节点本身，
+    //    并改用精确相等：既排除 dueTotal，也排除"多显示一项"的回归。
+    expect(home.find('.rtc-home__count').text()).toBe('待重默 2 篇')
+    expect(review.find('.rtc-review__text').text()).toBe('今日背诵 · 重默 2 篇')
     home.unmount()
     review.unmount()
   })

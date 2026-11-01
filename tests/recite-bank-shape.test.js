@@ -179,26 +179,25 @@ describe('④ 无正文的篇一律丢弃（isUsablePiece 在 2026-10-30 方案�
   })
 
   /**
-   * ⚠️ 已知缺口 K1（**不是契约，是当前行为**，待源侧修复后本用例必须跟着改）：
-   * `paragraphs: ['', '']`（数组非空、但每段都是空串）**仍然会被收**。
-   * 根因在 `src/content/reciteBank.js:208` 的 `isUsablePiece`：它只判 `paragraphs.length === 0`，
-   * 不判「字符串非空」，于是 `['']` / `['  ']` 能通过，页面渲染出一个真正空白的正文区。
-   * 构建期同一口径：`scripts/build-recite-bank.mjs:208` 的 `emptyBodyLines` 也只数
-   * `paragraphs.length > 0`，所以「无正文的篇数」那条断言同样点不出这种篇。
-   * 本用例把当前行为钉住并点名修什么：源侧一旦收紧 `isUsablePiece`，这里会红 →
-   * 改成「一律丢弃」即可（不要删用例）。
+   * K1 已修复（2026-11-02）：`isUsablePiece` 改用 `hasReadableBody(paragraphs)`，
+   * 判据是「**至少一段 trim 后非空**」，不再只是「数组长度 > 0」。
+   * 构建期 `emptyBodyLines`（`scripts/build-recite-bank.mjs`）**共用同一个函数**，
+   * 所以「运行时会丢弃」与「构建期点名」不会再出现两种口径。
+   *
+   * 为什么这两种形态必须丢：它们渲染出来是**真正空白的正文区且不报错** —— 学员看到白屏、
+   * 控制台安静，属于本仓最防的静默失败，宁可少收一篇也不能收一篇打不开的。
    */
-  it('K1 缺口：paragraphs 为「全是空串」的数组时当前仍被收（渲染出空白正文，见用例注释）', () => {
+  it('全空串 / 纯空白串的 paragraphs 一律丢弃（K1 修复后的契约）', () => {
     const ok = pieceOf(0, 'lesson')
     const kept = sanitizeBank(
       bankOf([{ ...ok, key: 'chinese|f|2', title: 'C 全空串', paragraphs: ['', ''] }])
     )
-    expect(kept.pieces.map((p) => p.key)).toEqual(['chinese|f|2'])
-    // 退化形态：`['  ']`（纯空白串）同样被收 —— 缺口同根，见上方 K1 说明
+    expect(kept.pieces).toEqual([])
+    // 退化形态：`['  ']`（纯空白串）同样丢弃 —— 与全空串同根，不许只堵一半
     const blank = sanitizeBank(
       bankOf([{ ...ok, key: 'chinese|f|4', title: 'E 纯空白串', paragraphs: ['  '] }])
     )
-    expect(blank.pieces).toHaveLength(1)
+    expect(blank.pieces).toEqual([])
   })
 
   it('退化成 0 篇时 bank 仍然可用（不返回 null），但不虚构内容', () => {

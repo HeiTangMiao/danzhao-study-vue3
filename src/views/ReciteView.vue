@@ -17,7 +17,7 @@
   <div class="rc">
     <header class="rc-head">
       <h1 class="rc-head__title">每日背诵</h1>
-      <p class="rc-head__sub">逐句默写 · 按档位滚动复习</p>
+      <p class="rc-head__sub">每日一篇 · 按记忆曲线滚动复习</p>
     </header>
 
     <!-- 加载中（首屏唯一阻塞态） -->
@@ -62,7 +62,7 @@
           </span>
           <span class="rc-piece__tags">
             <span class="rc-tag rc-tag--new">新篇</span>
-            <span class="rc-tag">{{ vm.fresh.blankCount }} 空</span>
+            <span class="rc-tag">{{ charLabel(vm.fresh) }}</span>
           </span>
           <span class="rc-piece__go" aria-hidden="true"><AppIcon name="chevron-right" :size="16" /></span>
         </router-link>
@@ -95,7 +95,7 @@
       <div class="rc-challenge">
         <router-link v-if="vm.challenge" class="rc-btn rc-btn--primary rc-btn--block" :to="challengeLink">
           <AppIcon name="siren" :size="16" />
-          <span>综合大冲关（{{ vm.challenge.sentenceCount }} 句 · 模拟考场）</span>
+          <span>综合大冲关（模拟考场）</span>
         </router-link>
         <p class="rc-challenge__hint">模拟考场不计入进度，随时可退出</p>
       </div>
@@ -157,17 +157,27 @@ function primaryLabel(piece) {
 }
 
 /**
+ * 篇幅标签（本方案不挖空，"N 空"已无意义，改报正文字数）。
+ * @param {object} piece 篇目
+ * @returns {string} 形如「713 字」；算不出时返回空串（模板里不显示该标签）
+ */
+function charLabel(piece) {
+  const n = piece && Array.isArray(piece.paragraphs) ? piece.paragraphs.join('').length : 0
+  return n > 0 ? `${n} 字` : ''
+}
+
+/**
  * 副行文案（与 `primaryLabel` 互补：主行用过的字段不再重复）。
  * @param {object} piece 篇目
  * @returns {string} 副行文案
  */
 function secondaryLabel(piece) {
   if (!piece) return ''
-  const blanks = `${piece.blankCount} 空`
+  const chars = charLabel(piece)
   if (piece.role === 'review') {
-    return `${piece.unitTitle || piece.fileTitle} · ${blanks}`
+    return `${piece.unitTitle || piece.fileTitle}${chars ? ` · ${chars}` : ''}`
   }
-  return `${piece.fileTitle} · ${blanks}`
+  return `${piece.fileTitle}${chars ? ` · ${chars}` : ''}`
 }
 
 /**

@@ -1,15 +1,16 @@
 /**
  * 每日背诵 · 篇目产物构建脚本（T02，P0）
  * 作者：engineer（Alex）
- * 目的：遍历 src/content 全部内容页的 **顶层** cloze 区块，为每一篇烘焙一张「坐标 + 计数 +
- *      角色 + 内容指纹」的卡片，产出 public/recite-bank/chinese.json，供背诵 Tab
- *      （L1 队列 / L2 单篇默写）离线消费。
+ * 目的：遍历 **08-背诵专项** 的 `knowledge` 区块（每个区块 = 一篇完整诗词原文 + 注音），
+ *      为每一篇烘焙一张「坐标 + 正文 + 角色 + 内容指纹」的卡片，
+ *      产出 public/recite-bank/chinese.json，供背诵页（队列 / 单篇）离线消费。
  *
  * 纪律（与 build-practice-bank.mjs 同一套）：
  *  - 文件遍历与元信息一律来自 scripts/lib/load-content.mjs（collectFiles / buildMetaIndex /
  *    importFresh / relPathOf），`fileKey` 来自 pageMeta.pageFileKeyOf —— 不在本脚本手拼路径或键。
- *  - 计数**不在本脚本重新解析**：句数 / 空数 / strict 数一律走 shared 层
- *    `clozeJudge.buildClozeItems` / `flattenBlanks`（H7：判分与解析单一真相源）。
+ *  - **不切句、不数空**：2026-10-30 起本功能**不再挖空、不再判分**（内容侧 10-29 变更通知，
+ *    原「复用 cloze 挖空默写」方案作废）。正文原样取 `knowledge.paragraphs`
+ *    （注音以括号内联在文本里），构建期**不做任何文本解析**。
  *  - 产物形状（**长键** / 主键格式 / 版本号归属）来自 `reciteBank.js`；每条篇目先经
  *    `normalizePiece` 归一再按 `PIECE_FIELDS` 重排落盘 —— 产物形状 === 运行时形状，
  *    「有人直接 `JSON.parse` 产物再读 `piece.fileKey`」这类错位从根上消失。
@@ -18,8 +19,9 @@
  *    不允许静默少收 —— 少收一篇用户看得见，静默错收一篇用户看不见，两者都必须留痕。
  *  - 只读内容、只写 public/recite-bank/，不碰 src/content/ 数据页。
  *
- * ⚠️ 断言是「内容快照式硬断言」：**故意**让内容侧一改 cloze 就构建失败。
- *    73 篇 / 170 句 / 193 空 / 16 篇一句多空 是全功能的事实基线，变了必须有人重新核验
+ * ⚠️ 断言是「内容快照式硬断言」：**故意**让内容侧一改篇目就构建失败。
+ *    **64 篇 / lesson 64 / review 0** 是当前的事实基线（2026-10-30 随方案变更重定；
+ *    原 73 篇 / 170 句 / 193 空 的 cloze 基线已随方案**作废**）。变了必须有人重新核验
  *    （见 design-recitation.md §0 与 PRD 的篇数口径）。失败信息必须能直接指导动作，
  *    所以 assertBaseline 收集**全部**失败项后一次性打印「期望 / 实际 / 差 / 差异清单」，而不是抛 assert 就退出。
  *
@@ -31,7 +33,6 @@ import { pathToFileURL } from 'node:url'
 import { ROOT, CONTENT_DIR, collectFiles, buildMetaIndex, importFresh, relPathOf } from './lib/load-content.mjs'
 import { pageFileKeyOf } from '../src/content/pageMeta.js'
 import { CONTENT_VERSION } from '../src/content/contentManifest.js'
-import { buildClozeItems, flattenBlanks } from '../src/content/clozeJudge.js'
 import {
   BANK_SCHEMA_VERSION,
   BANK_DIR,
@@ -39,7 +40,7 @@ import {
   PIECE_ROLE,
   PIECE_TRIGGER,
   PIECE_FIELDS,
-  CLOZE_MODE_INPUT,
+  hasReadableBody,
   pieceKeyOf,
   normalizePiece,
   deriveCounts,
@@ -54,6 +55,15 @@ const OUT_FILE = join(PUBLIC_DIR, RECITE_BANK_PATH)
 export const SUBJECT = 'chinese'
 
 /**
+ * 背诵篇目所在单元号（`src/content/chinese/08-背诵专项/`）。
+ *
+ * 为什么限定单元而不是「全库 knowledge 都收」：其它单元的 knowledge 是知识点讲解，
+ * 不是背诵篇目，全收会把它们混进每日队列。跳过时**必须点名**（见 `reportSkipped`）——
+ * 静默少收一篇，用户只会看到「今天没有背诵」，无从自查。
+ */
+export const RECITE_UNIT_NUM = '08'
+
+/**
  * 内容基线（**内容快照式硬断言**，非"参考值"）
  *
  * 这些数字是全功能的事实基线，来自 design-recitation.md §0 的本机实测复核。
@@ -62,26 +72,14 @@ export const SUBJECT = 'chinese'
  * 复核后请同步更新本常量，并复核 design-recitation.md §0 与 PRD 的篇数口径。
  */
 export const BASELINE = {
-  /** 全库 page.blocks 顶层 cloze 区块数（含 reveal 篇） */
-  totalClozeBlocks: 74,
-  /** 被排除的 reveal 篇数（`(block.mode || 'reveal') !== 'input'`） */
-  excludedReveal: 1,
-  /** 产物篇目数 = totalClozeBlocks − excludedReveal */
-  pieces: 73,
+  /** 08-背诵专项 的 knowledge 区块数（**唯一数据源**；其它单元的 knowledge 不收） */
+  totalReciteBlocks: 64,
+  /** 产物篇目数（本方案无 reveal 排除规则，等于 totalReciteBlocks） */
+  pieces: 64,
   /** 正课篇数（role === 'lesson'） */
-  lesson: 67,
-  /** 复习篇数（role === 'review'） */
-  review: 6,
-  /** 产物内总句数（sentenceCount 之和） */
-  totalSentence: 170,
-  /** 产物内总空位数（blankCount 之和。注意：不是句数，PRD 的 1.79 是句/篇） */
-  totalBlank: 193,
-  /** 产物内「一句多空」的篇数（blankCount > sentenceCount） */
-  multiBlankPieces: 16,
-  /** 全库「一句多空」的块数（含被排除的 reveal 篇，供汇总行对照） */
-  multiBlankAllBlocks: 17,
-  /** 产物内含 strict 句的篇内 strict 句总数（红线句，A3 用） */
-  strictSentences: 1
+  lesson: 64,
+  /** 复习篇数（role === 'review'，title 匹配 /自测|冲关/；08 单元当前为 0） */
+  review: 0
 }
 
 /** 复习篇判定：title 命中「自测」或「冲关」（设计 §0 / T02 实现要点） */
@@ -95,25 +93,15 @@ const CHALLENGE_KEYWORD = '冲关'
  *
  * 用途**不是校验**，而是自动迁移：主键只由坐标派生，内容搬家（插入/删除一篇、文件改名）
  * 会让坐标漂移，运行时用指纹认领旧进度（reciteBank 的 `reconcile`）。
- * 取 `title` + 每句 `text` + 每句 `alts`；**不取** `mode`（改名不影响内容同一性）、
- * **不取** `strict`（红线标记翻转不是内容变更）。
+ * 取 `title` + `paragraphs` 全文（含内联注音）；**不取**元信息字段（单元/顺序变了不是内容变更）。
  *
  * 不用 crypto.subtle（异步 + 需 secure context），32 位抗碰撞对「同一文件内几十篇」足够。
  * @param {{title?: string, items?: Array<object>}} block cloze 区块
  * @returns {string} base36 指纹
  */
 export function fingerprintOf(block) {
-  const items = block && Array.isArray(block.items) ? block.items : []
-  const src =
-    String((block && block.title) || '') +
-    '\u0001' +
-    items
-      .map((it) => {
-        const text = String((it && it.text) || '')
-        const alts = it && Array.isArray(it.alts) ? it.alts.join('\u0003') : ''
-        return text + '\u0002' + alts
-      })
-      .join('\u0001')
+  const paras = block && Array.isArray(block.paragraphs) ? block.paragraphs : []
+  const src = String((block && block.title) || '') + '\u0001' + paras.map((p) => String(p || '')).join('\u0001')
   let h = 0x811c9dc5
   for (let i = 0; i < src.length; i++) {
     h ^= src.charCodeAt(i)
@@ -132,7 +120,7 @@ export function fingerprintOf(block) {
  * @param {Array<object>} blocks 页面区块树
  * @returns {{topLevel: Array<object>, nested: Array<{depth: number, block: object}>}}
  */
-export function collectClozeBlocks(blocks) {
+export function collectReciteBlocks(blocks) {
   const topLevel = []
   const nested = []
   const walk = (list, depth) => {
@@ -144,7 +132,7 @@ export function collectClozeBlocks(blocks) {
         continue
       }
       if (!block || typeof block !== 'object') continue
-      if (block.type === 'cloze') {
+      if (block.type === 'knowledge') {
         if (depth === 0) topLevel.push(block)
         else nested.push({ depth, block })
         continue
@@ -155,30 +143,6 @@ export function collectClozeBlocks(blocks) {
   }
   walk(blocks, 0)
   return { topLevel, nested }
-}
-
-/**
- * 单块计数：句数 / 空数 / strict 句数 —— **一律**走共享判分层，本函数不做任何文本解析。
- *
- * `strictCount` 是**句数**而非空位数（`reciteBank.PIECE_KEYS` 契约原文：「`strict:true` 的句数」，
- * 设计 §3.4 同口径）：关雎的 strict 句含 2 个空、但只算 **1 句** —— 该字段用途是
- * 「A3 筛出含红线句的篇」，按句计数才与「全库仅 1 句 strict」这个事实基线对得上。
- * @param {{items?: Array<object>}} block cloze 区块
- * @returns {{sentenceCount: number, blankCount: number, strictCount: number}}
- */
-export function countBlock(block) {
-  const items = buildClozeItems(block)
-  const blanks = flattenBlanks(items)
-  return {
-    sentenceCount: items.length,
-    blankCount: blanks.length,
-    strictCount: items.filter((it) => it.strict === true).length
-  }
-}
-
-/** 求和（负数/非数字按 0 计，避免产物字段缺失把汇总算成 NaN） */
-function sumOf(rows, field) {
-  return rows.reduce((acc, r) => acc + (Number.isFinite(r[field]) ? r[field] : 0), 0)
 }
 
 /**
@@ -212,54 +176,38 @@ export function summarize(pieces, blockRows) {
   const blocks = Array.isArray(blockRows) ? blockRows : []
   const counts = deriveCounts(rows.map((p) => ({ role: p.role })))
   return {
-    totalClozeBlocks: blocks.length,
-    excludedReveal: blocks.filter((b) => b.mode !== CLOZE_MODE_INPUT).length,
+    totalReciteBlocks: blocks.length,
     pieces: rows.length,
     lesson: counts.lesson,
     review: counts.review,
-    totalSentence: sumOf(rows, 'sentenceCount'),
-    totalBlank: sumOf(rows, 'blankCount'),
-    multiBlankPieces: rows.filter((p) => p.blankCount > p.sentenceCount).length,
-    multiBlankAllBlocks: blocks.filter((b) => b.blankCount > b.sentenceCount).length,
-    strictSentences: sumOf(rows, 'strictCount')
+    totalParagraphs: rows.reduce((a, r) => a + (Array.isArray(r.paragraphs) ? r.paragraphs.length : 0), 0)
   }
 }
 
-/** 按 fileKey 聚合「篇 / 句 / 空」，供断言失败时打印可定位的差异清单 */
+/** 按 fileKey 聚合「篇 / 段落」，供断言失败时打印可定位的差异清单 */
 function breakdownByFile(rows) {
   const map = new Map()
   for (const r of rows) {
-    const cur = map.get(r.fileKey) || {
-      fileKey: r.fileKey,
-      fileTitle: r.fileTitle,
-      n: 0,
-      sentences: 0,
-      blanks: 0,
-      reveal: 0
-    }
+    const cur = map.get(r.fileKey) || { fileKey: r.fileKey, fileTitle: r.fileTitle, n: 0, paras: 0 }
     cur.n += 1
-    cur.sentences += Number.isFinite(r.sentenceCount) ? r.sentenceCount : 0
-    cur.blanks += Number.isFinite(r.blankCount) ? r.blankCount : 0
-    if (r.mode && r.mode !== CLOZE_MODE_INPUT) cur.reveal += 1
+    cur.paras += Array.isArray(r.paragraphs) ? r.paragraphs.length : 0
     map.set(r.fileKey, cur)
   }
   return [...map.values()].map(
-    (g) =>
-      `${g.fileTitle || g.fileKey}（${g.fileKey}）：${g.n} 篇 / ${g.sentences} 句 / ${g.blanks} 空` +
-      `${g.reveal ? `（含已排除 reveal ${g.reveal}）` : ''}`
+    (g) => `${g.fileTitle || g.fileKey}（${g.fileKey}）：${g.n} 篇 / ${g.paras} 段`
   )
 }
 
-/** 「一句多空」清单（证明该字段不是摆设：这些篇的 blankCount > sentenceCount） */
-function multiBlankLines(rows) {
+/** 「无正文」清单（渲染出来是空白页且不报错，必须点名）。
+ *
+ * ⚠️ 判据**不在此重写**：一律 import `reciteBank.hasReadableBody` —— 运行时 `isUsablePiece`
+ *    用的是同一个函数。两边各写一份的后果是「运行时丢掉这篇、构建期却说没问题」，
+ *    谁也不报警，空白正文就那样进了产物（历史教训：`['']` 这种形态两边都判成"有正文"）。
+ */
+function emptyBodyLines(rows) {
   return rows
-    .filter((r) => r.blankCount > r.sentenceCount)
-    .map((r) => `${r.fileTitle || r.fileKey} · ${r.title}（${r.sentenceCount} 句 / ${r.blankCount} 空）`)
-}
-
-/** 「有正文却零空位」清单（运行时会渲染不出任何输入框，必须点名） */
-function emptyBlankLines(rows) {
-  return rows.filter((r) => !(r.blankCount > 0)).map((r) => `${r.key}（${r.fileTitle || r.fileKey} · ${r.title}）`)
+    .filter((r) => !hasReadableBody(r.paragraphs))
+    .map((r) => `${r.key}（${r.fileTitle || r.fileKey} · ${r.title}）`)
 }
 
 /** 重复主键清单 */
@@ -292,77 +240,42 @@ export function assertBaseline(summary, pieces, blockRows, extra = {}) {
   const blocks = Array.isArray(blockRows) ? blockRows : []
   const bankBreakdown = breakdownByFile(rows)
   const allBreakdown = breakdownByFile(blocks)
-  const multiLines = multiBlankLines(rows)
   const failures = []
   const add = (label, expected, actual, hints = []) => {
     if (expected === actual) return
     failures.push({ label, expected, actual, delta: actual - expected, hints })
   }
 
-  // ① 全库块数（含 reveal）：这一项变了说明有页面新增/删除了 cloze，属于内容结构变更
-  add('全库顶层 cloze 块数（含 reveal）', BASELINE.totalClozeBlocks, summary.totalClozeBlocks, [
+  // ① 08 单元 knowledge 块数（唯一数据源）：变了说明内容侧新增/删减了背诵篇目
+  add('08-背诵专项 的 knowledge 块数', BASELINE.totalReciteBlocks, summary.totalReciteBlocks, [
     '全库按文件分布：',
     ...allBreakdown
   ])
-  // ② 排除的 reveal 篇数
-  add('排除的 reveal 块数（mode 缺省或 !== input）', BASELINE.excludedReveal, summary.excludedReveal, [
-    '全库按文件分布：',
-    ...allBreakdown
-  ])
-  // ③ 篇数 = 74 − 1
-  add(
-    `篇目数（全库 ${BASELINE.totalClozeBlocks} − reveal ${BASELINE.excludedReveal}）`,
-    BASELINE.pieces,
-    summary.pieces,
-    ['产物按文件分布：', ...bankBreakdown]
-  )
-  // ④ 正课 / 复习
+  // ② 产物篇目数
+  add('篇目数', BASELINE.pieces, summary.pieces, ['产物按文件分布：', ...bankBreakdown])
+  // ③ 正课 / 复习
   add('lesson 篇数', BASELINE.lesson, summary.lesson, ['产物按文件分布：', ...bankBreakdown])
   add('review 篇数（title 匹配 /自测|冲关/）', BASELINE.review, summary.review, [
-    '若 review 数变化，请先确认内容侧是否新增/删除了「综合自测 / 综合大冲关」块。',
+    '08 单元当前无复习篇；若数字变化，先确认内容侧是否新增了「综合自测 / 综合大冲关」块。',
     '产物按文件分布：',
     ...bankBreakdown
   ])
-  // ⑤ 句数 / 空数
-  add('总句数（sentenceCount 之和）', BASELINE.totalSentence, summary.totalSentence, [
-    '产物按文件分布：',
-    ...bankBreakdown
-  ])
-  add('总空位数（blankCount 之和）', BASELINE.totalBlank, summary.totalBlank, [
-    '产物按文件分布：',
-    ...bankBreakdown
-  ])
-  // ⑥ 一句多空篇数
-  add('一句多空的篇数（产物内 blankCount > sentenceCount）', BASELINE.multiBlankPieces, summary.multiBlankPieces, [
-    '当前产物内一句多空的篇：',
-    ...multiLines
-  ])
-  // ⑦ 结构性不变量（与内容基线无关，永远必须成立）
-  add('全库一句多空的块数（含 reveal，仅用于汇总行对照）', BASELINE.multiBlankAllBlocks, summary.multiBlankAllBlocks, [
-    '全库按文件分布：',
-    ...allBreakdown
-  ])
-  add('含 strict 句的篇内 strict 句总数', BASELINE.strictSentences, summary.strictSentences, [
-    'strict 句是红线句（全库仅关雎 1 句），数字变化意味着红线标记被翻转或新增 —— 必须复核 A3 专项断言。'
-  ])
-
-  // ⑧ order 为 0..n-1 连续
+  // ④ 结构性不变量（与内容基线无关，永远必须成立）
   const orderIssues = orderMismatchLines(rows)
   add('order 连续（0..n-1）', 0, orderIssues.length, orderIssues.slice(0, 20))
-  // ⑨ key 唯一
   const dups = duplicateLines(rows)
   add('重复主键数（key 必须唯一）', 0, dups.length, dups.slice(0, 20))
-  // ⑩ 每篇 blankCount > 0（零空篇渲染不出输入框 → 用户看到空白页且无报错）
-  const emptyBlanks = emptyBlankLines(rows)
-  add('零空位的篇数（每篇必须 blankCount > 0）', 0, emptyBlanks.length, emptyBlanks.slice(0, 20))
-  // ⑪ contentVersion 必须是有限数字（双源比较的唯一键）
+  // ⑤ 每篇必须有正文：无正文的篇渲染出来是空白页且不报错（静默失败，必须拦在构建期）
+  const emptyBody = emptyBodyLines(rows)
+  add('无正文的篇数（每篇必须 paragraphs.length > 0）', 0, emptyBody.length, emptyBody.slice(0, 20))
+  // ⑥ contentVersion 必须是有限数字（双源比较的唯一键）
   add('contentVersion 非有限数字（1 = 非法）', 0, Number.isFinite(extra.contentVersion) ? 0 : 1, [
     `期望：来自 contentManifest.CONTENT_VERSION 的有限数字 / 实际：${String(extra.contentVersion)}`
   ])
-  // ⑫ 产物必须能被运行时的 sanitizeBank 认出来（否则发布后加载即「产物不可用」）
+  // ⑦ 产物必须能被运行时的 sanitizeBank 认出来（否则发布后加载即「产物不可用」）
   if (extra.roundTripPieces !== undefined) {
     add('产物经 sanitizeBank 往返后的篇数', summary.pieces, extra.roundTripPieces, [
-      '被 sanitizeBank 丢弃的条目（缺 key / fileKey / title，或 schemaVersion / contentVersion 不合规）：',
+      '被 sanitizeBank 丢弃的条目（缺 key / fileKey / title / 正文，或版本不合规）：',
       ...(Array.isArray(extra.droppedKeys) && extra.droppedKeys.length ? extra.droppedKeys : ['（无明细）'])
     ])
   }
@@ -384,8 +297,8 @@ export function printFailures(failures) {
     for (const hint of f.hints || []) lines.push(`       ${hint}`)
   })
   lines.push(
-    '[recite-bank] 若内容侧确认新增/调整了默写篇目，请同步更新 scripts/build-recite-bank.mjs 顶部的 BASELINE 常量，' +
-      '并复核 docs/design-recitation.md §0 与 PRD 的篇数口径（73 篇 / 170 句 / 193 空 / 16 篇一句多空）。'
+    '[recite-bank] 若内容侧确认新增/调整了背诵篇目，请同步更新 scripts/build-recite-bank.mjs 顶部的 BASELINE 常量，' +
+      '并复核 docs/design-recitation.md §0 与 PRD 的篇数口径（当前：64 篇 / lesson 64 / review 0）。'
   )
   lines.push('[recite-bank] 产物**未**写入磁盘（断言先于落盘，避免把不合基线的产物入库）。')
   console.error(lines.join('\n'))
@@ -394,7 +307,9 @@ export function printFailures(failures) {
 /**
  * 采集背诵篇目（**不落盘**，供测试直接断言形状；构建入口 build() 消费它再断言 + 写盘）。
  *
- * 排除规则：`(block.mode || 'reveal') !== 'input'`（reveal 篇不能默写）。
+ * 采集范围：**只收** `08-背诵专项`（`RECITE_UNIT_NUM`）的**顶层** `knowledge` 区块；
+ *          其它单元整体跳过并点名（`otherUnits`）—— 它们的 knowledge 是知识点讲解，不是背诵篇目。
+ * 无排除规则：本方案不再有 reveal 概念（不挖空、不判分），所有篇目都可展示。
  * 角色规则：`title` 匹配 `/自测|冲关/` → `role: 'review'`，否则 `'lesson'`；
  *          review 里 `title` 含「冲关」→ `trigger: 'all'`，其余 `'file'`（**只在这一处**按 title 判定，
  *          判定结果落进产物，运行时不猜）。
@@ -406,7 +321,6 @@ export function printFailures(failures) {
  *   nested: Array<{rel: string, fileTitle: string, title: string, depth: number}>,
  *   unregistered: string[],
  *   loadFailed: Array<{rel: string, message: string}>,
- *   nonChinese: Array<{rel: string, title: string}>
  * }>}
  */
 export async function collectReciteBank() {
@@ -416,7 +330,7 @@ export async function collectReciteBank() {
   const nested = []
   const unregistered = []
   const loadFailed = []
-  const nonChinese = []
+  const otherUnits = []
 
   for (const file of collectFiles(CONTENT_DIR)) {
     const rel = relPathOf(file)
@@ -436,38 +350,31 @@ export async function collectReciteBank() {
     if (!page) continue
 
     // fileKey 由 pageMeta 唯一真相源生成（与 UnitView 的 pageKey 同一条规则）
+    // 只收「语文学科 + 08-背诵专项」。
+    // ⚠️ 单元号在三个学科间**会重复**：computer_08 是数据库、math_08 是计数原理。
+    //    只判 unitNum 会把它们的 knowledge 一起收进来 —— 本脚本第一次跑就吃了这个亏
+    //    （实测收到 88 篇而非 64 篇，正是多算了这两个单元）。学科与单元**必须同时**限定。
+    if (info.subject !== SUBJECT || String(info.unitNum) !== RECITE_UNIT_NUM) {
+      otherUnits.push({ rel, title: info.title })
+      continue
+    }
+
     const fileKey = pageFileKeyOf(info)
-    const { topLevel, nested: nestedBlocks } = collectClozeBlocks(page.blocks)
+    const { topLevel, nested: nestedBlocks } = collectReciteBlocks(page.blocks)
 
     for (const n of nestedBlocks) {
       nested.push({ rel, fileTitle: info.title, title: n.block.title || '', depth: n.depth })
     }
 
     topLevel.forEach((block, blockIndex) => {
-      const mode = block.mode || 'reveal'
       const title = typeof block.title === 'string' ? block.title : ''
-      const { sentenceCount, blankCount, strictCount } = countBlock(block)
+      const paragraphs = Array.isArray(block.paragraphs)
+        ? block.paragraphs.map((p) => String(p == null ? '' : p))
+        : []
 
-      // 全库统计：用于汇总行的「全库 N」与 reveal 计数（含被排除的块）
-      // 字段名与产物篇目对齐（sentenceCount / blankCount），差异清单才能一行两用
-      blockRows.push({
-        fileKey,
-        fileTitle: info.title,
-        rel,
-        title,
-        mode,
-        sentenceCount,
-        blankCount,
-        strictCount
-      })
+      // 全库统计：用于汇总行的「全库 N」；字段名与产物篇目对齐，差异清单才能一行两用
+      blockRows.push({ fileKey, fileTitle: info.title, rel, title, paragraphs })
 
-      // 排除 reveal 篇（不可默写；设计 §T02 实现要点）
-      if (mode !== CLOZE_MODE_INPUT) return
-      // 一期只产出语文：其它学科的 cloze 不写入 chinese.json，但必须点名（不允许静默少收）
-      if (info.subject !== SUBJECT) {
-        nonChinese.push({ rel, title })
-        return
-      }
 
       const role = REVIEW_TITLE_RE.test(title) ? PIECE_ROLE.REVIEW : PIECE_ROLE.LESSON
       // 先组装长键原文 → `normalizePiece` 归一并补默认值（lesson 剥 trigger / review 补 'file'）
@@ -494,10 +401,7 @@ export async function collectReciteBank() {
           fileTitle: info.title,
           unitTitle: info.unitTitle,
           title,
-          mode: CLOZE_MODE_INPUT,
-          sentenceCount,
-          blankCount,
-          strictCount,
+          paragraphs,
           fp: fingerprintOf(block)
         })
       )
@@ -528,11 +432,11 @@ export async function collectReciteBank() {
     pieces
   }
 
-  return { bank, pieces, blockRows, nested, unregistered, loadFailed, nonChinese }
+  return { bank, pieces, blockRows, nested, unregistered, loadFailed, otherUnits }
 }
 
 /** 打印「跳过类」告警：嵌套 cloze / 未注册文件 / 加载失败 / 非语文学科 —— 一律点名 */
-function reportSkipped({ nested, unregistered, loadFailed, nonChinese }) {
+function reportSkipped({ nested, unregistered, loadFailed, otherUnits }) {
   if (nested.length) {
     console.warn(
       '[recite-bank] ⚠️ 以下**嵌套** cloze 已跳过（运行时按 page.blocks 顶层 cloze 流水号定位，' +
@@ -553,10 +457,11 @@ function reportSkipped({ nested, unregistered, loadFailed, nonChinese }) {
         loadFailed.map((f) => `${f.rel}（${f.message}）`).join('\n  ')
     )
   }
-  if (nonChinese.length) {
+  if (otherUnits.length) {
     console.warn(
-      `[recite-bank] ⚠️ 以下 cloze 不属于 ${SUBJECT}，已跳过（一期只产出 ${RECITE_BANK_PATH}）：\n  ` +
-        nonChinese.map((n) => `${n.rel} · 「${n.title || '(无标题)'}」`).join('\n  ')
+      `[recite-bank] 以下 ${otherUnits.length} 个文件不在 ${SUBJECT}/${RECITE_UNIT_NUM}-背诵专项，已跳过` +
+        '（只收「语文 + 08 单元」的 knowledge；其余或是别的学科，或是知识点讲解而非背诵篇目）：\n  ' +
+        otherUnits.map((o) => `${o.rel}（${o.title}）`).join('\n  ')
     )
   }
 }
@@ -592,9 +497,7 @@ async function build() {
   const kb = (statSync(OUT_FILE).size / 1024).toFixed(1)
   console.log(
     `[recite-bank] ${summary.pieces} 篇（lesson ${summary.lesson} / review ${summary.review}），` +
-      `排除 reveal ${summary.excludedReveal}；sentence ${summary.totalSentence} / blank ${summary.totalBlank}；` +
-      `一句多空 ${summary.multiBlankPieces}（全库 ${summary.multiBlankAllBlocks}）；` +
-      `strict ${summary.strictSentences}；contentVersion ${bank.contentVersion}；` +
+      `正文段落 ${summary.totalParagraphs}；contentVersion ${bank.contentVersion}；` +
       `→ ${RECITE_BANK_PATH}（${kb} KB）`
   )
 }
