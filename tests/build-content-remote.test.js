@@ -13,6 +13,7 @@
  */
 import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest'
 import { createHash } from 'node:crypto'
+import { CONTENT_DIR, collectFiles } from '../scripts/lib/load-content.mjs'
 
 // 模式开关：'none' 原样 / 'bad' 非法内容 / 'mutated' 改一字节（vi.hoisted 保证工厂可用）
 vi.mock('../scripts/lib/load-content.mjs', async (importOriginal) => {
@@ -97,7 +98,11 @@ describe('① 分片与页结构', () => {
 
   it('每页含坐标六件套 + blocks，且 op 恒为 upsert（B1）', () => {
     const pages = allPages(snapA)
-    expect(pages.length).toBe(183) // 内容页总数（与 collectFiles 一致）；+1 = computer 04 单元新增「09-作品训练卡（三遍法）」
+    // 页数必须与「磁盘上的内容文件数」一致 —— **从源头派生，不写死数字**。
+    // 原先硬编码 183，内容侧 2026-11-02 新增 08-背诵专项后变 184，CI 直接红；
+    // 而这个断言真正要守的是「快照里的页 == 内容目录里的页」（漏收/多收），
+    // 不是「内容侧不许加页面」——写死数字守错了对象。
+    expect(pages.length).toBe(collectFiles(CONTENT_DIR).length)
     for (const p of pages) {
       expect(Object.keys(p)).toEqual(['subject', 'unitNum', 'fileIndex', 'fileKey', 'op', 'blocks', 'hash'])
       expect(p.op).toBe(OP.UPSERT)
