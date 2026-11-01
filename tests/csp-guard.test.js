@@ -341,15 +341,16 @@ describe('L6 · 无「运行时拼接」import()（H1）', () => {
    * 改的人会被强制读这段注释。
    *
    * 历史：11 → 13（T04 背诵功能新增 `/recite` 与 `/recite/:unitNum/:fileIndex/:blockIndex`
-   * 两条，均指向新视图）。**改动方向只允许「跟着路由数走」**，绝不许为了让断言变绿
+   * 两条，均指向新视图）→ **14**（2026-11-02 新增 `/recite/all` 全部篇目回看页）。
+   * **改动方向只允许「跟着路由数走」**，绝不许为了让断言变绿
    * 把路由改成非懒加载（那等于拿掉 H1 的保护）。成对锚点：`tests/batch-f-verify-r2-csp-meta.test.js`
    * 会回读本文件交叉校验，两处必须同步改。
    */
-  it('附加锚：router 的 13 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
+  it('附加锚：router 的 14 处路由懒加载必须全是字面量（防后人改成变量拼接）', () => {
     const routerSrc = readFileSync(join(ROOT, 'src/router/index.js'), 'utf-8')
     const args = extractImportArgs(routerSrc)
     const viewLazy = args.filter((a) => /^['"]@\/views\/.+\.vue['"]$/.test(a.trim()))
-    expect(viewLazy, 'router 应为 13 处 @/views/*.vue 懒加载').toHaveLength(13)
+    expect(viewLazy, 'router 应为 14 处 @/views/*.vue 懒加载').toHaveLength(14)
     // 其余（如 main.js 预热 useKatex 的动态 import）同样必须静态可分析
     for (const a of args) {
       expect(isStaticImportArg(a), `import(${a.trim()}) 必须静态可分析`).toBe(true)
