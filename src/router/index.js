@@ -83,8 +83,19 @@ const routes = [
     component: () => import('@/views/ReciteView.vue')
   },
   {
+    // 全部篇目（回看入口）：首页队列只显示「今日新篇 / 今日待重默」，
+    // 一篇背过之后排期被推到未来就从队列消失，学员无处回看 —— 本页补这个缺口。
+    // 必须排在 `/recite/:unitNum/:fileIndex/:blockIndex` **之前**：后者是 3 段动态参数，
+    // 若它在前，`/recite/all` 不会被误匹配（段数不同），但显式先声明可避免将来
+    // 有人把参数改成可选段时静默劫持本页。无 `meta.tab`（同 /recite）。
+    path: '/recite/all',
+    name: 'recite-all',
+    component: () => import('@/views/ReciteAllView.vue')
+  },
+  {
     // 单篇默写作答（T04）：坐标 = 产物条目里的 unitNum / fileIndex / blockIndex。
-    // `?manual=1` 是「综合大冲关 · 模拟考场」手动入口（该分支不写任何 recite_progress 行）。
+    // `?manual=1` 是「综合大冲关 · 模拟考场」手动入口（该分支不写任何 recite_progress 行）；
+    // 2026-11-02 起「全部篇目」的回看也复用它（回看不推进 stage，见 ReciteAllView 注释）。
     // 同样**无 `meta.tab`**。
     path: '/recite/:unitNum/:fileIndex/:blockIndex',
     name: 'recite-piece',

@@ -18,6 +18,10 @@
     <header class="rc-head">
       <h1 class="rc-head__title">每日背诵</h1>
       <p class="rc-head__sub">每日一篇 · 按记忆曲线滚动复习</p>
+      <!-- 队列看不到「背过的篇」，这里给一个总目录（只读回看，不改调度） -->
+      <!-- 用 path 而非 `{ name: 'recite-all' }`：命名路由要求路由表已注册该项，
+           而视图级测试常用最小路由表，命名查找失败会抛 "No match for"。 -->
+      <router-link class="rc-head__all" to="/recite/all">全部篇目 →</router-link>
     </header>
 
     <!-- 加载中（首屏唯一阻塞态） -->
@@ -344,4 +348,12 @@ onMounted(() => {
   color: var(--text-muted);
   text-align: center;
 }
+.rc-head__all {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--accent-fg, #1565c0);
+  text-decoration: none;
+}
+
 </style>

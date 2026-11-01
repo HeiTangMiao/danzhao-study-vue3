@@ -68,9 +68,8 @@
     <template v-else-if="state === 'ready'">
       <main class="rp-stage">
         <p v-if="isManual" class="rp-manual">自测模式：本次不计入背诵进度</p>
-        <article class="rp-passage">
-          <p v-for="(para, i) in paragraphs" :key="i" class="rp-passage__para">{{ para }}</p>
-        </article>
+        <!-- 逐字注音：诗词全注 → <ruby> 逐字；长篇只注难字 → 原样保留括号（解析见 reciteRuby.js） -->
+        <RecitePassage :paragraphs="paragraphs" />
 
         <!-- 自评：二元打卡（内容侧定义「已能背诵 / 还需练习」），纯打卡、不进判分口径 -->
         <div v-if="!submitted" class="rp-selfcheck">
@@ -114,6 +113,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
+import RecitePassage from '@/components/RecitePassage.vue'
 import { loadPage as loadContentPage } from '@/content/loadPage'
 import { RECITE_HOME_PATH, RECITE_PHASE, buildReciteContext, useReciteStore } from '@/stores/recite'
 
@@ -468,24 +468,6 @@ onUnmounted(() => {
 
 .rp-fade-enter-active, .rp-fade-leave-active { transition: opacity 160ms ease; }
 .rp-fade-enter-from, .rp-fade-leave-to { opacity: 0; }
-/* ── 整篇正文（含内联注音）──────────────────────────────────────────── */
-.rp-passage {
-  padding: 14px 16px;
-  background: var(--surface, #fff);
-  border-radius: 12px;
-}
-.rp-passage__para {
-  margin: 0 0 12px;
-  /* 注音以全角括号内联在正文里，行高放宽避免上下行粘连 */
-  font-size: 17px;
-  line-height: 2;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.rp-passage__para:last-child {
-  margin-bottom: 0;
-}
-
 /* ── 底部自评 ───────────────────────────────────────────────────────── */
 .rp-selfcheck {
   margin-top: 16px;

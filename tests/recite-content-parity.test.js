@@ -364,8 +364,16 @@ describe('identity 守卫：产物 title 与内容块 title 不一致', () => {
     const ready = await waitFor(() => (wrapper.find('.rp-passage').exists() ? wrapper : null))
     expect(ready, 'title 一致时未能进入朗读态').toBeTruthy()
 
-    // 整篇原文（含内联注音）原样展示 —— 新方案的"答案"就是这个全文
-    expect(wrapper.text()).toContain('关关雎鸠（guān guān jū jiū）')
+    // 整篇原文（含注音）原样展示 —— 新方案的"答案"就是这个全文。
+    // 2026-11-02 起渲染改为**逐字 ruby**（拼音在字上方），因此断言从「含括号原文」
+    // 改为「每个字一个 ruby + rt 逐字对齐」：这才是用户实际看到的形态。
+    // ⚠️ 别改回 `toContain('关关雎鸠（guān…）')` —— 逐字模式下不再输出括号。
+    const rubies = wrapper.findAll('ruby')
+    expect(rubies.length, '应逐字渲染 8 个 ruby（关关雎鸠 + 在河之洲）').toBe(8)
+    expect(rubies.map((r) => r.find('rt').text())).toEqual([
+      'guān', 'guān', 'jū', 'jiū', 'zài', 'hé', 'zhī', 'zhōu'
+    ])
+    expect(wrapper.text()).not.toContain('（')
     expect(wrapper.find('.rp-selfcheck').exists()).toBe(true)
     expect(H.stub.saveReciteProgress).not.toHaveBeenCalled()
 
