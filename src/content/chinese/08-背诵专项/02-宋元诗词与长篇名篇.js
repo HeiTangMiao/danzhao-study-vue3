@@ -1,12 +1,13 @@
 /**
  * 内容页面数据（content-schema 的实例）
  * 页面：背诵专项 · 宋元诗词与长篇名篇
- * 说明：每日背诵素材库（宋元词曲 + 唐诗长篇与北朝民歌，23 篇）—— 完整原文 + 注音。
+ * 说明：每日背诵素材库（宋元词曲 + 唐诗长篇与北朝民歌，23 篇）—— 完整原文 + 逐字注音。
  *
  * 形式约定（与 07-默写专项 刻意区分）：
  *   - 不做 cloze 挖空：背诵是「看着全篇诵读记忆」，不是「填空默写」
  *   - 诗词（诗/词/曲）逐字全注：注音随句标注，覆盖每字
- *   - 文言文与长篇（>150 字）只注难字：多音字、生僻字、通假字
+ *   - 2026-11-02 起**全部篇目逐字全注**（原「文言文与长篇只注难字」废止）：
+ *     每个分句后紧跟（pīn yīn），覆盖句中每一个字，多音字按句意取音
  *
  * ⚠️ 分页约定（2026-11-02 拆分）：08 单元按「时代 + 体裁」分 4 页，
  *    **不管分几页，每篇篇目仍是本页的一个顶层 `knowledge` 区块**。
@@ -138,9 +139,9 @@ export default {
     },
     {
       type: "knowledge",
-      title: "将进酒 · 李白（长篇，只注难字）",
+      title: "将进酒 · 李白",
       paragraphs: [
-        "君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽（zūn）空对月。天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。钟鼓馔（zhuàn）玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。陈王昔时宴平乐，斗酒十千恣（zì）欢谑（xuè）。主人何为言少钱，径须沽（gū）取对君酌。五花马，千金裘（qiú），呼儿将出换美酒，与尔同销万古愁。"
+        "君不见黄河之水天上来（jūn bú jiàn huáng hé zhī shuǐ tiān shàng lái），奔流到海不复回（bēn liú dào hǎi bú fù huí）。\n君不见高堂明镜悲白发（jūn bú jiàn gāo táng míng jìng bēi bái fà），朝如青丝暮成雪（zhāo rú qīng sī mù chéng xuě）。\n人生得意须尽欢（rén shēng dé yì xū jìn huān），莫使金樽空对月（mò shǐ jīn zūn kōng duì yuè）。\n天生我材必有用（tiān shēng wǒ cái bì yǒu yòng），千金散尽还复来（qiān jīn sàn jìn huán fù lái）。\n烹羊宰牛且为乐（pēng yáng zǎi niú qiě wéi lè），会须一饮三百杯（huì xū yì yǐn sān bǎi bēi）。\n岑夫子（cén fū zǐ），丹丘生（dān qiū shēng），将进酒（qiāng jìn jiǔ），杯莫停（bēi mò tíng）。\n与君歌一曲（yǔ jūn gē yì qǔ），请君为我倾耳听（qǐng jūn wèi wǒ qīng ěr tīng）。\n钟鼓馔玉不足贵（zhōng gǔ zhuàn yù bù zú guì），但愿长醉不愿醒（dàn yuàn cháng zuì bú yuàn xǐng）。\n古来圣贤皆寂寞（gǔ lái shèng xián jiē jì mò），惟有饮者留其名（wéi yǒu yǐn zhě liú qí míng）。\n陈王昔时宴平乐（chén wáng xī shí yàn píng lè），斗酒十千恣欢谑（dǒu jiǔ shí qiān zì huān xuè）。\n主人何为言少钱（zhǔ rén hé wèi yán shǎo qián），径须沽取对君酌（jìng xū gū qǔ duì jūn zhuó）。\n五花马（wǔ huā mǎ），千金裘（qiān jīn qiú），呼儿将出换美酒（hū ér jiāng chū huàn měi jiǔ），与尔同销万古愁（yǔ ěr tóng xiāo wàn gǔ chóu）。"
       ]
     },
     {
@@ -152,9 +153,9 @@ export default {
     },
     {
       type: "knowledge",
-      title: "茅屋为秋风所破歌 · 杜甫（长篇，只注难字）",
+      title: "茅屋为秋风所破歌 · 杜甫",
       paragraphs: [
-        "八月秋高风怒号，卷我屋上三重茅。茅飞渡江洒江郊，高者挂罥（juàn）长林梢，下者飘转沉塘坳（ào）。南村群童欺我老无力，忍能对面为盗贼。公然抱茅入竹去，唇焦口燥呼不得，归来倚仗自叹息。俄顷风定云墨色，秋天漠漠向昏黑。布衾（qīn）多年冷似铁，娇儿恶卧踏里裂。床头屋漏无干处，雨脚如麻未断绝。自经丧乱少睡眠，长夜沾湿何由彻！安得广厦（shà）千万间，大庇（bì）天下寒士俱欢颜，风雨不动安如山。呜呼！何时眼前突兀（wù）见此屋，吾庐独破受冻死亦足！"
+        "八月秋高风怒号（bā yuè qiū gāo fēng nù háo），卷我屋上三重茅（juǎn wǒ wū shàng sān chóng máo）。\n茅飞渡江洒江郊（máo fēi dù jiāng sǎ jiāng jiāo），高者挂罥长林梢（gāo zhě guà juàn cháng lín shāo），下者飘转沉塘坳（xià zhě piāo zhuǎn chén táng ào）。\n南村群童欺我老无力（nán cūn qún tóng qī wǒ lǎo wú lì），忍能对面为盗贼（rěn néng duì miàn wéi dào zéi）。\n公然抱茅入竹去（gōng rán bào máo rù zhú qù），唇焦口燥呼不得（chún jiāo kǒu zào hū bù dé），归来倚仗自叹息（guī lái yǐ zhàng zì tàn xī）。\n俄顷风定云墨色（é qǐng fēng dìng yún mò sè），秋天漠漠向昏黑（qiū tiān mò mò xiàng hūn hēi）。\n布衾多年冷似铁（bù qīn duō nián lěng sì tiě），娇儿恶卧踏里裂（jiāo ér wū wò tà lǐ liè）。\n床头屋漏无干处（chuáng tóu wū lòu wú gān chù），雨脚如麻未断绝（yǔ jiǎo rú má wèi duàn jué）。\n自经丧乱少睡眠（zì jīng sāng luàn shǎo shuì mián），长夜沾湿何由彻（cháng yè zhān shī hé yóu chè）！\n安得广厦千万间（ān dé guǎng shà qiān wàn jiān），大庇天下寒士俱欢颜（dà bì tiān xià hán shì jù huān yán），风雨不动安如山（fēng yǔ bú dòng ān rú shān）。\n呜呼（wū hū）！何时眼前突兀见此屋（hé shí yǎn qián tū wù xiàn cǐ wū），吾庐独破受冻死亦足（wú lú dú pò shòu dòng sǐ yì zú）！"
       ]
     },
     {
@@ -166,30 +167,30 @@ export default {
     },
     {
       type: "knowledge",
-      title: "白雪歌送武判官归京 · 岑参（长篇，只注难字）",
+      title: "白雪歌送武判官归京 · 岑参",
       paragraphs: [
-        "北风卷地白草折，胡天八月即飞雪。忽如一夜春风来，千树万树梨花开。散入珠帘湿罗幕，狐裘（qiú）不暖锦衾（qīn）薄。将军角弓不得控，都护铁衣冷难着。瀚（hàn）海阑（lán）干百丈冰，愁云惨淡万里凝。中军置酒饮归客，胡琴琵琶与羌（qiāng）笛。纷纷暮雪下辕门，风掣（chè）红旗冻不翻。轮台东门送君去，去时雪满天山路。山回路转不见君，雪上空留马行处。"
+        "北风卷地白草折（běi fēng juǎn dì bái cǎo zhé），胡天八月即飞雪（hú tiān bā yuè jí fēi xuě）。\n忽如一夜春风来（hū rú yí yè chūn fēng lái），千树万树梨花开（qiān shù wàn shù lí huā kāi）。\n散入珠帘湿罗幕（sàn rù zhū lián shī luó mù），狐裘不暖锦衾薄（hú qiú bù nuǎn jǐn qīn bó）。\n将军角弓不得控（jiāng jūn jiǎo gōng bù dé kòng），都护铁衣冷难着（dū hù tiě yī lěng nán zhuó）。\n瀚海阑干百丈冰（hàn hǎi lán gān bǎi zhàng bīng），愁云惨淡万里凝（chóu yún cǎn dàn wàn lǐ níng）。\n中军置酒饮归客（zhōng jūn zhì jiǔ yìn guī kè），胡琴琵琶与羌笛（hú qín pí pá yǔ qiāng dí）。\n纷纷暮雪下辕门（fēn fēn mù xuě xià yuán mén），风掣红旗冻不翻（fēng chè hóng qí dòng bù fān）。\n轮台东门送君去（lún tái dōng mén sòng jūn qù），去时雪满天山路（qù shí xuě mǎn tiān shān lù）。\n山回路转不见君（shān huí lù zhuǎn bú jiàn jūn），雪上空留马行处（xuě shàng kōng liú mǎ xíng chù）。"
       ]
     },
     {
       type: "knowledge",
-      title: "卖炭翁 · 白居易（长篇，只注难字）",
+      title: "卖炭翁 · 白居易",
       paragraphs: [
-        "卖炭翁，伐薪烧炭南山中。满面尘灰烟火色，两鬓（bìn）苍苍十指黑。卖炭得钱何所营？身上衣裳口中食。可怜身上衣正单，心忧炭贱愿天寒。夜来城外一尺雪，晓驾炭车辗（niǎn）冰辙（zhé）。牛困人饥日已高，市南门外泥中歇。翩翩（piān）两骑来是谁？黄衣使者白衫儿。手把文书口称敕（chì），回车叱（chì）牛牵向北。一车炭，千余斤，宫使驱将惜不得。半匹红绡（xiāo）一丈绫（líng），系向牛头充炭直（zhí，同“值”）。"
+        "卖炭翁（mài tàn wēng），伐薪烧炭南山中（fá xīn shāo tàn nán shān zhōng）。\n满面尘灰烟火色（mǎn miàn chén huī yān huǒ sè），两鬓苍苍十指黑（liǎng bìn cāng cāng shí zhǐ hēi）。\n卖炭得钱何所营（mài tàn dé qián hé suǒ yíng）？身上衣裳口中食（shēn shàng yī cháng kǒu zhōng shí）。\n可怜身上衣正单（kě lián shēn shàng yī zhèng dān），心忧炭贱愿天寒（xīn yōu tàn jiàn yuàn tiān hán）。\n夜来城外一尺雪（yè lái chéng wài yì chǐ xuě），晓驾炭车辗冰辙（xiǎo jià tàn chē niǎn bīng zhé）。\n牛困人饥日已高（niú kùn rén jī rì yǐ gāo），市南门外泥中歇（shì nán mén wài ní zhōng xiē）。\n翩翩两骑来是谁（piān piān liǎng qí lái shì shuí）？黄衣使者白衫儿（huáng yī shǐ zhě bái shān ér）。\n手把文书口称敕（shǒu bǎ wén shū kǒu chēng chì），回车叱牛牵向北（huí chē chì niú qiān xiàng běi）。\n一车炭（yì chē tàn），千余斤（qiān yú jīn），宫使驱将惜不得（gōng shǐ qū jiāng xī bù dé）。\n半匹红绡一丈绫（bàn pǐ hóng xiāo yí zhàng líng），系向牛头充炭直（jì xiàng niú tóu chōng tàn zhí）。"
       ]
     },
     {
       type: "knowledge",
-      title: "琵琶行（节选） · 白居易（长篇，只注难字）",
+      title: "琵琶行（节选） · 白居易",
       paragraphs: [
-        "浔阳江头夜送客，枫叶荻（dí）花秋瑟瑟（sè）。主人下马客在船，举酒欲饮无管弦。醉不成欢惨将别，别时茫茫江浸月。忽闻水上琵琶声，主人忘归客不发。……大弦嘈嘈（cáo）如急雨，小弦切切如私语。嘈嘈切切错杂弹，大珠小珠落玉盘。……银瓶乍（zhà）破水浆迸（bèng），铁骑突出刀枪鸣。曲终收拨当心画，四弦一声如裂帛。东船西舫（fǎng）悄无言，唯见江心秋月白。……同是天涯沦落人，相逢何必曾相识。"
+        "浔阳江头夜送客（xún yáng jiāng tóu yè sòng kè），枫叶荻花秋瑟瑟（fēng yè dí huā qiū sè sè）。\n主人下马客在船（zhǔ rén xià mǎ kè zài chuán），举酒欲饮无管弦（jǔ jiǔ yù yǐn wú guǎn xián）。\n醉不成欢惨将别（zuì bù chéng huān cǎn jiāng bié），别时茫茫江浸月（bié shí máng máng jiāng jìn yuè）。\n忽闻水上琵琶声（hū wén shuǐ shàng pí pá shēng），主人忘归客不发（zhǔ rén wàng guī kè bù fā）。\n……大弦嘈嘈如急雨（dà xián cáo cáo rú jí yǔ），小弦切切如私语（xiǎo xián qiè qiè rú sī yǔ）。\n嘈嘈切切错杂弹（cáo cáo qiè qiè cuò zá tán），大珠小珠落玉盘（dà zhū xiǎo zhū luò yù pán）。\n……银瓶乍破水浆迸（yín píng zhà pò shuǐ jiāng bèng），铁骑突出刀枪鸣（tiě jì tū chū dāo qiāng míng）。\n曲终收拨当心画（qǔ zhōng shōu bō dāng xīn huà），四弦一声如裂帛（sì xián yì shēng rú liè bó）。\n东船西舫悄无言（dōng chuán xī fǎng qiǎo wú yán），唯见江心秋月白（wéi jiàn jiāng xīn qiū yuè bái）。\n……同是天涯沦落人（tóng shì tiān yá lún luò rén），相逢何必曾相识（xiāng féng hé bì céng xiāng shí）。"
       ]
     },
     {
       type: "knowledge",
-      title: "木兰诗（长篇，只注难字）",
+      title: "木兰诗",
       paragraphs: [
-        "唧唧复唧唧，木兰当户织。不闻机杼（zhù）声，惟闻女叹息。问女何所思，问女何所忆。女亦无所思，女亦无所忆。昨夜见军帖，可汗（kè hán）大点兵，军书十二卷，卷卷有爷名。阿爷无大儿，木兰无长兄，愿为市鞍（ān）马，从此替爷征。东市买骏马，西市买鞍鞯（jiān），南市买辔（pèi）头，北市买长鞭。旦辞爷娘去，暮宿黄河边。不闻爷娘唤女声，但闻黄河流水鸣溅溅（jiān）。旦辞黄河去，暮至黑山头，不闻爷娘唤女声，但闻燕山胡骑（jì）鸣啾啾（jiū）。万里赴戎机，关山度若飞。朔（shuò）气传金柝（tuò），寒光照铁衣。将军百战死，壮士十年归。归来见天子，天子坐明堂。策勋（xūn）十二转，赏赐百千强。可汗问所欲，木兰不用尚书郎，愿驰千里足，送儿还故乡。爷娘闻女来，出郭相扶将；阿姊闻妹来，当户理红妆；小弟闻姊来，磨刀霍霍（huò）向猪羊。开我东阁门，坐我西阁床，脱我战时袍，著（zhuó）我旧时裳。当窗理云鬓（bìn），对镜帖（tiē）花黄。出门看火伴，火伴皆惊忙：同行十二年，不知木兰是女郎。雄兔脚扑朔（shuò），雌兔眼迷离；双兔傍地走，安能辨我是雄雌？"
+        "唧唧复唧唧（jī jī fù jī jī），木兰当户织（mù lán dāng hù zhī）。\n不闻机杼声（bù wén jī zhù shēng），惟闻女叹息（wéi wén nǚ tàn xī）。\n问女何所思（wèn nǚ hé suǒ sī），问女何所忆（wèn nǚ hé suǒ yì）。\n女亦无所思（nǚ yì wú suǒ sī），女亦无所忆（nǚ yì wú suǒ yì）。\n昨夜见军帖（zuó yè jiàn jūn tiě），可汗大点兵（kè hán dà diǎn bīng），军书十二卷（jūn shū shí èr juàn），卷卷有爷名（juàn juàn yǒu yé míng）。\n阿爷无大儿（ā yé wú dà ér），木兰无长兄（mù lán wú zhǎng xiōng），愿为市鞍马（yuàn wèi shì ān mǎ），从此替爷征（cóng cǐ tì yé zhēng）。\n东市买骏马（dōng shì mǎi jùn mǎ），西市买鞍鞯（xī shì mǎi ān jiān），南市买辔头（nán shì mǎi pèi tóu），北市买长鞭（běi shì mǎi cháng biān）。\n旦辞爷娘去（dàn cí yé niáng qù），暮宿黄河边（mù sù huáng hé biān）。\n不闻爷娘唤女声（bù wén yé niáng huàn nǚ shēng），但闻黄河流水鸣溅溅（dàn wén huáng hé liú shuǐ míng jiān jiān）。\n旦辞黄河去（dàn cí huáng hé qù），暮至黑山头（mù zhì hēi shān tóu），不闻爷娘唤女声（bù wén yé niáng huàn nǚ shēng），但闻燕山胡骑鸣啾啾（dàn wén yān shān hú jì míng jiū jiū）。\n万里赴戎机（wàn lǐ fù róng jī），关山度若飞（guān shān dù ruò fēi）。\n朔气传金柝（shuò qì chuán jīn tuò），寒光照铁衣（hán guāng zhào tiě yī）。\n将军百战死（jiāng jūn bǎi zhàn sǐ），壮士十年归（zhuàng shì shí nián guī）。\n归来见天子（guī lái jiàn tiān zǐ），天子坐明堂（tiān zǐ zuò míng táng）。\n策勋十二转（cè xūn shí èr zhuǎn），赏赐百千强（shǎng cì bǎi qiān qiáng）。\n可汗问所欲（kè hán wèn suǒ yù），木兰不用尚书郎（mù lán bú yòng shàng shū láng），愿驰千里足（yuàn chí qiān lǐ zú），送儿还故乡（sòng ér huán gù xiāng）。\n爷娘闻女来（yé niáng wén nǚ lái），出郭相扶将（chū guō xiāng fú jiāng）；阿姊闻妹来（ā zǐ wén mèi lái），当户理红妆（dāng hù lǐ hóng zhuāng）；小弟闻姊来（xiǎo dì wén zǐ lái），磨刀霍霍向猪羊（mó dāo huò huò xiàng zhū yáng）。\n开我东阁门（kāi wǒ dōng gé mén），坐我西阁床（zuò wǒ xī gé chuáng），脱我战时袍（tuō wǒ zhàn shí páo），著我旧时裳（zhuó wǒ jiù shí cháng）。\n当窗理云鬓（dāng chuāng lǐ yún bìn），对镜帖花黄（duì jìng tiē huā huáng）。\n出门看火伴（chū mén kàn huǒ bàn），火伴皆惊忙（huǒ bàn jiē jīng máng）：同行十二年（tóng háng shí èr nián），不知木兰是女郎（bù zhī mù lán shì nǚ láng）。\n雄兔脚扑朔（xióng tù jiǎo pū shuò），雌兔眼迷离（cí tù yǎn mí lí）；双兔傍地走（shuāng tù bàng dì zǒu），安能辨我是雄雌（ān néng biàn wǒ shì xióng cí）？"
       ]
     }
   ]

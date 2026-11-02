@@ -1,12 +1,13 @@
 /**
  * 内容页面数据（content-schema 的实例）
  * 页面：背诵专项 · 古文名篇（下）
- * 说明：每日背诵素材库（文言名篇 8 篇）—— 完整原文 + 难字注音，供朗读背诵。
+ * 说明：每日背诵素材库（文言名篇 8 篇）—— 完整原文 + 逐字注音，供朗读背诵。
  *
  * 形式约定（与 07-默写专项 刻意区分）：
  *   - 不做 cloze 挖空：背诵是「看着全篇诵读记忆」，不是「填空默写」
  *   - 诗词（诗/词/曲）逐字全注：注音随句标注，覆盖每字
- *   - 文言文与长篇（>150 字）只注难字：多音字、生僻字、通假字
+ *   - 2026-11-02 起**全部篇目逐字全注**（原「文言文与长篇只注难字」废止）：
+ *     每个分句后紧跟（pīn yīn），覆盖句中每一个字，多音字按句意取音
  *
  * ⚠️ 分页约定（2026-11-02 拆分）：08 单元按「时代 + 体裁」分 4 页，
  *    **不管分几页，每篇篇目仍是本页的一个顶层 `knowledge` 区块**。
@@ -33,58 +34,58 @@ export default {
     },
     {
       type: "knowledge",
-      title: "《论语》十二章（只注难字）",
+      title: "《论语》十二章",
       paragraphs: [
-        "子曰：“学而时习之，不亦说（yuè，通“悦”）乎？有朋自远方来，不亦乐乎？人不知而不愠（yùn），不亦君子乎？”\n曾子曰：“吾日三省（xǐng）吾身：为人谋而不忠乎？与朋友交而不信乎？传不习乎？”\n子曰：“吾十有五而志于学，三十而立，四十而不惑，五十而知天命，六十而耳顺，七十而从心所欲，不逾矩。”\n子曰：“温故而知新，可以为师矣。”\n子曰：“学而不思则罔（wǎng），思而不学则殆（dài）。”\n子曰：“贤哉，回也！一箪（dān）食，一瓢饮，在陋巷，人不堪其忧，回也不改其乐。贤哉，回也！”\n子曰：“知之者不如好之者，好之者不如乐之者。”\n子曰：“饭疏食，饮水，曲肱（gōng）而枕之，乐亦在其中矣。不义而富且贵，于我如浮云。”\n子曰：“三人行，必有我师焉。择其善者而从之，其不善者而改之。”\n子在川上曰：“逝者如斯夫，不舍昼夜。”\n子曰：“三军可夺帅也，匹夫不可夺志也。”\n子夏曰：“博学而笃（dǔ）志，切问而近思，仁在其中矣。”"
+        "子曰（zǐ yuē）：“学而时习之（xué ér shí xí zhī），不亦说乎（bù yì yuè hū）？有朋自远方来（yǒu péng zì yuǎn fāng lái），不亦乐乎（bù yì lè hū）？人不知而不愠（rén bù zhī ér bù yùn），不亦君子乎（bù yì jūn zǐ hū）？”\n曾子曰（zēng zǐ yuē）：“吾日三省吾身（wú rì sān xǐng wú shēn）：为人谋而不忠乎（wèi rén móu ér bù zhōng hū）？与朋友交而不信乎（yǔ péng yǒu jiāo ér bù xìn hū）？传不习乎（chuán bù xí hū）？”\n子曰（zǐ yuē）：“吾十有五而志于学（wú shí yǒu wǔ ér zhì yú xué），三十而立（sān shí ér lì），四十而不惑（sì shí ér bù huò），五十而知天命（wǔ shí ér zhī tiān mìng），六十而耳顺（liù shí ér ěr shùn），七十而从心所欲（qī shí ér cóng xīn suǒ yù），不逾矩（bù yú jǔ）。”\n子曰（zǐ yuē）：“温故而知新（wēn gù ér zhī xīn），可以为师矣（kě yǐ wéi shī yǐ）。”\n子曰（zǐ yuē）：“学而不思则罔（xué ér bù sī zé wǎng），思而不学则殆（sī ér bù xué zé dài）。”\n子曰（zǐ yuē）：“贤哉（xián zāi），回也（huí yě）！一箪食（yì dān shí），一瓢饮（yì piáo yǐn），在陋巷（zài lòu xiàng），人不堪其忧（rén bù kān qí yōu），回也不改其乐（huí yě bù gǎi qí lè）。贤哉（xián zāi），回也（huí yě）！”\n子曰（zǐ yuē）：“知之者不如好之者（zhī zhī zhě bù rú hào zhī zhě），好之者不如乐之者（hào zhī zhě bù rú lè zhī zhě）。”\n子曰（zǐ yuē）：“饭疏食（fàn shū shí），饮水（yǐn shuǐ），曲肱而枕之（qū gōng ér zhěn zhī），乐亦在其中矣（lè yì zài qí zhōng yǐ）。不义而富且贵（bù yì ér fù qiě guì），于我如浮云（yú wǒ rú fú yún）。”\n子曰（zǐ yuē）：“三人行（sān rén xíng），必有我师焉（bì yǒu wǒ shī yān）。择其善者而从之（zé qí shàn zhě ér cóng zhī），其不善者而改之（qí bù shàn zhě ér gǎi zhī）。”\n子在川上曰（zǐ zài chuān shàng yuē）：“逝者如斯夫（shì zhě rú sī fú），不舍昼夜（bù shě zhòu yè）。”\n子曰（zǐ yuē）：“三军可夺帅也（sān jūn kě duó shuài yě），匹夫不可夺志也（pǐ fū bù kě duó zhì yě）。”\n子夏曰（zǐ xià yuē）：“博学而笃志（bó xué ér dǔ zhì），切问而近思（qiè wèn ér jìn sī），仁在其中矣（rén zài qí zhōng yǐ）。”"
       ]
     },
     {
       type: "knowledge",
-      title: "《老子》四章（节选，只注难字）",
+      title: "《老子》四章（节选）",
       paragraphs: [
-        "上善若水。水善利万物而不争，处众人之所恶（wù），故几（jī）于道。居善地，心善渊，与善仁，言善信，正善治，事善能，动善时。夫唯不争，故无尤（yóu）。\n曲则全，枉（wǎng）则直，洼（wā）则盈，敝（bì）则新，少则得，多则惑。是以圣人抱一为天下式。不自见，故明；不自是，故彰；不自伐，故有功；不自矜（jīn），故长。夫唯不争，故天下莫能与之争。\n企（qǐ）者不立，跨者不行，自见者不明，自是者不彰，自伐者无功，自矜者不长。"
+        "上善若水（shàng shàn ruò shuǐ）。\n水善利万物而不争（shuǐ shàn lì wàn wù ér bù zhēng），处众人之所恶（chǔ zhòng rén zhī suǒ wù），故几于道（gù jī yú dào）。\n居善地（jū shàn dì），心善渊（xīn shàn yuān），与善仁（yǔ shàn rén），言善信（yán shàn xìn），正善治（zhèng shàn zhì），事善能（shì shàn néng），动善时（dòng shàn shí）。\n夫唯不争（fú wéi bù zhēng），故无尤（gù wú yóu）。\n曲则全（qū zé quán），枉则直（wǎng zé zhí），洼则盈（wā zé yíng），敝则新（bì zé xīn），少则得（shǎo zé dé），多则惑（duō zé huò）。\n是以圣人抱一为天下式（shì yǐ shèng rén bào yī wéi tiān xià shì）。\n不自见（bú zì xiàn），故明（gù míng）；不自是（bú zì shì），故彰（gù zhāng）；不自伐（bú zì fá），故有功（gù yǒu gōng）；不自矜（bú zì jīn），故长（gù zhǎng）。\n夫唯不争（fú wéi bù zhēng），故天下莫能与之争（gù tiān xià mò néng yǔ zhī zhēng）。\n企者不立（qǐ zhě bù lì），跨者不行（kuà zhě bù xíng），自见者不明（zì xiàn zhě bù míng），自是者不彰（zì shì zhě bù zhāng），自伐者无功（zì fá zhě wú gōng），自矜者不长（zì jīn zhě bù zhǎng）。"
       ]
     },
     {
       type: "knowledge",
-      title: "《孟子》· 鱼我所欲也 / 生于忧患（节选，只注难字）",
+      title: "《孟子》· 鱼我所欲也 / 生于忧患（节选）",
       paragraphs: [
-        "鱼，我所欲也；熊掌，亦我所欲也。二者不可得兼，舍鱼而取熊掌者也。生，亦我所欲也；义，亦我所欲也。二者不可得兼，舍生而取义者也。生亦我所欲，所欲有甚于生者，故不为苟得也；死亦我所恶（wù），所恶有甚于死者，故患有所不辟（bì，通“避”）也。……是故所欲有甚于生者，所恶有甚于死者。非独贤者有是心也，人皆有之，贤者能勿丧耳。\n故天将降大任于是人也，必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂（fú）乱其所为，所以动心忍性，曾（zēng，同“增”）益其所不能。……然后知生于忧患而死于安乐也。"
+        "鱼（yú），我所欲也（wǒ suǒ yù yě）；熊掌（xióng zhǎng），亦我所欲也（yì wǒ suǒ yù yě）。\n二者不可得兼（èr zhě bù kě dé jiān），舍鱼而取熊掌者也（shě yú ér qǔ xióng zhǎng zhě yě）。\n生（shēng），亦我所欲也（yì wǒ suǒ yù yě）；义（yì），亦我所欲也（yì wǒ suǒ yù yě）。二者不可得兼（èr zhě bù kě dé jiān），舍生而取义者也（shě shēng ér qǔ yì zhě yě）。\n生亦我所欲（shēng yì wǒ suǒ yù），所欲有甚于生者（suǒ yù yǒu shèn yú shēng zhě），故不为苟得也（gù bù wéi gǒu dé yě）；死亦我所恶（sǐ yì wǒ suǒ wù），所恶有甚于死者（suǒ wù yǒu shèn yú sǐ zhě），故患有所不辟也（gù huàn yǒu suǒ bù bì yě）。\n……是故所欲有甚于生者（shì gù suǒ yù yǒu shèn yú shēng zhě），所恶有甚于死者（suǒ wù yǒu shèn yú sǐ zhě）。\n非独贤者有是心也（fēi dú xián zhě yǒu shì xīn yě），人皆有之（rén jiē yǒu zhī），贤者能勿丧耳（xián zhě néng wù sàng ěr）。\n故天将降大任于是人也（gù tiān jiāng jiàng dà rèn yú shì rén yě），必先苦其心志（bì xiān kǔ qí xīn zhì），劳其筋骨（láo qí jīn gǔ），饿其体肤（è qí tǐ fū），空乏其身（kōng fá qí shēn），行拂乱其所为（xíng fú luàn qí suǒ wéi），所以动心忍性（suǒ yǐ dòng xīn rěn xìng），曾益其所不能（zēng yì qí suǒ bù néng）。\n……然后知生于忧患而死于安乐也（rán hòu zhī shēng yú yōu huàn ér sǐ yú ān lè yě）。"
       ]
     },
     {
       type: "knowledge",
-      title: "答谢中书书 · 陶弘景 / 与朱元思书 · 吴均（一短一长，短者逐字全注）",
+      title: "答谢中书书 · 陶弘景 / 与朱元思书 · 吴均",
       paragraphs: [
-        "《答谢中书书》：山川之美（shān chuān zhī měi），古来共谈（gǔ lái gòng tán）。高峰入云（gāo fēng rù yún），清流见底（qīng liú jiàn dǐ）。两岸石壁（liǎng àn shí bì），五色交辉（wǔ sè jiāo huī）。青林翠竹（qīng lín cuì zhú），四时俱备（sì shí jù bèi）。晓雾将歇（xiǎo wù jiāng xiē），猿鸟乱鸣（yuán niǎo luàn míng）；夕日欲颓（xī rì yù tuí），沉鳞竞跃（chén lín jìng yuè）。实是欲界之仙都（shí shì yù jiè zhī xiān dū）。自康乐以来（zì kāng lè yǐ lái），未复有能与其奇者（wèi fù yǒu néng yǔ qí qí zhě）。\n《与朱元思书》（节选，只注难字）：风烟俱净，天山共色。从流飘荡，任意东西。自富阳至桐庐一百许里，奇山异水，天下独绝。水皆缥（piǎo）碧，千丈见底。游鱼细石，直视无碍。急湍（tuān）甚箭，猛浪若奔。……鸢（yuān）飞戾（lì）天者，望峰息心；经纶（lún）世务者，窥谷忘反。横柯（kē）上蔽，在昼犹昏；疏条交映，有时见日。"
+        "《答谢中书书》（dá xiè zhōng shū shū）：山川之美（shān chuān zhī měi），古来共谈（gǔ lái gòng tán）。\n高峰入云（gāo fēng rù yún），清流见底（qīng liú jiàn dǐ）。两岸石壁（liǎng àn shí bì），五色交辉（wǔ sè jiāo huī）。\n青林翠竹（qīng lín cuì zhú），四时俱备（sì shí jù bèi）。\n晓雾将歇（xiǎo wù jiāng xiē），猿鸟乱鸣（yuán niǎo luàn míng）；夕日欲颓（xī rì yù tuí），沉鳞竞跃（chén lín jìng yuè）。\n实是欲界之仙都（shí shì yù jiè zhī xiān dū）。\n自康乐以来（zì kāng lè yǐ lái），未复有能与其奇者（wèi fù yǒu néng yǔ qí qí zhě）。\n《与朱元思书》（yǔ zhū yuán sī shū）（节选）：风烟俱净（fēng yān jù jìng），天山共色（tiān shān gòng sè）。\n从流飘荡（cóng liú piāo dàng），任意东西（rèn yì dōng xī）。\n自富阳至桐庐一百许里（zì fù yáng zhì tóng lú yì bǎi xǔ lǐ），奇山异水（qí shān yì shuǐ），天下独绝（tiān xià dú jué）。\n水皆缥碧（shuǐ jiē piǎo bì），千丈见底（qiān zhàng jiàn dǐ）。\n游鱼细石（yóu yú xì shí），直视无碍（zhí shì wú ài）。\n急湍甚箭（jí tuān shèn jiàn），猛浪若奔（měng làng ruò bēn）。\n……鸢飞戾天者（yuān fēi lì tiān zhě），望峰息心（wàng fēng xī xīn）；经纶世务者（jīng lún shì wù zhě），窥谷忘反（kuī gǔ wàng fǎn）。\n横柯上蔽（héng kē shàng bì），在昼犹昏（zài zhòu yóu hūn）；疏条交映（shū tiáo jiāo yìng），有时见日（yǒu shí jiàn rì）。"
       ]
     },
     {
       type: "knowledge",
-      title: "岳阳楼记 · 范仲淹（长篇，只注难字）",
+      title: "岳阳楼记 · 范仲淹",
       paragraphs: [
-        "庆历四年春，滕子京谪（zhé）守巴陵郡。越明年，政通人和，百废具兴。乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上。属（zhǔ）予作文以记之。\n予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤（shāng），横无际涯（yá）；朝晖（huī）夕阴，气象万千。此则岳阳楼之大观也，前人之述备矣。然则北通巫峡，南极潇湘，迁客骚（sāo）人，多会于此，览物之情，得无异乎？\n……嗟（jiē）夫！予尝求古仁人之心，或异二者之为，何哉？不以物喜，不以己悲；居庙堂之高则忧其民；处江湖之远则忧其君。是进亦忧，退亦忧。然则何时而乐耶？其必曰“先天下之忧而忧，后天下之乐而乐”乎！噫！微斯人，吾谁与归？"
+        "庆历四年春（qìng lì sì nián chūn），滕子京谪守巴陵郡（téng zǐ jīng zhé shǒu bā líng jùn）。\n越明年（yuè míng nián），政通人和（zhèng tōng rén hé），百废具兴（bǎi fèi jù xīng）。\n乃重修岳阳楼（nǎi chóng xiū yuè yáng lóu），增其旧制（zēng qí jiù zhì），刻唐贤今人诗赋于其上（kè táng xián jīn rén shī fù yú qí shàng）。\n属予作文以记之（zhǔ yǔ zuò wén yǐ jì zhī）。\n予观夫巴陵胜状（yú guān fú bā líng shèng zhuàng），在洞庭一湖（zài dòng tíng yì hú）。\n衔远山（xián yuǎn shān），吞长江（tūn cháng jiāng），浩浩汤汤（hào hào shāng shāng），横无际涯（héng wú jì yá）；朝晖夕阴（zhāo huī xī yīn），气象万千（qì xiàng wàn qiān）。\n此则岳阳楼之大观也（cǐ zé yuè yáng lóu zhī dà guān yě），前人之述备矣（qián rén zhī shù bèi yǐ）。\n然则北通巫峡（rán zé běi tōng wū xiá），南极潇湘（nán jí xiāo xiāng），迁客骚人（qiān kè sāo rén），多会于此（duō huì yú cǐ），览物之情（lǎn wù zhī qíng），得无异乎（dé wú yì hū）？\n……嗟夫（jiē fú）！予尝求古仁人之心（yú cháng qiú gǔ rén rén zhī xīn），或异二者之为（huò yì èr zhě zhī wéi），何哉（hé zāi）？\n不以物喜（bù yǐ wù xǐ），不以己悲（bù yǐ jǐ bēi）；居庙堂之高则忧其民（jū miào táng zhī gāo zé yōu qí mín）；处江湖之远则忧其君（chǔ jiāng hú zhī yuǎn zé yōu qí jūn）。\n是进亦忧（shì jìn yì yōu），退亦忧（tuì yì yōu）。\n然则何时而乐耶（rán zé hé shí ér lè yé）？其必曰（qí bì yuē）“先天下之忧而忧（xiān tiān xià zhī yōu ér yōu），后天下之乐而乐（hòu tiān xià zhī lè ér lè）”乎（hū）！\n噫（yī）！微斯人（wēi sī rén），吾谁与归（wú shuí yǔ guī）？"
       ]
     },
     {
       type: "knowledge",
-      title: "醉翁亭记 · 欧阳修（长篇，只注难字）",
+      title: "醉翁亭记 · 欧阳修",
       paragraphs: [
-        "环滁（chú）皆山也。其西南诸峰，林壑（hè）尤美，望之蔚（wèi）然而深秀者，琅琊（láng yá）也。山行六七里，渐闻水声潺潺（chán）而泻出于两峰之间者，酿泉也。峰回路转，有亭翼然临于泉上者，醉翁亭也。作亭者谁？山之僧智仙也。名之者谁？太守自谓也。\n……醉翁之意不在酒，在乎山水之间也。山水之乐，得之心而寓之酒也。\n……已而夕阳在山，人影散乱，太守归而宾客从也。树林阴翳（yì），鸣声上下，游人去而禽鸟乐也。然而禽鸟知山林之乐，而不知人之乐；人知从太守游而乐，而不知太守之乐其乐也。醉能同其乐，醒能述以文者，太守也。太守谓谁？庐陵欧阳修也。"
+        "环滁皆山也（huán chú jiē shān yě）。\n其西南诸峰（qí xī nán zhū fēng），林壑尤美（lín hè yóu měi），望之蔚然而深秀者（wàng zhī wèi rán ér shēn xiù zhě），琅琊也（láng yá yě）。\n山行六七里（shān xíng liù qī lǐ），渐闻水声潺潺而泻出于两峰之间者（jiàn wén shuǐ shēng chán chán ér xiè chū yú liǎng fēng zhī jiān zhě），酿泉也（niàng quán yě）。\n峰回路转（fēng huí lù zhuǎn），有亭翼然临于泉上者（yǒu tíng yì rán lín yú quán shàng zhě），醉翁亭也（zuì wēng tíng yě）。\n作亭者谁（zuò tíng zhě shuí）？山之僧智仙也（shān zhī sēng zhì xiān yě）。\n名之者谁（míng zhī zhě shuí）？太守自谓也（tài shǒu zì wèi yě）。\n……醉翁之意不在酒（zuì wēng zhī yì bù zài jiǔ），在乎山水之间也（zài hū shān shuǐ zhī jiān yě）。\n山水之乐（shān shuǐ zhī lè），得之心而寓之酒也（dé zhī xīn ér yù zhī jiǔ yě）。\n……已而夕阳在山（yǐ ér xī yáng zài shān），人影散乱（rén yǐng sǎn luàn），太守归而宾客从也（tài shǒu guī ér bīn kè cóng yě）。\n树林阴翳（shù lín yīn yì），鸣声上下（míng shēng shàng xià），游人去而禽鸟乐也（yóu rén qù ér qín niǎo lè yě）。\n然而禽鸟知山林之乐（rán ér qín niǎo zhī shān lín zhī lè），而不知人之乐（ér bù zhī rén zhī lè）；人知从太守游而乐（rén zhī cóng tài shǒu yóu ér lè），而不知太守之乐其乐也（ér bù zhī tài shǒu zhī lè qí lè yě）。\n醉能同其乐（zuì néng tóng qí lè），醒能述以文者（xǐng néng shù yǐ wén zhě），太守也（tài shǒu yě）。\n太守谓谁（tài shǒu wèi shuí）？庐陵欧阳修也（lú líng ōu yáng xiū yě）。"
       ]
     },
     {
       type: "knowledge",
-      title: "出师表 · 诸葛亮（长篇，只注难字）",
+      title: "出师表 · 诸葛亮",
       paragraphs: [
-        "先帝创业未半而中道崩殂（cú），今天下三分，益州疲弊，此诚危急存亡之秋也。然侍卫之臣不懈于内，忠志之士忘身于外者，盖追先帝之殊遇，欲报之于陛下也。诚宜开张圣听，以光先帝遗德，恢弘志士之气，不宜妄自菲（fěi）薄，引喻失义，以塞忠谏之路也。\n……亲贤臣，远小人，此先汉所以兴隆也；亲小人，远贤臣，此后汉所以倾颓（tuí）也。先帝在时，每与臣论此事，未尝不叹息痛恨于桓、灵也。\n……臣本布衣，躬耕于南阳，苟全性命于乱世，不求闻达于诸侯。先帝不以臣卑鄙，猥（wěi）自枉屈，三顾臣于草庐之中，咨（zī）臣以当世之事，由是感激，遂许先帝以驱驰。后值倾覆，受任于败军之际，奉命于危难之间，尔来二十有一年矣。\n……愿陛下托臣以讨贼兴复之效，不效，则治臣之罪，以告先帝之灵。……今当远离，临表涕（tì）零，不知所言。"
+        "先帝创业未半而中道崩殂（xiān dì chuàng yè wèi bàn ér zhōng dào bēng cú），今天下三分（jīn tiān xià sān fēn），益州疲弊（yì zhōu pí bì），此诚危急存亡之秋也（cǐ chéng wēi jí cún wáng zhī qiū yě）。\n然侍卫之臣不懈于内（rán shì wèi zhī chén bú xiè yú nèi），忠志之士忘身于外者（zhōng zhì zhī shì wàng shēn yú wài zhě），盖追先帝之殊遇（gài zhuī xiān dì zhī shū yù），欲报之于陛下也（yù bào zhī yú bì xià yě）。\n诚宜开张圣听（chéng yí kāi zhāng shèng tīng），以光先帝遗德（yǐ guāng xiān dì yí dé），恢弘志士之气（huī hóng zhì shì zhī qì），不宜妄自菲薄（bù yí wàng zì fěi bó），引喻失义（yǐn yù shī yì），以塞忠谏之路也（yǐ sè zhōng jiàn zhī lù yě）。\n……亲贤臣（qīn xián chén），远小人（yuǎn xiǎo rén），此先汉所以兴隆也（cǐ xiān hàn suǒ yǐ xīng lóng yě）；亲小人（qīn xiǎo rén），远贤臣（yuǎn xián chén），此后汉所以倾颓也（cǐ hòu hàn suǒ yǐ qīng tuí yě）。\n先帝在时（xiān dì zài shí），每与臣论此事（měi yǔ chén lùn cǐ shì），未尝不叹息痛恨于桓（wèi cháng bù tàn xī tòng hèn yú huán）、灵也（líng yě）。\n……臣本布衣（chén běn bù yī），躬耕于南阳（gōng gēng yú nán yáng），苟全性命于乱世（gǒu quán xìng mìng yú luàn shì），不求闻达于诸侯（bù qiú wén dá yú zhū hóu）。\n先帝不以臣卑鄙（xiān dì bù yǐ chén bēi bǐ），猥自枉屈（wěi zì wǎng qū），三顾臣于草庐之中（sān gù chén yú cǎo lú zhī zhōng），咨臣以当世之事（zī chén yǐ dāng shì zhī shì），由是感激（yóu shì gǎn jī），遂许先帝以驱驰（suì xǔ xiān dì yǐ qū chí）。\n后值倾覆（hòu zhí qīng fù），受任于败军之际（shòu rèn yú bài jūn zhī jì），奉命于危难之间（fèng mìng yú wēi nàn zhī jiān），尔来二十有一年矣（ěr lái èr shí yǒu yī nián yǐ）。\n……愿陛下托臣以讨贼兴复之效（yuàn bì xià tuō chén yǐ tǎo zéi xīng fù zhī xiào），不效（bú xiào），则治臣之罪（zé zhì chén zhī zuì），以告先帝之灵（yǐ gào xiān dì zhī líng）。\n……今当远离（jīn dāng yuǎn lí），临表涕零（lín biǎo tì líng），不知所言（bù zhī suǒ yán）。"
       ]
     },
     {
       type: "knowledge",
-      title: "赤壁赋 · 苏轼（长篇，只注难字）",
+      title: "赤壁赋 · 苏轼",
       paragraphs: [
-        "壬戌（rén xū）之秋，七月既望，苏子与客泛舟游于赤壁之下。清风徐来，水波不兴。举酒属（zhǔ）客，诵明月之诗，歌窈窕（yǎo tiǎo）之章。少焉，月出于东山之上，徘徊于斗牛之间。白露横江，水光接天。纵一苇之所如，凌万顷之茫然。浩浩乎如冯（píng，通“凭”）虚御风，而不知其所止；飘飘乎如遗世独立，羽化而登仙。\n……寄蜉蝣（fú yóu）于天地，渺沧海之一粟（sù）。哀吾生之须臾（yú），羡长江之无穷。挟飞仙以遨（áo）游，抱明月而长终。知不可乎骤得，托遗响于悲风。\n……且夫天地之间，物各有主，苟非吾之所有，虽一毫而莫取。惟江上之清风，与山间之明月，耳得之而为声，目遇之而成色，取之无禁，用之不竭。是造物者之无尽藏（zàng）也，而吾与子之所共适。"
+        "壬戌之秋（rén xū zhī qiū），七月既望（qī yuè jì wàng），苏子与客泛舟游于赤壁之下（sū zǐ yǔ kè fàn zhōu yóu yú chì bì zhī xià）。\n清风徐来（qīng fēng xú lái），水波不兴（shuǐ bō bù xīng）。\n举酒属客（jǔ jiǔ zhǔ kè），诵明月之诗（sòng míng yuè zhī shī），歌窈窕之章（gē yǎo tiǎo zhī zhāng）。\n少焉（shǎo yān），月出于东山之上（yuè chū yú dōng shān zhī shàng），徘徊于斗牛之间（pái huái yú dǒu niú zhī jiān）。\n白露横江（bái lù héng jiāng），水光接天（shuǐ guāng jiē tiān）。\n纵一苇之所如（zòng yì wěi zhī suǒ rú），凌万顷之茫然（líng wàn qǐng zhī máng rán）。\n浩浩乎如冯虚御风（hào hào hū rú píng xū yù fēng），而不知其所止（ér bù zhī qí suǒ zhǐ）；飘飘乎如遗世独立（piāo piāo hū rú yí shì dú lì），羽化而登仙（yǔ huà ér dēng xiān）。\n……寄蜉蝣于天地（jì fú yóu yú tiān dì），渺沧海之一粟（miǎo cāng hǎi zhī yí sù）。\n哀吾生之须臾（āi wú shēng zhī xū yú），羡长江之无穷（xiàn cháng jiāng zhī wú qióng）。\n挟飞仙以遨游（xié fēi xiān yǐ áo yóu），抱明月而长终（bào míng yuè ér cháng zhōng）。\n知不可乎骤得（zhī bù kě hū zhòu dé），托遗响于悲风（tuō yí xiǎng yú bēi fēng）。\n……且夫天地之间（qiě fú tiān dì zhī jiān），物各有主（wù gè yǒu zhǔ），苟非吾之所有（gǒu fēi wú zhī suǒ yǒu），虽一毫而莫取（suī yì háo ér mò qǔ）。\n惟江上之清风（wéi jiāng shàng zhī qīng fēng），与山间之明月（yǔ shān jiān zhī míng yuè），耳得之而为声（ěr dé zhī ér wéi shēng），目遇之而成色（mù yù zhī ér chéng sè），取之无禁（qǔ zhī wú jìn），用之不竭（yòng zhī bù jié）。\n是造物者之无尽藏也（shì zào wù zhě zhī wú jìn zàng yě），而吾与子之所共适（ér wú yǔ zǐ zhī suǒ gòng shì）。"
       ]
     }
   ]

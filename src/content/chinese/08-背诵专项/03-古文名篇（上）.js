@@ -6,7 +6,8 @@
  * 形式约定（与 07-默写专项 刻意区分）：
  *   - 不做 cloze 挖空：背诵是「看着全篇诵读记忆」，不是「填空默写」
  *   - 诗词（诗/词/曲）逐字全注：注音随句标注，覆盖每字
- *   - 文言文与长篇（>150 字）只注难字：多音字、生僻字、通假字
+ *   - 2026-11-02 起**全部篇目逐字全注**（原「文言文与长篇只注难字」废止）：
+ *     每个分句后紧跟（pīn yīn），覆盖句中每一个字，多音字按句意取音
  *
  * ⚠️ 分页约定（2026-11-02 拆分）：08 单元按「时代 + 体裁」分 4 页，
  *    **不管分几页，每篇篇目仍是本页的一个顶层 `knowledge` 区块**。
@@ -33,9 +34,9 @@ export default {
     },
     {
       type: "knowledge",
-      title: "三峡 · 郦道元（长篇，只注难字）",
+      title: "三峡 · 郦道元",
       paragraphs: [
-        "自三峡七百里中，两岸连山，略无阙（quē）处。重岩叠嶂（zhàng），隐天蔽日。自非亭午夜分，不见曦（xī）月。至于夏水襄（xiāng）陵，沿溯（sù）阻绝。或王命急宣，有时朝发白帝，暮到江陵，其间千二百里，虽乘奔御风，不以疾也。春冬之时，则素湍（tuān）绿潭，回清倒影。绝巘（yǎn）多生怪柏，悬泉瀑布，飞漱（shù）其间。清荣峻茂，良多趣味。每至晴初霜旦，林寒涧肃，常有高猿长啸，属（zhǔ）引凄异，空谷传响，哀转久绝。故渔者歌曰：“巴东三峡巫峡长，猿鸣三声泪沾裳（cháng）。”"
+        "自三峡七百里中（zì sān xiá qī bǎi lǐ zhōng），两岸连山（liǎng àn lián shān），略无阙处（lüè wú quē chù）。\n重岩叠嶂（chóng yán dié zhàng），隐天蔽日（yǐn tiān bì rì）。\n自非亭午夜分（zì fēi tíng wǔ yè fēn），不见曦月（bú jiàn xī yuè）。\n至于夏水襄陵（zhì yú xià shuǐ xiāng líng），沿溯阻绝（yán sù zǔ jué）。\n或王命急宣（huò wáng mìng jí xuān），有时朝发白帝（yǒu shí zhāo fā bái dì），暮到江陵（mù dào jiāng líng），其间千二百里（qí jiān qiān èr bǎi lǐ），虽乘奔御风（suī chéng bēn yù fēng），不以疾也（bù yǐ jí yě）。\n春冬之时（chūn dōng zhī shí），则素湍绿潭（zé sù tuān lǜ tán），回清倒影（huí qīng dào yǐng）。\n绝巘多生怪柏（jué yǎn duō shēng guài bǎi），悬泉瀑布（xuán quán pù bù），飞漱其间（fēi shù qí jiān）。\n清荣峻茂（qīng róng jùn mào），良多趣味（liáng duō qù wèi）。\n每至晴初霜旦（měi zhì qíng chū shuāng dàn），林寒涧肃（lín hán jiàn sù），常有高猿长啸（cháng yǒu gāo yuán cháng xiào），属引凄异（zhǔ yǐn qī yì），空谷传响（kōng gǔ chuán xiǎng），哀转久绝（āi zhuǎn jiǔ jué）。\n故渔者歌曰（gù yú zhě gē yuē）：“巴东三峡巫峡长（bā dōng sān xiá wū xiá cháng），猿鸣三声泪沾裳（yuán míng sān shēng lèi zhān cháng）。”"
       ]
     },
     {
@@ -56,42 +57,42 @@ export default {
       type: "knowledge",
       title: "记承天寺夜游 · 苏轼",
       paragraphs: [
-        "元丰六年十月十二日夜（yuán fēng liù nián shí yuè shí èr rì yè），解衣欲睡（jiě yī yù shuì），月色入户（yuè sè rù hù），欣然起行（xīn rán qǐ xíng）。\n念无与为乐者（niàn wú yǔ wéi lè zhě），遂至承天寺寻张怀民（suì zhì chéng tiān sì xún zhāng huái mín）。\n怀民亦未寝（huái mín yì wèi qǐn），相与步于中庭（xiāng yǔ bù yú zhōng tíng）。\n庭下如积水空明（tíng xià rú jī shuǐ kōng míng），水中藻（zǎo）、荇交横（xìng jiāo héng），盖竹柏影也（gài zhú bǎi yǐng yě）。\n何夜无月（hé yè wú yuè）？何处无竹柏（hé chù wú zhú bǎi）？但少闲人如吾两人者耳（dàn shǎo xián rén rú wú liǎng rén zhě ěr）。"
+        "元丰六年十月十二日夜（yuán fēng liù nián shí yuè shí èr rì yè），解衣欲睡（jiě yī yù shuì），月色入户（yuè sè rù hù），欣然起行（xīn rán qǐ xíng）。\n念无与为乐者（niàn wú yǔ wéi lè zhě），遂至承天寺寻张怀民（suì zhì chéng tiān sì xún zhāng huái mín）。\n怀民亦未寝（huái mín yì wèi qǐn），相与步于中庭（xiāng yǔ bù yú zhōng tíng）。\n庭下如积水空明（tíng xià rú jī shuǐ kōng míng），水中藻（shuǐ zhōng zǎo）、荇交横（xìng jiāo héng），盖竹柏影也（gài zhú bǎi yǐng yě）。\n何夜无月（hé yè wú yuè）？何处无竹柏（hé chù wú zhú bǎi）？但少闲人如吾两人者耳（dàn shǎo xián rén rú wú liǎng rén zhě ěr）。"
       ]
     },
     {
       type: "knowledge",
-      title: "马说 / 师说 · 韩愈（长篇，只注难字）",
+      title: "马说 / 师说 · 韩愈",
       paragraphs: [
-        "《马说》：世有伯乐，然后有千里马。千里马常有，而伯乐不常有。故虽有名马，祗（zhǐ）辱于奴隶人之手，骈（pián）死于槽枥（cáo lì）之间，不以千里称也。马之千里者，一食或尽粟（sù）一石（dàn）。食（sì，同“饲”）马者不知其能千里而食也。是马也，虽有千里之能，食不饱，力不足，才美不外见（xiàn，同“现”），且欲与常马等不可得，安求其能千里也？策之不以其道，食之不能尽其材，鸣之而不能通其意，执策而临之，曰：“天下无马！”呜呼！其真无马邪（yé）？其真不知马也！\n《师说》（节选）：古之学者必有师。师者，所以传道受（shòu，同“授”）业解惑也。人非生而知之者，孰（shú）能无惑？惑而不从师，其为惑也，终不解矣。……是故无贵无贱，无长无少，道之所存，师之所存也。"
+        "《马说》（mǎ shuō）：世有伯乐（shì yǒu bó lè），然后有千里马（rán hòu yǒu qiān lǐ mǎ）。\n千里马常有（qiān lǐ mǎ cháng yǒu），而伯乐不常有（ér bó lè bù cháng yǒu）。\n故虽有名马（gù suī yǒu míng mǎ），祗辱于奴隶人之手（zhǐ rǔ yú nú lì rén zhī shǒu），骈死于槽枥之间（pián sǐ yú cáo lì zhī jiān），不以千里称也（bù yǐ qiān lǐ chēng yě）。\n马之千里者（mǎ zhī qiān lǐ zhě），一食或尽粟一石（yì shí huò jìn sù yí dàn）。\n食马者不知其能千里而食也（sì mǎ zhě bù zhī qí néng qiān lǐ ér sì yě）。\n是马也（shì mǎ yě），虽有千里之能（suī yǒu qiān lǐ zhī néng），食不饱（shí bù bǎo），力不足（lì bù zú），才美不外见（cái měi bù wài xiàn），且欲与常马等不可得（qiě yù yǔ cháng mǎ děng bù kě dé），安求其能千里也（ān qiú qí néng qiān lǐ yě）？\n策之不以其道（cè zhī bù yǐ qí dào），食之不能尽其材（sì zhī bù néng jìn qí cái），鸣之而不能通其意（míng zhī ér bù néng tōng qí yì），执策而临之（zhí cè ér lín zhī），曰（yuē）：“天下无马（tiān xià wú mǎ）！”\n呜呼（wū hū）！其真无马邪（qí zhēn wú mǎ yé）？其真不知马也（qí zhēn bù zhī mǎ yě）！\n《师说》（shī shuō）（节选）：古之学者必有师（gǔ zhī xué zhě bì yǒu shī）。\n师者（shī zhě），所以传道受业解惑也（suǒ yǐ chuán dào shòu yè jiě huò yě）。\n人非生而知之者（rén fēi shēng ér zhī zhī zhě），孰能无惑（shú néng wú huò）？\n惑而不从师（huò ér bù cóng shī），其为惑也（qí wéi huò yě），终不解矣（zhōng bù jiě yǐ）。\n……是故无贵无贱（shì gù wú guì wú jiàn），无长无少（wú zhǎng wú shào），道之所存（dào zhī suǒ cún），师之所存也（shī zhī suǒ cún yě）。"
       ]
     },
     {
       type: "knowledge",
-      title: "劝学（节选） · 荀子（长篇，只注难字）",
+      title: "劝学（节选） · 荀子",
       paragraphs: [
-        "君子曰：学不可以已。青，取之于蓝，而青于蓝；冰，水为之，而寒于水。木直中绳，輮（róu）以为轮，其曲中规。虽有槁暴（gǎo pù），不复挺者，輮使之然也。故木受绳则直，金就砺（lì）则利，君子博学而日参省（cān xǐng）乎己，则知（zhì，同“智”）明而行无过矣。……故不积跬（kuǐ）步，无以至千里；不积小流，无以成江海。骐骥（qí jì）一跃，不能十步；驽（nú）马十驾，功在不舍。锲（qiè）而舍之，朽木不折；锲而不舍，金石可镂（lòu）。"
+        "君子曰（jūn zǐ yuē）：学不可以已（xué bù kě yǐ yǐ）。\n青（qīng），取之于蓝（qǔ zhī yú lán），而青于蓝（ér qīng yú lán）；冰（bīng），水为之（shuǐ wéi zhī），而寒于水（ér hán yú shuǐ）。\n木直中绳（mù zhí zhòng shéng），輮以为轮（róu yǐ wéi lún），其曲中规（qí qū zhòng guī）。\n虽有槁暴（suī yǒu gǎo pù），不复挺者（bú fù tǐng zhě），輮使之然也（róu shǐ zhī rán yě）。\n故木受绳则直（gù mù shòu shéng zé zhí），金就砺则利（jīn jiù lì zé lì），君子博学而日参省乎己（jūn zǐ bó xué ér rì cān xǐng hū jǐ），则知明而行无过矣（zé zhì míng ér xíng wú guò yǐ）。\n……故不积跬步（gù bù jī kuǐ bù），无以至千里（wú yǐ zhì qiān lǐ）；不积小流（bù jī xiǎo liú），无以成江海（wú yǐ chéng jiāng hǎi）。\n骐骥一跃（qí jì yí yuè），不能十步（bù néng shí bù）；驽马十驾（nú mǎ shí jià），功在不舍（gōng zài bù shě）。\n锲而舍之（qiè ér shě zhī），朽木不折（xiǔ mù bù zhé）；锲而不舍（qiè ér bù shě），金石可镂（jīn shí kě lòu）。"
       ]
     },
     {
       type: "knowledge",
-      title: "邹忌讽齐王纳谏 · 《战国策》（长篇，只注难字）",
+      title: "邹忌讽齐王纳谏 · 《战国策》",
       paragraphs: [
-        "邹忌修八尺有余，而形貌昳（yì）丽。朝（zhāo）服衣冠，窥（kuī）镜，谓其妻曰：“我孰与城北徐公美？”其妻曰：“君美甚，徐公何能及君也？”……明日徐公来，孰（shú，同“熟”）视之，自以为不如；窥镜而自视，又弗（fú）如远甚。暮寝（qǐn）而思之，曰：“吾妻之美我者，私我也；妾之美我者，畏我也；客之美我者，欲有求于我也。”于是入朝见威王，曰：“……今齐地方千里，百二十城，宫妇左右莫不私王，朝廷之臣莫不畏王，四境之内莫不有求于王：由此观之，王之蔽（bì）甚矣。”"
+        "邹忌修八尺有余（zōu jì xiū bā chǐ yǒu yú），而形貌昳丽（ér xíng mào yì lì）。\n朝服衣冠（zhāo fú yī guān），窥镜（kuī jìng），谓其妻曰（wèi qí qī yuē）：“我孰与城北徐公美（wǒ shú yǔ chéng běi xú gōng měi）？”\n其妻曰（qí qī yuē）：“君美甚（jūn měi shèn），徐公何能及君也（xú gōng hé néng jí jūn yě）？”\n……明日徐公来（míng rì xú gōng lái），孰视之（shú shì zhī），自以为不如（zì yǐ wéi bù rú）；窥镜而自视（kuī jìng ér zì shì），又弗如远甚（yòu fú rú yuǎn shèn）。\n暮寝而思之（mù qǐn ér sī zhī），曰（yuē）：“吾妻之美我者（wú qī zhī měi wǒ zhě），私我也（sī wǒ yě）；妾之美我者（qiè zhī měi wǒ zhě），畏我也（wèi wǒ yě）；客之美我者（kè zhī měi wǒ zhě），欲有求于我也（yù yǒu qiú yú wǒ yě）。”\n于是入朝见威王（yú shì rù cháo jiàn wēi wáng），曰（yuē）：“……今齐地方千里（jīn qí dì fāng qiān lǐ），百二十城（bǎi èr shí chéng），宫妇左右莫不私王（gōng fù zuǒ yòu mò bù sī wáng），朝廷之臣莫不畏王（cháo tíng zhī chén mò bù wèi wáng），四境之内莫不有求于王（sì jìng zhī nèi mò bù yǒu qiú yú wáng）：由此观之（yóu cǐ guān zhī），王之蔽甚矣（wáng zhī bì shèn yǐ）。”"
       ]
     },
     {
       type: "knowledge",
-      title: "曹刿论战 · 《左传》（长篇，只注难字）",
+      title: "曹刿论战 · 《左传》",
       paragraphs: [
-        "十年春，齐师伐我。公将战，曹刿（guì）请见。其乡人曰：“肉食者谋之，又何间（jiàn）焉？”刿曰：“肉食者鄙（bǐ），未能远谋。”乃入见。问：“何以战？”……公曰：“小大之狱，虽不能察，必以情。”对曰：“忠之属也。可以一战。战则请从。”……既克，公问其故。对曰：“夫战，勇气也。一鼓作气，再而衰，三而竭。彼竭我盈，故克之。夫大国，难测也，惧有伏焉。吾视其辙（zhé）乱，望其旗靡（mǐ），故逐之。”"
+        "十年春（shí nián chūn），齐师伐我（qí shī fá wǒ）。\n公将战（gōng jiāng zhàn），曹刿请见（cáo guì qǐng jiàn）。\n其乡人曰（qí xiāng rén yuē）：“肉食者谋之（ròu shí zhě móu zhī），又何间焉（yòu hé jiàn yān）？”\n刿曰（guì yuē）：“肉食者鄙（ròu shí zhě bǐ），未能远谋（wèi néng yuǎn móu）。”\n乃入见（nǎi rù jiàn）。问（wèn）：“何以战（hé yǐ zhàn）？”\n……公曰（gōng yuē）：“小大之狱（xiǎo dà zhī yù），虽不能察（suī bù néng chá），必以情（bì yǐ qíng）。”\n对曰（duì yuē）：“忠之属也（zhōng zhī shǔ yě）。可以一战（kě yǐ yí zhàn）。战则请从（zhàn zé qǐng cóng）。”\n……既克（jì kè），公问其故（gōng wèn qí gù）。\n对曰（duì yuē）：“夫战（fú zhàn），勇气也（yǒng qì yě）。一鼓作气（yì gǔ zuò qì），再而衰（zài ér shuāi），三而竭（sān ér jié）。\n彼竭我盈（bǐ jié wǒ yíng），故克之（gù kè zhī）。\n夫大国（fú dà guó），难测也（nán cè yě），惧有伏焉（jù yǒu fú yān）。\n吾视其辙乱（wú shì qí zhé luàn），望其旗靡（wàng qí qí mǐ），故逐之（gù zhú zhī）。”"
       ]
     },
     {
       type: "knowledge",
-      title: "桃花源记 · 陶渊明（长篇，只注难字）",
+      title: "桃花源记 · 陶渊明",
       paragraphs: [
-        "晋太元中，武陵人捕鱼为业。缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤（bīn）纷。渔人甚异之。复前行，欲穷其林。林尽水源，便得一山，山有小口，仿佛若有光。便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。土地平旷，屋舍俨（yǎn）然，有良田、美池、桑竹之属。阡陌（qiān mò）交通，鸡犬相闻。其中往来种作，男女衣着，悉如外人。黄发垂髫（tiáo），并怡（yí）然自乐。"
+        "晋太元中（jìn tài yuán zhōng），武陵人捕鱼为业（wǔ líng rén bǔ yú wéi yè）。\n缘溪行（yuán xī xíng），忘路之远近（wàng lù zhī yuǎn jìn）。\n忽逢桃花林（hū féng táo huā lín），夹岸数百步（jiā àn shù bǎi bù），中无杂树（zhōng wú zá shù），芳草鲜美（fāng cǎo xiān měi），落英缤纷（luò yīng bīn fēn）。\n渔人甚异之（yú rén shèn yì zhī）。复前行（fù qián xíng），欲穷其林（yù qióng qí lín）。\n林尽水源（lín jìn shuǐ yuán），便得一山（biàn dé yì shān），山有小口（shān yǒu xiǎo kǒu），仿佛若有光（fǎng fú ruò yǒu guāng）。\n便舍船（biàn shě chuán），从口入（cóng kǒu rù）。初极狭（chū jí xiá），才通人（cái tōng rén）。\n复行数十步（fù xíng shù shí bù），豁然开朗（huò rán kāi lǎng）。\n土地平旷（tǔ dì píng kuàng），屋舍俨然（wū shè yǎn rán），有良田（yǒu liáng tián）、美池（měi chí）、桑竹之属（sāng zhú zhī shǔ）。\n阡陌交通（qiān mò jiāo tōng），鸡犬相闻（jī quǎn xiāng wén）。\n其中往来种作（qí zhōng wǎng lái zhòng zuò），男女衣着（nán nǚ yī zhuó），悉如外人（xī rú wài rén）。\n黄发垂髫（huáng fà chuí tiáo），并怡然自乐（bìng yí rán zì lè）。"
       ]
     }
   ]
