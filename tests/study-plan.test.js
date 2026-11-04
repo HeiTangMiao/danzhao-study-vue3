@@ -6,7 +6,8 @@
  *  - ① 周预算：合计 32 → budgetValid true；改 31 → false（且 save 仍写入，不阻断）
  *  - ② 顺延：昨天未完成任务出现在今日清单；勾选后移出清单但仍在 tasks（不清零）
  *  - ③ 不惩罚：连续多天未完成 → 无新惩罚字段、任务不丢失
- *  - ④ 倒计时：daysUntil('2026-11-30')（今天 2026-10-09）=== 52；已过日期 → 负值
+ *  - ④ 倒计时：daysUntil 相对今天 / 已过为负 / 空串为 null；三条里程碑默认 date='' → days=null（未设置）
+ *  - ④' 旧存档迁移：三个旧推定默认值（官方未发布）→ 回落 ''；用户自改的日期保留
  *  - ⑤ 存储 round-trip：save → 新 store load 一致；损坏 JSON → 回落默认不抛
  *  - ⑥ 备份完整性：studyDb.exportAllData() 结果含 localStorage['study_plan_v1']
  *  - ⑦ 组件级：mount PlanView 三区块渲染；预算合计 ≠32 时出提示（不阻断）
@@ -24,6 +25,7 @@ import {
   WEEKLY_BUDGET_HOURS,
   DAILY_BUDGET_HOURS,
   MILESTONES,
+  LEGACY_DEFAULT_DATES,
   daysUntil
 } from '@/stores/studyPlan'
 import { useStudyDbStore } from '@/stores/studyDb'
@@ -79,19 +81,79 @@ describe('D-2 studyPlan store（①③④）', () => {
     expect(store.todayList.map((t) => t.title)).toEqual(['三天的旧任务', '两天前的任务'])
   })
 
-  it('④ 倒计时：daysUntil 相对今天；已过日期为负', () => {
+  it('④ 倒计时：daysUntil 相对今天；已过日期为负；空串为 null', () => {
     freezeTo('2026-10-09T10:00:00')
-    expect(daysUntil('2026-11-30')).toBe(52)
+    expect(daysUntil('2026-12-01')).toBe(53)
     expect(daysUntil('2026-10-09')).toBe(0)
     expect(daysUntil('2026-10-01')).toBe(-8)
-    // 非法日期 → null（不抛）
+    // 非法日期 / 空串 → null（不抛）；'' = 未设置，即方案 A 的默认值
     expect(daysUntil('not-a-date')).toBe(null)
+    expect(daysUntil('')).toBe(null)
 
     const store = useStudyPlanStore()
-    const op = store.countdowns.find((c) => c.id === 'op')
-    expect(op.days).toBe(52)
-    // 里程碑默认值来自 MILESTONES（单一来源）
+    // 方案 A：三条默认 date 全为空 = 未设置，不预设任何年份或月日
+    expect(store.milestones.map((m) => m.date)).toEqual(['', '', ''])
+    expect(store.countdowns.map((c) => c.days)).toEqual([null, null, null])
+    // 里程碑默认值来自 MILESTONES（单一来源）——store 只是它的拷贝，不另写一份。
+    // 覆盖来源只有两处，均有独立断言：① load() 的旧存档迁移（下方「旧存档迁移」用例）；
+    // ② setMilestoneDate() 学员自填（⑤ round-trip 用例）。本条守卫的是「二者都没发生时」的默认值。
     expect(store.milestones.map((m) => m.id)).toEqual(MILESTONES.map((m) => m.id))
+    expect(store.milestones.map((m) => m.date)).toEqual(MILESTONES.map((m) => m.date))
+  })
+})
+
+describe('方案 A · 旧存档迁移（④′ 官方未发布的推定日期不得复活）', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('迁移常量只登记三个旧推定默认值，且没有任何一条被重新用作默认值', () => {
+    expect([...LEGACY_DEFAULT_DATES]).toEqual(['2026-11-30', '2027-04-15', '2027-06-07'])
+    expect(MILESTONES.every((m) => !LEGACY_DEFAULT_DATES.includes(m.date))).toBe(true)
+  })
+
+  it('旧存档三条都是推定默认值 → 升级后全部显示「待设置」（date=\'\' / days=null）', () => {
+    freezeTo('2026-10-09T10:00:00')
+    localStorage.setItem(
+      'study_plan_v1',
+      JSON.stringify({
+        milestones: [
+          { id: 'op', date: '2026-11-30' },
+          { id: 'theory', date: '2027-04-15' },
+          { id: 'academic', date: '2027-06-07' }
+        ]
+      })
+    )
+    const store = useStudyPlanStore()
+    store.load()
+    expect(store.milestones.map((m) => m.date)).toEqual(['', '', ''])
+    expect(store.countdowns.map((c) => c.days)).toEqual([null, null, null])
+    // 迁移结果在下一次 save 时写回（自愈），旧字面量不再留在存档里
+    store.save()
+    const reread = JSON.parse(localStorage.getItem('study_plan_v1'))
+    expect(reread.milestones.map((m) => m.date)).toEqual(['', '', ''])
+  })
+
+  it('混合存档：只迁移旧推定字面量，用户自己改过的日期原样保留', () => {
+    freezeTo('2026-10-09T10:00:00')
+    localStorage.setItem(
+      'study_plan_v1',
+      JSON.stringify({
+        milestones: [
+          { id: 'op', date: '2026-12-01' }, // 用户改过 → 保留
+          { id: 'theory', date: '2027-04-15' }, // 旧推定默认值 → 迁移
+          { id: 'academic', date: '2027-06-07' } // 旧推定默认值 → 迁移
+        ]
+      })
+    )
+    const store = useStudyPlanStore()
+    store.load()
+    expect(store.milestones.map((m) => m.date)).toEqual(['2026-12-01', '', ''])
+    expect(store.countdowns.map((c) => c.days)).toEqual([53, null, null])
   })
 })
 
@@ -188,6 +250,21 @@ describe('D-2 PlanView 组件（⑦）', () => {
     expect(wrapper.text()).toContain('与目标 32')
     // 提示非阻断：页面正常渲染、无禁用态遮罩
     expect(wrapper.find('.plan-budget').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('⑦ 里程碑未设置时显示「待设置 · 以当年官方通知为准」，不是空白 / NaN', async () => {
+    const wrapper = mount(PlanView, { global: { plugins: [pinia] } })
+    await nextTick()
+    const badges = wrapper.findAll('.plan-ms__days')
+    expect(badges).toHaveLength(3)
+    for (const badge of badges) {
+      expect(badge.text()).toBe('待设置 · 以当年官方通知为准')
+      expect(badge.text().trim()).not.toBe('')
+      expect(badge.classes()).toContain('plan-ms__days--unset')
+    }
+    expect(wrapper.text()).not.toContain('NaN')
+    expect(wrapper.text()).not.toContain('undefined')
     wrapper.unmount()
   })
 

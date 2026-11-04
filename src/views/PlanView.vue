@@ -44,8 +44,8 @@
             @change="store.setMilestoneDate(m.id, $event.target.value)"
           />
           <span class="plan-ms__label">{{ m.label }}</span>
-          <span class="plan-ms__days">
-            <template v-if="m.days === null">—</template>
+          <span class="plan-ms__days" :class="{ 'plan-ms__days--unset': m.days === null }">
+            <template v-if="m.days === null">待设置 · 以当年官方通知为准</template>
             <template v-else-if="m.days < 0">已过 {{ -m.days }} 天</template>
             <template v-else>还有 {{ m.days }} 天</template>
           </span>
@@ -239,7 +239,7 @@ onMounted(async () => {
 /* 里程碑 */
 .plan-milestones { display: flex; flex-direction: column; gap: var(--space-2); }
 .plan-ms {
-  display: flex; align-items: center; gap: var(--space-3);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
   padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-muted);
 }
 .plan-ms.is-past { opacity: 0.7; }
@@ -250,6 +250,8 @@ onMounted(async () => {
 }
 .plan-ms__label { flex: 1; font-size: var(--fs-base); }
 .plan-ms__days { flex: 0 0 auto; font-weight: var(--fw-semibold); color: var(--primary); font-variant-numeric: tabular-nums; }
+/* 未设置文案较长：弱化为说明文字并允许换行（窄屏不把日期输入框挤出容器） */
+.plan-ms__days--unset { font-size: var(--fs-sm); font-weight: var(--fw-normal); color: var(--text-muted); }
 .plan-ms.is-past .plan-ms__days { color: var(--text-muted); }
 
 /* 预算表 */

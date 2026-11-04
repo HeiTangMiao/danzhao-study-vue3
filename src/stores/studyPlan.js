@@ -24,14 +24,28 @@ export const WEEKLY_BUDGET_HOURS = 32
 export const DAILY_BUDGET_HOURS = WEEKLY_BUDGET_HOURS / 7
 
 /**
- * 里程碑（P0-7 验收 2）：日期为**可编辑默认值**（需求只给「11/30 / 次年 4 月 / 6、7 月」，
- * 精确日由用户在页面改；默认填当下最合理的锚点）。倒计时 = 目标日 - 今天（天）。
+ * 里程碑（P0-7 验收 2）：`date` 默认为 `''` = 未设置，由学员按当年官方通知自行填写。
+ * 不预设年份、也不预设月日 —— 相应年度的考试安排尚未由官方发布，任何推定锚点都不作为默认值。
+ * `daysUntil('')` 返回 null，视图据此显示「待设置」。倒计时 = 目标日 - 今天（天）。
  */
 export const MILESTONES = [
-  { id: 'op', label: '技能操作考', date: '2026-11-30' },
-  { id: 'theory', label: '理论考', date: '2027-04-15' },
-  { id: 'academic', label: '语数考试', date: '2027-06-07' }
+  { id: 'op', label: '技能操作考', date: '' },
+  { id: 'theory', label: '理论考', date: '' },
+  { id: 'academic', label: '语数考试', date: '' }
 ]
+
+/**
+ * 旧推定默认值（官方未发布，仅用于旧存档迁移匹配）：老版本把这三个字面量写进了
+ * `study_plan_v1`，命中即视为「未设置」并回落 `''`。
+ * ⚠️ 禁止把它们重新用作 MILESTONES 默认值 —— 它们不是考试日期，只是迁移匹配键。
+ * 存档里没有 isUserSet 标记，无法区分「学员恰好手填了同一天」与「沿用旧默认值」；
+ * 按来件方案只做字面量精确匹配，因此只命中这三个值，用户改过的其他日期一律保留。
+ */
+export const LEGACY_DEFAULT_DATES = Object.freeze([
+  '2026-11-30',
+  '2027-04-15',
+  '2027-06-07'
+])
 
 /** localStorage 键（§7 P-D1）：与 studyDb.exportAllData 备份清单保持一致 */
 const STORAGE_KEY = 'study_plan_v1'
@@ -60,6 +74,17 @@ export function daysUntil(dateStr) {
   const now = new Date()
   const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   return Math.ceil((target.getTime() - todayMid.getTime()) / 86400000)
+}
+
+/**
+ * 旧存档里程碑日期迁移：命中三个旧推定默认值 → 视为「未设置」（`''`）。
+ * 只按字面量精确匹配，不清除用户改过的任何日期；非字符串 / 空值同样回落 `''`。
+ * @param {unknown} savedDate `study_plan_v1` 里的 milestone.date
+ * @returns {string} 迁移后的日期
+ */
+function migrateMilestoneDate(savedDate) {
+  const date = typeof savedDate === 'string' ? savedDate : ''
+  return LEGACY_DEFAULT_DATES.includes(date) ? '' : date
 }
 
 export const useStudyPlanStore = defineStore('studyPlan', () => {
@@ -107,10 +132,12 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
         budget.value = { ...budget.value, ...parsed.budget }
       }
       if (Array.isArray(parsed.milestones)) {
-        // 以默认里程碑的 id/label/顺序为准，仅套用存储里改过的日期（防旧结构漂移）
+        // 以默认里程碑的 id/label/顺序为准，仅套用存储里改过的日期（防旧结构漂移）。
+        // 旧推定默认值（官方未发布）会被老存档原样读回 → 经迁移一律视为「未设置」。
+        // 之后的任意一次 save() 会把迁移结果写回，旧值自然消失（自愈，无需单独清库）。
         milestones.value = MILESTONES.map((base) => {
           const saved = parsed.milestones.find((x) => x && x.id === base.id)
-          return { ...base, date: saved && saved.date ? saved.date : base.date }
+          return { ...base, date: saved ? migrateMilestoneDate(saved.date) : base.date }
         })
       }
       if (Array.isArray(parsed.tasks)) {
