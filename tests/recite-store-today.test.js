@@ -287,3 +287,48 @@ describe('⑤ T1 · recite_state 8 字段整行保真（回归）', () => {
     expect(persisted.sessionStartedAt).toBe(0)
   })
 })
+
+describe('⑥ T4 · 毕业保持档答错（applyResult 的 !passed 分支优先于毕业）', () => {
+  it('深链进已毕业篇自评「还需练习」→ stage=0 / nextDate=明天 / learnedAt 保留', async () => {
+    const db = useStudyDbStore()
+    const realToday = getDateStr()
+    const oldAt = Date.now() - 40 * 86400000
+    const learnedDay = addDays(realToday, -40)
+    await db.saveReciteProgress({
+      key: KEY_1,
+      subject: 'chinese',
+      fileKey: FILE_KEY,
+      blockIndex: 0,
+      pieceTitle: '《诗经》 · 关雎',
+      fp: 'fp-1',
+      stage: 5,
+      nextDate: null,
+      lastCorrect: true,
+      lastAt: oldAt,
+      doneCount: 6,
+      learnedAt: learnedDay,
+      createdAt: oldAt,
+      deleted: false
+    })
+    const store = useReciteStore()
+    await store.init()
+    // 历史 stage=5 / nextDate=null 行零迁移即进保持档（lastAt 早已过保持期）
+    expect(store.viewModel.maintenanceCount).toBe(1)
+    expect(store.viewModel.maintenance[0].piece.key).toBe(KEY_1)
+    expect(store.viewModel.hasTask).toBe(true)
+
+    const { row } = await store.submitResult({ pieceKey: KEY_1, allCorrect: false })
+    expect(row.stage).toBe(0)
+    expect(row.nextDate).toBe(addDays(realToday, 1))
+    expect(row.learnedAt).toBe(learnedDay)
+    expect(row.lastCorrect).toBe(false)
+
+    const persisted = (await db.getReciteProgressAll()).find((r) => r.key === KEY_1)
+    expect(persisted.stage).toBe(0)
+    expect(persisted.nextDate).toBe(addDays(realToday, 1))
+    expect(persisted.learnedAt).toBe(learnedDay)
+    // 不再是毕业行 → 从保持队列退出，排到明天的常规队列
+    expect(store.viewModel.maintenanceCount).toBe(0)
+    expect(store.viewModel.dueCount).toBe(0)
+  })
+})

@@ -44,6 +44,10 @@ vi.mock('@/stores/recite', async () => {
     dueRemaining: 0,
     suppressedNew: false,
     hasTask: false,
+    maintenance: [],
+    maintenanceCount: 0,
+    maintenanceTotal: 0,
+    maintenanceRemaining: 0,
     challenge: null
   })
   const todayRef = ref(getDateStr())
@@ -118,6 +122,10 @@ function resetState(patch = {}) {
     dueCount: 0,
     dueTotal: 0,
     hasTask: false,
+    maintenance: [],
+    maintenanceCount: 0,
+    maintenanceTotal: 0,
+    maintenanceRemaining: 0,
     ...patch
   })
 }
@@ -288,6 +296,34 @@ describe('ReciteTaskCard · 内容与角标', () => {
     expect(wrapper.text()).toContain('新篇')
     expect(wrapper.text()).toContain('今日新篇 1 篇')
     wrapper.unmount()
+  })
+
+  it('仅保持档也有任务：卡片显示篇名、出处与「保持」角标（home 用 hasTask；review 仍只看 dueCount）', async () => {
+    resetState({
+      due: [],
+      dueCount: 0,
+      fresh: null,
+      freshCount: 0,
+      maintenance: [
+        { piece: duePiece('已毕业篇'), row: { key: 'chinese|x|0', stage: 5, nextDate: null } }
+      ],
+      maintenanceCount: 1,
+      maintenanceTotal: 1,
+      maintenanceRemaining: 0,
+      hasTask: true
+    })
+    const home = await mountCard('home')
+    expect(home.text()).toContain('已毕业篇')
+    expect(home.text()).toContain('默写专项 · 测试文件')
+    expect(home.text()).toContain('保持')
+    expect(home.text()).toContain('保持 1 篇')
+    expect(home.find('.rtc-home__main').exists()).toBe(true)
+    home.unmount()
+
+    // 复习 Tab 只关心常规重默：dueCount=0 时整行不渲染，保持档不进复习入口
+    const review = await mountCard('review')
+    expect(review.find('.rtc-review').exists()).toBe(false)
+    review.unmount()
   })
 
   it('streak>0 时显示连续天数；streak=0 时不显示', async () => {

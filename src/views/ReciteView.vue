@@ -7,9 +7,11 @@
   三态互斥（§7.4）：
    - loading：素材加载中（`await loadBundled()` 是首屏唯一的阻塞点）
    - error  ：加载失败 → **独立态 + 重试按钮**，不白屏、不静默显示空队列
-   - ready  ：进度条 / 连续天数 / 今日新篇 / 今日待重默 / 底部常驻大冲关
+   - ready  ：进度条 / 连续天数 / 今日新篇 / 今日待重默 / 低频保持 / 底部常驻大冲关
 
-  ⚠️ 今日待重默分区在**无到期篇时整块不渲染**（不留空白卡）。
+  ⚠️ 今日待重默 / 低频保持两个分区都在**无对应篇目时整块不渲染**（不留空白卡）。
+  ⚠️ 低频保持是 C3a 的独立队列：毕业行（nextDate=null）按保持期低频复现，
+     与常规重默分池、不挤掉新篇；视图内不做任何日期算术（§7.5）。
   ⚠️ 复习篇列表项必须显示 `fileTitle`（5 篇综合自测的 `title` 完全相同，显示 title 会 5 行一模一样，
      见 §3.4 末尾的坑）。lesson 篇则显示 `title`（篇名才有信息量），`fileTitle` 作为出处副行。
 -->
@@ -93,6 +95,32 @@
             </router-link>
           </li>
         </ul>
+      </section>
+
+      <!-- 低频保持（C3a）：已毕业篇目按保持期低频复现，与常规重默分池、不挤掉新篇。
+           角标用固定文案「保持」，不用 attemptLabel（stage=5 会显示「第 6 次」，语义错）。 -->
+      <section v-if="vm.maintenance.length" class="rc-block">
+        <h2 class="rc-block__title">
+          低频保持
+          <span class="rc-block__count">{{ vm.maintenance.length }}</span>
+        </h2>
+        <ul class="rc-due">
+          <li v-for="item in vm.maintenance" :key="item.piece.key" class="rc-due__item">
+            <router-link class="card rc-piece" :to="pieceLink(item.piece)">
+              <span class="rc-piece__body">
+                <span class="rc-piece__title">{{ primaryLabel(item.piece) }}</span>
+                <span class="rc-piece__src">{{ secondaryLabel(item.piece) }}</span>
+              </span>
+              <span class="rc-piece__tags">
+                <span class="rc-tag rc-tag--due">保持</span>
+              </span>
+              <span class="rc-piece__go" aria-hidden="true"><AppIcon name="chevron-right" :size="16" /></span>
+            </router-link>
+          </li>
+        </ul>
+        <p v-if="vm.maintenanceRemaining > 0" class="rc-block__more">
+          另有 {{ vm.maintenanceRemaining }} 篇排后面
+        </p>
       </section>
 
       <!-- 底部常驻：综合大冲关（模拟考场；`?manual=1` → 不写任何进度，I6） -->
@@ -277,6 +305,7 @@ onMounted(() => {
 }
 
 .rc-due { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.rc-block__more { margin: var(--space-2) 0 0; font-size: var(--fs-sm); color: var(--text-muted); }
 
 /* 篇目行：整行可点，触控高度 ≥44px（A10 / F2） */
 .rc-piece {

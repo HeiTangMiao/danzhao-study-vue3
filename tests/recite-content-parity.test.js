@@ -720,6 +720,35 @@ describe('ReciteView 首页：视图只读 viewModel（分母取产物 counts.le
       H.stub.getReciteProgressAll.mockImplementation(original)
     }
   })
+
+  it('C3a 低频保持：毕业行进第三块，角标固定「保持」而非「第 6 次」', async () => {
+    H.bank = makeHomeBank()
+    const original = H.stub.getReciteProgressAll.getMockImplementation()
+    const graduated = learnedRow()
+    graduated.key = `chinese|${FILE_KEY}|2`
+    graduated.blockIndex = 2
+    graduated.pieceTitle = '已毕业篇'
+    graduated.fp = 'fp2'
+    graduated.stage = 5
+    graduated.nextDate = null
+    graduated.lastAt = 1 // 1970-01-01 → 保持日早已过，零迁移即到期
+    H.stub.getReciteProgressAll.mockResolvedValue([learnedRow(), graduated])
+    try {
+      const { wrapper } = await mountHome()
+      await waitFor(() => (wrapper.text().includes('低频保持') ? wrapper : null))
+
+      expect(wrapper.text()).toContain('低频保持')
+      const tags = wrapper.findAll('.rc-tag--due')
+      expect(tags.map((t) => t.text())).toContain('保持')
+      // 固定文案，不走 attemptLabel（stage=5 会显示「第 6 次」，语义错）
+      expect(wrapper.text()).not.toContain('第 6 次')
+      // 毕业行不进常规待重默分区，也不算「逾期 N 天」
+      expect(wrapper.text()).not.toContain('逾期')
+      wrapper.unmount()
+    } finally {
+      H.stub.getReciteProgressAll.mockImplementation(original)
+    }
+  })
 })
 
 // ═══════════════ 路由可达性 + 4 Tab 不变 ═══════════════

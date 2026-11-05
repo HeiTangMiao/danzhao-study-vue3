@@ -31,6 +31,8 @@ import {
   DAILY_DUE_LIMIT,
   NEW_SUPPRESS_AT,
   DAILY_NEW_LIMIT,
+  MAINTENANCE_DAYS,
+  MAINTENANCE_DAILY_LIMIT,
   EMPTY_RECITE_STATE,
   STATE_KEY,
   getDateStr,
@@ -38,6 +40,8 @@ import {
   subjectKeyOf,
   applyResult,
   isDue,
+  maintenanceDueDateOf,
+  isMaintenanceDue,
   buildQueue,
   syncReviewTriggers,
   reconcile,
@@ -107,7 +111,7 @@ function mkRow(piece, opt = {}) {
     stage: opt.stage === undefined ? 0 : opt.stage,
     nextDate: opt.nextDate === undefined ? TODAY : opt.nextDate,
     lastCorrect: opt.lastCorrect === undefined ? true : opt.lastCorrect,
-    lastAt: 1759000000000,
+    lastAt: opt.lastAt === undefined ? 1759000000000 : opt.lastAt,
     doneCount: opt.doneCount === undefined ? 1 : opt.doneCount,
     learnedAt: opt.learnedAt === undefined ? null : opt.learnedAt,
     createdAt: 1759000000000,
@@ -789,5 +793,150 @@ describe('reciteBankClient 双源 SWR（5 个场景，mock fetchJson）', () => 
     const b = await loadBundled('chinese')
     expect(b).toBe(a)
     expect(fetchJson).toHaveBeenCalledTimes(1)
+  })
+})
+
+// ───────────────────────── C3a · 毕业保持队列（T4） ─────────────────────────
+
+/** 造「本地当天零点」的毫秒时间戳（保持日按本地时区算，不用 UTC / toISOString） */
+function localMidnightMs(dayStr) {
+  const [y, m, d] = dayStr.split('-').map(Number)
+  return new Date(y, m - 1, d).getTime()
+}
+
+/** 造一条历史毕业行（stage=5 / nextDate=null）；lastAt 缺省为早已过保持期的时间 */
+function graduatedRow(piece, over = {}) {
+  return mkRow(piece, {
+    stage: MAX_STAGE,
+    nextDate: null,
+    lastAt: localMidnightMs('2026-09-01'),
+    ...over
+  })
+}
+
+describe('C3a · 毕业保持期常量（派生值，ladder 本身不动）', () => {
+  it('MAINTENANCE_DAYS = 末档累计 × 2 = 30；MAINTENANCE_DAILY_LIMIT = floor(DAILY_DUE_LIMIT/2) = 2', () => {
+    expect(MAINTENANCE_DAYS).toBe(30)
+    expect(MAINTENANCE_DAILY_LIMIT).toBe(2)
+    // 用 [length-1] 而非 .at()：与实现的派生式逐字同源
+    expect(MAINTENANCE_DAYS).toBe(CUMULATIVE_DAYS[CUMULATIVE_DAYS.length - 1] * 2)
+    expect(MAINTENANCE_DAILY_LIMIT).toBe(Math.max(1, Math.floor(DAILY_DUE_LIMIT / 2)))
+    // ladder 常量一个都没动
+    expect(CUMULATIVE_DAYS).toEqual([1, 2, 4, 7, 15])
+    expect(STAGE_DELTA).toEqual([1, 1, 2, 3, 8])
+    expect(MAX_STAGE).toBe(5)
+    expect(NEW_SUPPRESS_AT).toBe(3)
+    expect(DAILY_DUE_LIMIT).toBe(5)
+  })
+})
+
+describe('C3a · maintenanceDueDateOf / isMaintenanceDue', () => {
+  it('maintenanceDueDateOf：只对生效毕业行产出本地日期，其余返回 null', () => {
+    const piece = mkPiece(0)
+    expect(maintenanceDueDateOf(graduatedRow(piece))).toBe('2026-10-01')
+    expect(maintenanceDueDateOf(graduatedRow(piece, { lastAt: localMidnightMs('2026-10-20') }))).toBe('2026-11-19')
+    expect(maintenanceDueDateOf(graduatedRow(piece, { nextDate: TODAY }))).toBeNull()
+    expect(maintenanceDueDateOf(graduatedRow(piece, { deleted: true }))).toBeNull()
+    expect(maintenanceDueDateOf({ ...graduatedRow(piece), lastAt: undefined })).toBeNull()
+    expect(maintenanceDueDateOf(null)).toBeNull()
+  })
+
+  it('isMaintenanceDue ① 已过保持期 → true；② 未到保持期 → false', () => {
+    const piece = mkPiece(0)
+    expect(isMaintenanceDue(graduatedRow(piece), TODAY)).toBe(true)
+    expect(isMaintenanceDue(graduatedRow(piece, { lastAt: localMidnightMs('2026-10-20') }), TODAY)).toBe(false)
+  })
+
+  it('isMaintenanceDue ③ 未毕业（nextDate 非 null）→ false；④ 软删 → false', () => {
+    const piece = mkPiece(0)
+    expect(isMaintenanceDue(graduatedRow(piece, { nextDate: '2026-10-20' }), TODAY)).toBe(false)
+    expect(isMaintenanceDue(graduatedRow(piece, { nextDate: '' }), TODAY)).toBe(false)
+    expect(isMaintenanceDue(graduatedRow(piece, { deleted: true }), TODAY)).toBe(false)
+    // 仍归常规 isDue 管，两条判据互不改写
+    expect(isDue(graduatedRow(piece, { nextDate: '2026-10-20' }), TODAY)).toBe(true)
+  })
+
+  it('isMaintenanceDue 历史毕业行缺 lastAt → 从严 true（宁可多默一次，不可漏默）', () => {
+    const legacy = { ...graduatedRow(mkPiece(0)), lastAt: undefined }
+    expect(maintenanceDueDateOf(legacy)).toBeNull()
+    expect(isMaintenanceDue(legacy, TODAY)).toBe(true)
+  })
+})
+
+describe('C3a · buildQueue 保持档分池（常规语义不变）', () => {
+  it('3 常规到期 + 10 保持到期 → due 3 / maintenance 截 2 / suppressedNew 只由 due 决定', () => {
+    const pieces = []
+    for (let i = 0; i < 14; i++) pieces.push(mkPiece(i))
+    const rows = [
+      ...[0, 1, 2].map((i) => mkRow(pieces[i], { stage: 1, nextDate: '2026-10-20' })),
+      ...[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => graduatedRow(pieces[i]))
+    ]
+    const q = buildQueue({ pieces, rows, today: TODAY })
+    expect(q.dueCount).toBe(3)
+    expect(q.due).toHaveLength(3)
+    expect(q.remainingDueCount).toBe(0)
+    expect(q.suppressedNew).toBe(true) // 3 >= NEW_SUPPRESS_AT
+    expect(q.fresh).toEqual([])
+    expect(q.maintenanceCount).toBe(10)
+    expect(q.maintenance).toHaveLength(MAINTENANCE_DAILY_LIMIT)
+    expect(q.maintenanceRemaining).toBe(8)
+    // 两池严格互斥：常规 due 一条都没被保持档挤掉
+    expect(q.due.every((d) => d.row.nextDate !== null)).toBe(true)
+    expect(q.maintenance.every((m) => m.row.nextDate === null)).toBe(true)
+  })
+
+  it('0 常规 + 10 保持到期 → fresh 照给 1 篇、保持截 2 篇、无饥饿', () => {
+    const pieces = []
+    for (let i = 0; i < 11; i++) pieces.push(mkPiece(i))
+    const rows = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => graduatedRow(pieces[i]))
+    const q = buildQueue({ pieces, rows, today: TODAY })
+    expect(q.dueCount).toBe(0)
+    expect(q.due).toEqual([])
+    expect(q.suppressedNew).toBe(false)
+    expect(q.fresh).toHaveLength(1)
+    expect(q.fresh[0].key).toBe(pieces[10].key)
+    expect(q.maintenanceCount).toBe(10)
+    expect(q.maintenance).toHaveLength(MAINTENANCE_DAILY_LIMIT)
+    expect(q.maintenanceRemaining).toBe(8)
+  })
+
+  it('保持档不进复习 Tab：deriveStats.dueCount 仍只数常规到期，DAILY_DUE_LIMIT 只截常规 due', () => {
+    const pieces = [mkPiece(0), mkPiece(1)]
+    const rows = [
+      mkRow(pieces[0], { stage: 1, nextDate: '2026-10-20' }),
+      graduatedRow(pieces[1])
+    ]
+    const stats = deriveStats({ pieces, rows, state: null, today: TODAY })
+    expect(stats.dueCount).toBe(1)
+    const q = buildQueue({ pieces, rows, today: TODAY, opts: { dueLimit: 5 } })
+    expect(q.dueCount).toBe(1)
+    expect(q.due).toHaveLength(1)
+    expect(q.maintenanceCount).toBe(1)
+  })
+
+  it('保持档按「保持日最早 → order」排序，常规 due 排序口径不变', () => {
+    const pieces = [mkPiece(0), mkPiece(1), mkPiece(2), mkPiece(3)]
+    const rows = [
+      graduatedRow(pieces[0], { lastAt: localMidnightMs('2026-09-20') }), // 保持日 2026-10-20
+      graduatedRow(pieces[1]), // 保持日 2026-10-01
+      graduatedRow(pieces[2]) // 保持日 2026-10-01，order 更大
+    ]
+    const q = buildQueue({ pieces, rows, today: TODAY })
+    expect(q.maintenanceCount).toBe(3)
+    expect(q.maintenance.map((m) => m.piece.key)).toEqual([pieces[1].key, pieces[2].key])
+    expect(q.maintenanceRemaining).toBe(1)
+    expect(q.fresh.map((p) => p.key)).toEqual([pieces[3].key])
+  })
+})
+
+describe('C3a · 历史毕业行零迁移', () => {
+  it('毕业行（stage=5 / nextDate=null）原样通过 reconcile，不产生 migrated / orphaned', () => {
+    const piece = mkPiece(0)
+    const row = graduatedRow(piece)
+    const r = reconcile({ pieces: [piece], rows: [row] })
+    expect(r.migrated).toEqual([])
+    expect(r.orphaned).toEqual([])
+    expect(r.rows).toHaveLength(1)
+    expect(r.rows[0]).toMatchObject({ key: piece.key, stage: MAX_STAGE, nextDate: null })
   })
 })

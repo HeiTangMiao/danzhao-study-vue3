@@ -206,6 +206,8 @@ export const useReciteStore = defineStore('recite', () => {
    *    （裸除法在 `total === 0` 时出 `NaN`，CSS 里静默失效、测试抓不到）；
    *  - `dueCount`：今日**可作**的重默篇数（已被 `DAILY_DUE_LIMIT` 截断）；
    *    `dueRemaining`：因单日上限被挤到后面的篇数（视图可提示「另有 N 篇」）；
+   *  - `maintenance`：今日可作（已被 `MAINTENANCE_DAILY_LIMIT` 截断）的毕业保持档；
+   *    `maintenanceTotal` = 未截断总数、`maintenanceRemaining` = 被挤到后面的篇数；
    *  - `fresh`：今日新篇（最多 1 篇；`suppressedNew` 时恒为 `null`）。
    */
   const viewModel = computed(() => {
@@ -225,8 +227,13 @@ export const useReciteStore = defineStore('recite', () => {
       dueCount: q.due.length,
       dueTotal: q.dueCount,
       dueRemaining: q.remainingDueCount,
+      maintenance: q.maintenance,
+      maintenanceCount: q.maintenance.length,
+      maintenanceTotal: q.maintenanceCount,
+      maintenanceRemaining: q.maintenanceRemaining,
       suppressedNew: q.suppressedNew,
-      hasTask: q.due.length > 0 || q.fresh.length > 0,
+      // 保持档也算「今日有任务」：否则只有保持档的当天会被 Q6 误判成无任务日
+      hasTask: q.due.length > 0 || q.fresh.length > 0 || q.maintenance.length > 0,
       challenge: challengePiece.value
     }
   })

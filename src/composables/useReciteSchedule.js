@@ -54,6 +54,15 @@ export const NEW_SUPPRESS_AT = 3
 /** 每日新篇数（P2-2 明确不做可配置，留常量便于 P1 使用） */
 export const DAILY_NEW_LIMIT = 1
 
+/**
+ * 毕业保持期（天）：末档累计天数的 2 倍，**由 CUMULATIVE_DAYS 派生**，禁手写字面量。
+ * `nextDate === null` 的历史毕业行由 `lastAt` 推导保持日，零迁移即可进入保持队列。
+ */
+export const MAINTENANCE_DAYS = CUMULATIVE_DAYS[CUMULATIVE_DAYS.length - 1] * 2
+
+/** 每日保持档上限：常规重默上限的一半（至少 1 篇）；保持档不挤占常规重默名额 */
+export const MAINTENANCE_DAILY_LIMIT = Math.max(1, Math.floor(DAILY_DUE_LIMIT / 2))
+
 /** `recite_state` 全表唯一行的主键（设计 §3.3） */
 export const STATE_KEY = 'main'
 
@@ -373,6 +382,38 @@ export function overdueDays(row, today) {
   return diff > 0 ? diff : 0
 }
 
+// ─────────────────── 2.5 毕业保持队列（C3a：毕业不再永久移除） ───────────────────
+
+/**
+ * 毕业行的下次保持日 = 最后一次作答日 + `MAINTENANCE_DAYS`。
+ *
+ * 只认「生效行 + `nextDate === null`（已毕业）+ `lastAt` 为有限数」三条件；
+ * 其余（未毕业 / 软删 / 历史行缺 `lastAt`）返回 null。
+ * ⚠️ 用 `getDateStr(new Date(ms))` 取**本地**日期，不用 `toISOString`（UTC 会跨日偏一天）。
+ * @param {object|null|undefined} row `recite_progress` 行
+ * @returns {string|null} `YYYY-MM-DD` 或 null
+ */
+export function maintenanceDueDateOf(row) {
+  if (!isLiveRow(row) || row.nextDate !== null) return null
+  if (!Number.isFinite(row.lastAt)) return null
+  return addDays(getDateStr(new Date(row.lastAt)), MAINTENANCE_DAYS)
+}
+
+/**
+ * 毕业行今日是否该进保持队列（判据唯一真相源，与 `isDue` 并列但互不改写）。
+ *  - 未毕业 / 软删 → false（归常规 `isDue` 管）；
+ *  - 历史行缺 `lastAt` → **true**（算不出保持日时宁可多默一次，不可漏默）；
+ *  - 其余按 `YYYY-MM-DD` 字符串比较（I3：不用时间戳比较，避时区/夏令时错位）。
+ * @param {object|null|undefined} row `recite_progress` 行
+ * @param {string} [today] `YYYY-MM-DD`（可注入）
+ * @returns {boolean}
+ */
+export function isMaintenanceDue(row, today) {
+  if (!isLiveRow(row) || row.nextDate !== null) return false
+  if (!Number.isFinite(row.lastAt)) return true
+  return maintenanceDueDateOf(row) <= normalizeDay(today)
+}
+
 // ─────────────────────────────── 3. 今日队列 ───────────────────────────────
 
 /**
@@ -381,6 +422,9 @@ export function overdueDays(row, today) {
  * 规则：
  *  - **重默（due）**：有生效行且 `isDue` 的篇（lesson / review 都算），
  *    按「排期最早（逾期最久）→ `order` 升序」排序，截断到 `DAILY_DUE_LIMIT`（默认 5）；
+ *  - **保持（maintenance）**：已毕业行（`nextDate === null`）且 `isMaintenanceDue` 的篇，
+ *    按「保持日最早 → `order` 升序」排序，截断到 `MAINTENANCE_DAILY_LIMIT`（默认 2）；
+ *    与常规重默**分池、不互相挤占**，也不参与 `suppressedNew` 的判定；
  *  - **新篇（fresh）**：`role !== 'review'` 且**没有生效行**的篇，按 `order` 升序，
  *    只取 `DAILY_NEW_LIMIT`（默认 1）篇 —— 断更多日也**不补发**、`order` 不跳（A6）；
  *  - **抑制**：到期篇数 ≥ `NEW_SUPPRESS_AT`（默认 3）→ `fresh` 强制为空、`suppressedNew = true`（A5）。
@@ -392,12 +436,16 @@ export function overdueDays(row, today) {
  * @returns {{
  *   due: Array<{piece: object, row: object}>,
  *   fresh: Array<object>,
+ *   maintenance: Array<{piece: object, row: object}>,
  *   suppressedNew: boolean,
  *   remainingDueCount: number,
  *   dueCount: number,
- *   newCount: number
- * }} 队列。`due` 项是 `{piece, row}`（视图既要渲染篇目，也要读 `stage`），
- *    `fresh` 项是篇目本身（尚无行）；`remainingDueCount` = 因上限被挤到明天的篇数。
+ *   newCount: number,
+ *   maintenanceCount: number,
+ *   maintenanceRemaining: number
+ * }} 队列。`due` / `maintenance` 项是 `{piece, row}`（视图既要渲染篇目，也要读 `stage`），
+ *    `fresh` 项是篇目本身（尚无行）；`remainingDueCount` = 因常规上限被挤到明天的篇数，
+ *    `maintenanceCount` 为保持档未截断总数，`maintenanceRemaining` 为因保持档上限被挤到后面的篇数。
  */
 export function buildQueue({ pieces = [], rows = [], today, opts = {} } = {}) {
   const day = normalizeDay(today)
@@ -408,12 +456,14 @@ export function buildQueue({ pieces = [], rows = [], today, opts = {} } = {}) {
   const rowMap = rowsToMap(rows)
 
   const dueAll = []
+  const maintenanceAll = []
   const freshAll = []
   for (const piece of list) {
     if (!piece || typeof piece !== 'object' || !piece.key) continue
     const row = rowMap.get(piece.key)
     if (isLiveRow(row)) {
       if (isDue(row, day)) dueAll.push({ piece, row })
+      else if (isMaintenanceDue(row, day)) maintenanceAll.push({ piece, row })
       continue
     }
     // 复习篇不进「每日新篇」池（它们由 syncReviewTriggers 条件推入）
@@ -426,19 +476,30 @@ export function buildQueue({ pieces = [], rows = [], today, opts = {} } = {}) {
     if (na !== nb) return na < nb ? -1 : 1
     return toInt(a.piece.order, 0) - toInt(b.piece.order, 0)
   })
+  maintenanceAll.sort((a, b) => {
+    const da = maintenanceDueDateOf(a.row) || ''
+    const db = maintenanceDueDateOf(b.row) || ''
+    if (da !== db) return da < db ? -1 : 1
+    return toInt(a.piece.order, 0) - toInt(b.piece.order, 0)
+  })
   freshAll.sort((a, b) => toInt(a.order, 0) - toInt(b.order, 0))
 
+  // 抑制只看常规重默：保持档不挤掉新篇（A5 语义不变）
   const suppressedNew = dueAll.length >= suppressAt
   const due = dueAll.slice(0, dueLimit)
+  const maintenance = maintenanceAll.slice(0, MAINTENANCE_DAILY_LIMIT)
   const fresh = suppressedNew ? [] : freshAll.slice(0, newLimit)
 
   return {
     due,
     fresh,
+    maintenance,
     suppressedNew,
     remainingDueCount: Math.max(0, dueAll.length - due.length),
     dueCount: dueAll.length,
-    newCount: freshAll.length
+    newCount: freshAll.length,
+    maintenanceCount: maintenanceAll.length,
+    maintenanceRemaining: Math.max(0, maintenanceAll.length - maintenance.length)
   }
 }
 

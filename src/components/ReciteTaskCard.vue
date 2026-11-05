@@ -8,7 +8,7 @@
  *   在 `.vue` 里出现 `+1` / `addDays` / `new Date()` 就是位置错了）。
  *
  * ★ 无任务时**整卡不渲染**（不出现占位空卡）：
- *   - `home`：`hasTask === false`（既无今日新篇、也无到期重默）；
+ *   - `home`：`hasTask === false`（既无今日新篇、也无到期重默、也无低频保持档）；
  *   - `review`：`dueCount === 0`（复习 Tab 只关心「今天还有几篇要重默」，无新篇概念）。
  *
  * ★ 计数一律用 `dueCount`（今日**可作**、已被 `DAILY_DUE_LIMIT` 截断），
@@ -42,9 +42,11 @@ const visible = computed(() =>
 )
 
 /**
- * 主行篇目：优先「今日待重默」的第一条，其次「今日新篇」。
- * ⚠️ 两者形状不同：`due` 的条目是 `{ piece, row }`，`fresh` 直接是 **piece 本身**
+ * 主行篇目：优先「今日待重默」的第一条，其次「今日新篇」，再次「低频保持」第一条。
+ * ⚠️ 两类形状不同：`due` / `maintenance` 的条目是 `{ piece, row }`，`fresh` 直接是 **piece 本身**
  * （见 `buildQueue` 的返回值）。这里统一抹平成同一形状，模板不必区分。
+ * 第三分支必做：当天只有保持档时（due=[]、fresh=null），缺了它 `main` 会返回 null，
+ * 首页卡渲染出来却没有篇名/出处/角标。
  */
 const main = computed(() => {
   const due = vm.value.due
@@ -72,14 +74,28 @@ const main = computed(() => {
       overdue: 0
     }
   }
+  const maintenance = vm.value.maintenance
+  if (Array.isArray(maintenance) && maintenance.length > 0) {
+    const item = maintenance[0]
+    const piece = item && item.piece ? item.piece : {}
+    return {
+      title: piece.title || '',
+      fileTitle: piece.fileTitle || '',
+      charCount: Array.isArray(piece.paragraphs) ? piece.paragraphs.join('').length : 0,
+      tag: '保持',
+      // 毕业行 nextDate === null → overdueDays 恒返 0，正好不显示「逾期 N 天」角标
+      overdue: 0
+    }
+  }
   return null
 })
 
-/** 计数行：「今日新篇 N 篇 · 待重默 M 篇」，某一项为 0 时只显示另一项 */
+/** 计数行：「今日新篇 N 篇 · 待重默 M 篇 · 保持 K 篇」，某一项为 0 时只显示其余项 */
 const countText = computed(() => {
   const parts = []
   if (vm.value.freshCount > 0) parts.push(`今日新篇 ${vm.value.freshCount} 篇`)
   if (vm.value.dueCount > 0) parts.push(`待重默 ${vm.value.dueCount} 篇`)
+  if (vm.value.maintenanceCount > 0) parts.push(`保持 ${vm.value.maintenanceCount} 篇`)
   return parts.join(' · ')
 })
 </script>
