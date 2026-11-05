@@ -267,11 +267,12 @@ export const useReciteStore = defineStore('recite', () => {
    *  - `applyResult` 按旧日算 `nextDate`：整篇排期早一天，刚背完的篇**立刻又回到待重默**；
    *    `learnedAt` 也会记成旧的那天（`learnedAt` 只写不撤，计数不受影响但日期偏一天）。
    *
-   * 调用点**只有三处**，且都必须走本函数（禁止各处手写一次取时间）：
+   * 调用点**只有四处**，且都必须走本函数（禁止各处手写一次取时间）：
    *  ① `doInit()` —— 初次加载落地产物后；
    *  ② `init()` 命中「已加载」的**提前 return 分支** —— 隔夜重进首页时纠正快照；
    *  ③ `submitResult()` 入口（**在 `manual` 早退之前**）—— 作答是「今天确实做了事」的唯一事实来源；
    *    手动（模拟考场）也刷：这样「`today` 在任何入口都不陈旧」是无条件不变量（team-lead 裁定）。
+   *  ④ `beginSession()` 入口（T1）—— 会话日期必须以真实今天为准，否则隔夜恢复会挂到旧日。
    * 并发加载期间（`inFlight` 已存在）不刷新：那时多刷一次没有意义（T03 复核点 ②）。
    *
    * ⚠️ I4：本文件取时间的字面调用只有 2 处 —— `today` 的 `ref` 初值（构造兜底）与本函数。
@@ -423,6 +424,54 @@ export const useReciteStore = defineStore('recite', () => {
   }
 
   /**
+   * 会话态**唯一写入口**（T1 私有）：整行合并 → 落库 → 回写内存。
+   * `{ ...state.value }` 保证 examDate / streak 等已有字段不被 patch 抹掉，`key` 由单行表主键钉死。
+   * ⚠️ 本 store 不取时间（I4 守卫：`recite.js` 只允许 2 处 `getDateStr`、0 处 `new Date` / `Date.now`，
+   *    见 `tests/recite-store-today.test.js`），故 `sessionStartedAt` 的 ms 锚点由调用方注入。
+   * @param {object} patch 要覆盖的会话字段
+   * @returns {Promise<object>} 写入后的整行
+   */
+  async function writeStatePatch(patch) {
+    const next = { ...state.value, ...patch, key: 'main' }
+    await db.saveReciteState(next)
+    state.value = next
+    return next
+  }
+
+  /**
+   * 开始一次背诵会话（T1 骨架；完整 `restoreSession()` 属 T2，本次不实现）。
+   *
+   * ★ 幂等守卫：同篇 + 同一天重复进入 → **直接 return，不刷新 `sessionStartedAt`**。
+   *   刷新锚点会把上一次已提交的 `row.lastAt` 判成「未提交」，恢复后重复自评 —— 最隐蔽的一处。
+   *
+   * @param {string} pieceKey 当前篇主键
+   * @param {number} startedAt 会话起点毫秒时间戳（调用方注入：本 store 不取时间，见 writeStatePatch）
+   * @returns {Promise<object|undefined>} 新行；命中守卫 / 入参非法时 undefined
+   */
+  async function beginSession(pieceKey, startedAt) {
+    const key = typeof pieceKey === 'string' ? pieceKey : ''
+    if (!key || !Number.isFinite(startedAt) || startedAt <= 0) return undefined
+    syncToday()
+    const day = today.value
+    const cur = state.value
+    if (cur.sessionPieceKey === key && cur.sessionDate === day) return undefined
+    return writeStatePatch({
+      sessionPieceKey: key,
+      sessionDate: day,
+      sessionStartedAt: startedAt
+    })
+  }
+
+  /** 清除会话态（已为空则直接 return，不产生无意义写盘） */
+  async function clearSession() {
+    const cur = state.value
+    if (cur.sessionPieceKey === '' && cur.sessionDate === '' && cur.sessionStartedAt === 0) {
+      return undefined
+    }
+    return writeStatePatch({ sessionPieceKey: '', sessionDate: '', sessionStartedAt: 0 })
+  }
+
+  /**
    * 提交一次作答：**唯一写 `recite_progress` / `recite_state` 的入口**（§7.5）。
    *
    * 顺序（§4.1 时序图）：`applyResult` → 落库 → `syncReviewTriggers` → 落库 → `bumpStreak` → 落库。
@@ -486,8 +535,11 @@ export const useReciteStore = defineStore('recite', () => {
     rows.value = mergedRows
 
     // 连续天数（Q6 临时规则；无任务日不判负不推进）
+    // ★ 整行合并：bumpStreak 只产 streak 补丁，必须叠回 state.value，
+    //   否则 examDate / session* 四个新字段会在下一次自评时被静默抹掉。
     try {
-      const nextState = bumpStreak({ state: state.value, today: day, hasTaskToday: true })
+      const streakPatch = bumpStreak({ state: state.value, today: day, hasTaskToday: true })
+      const nextState = { ...state.value, ...streakPatch }
       await db.saveReciteState(nextState)
       state.value = nextState
     } catch (err) {
@@ -523,6 +575,8 @@ export const useReciteStore = defineStore('recite', () => {
     setToday,
     setManualOnly,
     getPiece,
-    submitResult
+    submitResult,
+    beginSession,
+    clearSession
   }
 })

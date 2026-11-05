@@ -132,7 +132,16 @@ describe('调度常量（设计 §3.5 唯一真相源）', () => {
     expect(NEW_SUPPRESS_AT).toBe(3)
     expect(DAILY_NEW_LIMIT).toBe(1)
     expect(STATE_KEY).toBe('main')
-    expect(EMPTY_RECITE_STATE).toEqual({ key: 'main', streak: 0, maxStreak: 0, lastActiveDate: '' })
+    expect(EMPTY_RECITE_STATE).toEqual({
+      key: 'main',
+      streak: 0,
+      maxStreak: 0,
+      lastActiveDate: '',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
+    })
   })
 })
 
@@ -544,7 +553,37 @@ describe('reconcile · 内容指纹自动迁移（设计 §3.2 三情形）', ()
 describe('bumpStreak（Q6：无任务日不判负不推进）', () => {
   it('首次完成 → streak=1、lastActiveDate=today、maxStreak=1', () => {
     const s = bumpStreak({ state: null, today: TODAY, hasTaskToday: true })
-    expect(s).toEqual({ key: 'main', streak: 1, maxStreak: 1, lastActiveDate: TODAY })
+    expect(s).toEqual({
+      key: 'main',
+      streak: 1,
+      maxStreak: 1,
+      lastActiveDate: TODAY,
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
+    })
+  })
+
+  it('整行保真：bumpStreak 不抹 examDate / session* 四个新字段', () => {
+    const base = {
+      key: 'main',
+      streak: 2,
+      maxStreak: 4,
+      lastActiveDate: '2026-10-25',
+      examDate: '2026-12-01',
+      sessionPieceKey: 'chinese|f|0',
+      sessionDate: TODAY,
+      sessionStartedAt: 1730000000000
+    }
+    const s = bumpStreak({ state: base, today: TODAY, hasTaskToday: true })
+    expect(s).toEqual({
+      ...base,
+      key: 'main',
+      streak: 3,
+      maxStreak: 4,
+      lastActiveDate: TODAY
+    })
   })
 
   it('昨天有记录 → streak+1；同日重复调用幂等', () => {

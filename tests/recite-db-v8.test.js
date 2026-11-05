@@ -233,7 +233,11 @@ describe('② init 幂等 + 新仓库读写', () => {
       key: 'main',
       streak: 0,
       maxStreak: 0,
-      lastActiveDate: ''
+      lastActiveDate: '',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
     })
 
     await db.saveReciteState({ key: 'ignored', streak: 3, maxStreak: 5, lastActiveDate: '2026-10-26' })
@@ -241,7 +245,11 @@ describe('② init 幂等 + 新仓库读写', () => {
       key: 'main',
       streak: 3,
       maxStreak: 5,
-      lastActiveDate: '2026-10-26'
+      lastActiveDate: '2026-10-26',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
     })
 
     // 覆盖而非追加（单行表）
@@ -256,6 +264,39 @@ describe('② init 幂等 + 新仓库读写', () => {
     })
     expect(rows).toHaveLength(1) // 全表只有一行
     expect(rows[0].key).toBe('main')
+  })
+
+  it('recite_state 8 字段读写往返保真；非法类型严格回落零值', async () => {
+    const full = {
+      key: 'main',
+      streak: 4,
+      maxStreak: 7,
+      lastActiveDate: '2026-10-26',
+      examDate: '2026-12-01',
+      sessionPieceKey: 'chinese|f|0',
+      sessionDate: '2026-10-26',
+      sessionStartedAt: 1730000000000
+    }
+    await db.saveReciteState(full)
+    expect(await db.getReciteState()).toEqual(full)
+
+    // 非法类型一律严格回落，不做 Number(v) 宽松强转（NaN / '' 不进库）
+    await db.saveReciteState({
+      examDate: 123,
+      sessionPieceKey: null,
+      sessionDate: undefined,
+      sessionStartedAt: 'not-a-number'
+    })
+    expect(await db.getReciteState()).toEqual({
+      key: 'main',
+      streak: 0,
+      maxStreak: 0,
+      lastActiveDate: '',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
+    })
   })
 })
 
@@ -288,7 +329,11 @@ describe('③ 换账号清理（上线准入项：不同步 ≠ 不用清）', (
       key: 'main',
       streak: 0,
       maxStreak: 0,
-      lastActiveDate: ''
+      lastActiveDate: '',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
     })
     // 既有同步仓库的清空行为未被改动（方法名 / 签名 / SYNC_STORE_NAMES 都不动）
     expect(await db.getAllStudyLogs()).toEqual([])
@@ -341,7 +386,11 @@ describe('④ 导出 / 导入纳入两张新表', () => {
       key: 'main',
       streak: 6,
       maxStreak: 9,
-      lastActiveDate: '2026-10-26'
+      lastActiveDate: '2026-10-26',
+      examDate: '',
+      sessionPieceKey: '',
+      sessionDate: '',
+      sessionStartedAt: 0
     })
   })
 

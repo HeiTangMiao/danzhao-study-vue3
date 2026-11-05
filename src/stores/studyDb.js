@@ -1103,23 +1103,36 @@ export const useStudyDbStore = defineStore('studyDb', {
     /**
      * 取背诵状态（单行表）。**缺行返回零值结构**，不返回 null ——
      * 让调用方无需再判空（streak 显示 0 天）。
-     * @returns {Promise<{key: string, streak: number, maxStreak: number, lastActiveDate: string}>}
+     * 8 字段与 `useReciteSchedule.EMPTY_RECITE_STATE` 一一对应；新字段严格按类型回落，
+     * 不做 `Number(v)` 宽松强转（会把 undefined/字符串静默变成 0/NaN）。
+     * @returns {Promise<{key: string, streak: number, maxStreak: number, lastActiveDate: string, examDate: string, sessionPieceKey: string, sessionDate: string, sessionStartedAt: number}>}
      */
     async getReciteState() {
       await this.init()
       const row = await dbGet('recite_state', 'main')
-      if (!row) return { key: 'main', streak: 0, maxStreak: 0, lastActiveDate: '' }
+      if (!row) {
+        return {
+          key: 'main', streak: 0, maxStreak: 0, lastActiveDate: '',
+          examDate: '', sessionPieceKey: '', sessionDate: '', sessionStartedAt: 0
+        }
+      }
       return {
         key: 'main',
         streak: row.streak || 0,
         maxStreak: row.maxStreak || 0,
-        lastActiveDate: typeof row.lastActiveDate === 'string' ? row.lastActiveDate : ''
+        lastActiveDate: typeof row.lastActiveDate === 'string' ? row.lastActiveDate : '',
+        examDate: typeof row.examDate === 'string' ? row.examDate : '',
+        sessionPieceKey: typeof row.sessionPieceKey === 'string' ? row.sessionPieceKey : '',
+        sessionDate: typeof row.sessionDate === 'string' ? row.sessionDate : '',
+        sessionStartedAt: Number.isFinite(row.sessionStartedAt) ? row.sessionStartedAt : 0
       }
     },
 
     /**
      * 写入背诵状态（单行表，主键恒为 `'main'`）。
-     * @param {Object} row 状态行（缺字段按 0 / 空串兜底）
+     * 调用方必须传整行（store 侧由 `state.value` / `writeStatePatch` 保证）；
+     * 缺字段按 0 / 空串兜底，避免半残行。
+     * @param {Object} row 状态行
      * @returns {Promise<void>}
      */
     async saveReciteState(row) {
@@ -1128,7 +1141,11 @@ export const useStudyDbStore = defineStore('studyDb', {
         key: 'main',
         streak: src.streak || 0,
         maxStreak: src.maxStreak || 0,
-        lastActiveDate: typeof src.lastActiveDate === 'string' ? src.lastActiveDate : ''
+        lastActiveDate: typeof src.lastActiveDate === 'string' ? src.lastActiveDate : '',
+        examDate: typeof src.examDate === 'string' ? src.examDate : '',
+        sessionPieceKey: typeof src.sessionPieceKey === 'string' ? src.sessionPieceKey : '',
+        sessionDate: typeof src.sessionDate === 'string' ? src.sessionDate : '',
+        sessionStartedAt: Number.isFinite(src.sessionStartedAt) ? src.sessionStartedAt : 0
       }
       await this.init()
       return dbPut('recite_state', next)

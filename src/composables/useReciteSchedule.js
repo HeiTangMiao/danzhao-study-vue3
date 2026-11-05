@@ -69,12 +69,18 @@ const TRIGGER_ALL = 'all'
 /**
  * `recite_state` 的零值结构（每次 `bumpStreak` 都以它为底，防止调用方共享引用互相污染）。
  * 冻结：任何模块都不该就地改它。
+ * 8 字段是 T1 一次性定下的行形状：`examDate` 为契约④（'' = 未设置、学员自填），
+ * 三个 `session*` 为会话态（'' / 0 = 无进行中会话）。缺一处，读写白名单就会静默抹字段。
  */
 export const EMPTY_RECITE_STATE = Object.freeze({
   key: STATE_KEY,
   streak: 0,
   maxStreak: 0,
-  lastActiveDate: ''
+  lastActiveDate: '',
+  examDate: '',
+  sessionPieceKey: '',
+  sessionDate: '',
+  sessionStartedAt: 0
 })
 
 // ─────────────────────── 日期工具（镜像 #1，见文件头；对拍用例钉死） ───────────────────────
@@ -667,7 +673,10 @@ export function bumpStreak({ state = null, today, hasTaskToday = true } = {}) {
   if (prev.lastActiveDate === day) return prev // 当天已计过 → 幂等
 
   const streak = prev.lastActiveDate === addDays(day, -1) ? toInt(prev.streak, 0) + 1 : 1
+  // spread `prev`：从根上保住 examDate / session* 等所有非 streak 字段，
+  // 不再逐处罗列白名单（漏一处 → 下次自评静默抹字段）。两个早退分支原本就返回 prev，不动。
   return {
+    ...prev,
     key: STATE_KEY,
     streak,
     maxStreak: Math.max(toInt(prev.maxStreak, 0), streak),

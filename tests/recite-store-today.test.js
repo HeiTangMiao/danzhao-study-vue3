@@ -12,7 +12,8 @@
  *
  * 修复规格（team-lead 三条硬约束）：
  *  - 只改 `src/stores/recite.js`；`getDateStr` 仍是全仓唯一「今天」产出者，不许出现第二处 `new Date`；
- *  - 内部抽一个 `syncToday()`（一处实现），**三处调用**：`doInit()`、`init()` 已加载分支、`submitResult()` 入口；
+ *  - 内部抽一个 `syncToday()`（一处实现），修复当时**三处调用**：`doInit()`、`init()` 已加载分支、`submitResult()` 入口；
+ *    T1 后新增第 4 处 `beginSession()`（同样只走 `syncToday()`，不新增时间字面调用）。
  *  - `submitResult` 三处消费（`applyResult` / `syncReviewTriggers` / `bumpStreak`）统一吃局部 `day`；
  *  - `submitResult` **签名不变**（不加可选 `today` 入参 —— 这个 bug 的成因就是 `today` 与真实日期脱钩，
  *    在修复提交里再开一条「调用方可传任意日期」的通道方向是反的）。
@@ -219,5 +220,70 @@ describe('④ 单时间源守卫（I4：禁止第二个时间源）', () => {
     // 第二时间源（I4 明令禁止）
     expect(source.match(/new Date\s*\(/g) || []).toHaveLength(0)
     expect(source.match(/Date\.now\s*\(/g) || []).toHaveLength(0)
+  })
+})
+
+describe('⑤ T1 · recite_state 8 字段整行保真（回归）', () => {
+  it('设置 examDate 后跑一次 submitResult：examDate 仍在、会话字段保持已清', async () => {
+    const db = useStudyDbStore()
+    // 夹具只传 4 个旧字段 + examDate；其余 3 个会话字段由 saveReciteState 严格回落零值
+    await db.saveReciteState({
+      streak: 2,
+      maxStreak: 5,
+      lastActiveDate: addDays(getDateStr(), -1),
+      examDate: '2026-12-01'
+    })
+    const store = useReciteStore()
+    await store.init()
+    expect(store.state.examDate).toBe('2026-12-01')
+    expect(store.state.sessionPieceKey).toBe('')
+    expect(store.state.sessionDate).toBe('')
+    expect(store.state.sessionStartedAt).toBe(0)
+
+    await store.submitResult({ pieceKey: KEY_1, allCorrect: true })
+
+    // streak 补丁叠回整行 → examDate 不被抹；submitResult 也不会凭空造出一个会话
+    expect(store.state.examDate).toBe('2026-12-01')
+    expect(store.state.sessionPieceKey).toBe('')
+    expect(store.state.sessionDate).toBe('')
+    expect(store.state.sessionStartedAt).toBe(0)
+    const persisted = await db.getReciteState()
+    expect(persisted.examDate).toBe('2026-12-01')
+    expect(persisted.sessionPieceKey).toBe('')
+    expect(persisted.sessionDate).toBe('')
+    expect(persisted.sessionStartedAt).toBe(0)
+    expect(persisted.streak).toBe(3)
+  })
+
+  it('beginSession 幂等：同篇同日不刷新 sessionStartedAt；clearSession 清空且不抹 examDate', async () => {
+    const db = useStudyDbStore()
+    await db.saveReciteState({ examDate: '2026-12-01' })
+    const store = useReciteStore()
+    await store.init()
+
+    const anchor = 1730000000000
+    await store.beginSession(KEY_1, anchor)
+    expect(store.state.sessionPieceKey).toBe(KEY_1)
+    expect(store.state.sessionDate).toBe(getDateStr())
+    expect(store.state.sessionStartedAt).toBe(anchor)
+    expect(store.state.examDate).toBe('2026-12-01')
+
+    // 同篇 + 同一天重复进入 → 守卫命中，锚点保持不变（否则已提交的 row.lastAt 会被判成未提交）
+    await store.beginSession(KEY_1, anchor + 60000)
+    expect(store.state.sessionStartedAt).toBe(anchor)
+
+    await store.clearSession()
+    expect(store.state.sessionPieceKey).toBe('')
+    expect(store.state.sessionDate).toBe('')
+    expect(store.state.sessionStartedAt).toBe(0)
+    expect(store.state.examDate).toBe('2026-12-01')
+
+    // 已空时再清 → 幂等，不产生无意义写盘
+    await store.clearSession()
+    const persisted = await db.getReciteState()
+    expect(persisted.examDate).toBe('2026-12-01')
+    expect(persisted.sessionPieceKey).toBe('')
+    expect(persisted.sessionDate).toBe('')
+    expect(persisted.sessionStartedAt).toBe(0)
   })
 })
