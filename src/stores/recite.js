@@ -465,10 +465,60 @@ export const useReciteStore = defineStore('recite', () => {
   /** 清除会话态（已为空则直接 return，不产生无意义写盘） */
   async function clearSession() {
     const cur = state.value
-    if (cur.sessionPieceKey === '' && cur.sessionDate === '' && cur.sessionStartedAt === 0) {
-      return undefined
-    }
+    if (!cur.sessionPieceKey && !cur.sessionDate && !cur.sessionStartedAt) return undefined
     return writeStatePatch({ sessionPieceKey: '', sessionDate: '', sessionStartedAt: 0 })
+  }
+
+  /**
+   * 恢复进行中的背诵会话（T2）：**只在启动跑一次**，切后台回前台不跑完整恢复。
+   *
+   * 五态与清会话口径：
+   *  - `none`      无会话 → 不导航、不清
+   *  - `expired`   会话跨日 → 清
+   *  - `stale`     会话篇已不在产物里 → 清
+   *  - `resumable` 当日会话但尚未提交 → **保留会话**，允许重新自评
+   *  - `committed` 已提交（`row.lastAt >= sessionStartedAt`）→ 清 + 由视图导航回首页，**绝不重放 submitResult**
+   *
+   * ★ 三重防重复自评：判据取持久行 `lastAt` 而非内存布尔；恢复路径从不调 `submitResult`；
+   *   `bumpStreak` 的「`lastActiveDate === day`」早退分支保证同日不重复 +1。
+   *   hash 路由会把单篇 URL 带回；`committed` 若清了会话，`restoreSession()` 会落 `none`、不导航，
+   *   单篇页以 `submitted=false` 重挂 → 可重复自评、stage 二次 +1。故锚点必须留到恢复时才消费。
+   *
+   * ⚠️ I4：本函数不取时间。日期只用 `today.value` / `s.sessionDate` 两个字符串比较；
+   *   时间戳只用 `row.lastAt` / `s.sessionStartedAt` 两个 number 比较。
+   *
+   * @returns {Promise<{status: 'none'|'expired'|'stale'|'resumable'|'committed', piece?: object}>}
+   */
+  async function restoreSession() {
+    await init() // 已加载的早退分支会 syncToday()
+    state.value = await db.getReciteState() // 重读持久行，不靠内存
+    const s = state.value
+    if (!s.sessionPieceKey) return { status: 'none' }
+    if (s.sessionDate !== today.value) {
+      await clearSession()
+      return { status: 'expired' }
+    }
+    const piece = pieceByKey.value.get(s.sessionPieceKey)
+    if (!piece) {
+      await clearSession()
+      return { status: 'stale' }
+    }
+    const row = rowMap.value.get(s.sessionPieceKey)
+    const committed =
+      !!row &&
+      row.deleted !== true &&
+      Number.isFinite(row.lastAt) &&
+      row.lastAt >= s.sessionStartedAt
+    if (!committed) return { status: 'resumable', piece }
+
+    // 已提交：绝不重放 submitResult。若 streak 那次写入丢了，用**会话当天**补写，
+    // 而不是 today.value（可能已是次日，会把 streak 重置成 1）。
+    if (s.lastActiveDate !== s.sessionDate) {
+      const patch = bumpStreak({ state: s, today: s.sessionDate, hasTaskToday: true })
+      await writeStatePatch(patch)
+    }
+    await clearSession()
+    return { status: 'committed', piece }
   }
 
   /**
@@ -577,6 +627,7 @@ export const useReciteStore = defineStore('recite', () => {
     getPiece,
     submitResult,
     beginSession,
-    clearSession
+    clearSession,
+    restoreSession
   }
 })

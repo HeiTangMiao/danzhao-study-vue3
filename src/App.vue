@@ -58,6 +58,9 @@ import { useProgressStore } from '@/stores/progress'
 import { useAuthStore } from '@/stores/auth'
 import { useSyncEngine } from '@/sync/engine'
 import { startBackgroundRefresh } from '@/utils/contentClient'
+import { useReciteStore, RECITE_HOME_PATH } from '@/stores/recite'
+import { ensureStoragePersistence } from '@/utils/storageQuota'
+import { normalizeUnitNum } from '@/utils/routeParams'
 import AppTabBar from '@/components/AppTabBar.vue'
 
 const router = useRouter()
@@ -65,6 +68,10 @@ const route = useRoute()
 const { isDark, toggleTheme } = useTheme()
 const auth = useAuthStore()
 const { runSync } = useSyncEngine()
+const recite = useReciteStore()
+
+/** 启动态防重入：完整恢复只在启动时跑一次 */
+let restoring = false
 
 // 是否一级 Tab 页（route.meta.tab 存在）：仅用于移动端底部 pill 的内容区让位。
 // 桌面顶栏常驻所有页面，故其让位不依赖此值。
@@ -94,6 +101,58 @@ async function doSync() {
   setTimeout(() => { syncMsg.value = '' }, 3000)
 }
 
+/**
+ * 完整恢复一次背诵会话（只在启动跑；切后台回前台不跑，见 onVisibilityChange）。
+ * `committed` → 回首页（hash 路由会把单篇 URL 带回，不导航会以未提交态重挂）；
+ * `resumable` → 若当前不在那篇，replace 到该篇；其余状态不导航。
+ */
+async function restoreOnce() {
+  if (restoring) return
+  restoring = true
+  try {
+    const r = await recite.restoreSession()
+    if (r.status === 'committed') {
+      if (route.name === 'recite-piece') router.replace(RECITE_HOME_PATH)
+      return
+    }
+    if (r.status === 'resumable') {
+      const p = r.piece
+      const same =
+        route.name === 'recite-piece' &&
+        normalizeUnitNum(route.params.unitNum) === p.unitNum &&
+        String(route.params.fileIndex) === String(p.fileIndex) &&
+        String(route.params.blockIndex) === String(p.blockIndex)
+      if (!same) {
+        router.replace({
+          name: 'recite-piece',
+          params: { unitNum: p.unitNum, fileIndex: p.fileIndex, blockIndex: p.blockIndex }
+        })
+      }
+    }
+  } catch (e) {
+    console.warn('[App] 背诵会话恢复失败', e)
+  } finally {
+    restoring = false
+  }
+}
+
+/** 前台可见：只刷 today。hidden 不写库；完整恢复只在启动跑一次，避免把完成态学员踢回首页 */
+async function onVisibilityChange() {
+  if (document.visibilityState !== 'visible') return
+  await recite.init().catch((e) => console.warn('[App] 前台刷新失败', e))
+}
+
+/** 启动接线：注册可见性监听 → 完整恢复一次 → 空闲时尝试持久化申请（全部 fire-and-forget） */
+async function bootstrapRecite() {
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  await restoreOnce()
+  const idle =
+    typeof window.requestIdleCallback === 'function'
+      ? window.requestIdleCallback
+      : (fn) => setTimeout(fn, 0)
+  idle(() => { ensureStoragePersistence().catch(() => {}) }, { timeout: 2000 })
+}
+
 let syncTimer = null
 onMounted(() => {
   // 远程内容：**启动后后台静默**检查一次（P-S11 a / P-S14 a）
@@ -102,6 +161,9 @@ onMounted(() => {
   // （下次进页生效；UnitView 可 watch contentVersion 主动重取）。
   startBackgroundRefresh()
 
+  // 背诵会话恢复 + 存储持久化：后台发起，不进首屏关键路径
+  bootstrapRecite().catch((e) => console.warn('[App] 启动接线失败', e))
+
   if (auth.isLoggedIn) {
     doSync()
     syncTimer = setInterval(() => {
@@ -109,7 +171,10 @@ onMounted(() => {
     }, 5 * 60 * 1000)
   }
 })
-onBeforeUnmount(() => { if (syncTimer) clearInterval(syncTimer) })
+onBeforeUnmount(() => {
+  if (syncTimer) clearInterval(syncTimer)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+})
 
 function logout() {
   if (!window.confirm('确定要退出登录吗？')) return

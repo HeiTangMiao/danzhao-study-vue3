@@ -137,6 +137,18 @@ const confirmOpen = ref(false)
 /** 根节点（读输入框内容做离开确认，无需给 ClozeBlock 加任何接口） */
 /** 被守卫拦下的目标地址 */
 let pendingTarget = ''
+/** 本页是否已发起过「主动离开清会话」（避免 goHome 与路由守卫重复写同一行） */
+let sessionCleared = false
+
+/**
+ * 主动离开单篇页才清会话；unload / 切后台不清不写（onUnmounted 只保留 endAnswering）。
+ * fire-and-forget：保持路由守卫同步，不在导航路径上引入第二个 await。
+ */
+function leaveAndClearSession() {
+  if (sessionCleared) return
+  sessionCleared = true
+  store.clearSession().catch((e) => console.warn('[RecitePieceView] 清除会话失败:', e))
+}
 
 /** 大冲关手动入口：`?manual=1`（I6 → 不写任何行） */
 const isManual = computed(() => String(route.query.manual || '') === '1')
@@ -197,6 +209,7 @@ async function load() {
   state.value = 'loading'
   block.value = null
   piece.value = null
+  sessionCleared = false
 
   try {
     await store.init()
@@ -261,6 +274,10 @@ async function load() {
   context.value = buildReciteContext(found)
   block.value = target
   state.value = 'ready'
+  // T2：会话锚点 write-ahead（先落盘，恢复时靠 row.lastAt 判是否已提交）。
+  // ⚠️ 必须传第二参：beginSession 对非法 ms 直接 return，漏传会「会话永不落盘、恢复静默失效」。
+  // manual（模拟考场 / 全部篇目回看）不建会话、不写库。
+  if (!isManual.value) await store.beginSession(found.key, Date.now())
 }
 
 /**
@@ -295,9 +312,10 @@ async function onSelfCheck(canRecite) {
   }
 }
 
-/** 回首页（放行守卫，避免二次确认自锁） */
+/** 回首页（放行守卫，避免二次确认自锁；主动离开 → 清会话） */
 function goHome() {
   allowLeave.value = true
+  leaveAndClearSession()
   router.push(RECITE_HOME_PATH)
 }
 
@@ -317,6 +335,7 @@ function confirmLeave() {
   allowLeave.value = true
   const target = pendingTarget || RECITE_HOME_PATH
   pendingTarget = ''
+  leaveAndClearSession()
   router.push(target)
 }
 
@@ -338,7 +357,10 @@ async function retryLoad() {
  * 返回 `false` 取消本次导航并弹二次确认 —— 确认后再带 `allowLeave` 重新导航。
  */
 onBeforeRouteLeave((to) => {
-  if (!needsConfirm()) return true
+  if (!needsConfirm()) {
+    leaveAndClearSession()
+    return true
+  }
   pendingTarget = to.fullPath
   confirmOpen.value = true
   return false
