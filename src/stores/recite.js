@@ -439,7 +439,7 @@ export const useReciteStore = defineStore('recite', () => {
   }
 
   /**
-   * 开始一次背诵会话（T1 骨架；完整 `restoreSession()` 属 T2，本次不实现）。
+   * 开始一次背诵会话（T1 骨架；完整的 `restoreSession()` 已由 T2 在下方实现）。
    *
    * ★ 幂等守卫：同篇 + 同一天重复进入 → **直接 return，不刷新 `sessionStartedAt`**。
    *   刷新锚点会把上一次已提交的 `row.lastAt` 判成「未提交」，恢复后重复自评 —— 最隐蔽的一处。
