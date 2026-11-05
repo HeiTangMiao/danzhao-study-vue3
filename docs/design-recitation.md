@@ -37,6 +37,8 @@
 
 ## 0. 复核基线（本文设计的全部事实依据）
 
+> **⚠️ 以下表格为 2026-10-30 快照，现行实现以代码为准。** 本文头部已标 v1.6「大部分作废、仅作历史追溯」；下表过时数字有意保留（见附录 B.0），不逐项改数。
+
 | 事实 | 复核方式 / 位置 | 结果 |
 | --- | --- | --- |
 | ~~全库 `cloze` 74 块 / 73 篇 / 170 句 / 193 空 / 16 篇一句多空~~ | —— | **已随 v1.6 方案变更作废**（这些口径服务于「挖空默写 + 判分」，新方案不挖空、不判分） |
@@ -48,7 +50,7 @@
 | 是否判分 | 内容侧 2026-10-29 变更通知 | **不判分**。自评「已能背诵」→ `allCorrect:true`（stage+1，按 1/2/4/7/15 天推进）；「还需练习」→ `false`（stage 归 0，明天重现） |
 | `DB_NAME` / `DB_VERSION` | `src/stores/studyDb.js:34-35` | `study_game_db` / **8**（v8 新增 `recite_progress` / `recite_state` 两表；二者属 `DEVICE_LOCAL_STORES`，不进同步） |
 | 同步实体清单 | `src/sync/engine.js:29-38` `ENTITIES`（7 项）；`src/stores/studyDb.js:328-336` `SYNC_STORE_NAMES` 同 7 项 | 两处必须同步维护 |
-| 换账号清理 | `src/stores/auth.js:86-91` → `studyDb.clearAllSyncedData()`（只清 `SYNC_STORE_NAMES`） | **新表不会被清**（见 §1 异议 8） |
+| 换账号清理 | `src/stores/auth.js:86-91` → `studyDb.clearAllSyncedData()`（`src/stores/studyDb.js:402-410`：清 `SYNC_STORE_NAMES` **与** `DEVICE_LOCAL_STORES`） | **两张新表会被一并清空**：`recite_progress` / `recite_state` 都在 `DEVICE_LOCAL_STORES`（`studyDb.js:377`）。不同步 ≠ 不用清 —— 否则 B 登录后会看到 A 的「已背 X / 连续 N 天」（见 §1 异议 8；此处修正见附录 B.0） |
 | CSP | `src-tauri/tauri.conf.json:23` | `script-src 'self'`；`connect-src 'self' ipc: http://ipc.localhost https://520305.top`；`style-src 'self' 'unsafe-inline'` |
 | 构建目标 | `vite.config.js:39` `target:'es2019'` | `?.` / `??` **会被 esbuild 降级**（既有源码已在用：`studyDb.js:896` `extra?.selfTier`）→ 本仓可写 |
 | `siteRoot()` 在 Tauri 下 | `src/utils/assetBase.js:13-25` | 返回**线上 origin**（`https://520305.top`）；相对模式返回 `'./'`。两源并存是 §1 异议 7 的设计基础 |
@@ -1350,6 +1352,13 @@ emit('submitted', {
 | 18 | P0-1 口径 | 「一句多空 17 篇」 | **产物内 16 篇**（正课 15 + 复习 1），全库 74 块含 reveal 篇为 17 —— 两种数法都对，脚本断言 16 并注释说明 | 口径澄清（§1 异议 4） |
 
 ## 附录 B · v1.0 → v1.4 变更记录
+
+### B.0 v1.6 冻结后最小修订（2026-11-04 契约评估）
+
+| 变更 | 触发 | 位置 |
+| --- | --- | --- |
+| §0 增一行「以下表格为 2026-10-30 快照，现行以代码为准」；「换账号清理」一行由「**新表不会被清**」改为「**两张设备本地表会被一并清空**」 | **谁发现**：功能侧 2026-11-04 契约评估。**为什么**：属 `:31` 冻结条款 ②「**实现对而文档错**」，非顺手改进 —— `recite_progress` / `recite_state` 都在 `DEVICE_LOCAL_STORES`（`src/stores/studyDb.js:377`），`clearAllSyncedData()`（`:402-410`，`auth.js:87` 触发）会清整张表；文档结论与实现相反，会误导后续实现 | §0、附录 B |
+| 其余过时数字**有意保留**为历史快照，不逐项改数 | 同一评估：文档头部已标 v1.6「大部分作废、仅作历史追溯、不再作为实现依据」，逐项改数会让人误以为整份文档被重新校验过。有意保留的是：数据源路径、`CONTENT_VERSION = 4`、《短歌行》713 字、产物 60.4 KB；**现行值见代码** | §0 及其余各节 |
 
 ### B.1 v1.4 → v1.5
 
