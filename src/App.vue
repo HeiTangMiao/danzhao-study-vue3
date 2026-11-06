@@ -103,7 +103,8 @@ async function doSync() {
 
 /**
  * 完整恢复一次背诵会话（只在启动跑；切后台回前台不跑，见 onVisibilityChange）。
- * `committed` → 回首页（hash 路由会把单篇 URL 带回，不导航会以未提交态重挂）；
+ * `committed` / `unavailable` → 回首页（hash 路由会把单篇 URL 带回，不导航会以未提交态重挂；
+ * `unavailable` 时强制回首页还能让错误态在 ReciteView 呈现，篇页根本不进 ready）。
  * `resumable` → 若当前不在那篇，replace 到该篇；其余状态不导航。
  */
 async function restoreOnce() {
@@ -111,7 +112,7 @@ async function restoreOnce() {
   restoring = true
   try {
     const r = await recite.restoreSession()
-    if (r.status === 'committed') {
+    if (r.status === 'committed' || r.status === 'unavailable') {
       if (route.name === 'recite-piece') router.replace(RECITE_HOME_PATH)
       return
     }

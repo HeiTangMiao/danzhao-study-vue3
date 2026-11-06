@@ -14,6 +14,7 @@
  *     - 「submitResult 不消费会话锚点」：锚点原样保留、row.lastAt >= anchor，
  *       随后 restoreSession() 返回 committed 且不写第二份 recite_progress
  *  ⑥ manual=1 回看不建会话（不写库）
+ *  ⑦ T2 收尾补丁：ERROR 态 `unavailable` 前置短路，产物不可用时保留会话锚点、恢复后仍落 `committed`
  *
  * 环境：jsdom（localStorage / document）+ fake-indexeddb（真 studyDb）。
  * 产物与内容页用可控桩，DB 与 store 全走真实现 —— 本用例要断「真的落库」。
@@ -26,13 +27,17 @@ import { createPinia, setActivePinia } from 'pinia'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
-const H = vi.hoisted(() => ({ bank: null, page: null }))
+const H = vi.hoisted(() => ({ bank: null, page: null, loadError: null }))
 
 vi.mock('@/utils/reciteBankClient', () => ({
   DEFAULT_SUBJECT: 'chinese',
   BUNDLED_TIMEOUT_MS: 3000,
   REMOTE_TIMEOUT_MS: 2500,
-  loadBundled: async () => H.bank,
+  // ⑦ 用可控开关注入「产物加载失败」现场：doInit 会转 ERROR 态并在读 rows/state 前 return
+  loadBundled: async () => {
+    if (H.loadError) throw H.loadError
+    return H.bank
+  },
   refreshFromRemote: async () => null,
   resetReciteBankCache: () => {},
   getCachedBank: () => H.bank
@@ -162,6 +167,7 @@ let pinia
 beforeEach(async () => {
   H.bank = makeBank()
   H.page = makePage()
+  H.loadError = null
   pinia = createPinia()
   setActivePinia(pinia)
   const db = useStudyDbStore()
@@ -394,5 +400,70 @@ describe('⑥ manual=1 回看不建会话', () => {
     expect(s.sessionStartedAt).toBe(0)
     expect(await db.getReciteProgressAll()).toEqual([])
     wrapper.unmount()
+  })
+})
+
+describe('⑦ T2 收尾补丁 · ERROR 态保留会话锚点', () => {
+  it('ERROR 态保留会话锚点：产物不可用时 unavailable，恢复后仍落 committed', async () => {
+    const db = useStudyDbStore()
+    const anchor = Date.now() - 1000
+    // 已提交现场：进度行 lastAt >= 会话锚点；状态行带 examDate + 三个会话字段
+    await db.saveReciteProgress(reciteRow({ lastAt: anchor + 10 }))
+    await db.saveReciteState(
+      emptyState({
+        examDate: '2026-12-01',
+        lastActiveDate: getDateStr(),
+        sessionPieceKey: PIECE_KEY,
+        sessionDate: getDateStr(),
+        sessionStartedAt: anchor
+      })
+    )
+    const beforeState = await db.getReciteState()
+    const beforeRows = await db.getReciteProgressAll()
+
+    // ① 产物加载失败 → doInit 在读 rows/state 之前就 return（phase=ERROR / loaded=false）
+    H.loadError = new Error('产物加载失败（测试注入）')
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const store = useReciteStore()
+    const r1 = await store.restoreSession()
+    errorSpy.mockRestore()
+    expect(r1).toEqual({ status: 'unavailable' })
+    expect(store.phase).toBe('error')
+
+    // ② 会话三字段与 examDate 逐字不变；无 saveReciteProgress、无 clearSession。
+    //    以持久行逐字相等为准 —— 任何写库都会让这两条断言落空（比 spy 更不易被绕过）。
+    const afterState = await db.getReciteState()
+    expect(afterState).toEqual(beforeState)
+    expect(afterState.examDate).toBe('2026-12-01')
+    expect(afterState.sessionPieceKey).toBe(PIECE_KEY)
+    expect(afterState.sessionDate).toBe(getDateStr())
+    expect(afterState.sessionStartedAt).toBe(anchor)
+    expect(await db.getReciteProgressAll()).toEqual(beforeRows)
+
+    // ③ 产物恢复可用后重跑 → 锚点真活下来，落 committed（而不是 stale / none）
+    H.loadError = null
+    const r2 = await store.restoreSession()
+    expect(r2.status).toBe('committed')
+    expect(r2.piece.key).toBe(PIECE_KEY)
+    expect((await db.getReciteState()).sessionPieceKey).toBe('')
+    const rows = await db.getReciteProgressAll()
+    expect(rows).toHaveLength(1)
+    expect(rows[0].doneCount).toBe(beforeRows[0].doneCount)
+  })
+
+  it('静态源码守卫：短路用 ERROR||!loaded，restoreOnce 显式处理 unavailable', () => {
+    const storeSrc = readFileSync(join(process.cwd(), 'src/stores/recite.js'), 'utf8')
+    const appSrc = readFileSync(join(process.cwd(), 'src/App.vue'), 'utf8')
+    // 必须是成对判据，不能退化成 blanket `phase !== IDLE`（ANSWERING 并发会跳过恢复、丢掉 committed）。
+    // ⚠️ 只切片 restoreSession 本体：文件其它函数（如 onRemoteBank）本就有合法的
+    //    `phase.value !== RECITE_PHASE.IDLE`，全文件 not.toContain 会误报。
+    const start = storeSrc.indexOf('async function restoreSession()')
+    const next = storeSrc.indexOf('async function submitResult(', start)
+    const body = storeSrc.slice(start, next > start ? next : storeSrc.length)
+    expect(start).toBeGreaterThan(-1)
+    expect(body).toContain('phase.value === RECITE_PHASE.ERROR || !loaded.value')
+    expect(body).not.toContain('phase.value !== RECITE_PHASE.IDLE')
+    // 第六态若不在 restoreOnce 里显式接线，会被静默忽略（篇页仍可能以 submitted=false 挂载）
+    expect(appSrc).toContain("r.status === 'committed' || r.status === 'unavailable'")
   })
 })

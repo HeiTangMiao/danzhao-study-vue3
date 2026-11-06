@@ -479,12 +479,22 @@ export const useReciteStore = defineStore('recite', () => {
   /**
    * 恢复进行中的背诵会话（T2）：**只在启动跑一次**，切后台回前台不跑完整恢复。
    *
-   * 五态与清会话口径：
+   * 六态与清会话口径（第六态是**五态之前的前置短路**）：
+   *  - `unavailable` 产物/进度不可用 → 不做任何判定、不清、不导航，锚点留给下次成功启动；
    *  - `none`      无会话 → 不导航、不清
    *  - `expired`   会话跨日 → 清
    *  - `stale`     会话篇已不在产物里 → 清
    *  - `resumable` 当日会话但尚未提交 → **保留会话**，允许重新自评
    *  - `committed` 已提交（`row.lastAt >= sessionStartedAt`）→ 清 + 由视图导航回首页，**绝不重放 submitResult**
+   *
+   * ★ `unavailable` 为什么必须整体短路：`doInit()` 在 `loadBundled()` 抛错时
+   *   `phase=ERROR` / `loaded=false`，且在读 rows/state **之前**就 return → `rowMap` 为空。
+   *   此时 `expired` 照样会清、`stale` 必然命中、`resumable`/`committed` 都在空 rowMap 上判，
+   *   结论全不可信。清掉锚点后，学员点「重试」→ `load()` 用新的时间戳重建会话 →
+   *   单篇页以 `submitted=false` 进 ready → 已提交篇可再次自评、stage 二次 +1。
+   *   ⚠️ 守卫**不能**写 `phase !== IDLE`：启动时 hash 路由可能并发挂载 `RecitePieceView`
+   *   并 `beginAnswering()` 把 phase 置 `ANSWERING`，blanket 判定会跳过恢复、反而丢掉
+   *   `committed` 的强制回首页；`loaded=true` 在 `ANSWERING` 态仍成立，故用本式不误伤。
    *
    * ★ 三重防重复自评：判据取持久行 `lastAt` 而非内存布尔；恢复路径从不调 `submitResult`；
    *   `bumpStreak` 的「`lastActiveDate === day`」早退分支保证同日不重复 +1。
@@ -494,10 +504,14 @@ export const useReciteStore = defineStore('recite', () => {
    * ⚠️ I4：本函数不取时间。日期只用 `today.value` / `s.sessionDate` 两个字符串比较；
    *   时间戳只用 `row.lastAt` / `s.sessionStartedAt` 两个 number 比较。
    *
-   * @returns {Promise<{status: 'none'|'expired'|'stale'|'resumable'|'committed', piece?: object}>}
+   * @returns {Promise<{status: 'unavailable'|'none'|'expired'|'stale'|'resumable'|'committed', piece?: object}>}
    */
   async function restoreSession() {
     await init() // 已加载的早退分支会 syncToday()
+    // 前置整体短路：产物/进度不可用时任何五态判定都不可信，锚点原样留给下次成功启动
+    if (phase.value === RECITE_PHASE.ERROR || !loaded.value) {
+      return { status: 'unavailable' }
+    }
     state.value = await db.getReciteState() // 重读持久行，不靠内存
     const s = state.value
     if (!s.sessionPieceKey) return { status: 'none' }
