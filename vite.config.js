@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { fileURLToPath, URL } from 'node:url'
+import { stripExprEvalEval } from './scripts/vite-plugin-strip-expr-eval.mjs'
 
 /**
  * Vite 构建配置
@@ -12,6 +13,12 @@ import { fileURLToPath, URL } from 'node:url'
  */
 export default defineConfig({
   plugins: [
+    // CSP：expr-eval 的 toJSFunction 原型方法体里带 `new Function(`，摇树摇不掉，
+    // 生产 CSP 是 script-src 'self'（无 unsafe-eval），漏接会「CI 全绿但真机静默丢曲线」。
+    // 该插件带 enforce:'pre'，Vite 把它排进 pre 桶 —— 一定先于普通插件（vue() / esbuild
+    // transform / import-analysis）执行，此时源码仍是原始字面量，替换才有效。
+    // 与 vue() 在数组里的先后不影响实际顺序（enforce 分桶优先），置于首位只为让顺序可读。
+    stripExprEvalEval(),
     vue(),
     // 体积分析开关：`ANALYZE=1` 时输出 bundle 明细到 dist/stats.html（网络图，便于人工排查大块）
     ...(process.env.ANALYZE === '1'
