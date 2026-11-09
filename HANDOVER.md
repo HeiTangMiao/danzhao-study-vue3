@@ -141,7 +141,7 @@ git tag v0.3.2 && git push origin v0.3.2
 | **文档归档遗留** | 已清理 | docs 主浏览面 39→13 份，93 份归入 `docs/archive/2026-10/`（零删除） |
 | **后端无限流** | ✅ 已修 | v0.3.2 已落地（`1925ee3` + `c66bdb5`）：认证端点限流（IP 固定窗口 + 账号封禁），并修 `RATE_LIMIT=false` 静默失效等三处坑。文档见 `docs/auth-rate-limit.md`（含改阈值 / 换部署形态 / 验收上线） |
 | **.git 历史大文件**（68MB） | HEAD 已清 / 历史暂不重写 | HEAD 已清：`release/` v0.1.1 便携版 zip、`.wix-dl/wix-ghproxy.zip`（8.1MB，50afc10）均已摘除。历史仍在（geogebra vendor ~26MB / v0.1.1 zip 5.5MB / wix 8.1MB），需 `filter-repo`/BFG 重写。**⚠️ 重写会改所有 commit hash（含守卫测试硬编码的基线 `54300fa`）**：顺序必须是「先重写 → 取新哈希 → 改 `tests/s2-verify-boundaries.test.js:14` 与 `tests/loadpage-remote-fallback.test.js:192` → 最后 force-push」，且全员重新 clone |
-| **发版门禁（gate）** | 2026-10-23 上线 | `release.yml` 的 gate job（`1704d81`），与 CI quality 同口径（lint / 生产构建 / 三个内容校验脚本），不过门禁不出包。**v0.3.2 为首次执行并通过**。⚠️ v0.3.1 及更早版本是门禁上线前发布的，未经此门禁 |
+| **发版门禁（gate）** | 2026-10-18 引入（`1704d81`），已实证执行 | `release.yml` 的 gate job，与 CI quality 同口径（lint / 生产构建 / 三个内容校验脚本），不过门禁不出包。**已在真实 CI 跑过 2 次、均 success**（2026-11-09 匿名 API 实证）：run 22（2026-10-22，v0.3.2 首次 push，**首秀**）、run 23（2026-10-25，v0.3.2 重打 tag），两次均为 5 jobs 且首 job「发布门禁」success。⚠️ v0.3.1（run 21，2026-10-17）只有 4 个构建 job、**无门禁**，属门禁引入前发布。查询方式：`api.github.com/repos/HeiTangMiao/danzhao-study-vue3/actions/workflows/release.yml/runs` + 对应 `runs/{id}/jobs` |
 | **历史文档路径** | 不要移动 | 5 条硬引用红线，见 `CLAUDE.md` 末尾 |
 
 ### 5.1 `.git` 历史重写：2026-10-24 实测结论（暂缓）
@@ -194,11 +194,11 @@ git tag v0.3.2 && git push origin v0.3.2
 接手方请逐项确认：
 
 - [ ] `npm ci` + `npm run dev` 能跑起来
-- [ ] `npm test` 全绿（114 文件 / 1427 用例，约 5 分钟）
+- [ ] `npm test` 全绿（2026-11-09 实测 **130 文件 / 1822 用例**，约 6 分钟）
 - [ ] `npm run validate:content` + `lint` + `check:dup` + `check:single` + `check:fill` 全绿
-- [ ] 能打 tag 触发一次 `release.yml`（**`gate` job 尚未在真实 CI 跑过**，建议首次发版时盯一下）
+- [ ] 能打 tag 触发一次 `release.yml`（**`gate` job 已在真实 CI 跑过 2 次且均 success**，见 §5 表格；下次发版仍须用**新版本号**，旧 tag dispatch 会用 main HEAD 覆盖旧 release）
 - [ ] 拿到服务器 `/var/www/danzhao-study` 的部署权限与 rsync 目标
 - [ ] 拿到 `server/.env`（含 `JWT_SECRET`、`DATABASE_URL`、`ALLOWED_ORIGIN`）
 - [ ] 拿到 GitHub 仓库与 Release 权限
 - [ ] 拿到 Tauri Android 签名（`ANDROID_KEYSTORE_BASE64` 等 secrets）
-- [ ] 在**真实 Android 8 设备**上验证过 WebView 不白屏（build.target 修复未经真机验证）
+- [ ] 在**真实 Android 8 设备**上验证过 WebView 不白屏（**v0.3.2 已于 2026-10-24 真机实测通过**：不白屏、代码块与 Python 缩进均正常，见 §5 `build.target` 一行；此处保留勾选位供接手方按自己设备复验，不再是「未验证」）
