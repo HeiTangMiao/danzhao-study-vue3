@@ -376,6 +376,25 @@ const SYNC_STORE_NAMES = [
  */
 const DEVICE_LOCAL_STORES = ['recite_progress', 'recite_state']
 
+/**
+ * **设备本地**（不参与同步）但**必须随换账号清空**的 localStorage 键。
+ *
+ * 与 `DEVICE_LOCAL_STORES` 同一口径、只是载体不同：学习计划 `study_plan_v1`
+ * （`src/stores/studyPlan.js` 的 `STORAGE_KEY`）保存的是**具体学员的**周预算、
+ * 里程碑自填日期与每日清单，同样不进云同步。只清 IndexedDB 不清它，
+ * A 登出、B 登录后 B 会看到 A 的考试日期 / 待办 —— 与当年 `recite_progress`
+ * 的跨用户污染同型（见 `project-assessment-2026-10-17.md` Top 1）。
+ *
+ * ⚠️ **职责分离**：本清单是「清理清单」，与 `exportAllData()` 里的 `lsKeys`
+ *    （「备份清单」：`pomodoro_state` / `math_theme` / `study_plan_v1`）互不复用、互不改写：
+ *    - 备份清单要**全**（导出备份不能漏学习计划）；
+ *    - 清理清单要**窄**（只清账号相关数据，设备偏好 `pomodoro_state` / `math_theme` 不动）。
+ *    两处各自独立，禁止合并成一张表，否则「往备份里加一个键」会顺带把它从别的账号清掉。
+ * ⚠️ 只清这里列出的键；`SYNC_STORE_NAMES` / `DEVICE_LOCAL_STORES` 均不变，
+ *    同步仓库与设备本地表的清理行为也不变。
+ */
+const DEVICE_LOCAL_LS_KEYS = ['study_plan_v1']
+
 export const useStudyDbStore = defineStore('studyDb', {
   actions: {
     // ===== 初始化 =====
@@ -398,6 +417,8 @@ export const useStudyDbStore = defineStore('studyDb', {
      * `tests/sync-engine.test.js` 依赖它们）；每日背诵的两张**设备本地表**
      * （`DEVICE_LOCAL_STORES`）在这里**追加**清除：
      * 它们不同步，但**必须**随换账号清空，否则 B 登录后会看到 A 的「已背 X / 连续 N 天」。
+     * 同口径再追加 `DEVICE_LOCAL_LS_KEYS` 里的 localStorage 键（学习计划），
+     * 否则 B 会看到 A 自填的里程碑日期与待办。
      */
     async clearAllSyncedData() {
       await this.init()
@@ -408,6 +429,13 @@ export const useStudyDbStore = defineStore('studyDb', {
       for (const name of DEVICE_LOCAL_STORES) {
         await dbClear(name)
       }
+      // 设备本地 localStorage 键（同口径，见 DEVICE_LOCAL_LS_KEYS 的 JSDoc）。
+      // 非浏览器环境 / 存储不可用时静默跳过，不影响上面的 IndexedDB 清理结果。
+      try {
+        if (typeof localStorage !== 'undefined') {
+          for (const key of DEVICE_LOCAL_LS_KEYS) localStorage.removeItem(key)
+        }
+      } catch (e) { /* 存储不可用（隐私模式 / 非浏览器）：忽略，不抛给 auth.setSession */ }
     },
 
     /**

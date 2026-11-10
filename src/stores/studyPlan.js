@@ -205,10 +205,31 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
     save()
   }
 
-  /** 修改里程碑日期（仅接受 YYYY-MM-DD） */
+  /**
+   * 修改里程碑日期。
+   *
+   * 契约（本轮授权放开「清空」）：
+   *  - `YYYY-MM-DD` → 设为该日期（格式校验口径与原实现一致，只校验形状、不校验真实月日）；
+   *  - **空值 `''` / `null` / `undefined` → 清回「未设置」（`''`）**：
+   *    `<input type="date">` 清空时 `value` 即为 `''`，学员可撤销误填；
+   *    `daysUntil('')` 返回 null，视图回到「待设置 · 以当年官方通知为准」空态；
+   *  - 其它非法值（非字符串 / 格式不符）→ **拒绝**：保持原值不变、不写盘。
+   *
+   * 清空写回的是空串 `''`，不是 `LEGACY_DEFAULT_DATES` 里的旧推定默认值；
+   * `load()` 的 `migrateMilestoneDate('')` 不命中任何迁移键，故 reload 后仍是
+   * 「未设置」，旧默认值不会复活（`save()` 的自愈写回同样只写 `''`）。
+   * 只改 `id` 命中的那一条，其余里程碑原样不动。
+   *
+   * @param {string} id 里程碑 id（'op' | 'theory' | 'academic'）
+   * @param {string|null|undefined} date YYYY-MM-DD，或空值表示清空
+   * @returns {void}
+   */
   function setMilestoneDate(id, date) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))) return
-    milestones.value = milestones.value.map((m) => (m.id === id ? { ...m, date } : m))
+    const isEmpty = date === '' || date === null || date === undefined
+    const isValid = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)
+    if (!isEmpty && !isValid) return
+    const nextDate = isEmpty ? '' : date
+    milestones.value = milestones.value.map((m) => (m.id === id ? { ...m, date: nextDate } : m))
     save()
   }
 
