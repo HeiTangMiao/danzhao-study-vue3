@@ -50,6 +50,12 @@ export const LEGACY_DEFAULT_DATES = Object.freeze([
 /** localStorage 键（§7 P-D1）：与 studyDb.exportAllData 备份清单保持一致 */
 const STORAGE_KEY = 'study_plan_v1'
 
+/**
+ * 周预算默认值的**单一来源**（`budget` 初值与 `load()` 的无条件重置共用）。
+ * 不另写一份字面量：切账号重置若与初值漂移，会出现「重置后合计不是 32」的静默偏差。
+ */
+const DEFAULT_BUDGET = Object.freeze({ math: 10, chinese: 8, computer: 14, other: 0 })
+
 /** 本地时区 YYYY-MM-DD（与 studyDb.getDateStr 同口径） */
 function getDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -89,7 +95,7 @@ function migrateMilestoneDate(savedDate) {
 
 export const useStudyPlanStore = defineStore('studyPlan', () => {
   // ===== ① 周预算（科目 × 小时，手填）=====
-  const budget = ref({ math: 10, chinese: 8, computer: 14, other: 0 })
+  const budget = ref({ ...DEFAULT_BUDGET })
   const budgetTotal = computed(() =>
     Object.values(budget.value).reduce((s, h) => s + (Number(h) || 0), 0)
   )
@@ -120,14 +126,36 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
   /** 是否顺延（用于「顺延」角标）：未完成且截止日早于今天 */
   const overdue = (t) => !!t && !t.done && (t.dueDate || '') < today.value
 
-  /** 从 localStorage 读取（损坏 / 结构缺失 → 回落默认，不抛） */
+  /**
+   * 从 localStorage 读取：**先无条件重置到默认，再套用存档**（全程不写盘）。
+   *
+   * 为什么必须先重置（换账号隔离 P0 + 半残存档自愈）：
+   *   本 store 是 Pinia **setup store 单例**，SPA 内切账号 / 路由重挂都不重建实例，
+   *   视图读内存不读盘。若沿用「增量 merge」，空存档、半残存档（缺 milestones/tasks
+   *   字段）、损坏 JSON 都会把上一账号的 budget / milestones / tasks 留在内存里显示，
+   *   且下一次 `save()` 会把整包旧数据写回（残留复活）。
+   *   故契约是「默认态 = 起点，parsed 只是覆盖层」：任何异常路径都自然停在默认态。
+   *
+   * ⚠️ 全程不写盘：旧推定默认值的迁移结果仍由之后的任意一次 `save()` 自愈写回
+   *    （`migrateMilestoneDate` 的语义不变）。
+   * ⚠️ 何时需要补显式 `resetInMemory()` action（当前**不必**：全仓唯一消费者是
+   *    `PlanView.vue`，其 `onMounted` 每次挂载都调本函数，所有可观测/写盘路径都过这里）：
+   *    将来若新增「不经过 load() 就消费本 store」的入口（新的非 PlanView 视图、
+   *    路由守卫展示计划数据、或切账号不卸载 PlanView 的形态），本函数就不再是唯一闸门，
+   *    届时必须加 action 并在换账号处同步调用（setup store 无 `$reset()` 可用）。
+   */
   function load() {
     today.value = getDateStr() // 刷新「今天」（跨天后再进页面时顺延口径正确）
+    // ① 无条件重置到默认（单一来源：DEFAULT_BUDGET / MILESTONES）
+    budget.value = { ...DEFAULT_BUDGET }
+    milestones.value = MILESTONES.map((m) => ({ ...m }))
+    tasks.value = []
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (!raw) return
       const parsed = JSON.parse(raw)
       if (!parsed || typeof parsed !== 'object') return
+      // ② 再套用存档（只覆盖 parsed 里实际存在的字段）
       if (parsed.budget && typeof parsed.budget === 'object') {
         budget.value = { ...budget.value, ...parsed.budget }
       }
@@ -144,7 +172,7 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
         tasks.value = parsed.tasks.filter((t) => t && typeof t === 'object' && t.id && t.title)
       }
     } catch (e) {
-      // 损坏 JSON：回落默认，不影响页面（对齐「不阻塞」原则）
+      // 损坏 JSON / 存储不可用：内存已停在默认态，不抛（对齐「不阻塞」原则）
       console.warn('[studyPlan] 读取失败，已回落默认值:', e)
     }
   }

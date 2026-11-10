@@ -419,8 +419,20 @@ export const useStudyDbStore = defineStore('studyDb', {
      * 它们不同步，但**必须**随换账号清空，否则 B 登录后会看到 A 的「已背 X / 连续 N 天」。
      * 同口径再追加 `DEVICE_LOCAL_LS_KEYS` 里的 localStorage 键（学习计划），
      * 否则 B 会看到 A 自填的里程碑日期与待办。
+     * ⚠️ 该 localStorage 清理**同步前置**到第一个 await 之前：调用方可能不等清库完成
+     *    就跳转路由，排在 9 个 `await dbClear` 之后会让新账号首页读到尚未清掉的计划。
      */
     async clearAllSyncedData() {
+      // ★ 必须在 `await this.init()` 之前同步执行（P1① 竞态）：
+      //   `setSession` 的调用方并不都 await 清库 Promise（P1② 既有竞态本轮未改、单列已知项），
+      //   故同步点清零才能让「清理已开始」这件事对任何路径都无条件成立。
+      //   非浏览器环境 / 存储不可用时静默跳过，不影响下面的 IndexedDB 清理结果。
+      try {
+        if (typeof localStorage !== 'undefined') {
+          for (const key of DEVICE_LOCAL_LS_KEYS) localStorage.removeItem(key)
+        }
+      } catch (e) { /* 存储不可用（隐私模式 / 非浏览器）：忽略，不抛给 auth.setSession */ }
+
       await this.init()
       for (const name of SYNC_STORE_NAMES) {
         await dbClear(name)
@@ -429,13 +441,6 @@ export const useStudyDbStore = defineStore('studyDb', {
       for (const name of DEVICE_LOCAL_STORES) {
         await dbClear(name)
       }
-      // 设备本地 localStorage 键（同口径，见 DEVICE_LOCAL_LS_KEYS 的 JSDoc）。
-      // 非浏览器环境 / 存储不可用时静默跳过，不影响上面的 IndexedDB 清理结果。
-      try {
-        if (typeof localStorage !== 'undefined') {
-          for (const key of DEVICE_LOCAL_LS_KEYS) localStorage.removeItem(key)
-        }
-      } catch (e) { /* 存储不可用（隐私模式 / 非浏览器）：忽略，不抛给 auth.setSession */ }
     },
 
     /**
