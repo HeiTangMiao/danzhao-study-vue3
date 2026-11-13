@@ -392,6 +392,11 @@ const DEVICE_LOCAL_STORES = ['recite_progress', 'recite_state']
  *    两处各自独立，禁止合并成一张表，否则「往备份里加一个键」会顺带把它从别的账号清掉。
  * ⚠️ 只清这里列出的键；`SYNC_STORE_NAMES` / `DEVICE_LOCAL_STORES` 均不变，
  *    同步仓库与设备本地表的清理行为也不变。
+ *
+ * ⚠️ examdate_sync 受控例外：该键现为**混合载体** —— 三条里程碑日期自本期起是
+ *    账号级同步数据（旁路实体 `exam_milestone`），周预算 `budget` / 每日清单 `tasks`
+ *    仍是设备本地、不进云同步。换账号整体清理后，里程碑由服务端按账号重新下发；
+ *    本期只把三条提升为账号级，不扩大到其它 localStorage 键、不改本清单的值。
  */
 const DEVICE_LOCAL_LS_KEYS = ['study_plan_v1']
 
@@ -424,6 +429,10 @@ export const useStudyDbStore = defineStore('studyDb', {
      *    2026-11-13 起 `auth.login/register` 已 await 清库 Promise（P1② 已修），
      *    但本前置仍保留为纵深防御：清 IndexedDB 是异步的，任何新增的直接调用点都不该
      *    因为漏 await 而让下一个账号读到上一个账号的计划。
+     * ⚠️ G2（examdate_sync）：账号级同步游标 `sync_meta_v1:<uid>` 也必须在这段同步前置里
+     *    一并按前缀清除。否则切走时本地三条里程碑被清、游标还在 → 切回原账号增量拉取
+     *    返回空 → 三条永久丢失。清掉后首次同步退化为全量拉取；既有 7 实体也随带全量
+     *    重拉（`applySynced` 整行幂等 put、LWW 相等丢弃，零副作用）。
      */
     async clearAllSyncedData() {
       // ★ 必须在 `await this.init()` 之前同步执行（P1① 竞态，纵深防御）：
@@ -433,6 +442,14 @@ export const useStudyDbStore = defineStore('studyDb', {
       try {
         if (typeof localStorage !== 'undefined') {
           for (const key of DEVICE_LOCAL_LS_KEYS) localStorage.removeItem(key)
+          // G2：按 uid 分存的同步游标（engine.metaKey()）。先收集后删除 ——
+          // 遍历中直接 removeItem 会改变 localStorage.length 导致漏删。
+          const cursorKeys = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)
+            if (k && k.indexOf('sync_meta_v1:') === 0) cursorKeys.push(k)
+          }
+          for (const k of cursorKeys) localStorage.removeItem(k)
         }
       } catch (e) { /* 存储不可用（隐私模式 / 非浏览器）：忽略，不抛给 auth.setSession */ }
 
@@ -1214,7 +1231,9 @@ export const useStudyDbStore = defineStore('studyDb', {
       ])
 
       // 收集 localStorage 中与应用相关的数据（仅仍实际写入的键，避免备份历史残留键）
-      // study_plan_v1：D-2 学习计划三件套（缺失会导致「导出备份不含学习计划」）
+      // study_plan_v1：D-2 学习计划三件套（缺失会导致「导出备份不含学习计划」）。
+      // examdate_sync：三条里程碑的 date + updatedAt 就在该键内，整包透传 → 备份天然覆盖，
+      // 无需改本清单的值（清单值受「职责分离、禁止合并」约束，一律不动）。
       const lsKeys = ['pomodoro_state', 'math_theme', 'study_plan_v1']
       const lsData = {}
       for (const k of lsKeys) {

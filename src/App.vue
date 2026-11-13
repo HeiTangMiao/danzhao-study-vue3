@@ -51,7 +51,7 @@
  * 使用 useTheme composable 管理明暗主题，主题状态持久化到 localStorage。
  * 已登录时启动同步：进入即同步一次 + 每 5 分钟后台增量同步。
  */
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from './composables/useTheme'
 import { useProgressStore } from '@/stores/progress'
@@ -155,6 +155,18 @@ async function bootstrapRecite() {
 }
 
 let syncTimer = null
+
+/**
+ * 启动 5 分钟后台增量同步（幂等：已启动则不重复）。
+ * 既有行为保持：只在登录后启动，回调内再次判 `auth.isLoggedIn`。
+ */
+function startSyncPolling() {
+  if (syncTimer) return
+  syncTimer = setInterval(() => {
+    if (auth.isLoggedIn) runSync().catch((e) => console.error('[App] 后台同步失败:', e))
+  }, 5 * 60 * 1000)
+}
+
 onMounted(() => {
   // 远程内容：**启动后后台静默**检查一次（P-S11 a / P-S14 a）
   // 不 await、失败静默跳过、一次会话只触发一次 —— 网络绝不进进页与首屏关键路径。
@@ -167,11 +179,26 @@ onMounted(() => {
 
   if (auth.isLoggedIn) {
     doSync()
-    syncTimer = setInterval(() => {
-      if (auth.isLoggedIn) runSync().catch((e) => console.error('[App] 后台同步失败:', e))
-    }, 5 * 60 * 1000)
+    startSyncPolling()
   }
 })
+
+/**
+ * ★ G1（examdate_sync）：登录动作本身必须触发同步。
+ *
+ * `onMounted` 只在「挂载时已登录」跑一次 `doSync()` + 轮询；`LoginView` 登录后
+ * `router.replace` 不重挂 App，若不监听登录状态，换设备登录最多要等 5 分钟
+ * （挂载时未登录时甚至根本没有轮询）才能拉到账号级的三条考试里程碑。
+ * `doSync()` 自带 `syncing` 锁防重入，不会与 onMounted 的同一次同步重复发请求。
+ * 同步接线只在本文件（App.vue）完成，不在各 store 中调用。
+ */
+watch(() => auth.isLoggedIn, (loggedIn, wasLoggedIn) => {
+  if (loggedIn && !wasLoggedIn) {
+    doSync()
+    startSyncPolling()
+  }
+})
+
 onBeforeUnmount(() => {
   if (syncTimer) clearInterval(syncTimer)
   document.removeEventListener('visibilitychange', onVisibilityChange)

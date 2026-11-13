@@ -100,6 +100,14 @@ describe('D-2 studyPlan store（①③④）', () => {
     expect(store.milestones.map((m) => m.id)).toEqual(MILESTONES.map((m) => m.id))
     expect(store.milestones.map((m) => m.date)).toEqual(MILESTONES.map((m) => m.date))
   })
+
+  it('④+ examdate_sync：MILESTONES 每项带 updatedAt:\'\'，默认不推送任何同步行', () => {
+    const store = useStudyPlanStore()
+    expect(MILESTONES.every((m) => m.updatedAt === '')).toBe(true)
+    expect(store.milestones.every((m) => m.updatedAt === '')).toBe(true)
+    expect(store.getMilestoneSyncRows()).toEqual([])
+    expect(store.nextMilestone).toBeNull()
+  })
 })
 
 describe('方案 A · 旧存档迁移（④′ 官方未发布的推定日期不得复活）', () => {
@@ -199,6 +207,9 @@ describe('D-2 顺延与存储（②⑤⑥）', () => {
     expect(store.budget.math).toBe(12)
     expect(store.tasks.some((t) => t.title === '复习 PS 图层')).toBe(true)
     expect(store.milestones.find((m) => m.id === 'op').date).toBe('2026-12-01')
+    // examdate_sync：updatedAt 必须随存档 round-trip 保留（漏透传 = 跨设备静默失效）
+    expect(store.milestones.find((m) => m.id === 'op').updatedAt).toBeTruthy()
+    expect(store.getMilestoneSyncRows()).toHaveLength(1)
   })
 
   it('⑤ 损坏 JSON：load 不抛、回落默认', () => {

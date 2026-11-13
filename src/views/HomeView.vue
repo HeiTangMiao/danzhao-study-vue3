@@ -45,6 +45,10 @@
          无任务时组件自身不渲染任何节点，不会留占位空卡。 -->
     <ReciteTaskCard variant="home" />
 
+    <!-- P1-1 考试倒计时只读展示位（examdate_sync）：消费同一份里程碑真相源，
+         只显示最近一个未来日期；只读、不新增写入口、不新增 Tab，点击跳 /plan。 -->
+    <ExamCountdownCard />
+
     <!-- 继续学习卡片：上次学习位置一键直达 -->
     <section v-if="lastStudy" class="continue-card card">
       <button class="continue-card__main" @click="continueStudy">
@@ -167,6 +171,7 @@ import { countDue } from '@/composables/useSpacedReview'
 import { SUBJECT_LIST, SUBJECT_META, getSubjectConfig } from '@/content/index'
 import SearchPanel from '@/components/SearchPanel.vue'
 import ReciteTaskCard from '@/components/ReciteTaskCard.vue'
+import ExamCountdownCard from '@/components/ExamCountdownCard.vue'
 import AppIcon from '@/components/AppIcon.vue'
 
 const router = useRouter()

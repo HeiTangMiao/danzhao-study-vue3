@@ -23,7 +23,8 @@ vi.mock('@/sync/api', () => ({ api: { sync: vi.fn() } }))
 import { api } from '@/sync/api'
 import { useAuthStore } from '@/stores/auth'
 import { useStudyDbStore } from '@/stores/studyDb'
-import { useSyncEngine } from '@/sync/engine'
+import { useSyncEngine, MILESTONE_ENTITY } from '@/sync/engine'
+import { useStudyPlanStore, MILESTONE_ENTITY as PLAN_MILESTONE_ENTITY } from '@/stores/studyPlan'
 
 describe('syncEngine 行为契约', () => {
   let auth
@@ -115,5 +116,66 @@ describe('syncEngine 行为契约', () => {
     expect(payload.changes).toHaveLength(1)
     expect(payload.changes[0]).toMatchObject({ entity: 'notes', key: 'p1', deleted: false })
     expect(payload.since).toBeNull()
+  })
+
+  it('⑥ 里程碑旁路：三条写入 → 3 个独立 item_key（ENTITIES 7 项不变）', async () => {
+    auth.accessToken = 't'
+    auth.user = { id: 'u1' }
+    const plan = useStudyPlanStore()
+    plan.setMilestoneDate('op', '2026-12-01')
+    plan.setMilestoneDate('theory', '2027-01-15')
+    plan.setMilestoneDate('academic', '2027-06-20')
+    api.sync.mockResolvedValue({ cursor: 'cur-ms', changes: [] })
+
+    const r = await sync.runSync()
+
+    // 两处实体名常量必须相等（防 engine.js 与 studyPlan.js 漂移）
+    expect(MILESTONE_ENTITY).toBe(PLAN_MILESTONE_ENTITY)
+    expect(r).toEqual({ ok: true, pushed: 3, pulled: 0 })
+    const payload = api.sync.mock.calls[0][0]
+    const ms = payload.changes.filter((c) => c.entity === 'exam_milestone')
+    expect(ms).toHaveLength(3)
+    expect(ms.map((c) => c.key).sort()).toEqual(['academic', 'op', 'theory'])
+    expect(ms.every((c) => c.deleted === false)).toBe(true)
+    expect(ms.every((c) => c.key.length > 0)).toBe(true)
+    expect(plan.syncStatus).toBe('synced')
+  })
+
+  it('⑦ 应用远端里程碑行：只覆盖命中 id，不走 IndexedDB applySynced / removeSynced', async () => {
+    auth.accessToken = 't'
+    auth.user = { id: 'u1' }
+    const plan = useStudyPlanStore()
+    plan.setMilestoneDate('academic', '2027-06-20')
+    const academicBefore = JSON.stringify(plan.milestones.find((m) => m.id === 'academic'))
+    const remoteAt1 = '2026-10-09T02:00:00.100Z'
+    const remoteAt2 = '2026-10-09T02:00:00.200Z'
+    api.sync.mockResolvedValue({
+      cursor: 'c1',
+      changes: [
+        {
+          entity: 'exam_milestone', key: 'op', deleted: false, updatedAt: remoteAt1,
+          payload: { id: 'op', label: '远端脏标签', date: '2026-12-01', updatedAt: remoteAt1 }
+        },
+        {
+          entity: 'exam_milestone', key: 'theory', deleted: false, updatedAt: remoteAt2,
+          payload: { id: 'theory', label: '远端脏标签', date: '2027-01-15', updatedAt: remoteAt2 }
+        }
+      ]
+    })
+    const applySynced = vi.spyOn(db, 'applySynced')
+    const removeSynced = vi.spyOn(db, 'removeSynced')
+
+    const r = await sync.runSync()
+
+    expect(r).toEqual({ ok: true, pushed: 1, pulled: 2 })
+    // 旁路实体绝不落到既有 7 张 IndexedDB 仓库
+    expect(applySynced).not.toHaveBeenCalled()
+    expect(removeSynced).not.toHaveBeenCalled()
+    // ★ 按 id 逐项覆盖：第三条原值（含 updatedAt）必须原样不动
+    expect(plan.milestones.map((m) => m.date)).toEqual(['2026-12-01', '2027-01-15', '2027-06-20'])
+    expect(JSON.stringify(plan.milestones.find((m) => m.id === 'academic'))).toBe(academicBefore)
+    expect(plan.milestones.find((m) => m.id === 'op').label).toBe('技能操作考')
+    expect(plan.milestones.find((m) => m.id === 'op').updatedAt).toBe(remoteAt1)
+    expect(plan.syncStatus).toBe('synced')
   })
 })

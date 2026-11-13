@@ -167,11 +167,63 @@ describe('换账号清理 · study_plan_v1', () => {
 
   it('⑧ P1①：clearAllSyncedData() 未 await 的同步点就已清（清理在第一个 await 之前）', async () => {
     seedAccountAResidue()
+    // ★ G2：按 uid 分存的账号级同步游标必须同样在同步前置段清掉，
+    //   否则切回原账号时 since 还在 → 增量拉取返回空 → 三条里程碑永久丢失。
+    localStorage.setItem('sync_meta_v1:u1', JSON.stringify({ deviceId: 'd1', since: { ts: '2026-10-09T02:00:00.000Z', key: 'op' } }))
+    localStorage.setItem('sync_meta_v1:u2', JSON.stringify({ deviceId: 'd2', since: null }))
     const pending = db.clearAllSyncedData()
-    // 同步点：不 await、不轮询
+    // 同步点：不 await、不轮询（断言不许放宽）
     expect(localStorage.getItem(PLAN_KEY)).toBe(null)
+    expect(localStorage.getItem('sync_meta_v1:u1')).toBe(null)
+    expect(localStorage.getItem('sync_meta_v1:u2')).toBe(null)
     await pending
     expect(localStorage.getItem(PLAN_KEY)).toBe(null)
+    expect(localStorage.getItem('sync_meta_v1:u1')).toBe(null)
     expect(localStorage.getItem('math_theme')).toBe('dark')
+  })
+
+  it('⑨ G2 端到端：切账号清盘+清游标 → B 空态 → 切回 A 全量拉回三条', async () => {
+    const plan = useStudyPlanStore()
+    plan.setMilestoneDate('op', '2026-12-01')
+    plan.setMilestoneDate('theory', '2027-01-15')
+    plan.setMilestoneDate('academic', '2027-06-20')
+    localStorage.setItem('sync_meta_v1:u1', JSON.stringify({ deviceId: 'd1', since: { ts: '2026-10-09T03:00:00.000Z', key: 'academic' } }))
+
+    await auth.setSession({ user: { id: 'u1' }, accessToken: 'a', refreshToken: 'r' })
+    const switched = auth.setSession({ user: { id: 'u2' }, accessToken: 'b', refreshToken: 'r' })
+    // 同步点（不 await）：本地三条与游标都已清
+    expect(localStorage.getItem(PLAN_KEY)).toBe(null)
+    expect(localStorage.getItem('sync_meta_v1:u1')).toBe(null)
+    await switched
+
+    // B 账号：重挂 PlanView → load() → 空态，不含 A 的任何日期
+    setActivePinia(createPinia())
+    const b = useStudyPlanStore()
+    b.load()
+    expect(b.milestones.map((m) => m.date)).toEqual(['', '', ''])
+    expect(localStorage.getItem(PLAN_KEY)).toBe(null)
+
+    // 切回 A：游标为 null → 退化为全量拉取 → 服务端按 3 个独立 item_key 下发三行
+    const rows = [
+      {
+        entity: 'exam_milestone', key: 'op', deleted: false,
+        updatedAt: '2026-10-09T02:00:00.100Z',
+        payload: { id: 'op', label: '技能操作考', date: '2026-12-01', updatedAt: '2026-10-09T02:00:00.100Z' }
+      },
+      {
+        entity: 'exam_milestone', key: 'theory', deleted: false,
+        updatedAt: '2026-10-09T02:00:00.200Z',
+        payload: { id: 'theory', label: '理论考', date: '2027-01-15', updatedAt: '2026-10-09T02:00:00.200Z' }
+      },
+      {
+        entity: 'exam_milestone', key: 'academic', deleted: false,
+        updatedAt: '2026-10-09T02:00:00.300Z',
+        payload: { id: 'academic', label: '语数考试', date: '2027-06-20', updatedAt: '2026-10-09T02:00:00.300Z' }
+      }
+    ]
+    b.applySyncedMilestoneRows(rows)
+    expect(b.milestones.map((m) => m.date)).toEqual(['2026-12-01', '2027-01-15', '2027-06-20'])
+    expect(b.getMilestoneSyncRows()).toHaveLength(3)
+    expect(b.getMilestoneSyncRows().map((r) => r.key)).toEqual(['op', 'theory', 'academic'])
   })
 })

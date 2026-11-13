@@ -142,6 +142,22 @@ describe('setMilestoneDate · 清空契约', () => {
     }
     expect(MILESTONES.every((m) => m.date === '')).toBe(true)
   })
+
+  it('⑧ 清空后同步行仍推 date:\'\' 正常行（不用墓碑、带新 updatedAt）', () => {
+    freezeTo('2026-10-09T10:00:00')
+    const store = useStudyPlanStore()
+    store.setMilestoneDate('op', '2026-12-01')
+    const atBefore = store.milestones.find((m) => m.id === 'op').updatedAt
+    store.setMilestoneDate('op', '')
+
+    const rows = store.getMilestoneSyncRows()
+    expect(rows).toHaveLength(1)
+    expect(rows[0].entity).toBe('exam_milestone')
+    expect(rows[0].key).toBe('op')
+    expect(rows[0].payload.date).toBe('')
+    expect(rows[0].deleted).toBe(false)
+    expect(Date.parse(rows[0].updatedAt)).toBeGreaterThan(Date.parse(atBefore))
+  })
 })
 
 describe('load() · 先无条件重置再套用（半残存档自愈 / 正常存档无回归）', () => {

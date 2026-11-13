@@ -51,6 +51,13 @@
           </span>
         </div>
       </div>
+      <!-- 官方口径常驻小字：完整口径在此承载，三条「待设置」空态原文案一字不动 -->
+      <p class="plan-ms__official">
+        考试日期以浙江省教育考试院当年发布的通知为准，本应用仅作记录，请自行核对。多条日期以最后一次修改为准。
+      </p>
+      <!-- P1-2 同步状态弱提示：仅已登录且 pending / offline 时显示；
+           正常态与未登录不显示任何小字（不显示「已同步」假状态、不展示跨设备承诺） -->
+      <p v-if="showSyncHint" class="plan-ms__sync">{{ syncHintText }}</p>
     </section>
 
     <!-- ① 周预算表 -->
@@ -147,10 +154,26 @@ import { ref, computed, onMounted } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 import { useStudyPlanStore, WEEKLY_BUDGET_HOURS, DAILY_BUDGET_HOURS } from '@/stores/studyPlan'
 import { useStudyDbStore } from '@/stores/studyDb'
+import { useAuthStore } from '@/stores/auth'
 import { SUBJECT_META } from '@/content/index'
 
 const store = useStudyPlanStore()
 const db = useStudyDbStore()
+const auth = useAuthStore()
+
+/**
+ * P1-2 同步状态弱提示显示条件（裁决 2 / 裁决 6）：
+ * 只有「已登录 且 pending/offline」才显示区块底部小字。
+ * `local`（未登录短路）与 `synced`（正常态）一律不显示，未登录也不展示任何跨设备承诺。
+ */
+const showSyncHint = computed(() =>
+  auth.isLoggedIn && (store.syncStatus === 'pending' || store.syncStatus === 'offline')
+)
+const syncHintText = computed(() =>
+  store.syncStatus === 'offline'
+    ? '离线 · 本机修改将在联网后同步'
+    : '待同步（离线编辑将在联网后同步）'
+)
 
 // 预算科目：三学科 + 其他（其他覆盖未列出的复习/整理时间）
 const budgetSubjects = computed(() => [
@@ -253,6 +276,15 @@ onMounted(async () => {
 /* 未设置文案较长：弱化为说明文字并允许换行（窄屏不把日期输入框挤出容器） */
 .plan-ms__days--unset { font-size: var(--fs-sm); font-weight: var(--fw-normal); color: var(--text-muted); }
 .plan-ms.is-past .plan-ms__days { color: var(--text-muted); }
+/* 官方口径常驻小字 + 同步状态弱提示（examdate_sync）：区块底部、不弹窗、不阻断 */
+.plan-ms__official,
+.plan-ms__sync {
+  margin-top: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+.plan-ms__sync { margin-top: var(--space-2); }
 
 /* 预算表 */
 .plan-budget { display: flex; flex-direction: column; gap: var(--space-2); }
