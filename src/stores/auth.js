@@ -70,8 +70,14 @@ export const useAuthStore = defineStore('auth', {
      * 换账号检测：本地数据归属（DATA_OWNER_KEY）≠ 新 userId → 先清空同步仓库再让新账号进场。
      * 只在「确实换了人」时清；同账号（刷新恢复 / 登出后重登）一律不清，避免误丢未同步进度。
      *
-     * @returns {Promise<void>|undefined} 发生换账号时返回清库 Promise（便于测试与调用方 await）；
-     *          未换账号返回 undefined。登录主流程不依赖它，故不 await 也不会卡住。
+     * @returns {Promise<void>|undefined} 发生换账号时返回清库 Promise（调用方**必须 await**，
+     *          见下方 login/register）；未换账号返回 undefined（await 立即 resolve，无延迟）。
+     *
+     * ⚠️ **P1② 换账号竞态（2026-11-13 修）**：清库含 `await this.init()` + 9 个 `await dbClear`。
+     *    若 login/register 不 await 就返回，`LoginView.vue:91` 会立刻 `router.replace`，
+     *    B 的首页可能在 IndexedDB 清完之前读到 A 的错题/笔记/书签/背诵进度（隐私 + 数据完整性）。
+     *    代价：仅换账号登录需等清库完成（实测约 60ms，生产 IndexedDB 数据多时更久）；
+     *    同账号 / 未登录态返回 undefined，无额外延迟。
      */
     setSession({ user, accessToken, refreshToken }) {
       const nextId = user && user.id != null ? String(user.id) : null
@@ -91,17 +97,17 @@ export const useAuthStore = defineStore('auth', {
       return undefined
     },
 
-    /** 注册并登录 */
+    /** 注册并登录（await 清库 Promise，确保跳转前本地数据已隔离） */
     async register({ username, password, email }) {
       const d = await post('/auth/register', { username, password, email })
-      this.setSession(d)
+      await this.setSession(d)
       return d.user
     },
 
-    /** 登录 */
+    /** 登录（await 清库 Promise，确保跳转前本地数据已隔离） */
     async login({ username, password }) {
       const d = await post('/auth/login', { username, password })
-      this.setSession(d)
+      await this.setSession(d)
       return d.user
     },
 

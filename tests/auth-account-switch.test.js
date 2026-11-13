@@ -13,7 +13,7 @@
  *  ④ 未登录态 setSession（user 无 id）→ 不清（无归属可比）
  */
 import 'fake-indexeddb/auto'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { useStudyDbStore } from '@/stores/studyDb'
@@ -79,5 +79,45 @@ describe('换账号本地数据隔离', () => {
     const ret = auth.setSession({ user: null, accessToken: '', refreshToken: '' })
     expect(ret).toBeUndefined()
     expect(await db.getNote('p1')).not.toBeNull()
+  })
+
+  it('⑤ P1②：await auth.login(u2) 返回的那一刻，A 的 IndexedDB 数据已清空（不许等额外 tick）', async () => {
+    await auth.setSession({ user: { id: 'u1' }, accessToken: 'a', refreshToken: 'r' })
+    await db.saveNote({ pageKey: 'p1', content: 'A 的笔记' })
+    await db.saveBookmark({ pageKey: 'p1', subject: 'math', title: 'A 的书签' })
+    await db.addError({ id: 'e1', question: 'A 的错题' })
+    localStorage.setItem('study_plan_v1', JSON.stringify({ budget: { math: 99 } }))
+
+    // 桩：真实 login() 走 post() → 全局 fetch
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ user: { id: 'u2' }, accessToken: 'b', refreshToken: 'r' })
+    })))
+
+    await auth.login({ username: 'u2', password: 'x' })
+    // ★ 立即断言：login 已 resolve，清库 Promise 必须已 await 完成。
+    //   若 login 里漏掉 await，9 个 dbClear 尚在飞 → 这些断言会红。
+    expect(await db.getNote('p1')).toBeNull()
+    expect(await db.getBookmark('p1')).toBeNull()
+    expect(await db.getAllErrorsRaw()).toHaveLength(0)
+    expect(localStorage.getItem('study_plan_v1')).toBe(null)
+    expect(localStorage.getItem('local_data_owner')).toBe('u2')
+  })
+
+  it('⑥ P1②：同账号 login 不触发清库、无额外延迟（setSession 返回 undefined）', async () => {
+    await auth.setSession({ user: { id: 'u1' }, accessToken: 'a', refreshToken: 'r' })
+    await db.saveNote({ pageKey: 'p1', content: 'A 的笔记' })
+
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ user: { id: 'u1' }, accessToken: 'a2', refreshToken: 'r' })
+    })))
+
+    await auth.login({ username: 'u1', password: 'x' })
+    expect(await db.getNote('p1')).not.toBeNull()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 })

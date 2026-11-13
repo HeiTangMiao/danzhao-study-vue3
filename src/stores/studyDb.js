@@ -419,13 +419,16 @@ export const useStudyDbStore = defineStore('studyDb', {
      * 它们不同步，但**必须**随换账号清空，否则 B 登录后会看到 A 的「已背 X / 连续 N 天」。
      * 同口径再追加 `DEVICE_LOCAL_LS_KEYS` 里的 localStorage 键（学习计划），
      * 否则 B 会看到 A 自填的里程碑日期与待办。
-     * ⚠️ 该 localStorage 清理**同步前置**到第一个 await 之前：调用方可能不等清库完成
-     *    就跳转路由，排在 9 个 `await dbClear` 之后会让新账号首页读到尚未清掉的计划。
+     * ⚠️ 该 localStorage 清理**同步前置**到第一个 await 之前：即使调用方不 await 本方法
+     *    （如 `ProfileView.vue:118` 直接 `setSession`），同步点也已清零，不依赖调用方时序。
+     *    2026-11-13 起 `auth.login/register` 已 await 清库 Promise（P1② 已修），
+     *    但本前置仍保留为纵深防御：清 IndexedDB 是异步的，任何新增的直接调用点都不该
+     *    因为漏 await 而让下一个账号读到上一个账号的计划。
      */
     async clearAllSyncedData() {
-      // ★ 必须在 `await this.init()` 之前同步执行（P1① 竞态）：
-      //   `setSession` 的调用方并不都 await 清库 Promise（P1② 既有竞态本轮未改、单列已知项），
-      //   故同步点清零才能让「清理已开始」这件事对任何路径都无条件成立。
+      // ★ 必须在 `await this.init()` 之前同步执行（P1① 竞态，纵深防御）：
+      //   清库含 9 个 `await dbClear`；同步点先清 localStorage，可让「计划已清」对任何
+      //   调用路径无条件成立，不依赖调用方是否 await（P1② 已在 auth.js 修，此处仍保留）。
       //   非浏览器环境 / 存储不可用时静默跳过，不影响下面的 IndexedDB 清理结果。
       try {
         if (typeof localStorage !== 'undefined') {
