@@ -230,14 +230,21 @@ jobs:
           HOST: ${{ secrets.DEPLOY_HOST }}
           USER: ${{ secrets.DEPLOY_USER }}
         run: |
+          # ⚠️ nginx reload 是异步生效：重载瞬间本机 127.0.0.1 可能连接被拒 / 临时落到 SPA 兜底。
+          #     原实现 reload 后立刻 curl 且无重试，产物已全部 rsync 就位却让本步骤假红（CI run 179
+          #     的 step 5 仅 4 秒即失败；手动复跑三条验证全过）。故给探测加有限重试窗口，
+          #     **重试耗尽仍失败才判真失败**，不放宽任何判据（200 / application/json 仍是硬要求）。
+          #     --retry-connrefused 覆盖连接拒绝；--retry 同时覆盖 5xx 等瞬时错误。
+          CURL_RETRY="--retry 5 --retry-delay 2 --retry-connrefused --max-time 15"
           # 顺带清掉旧版单文件索引（阶段 7.4 已下线，留着只是占 241 KB 磁盘）
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" "rm -f /var/www/danzhao-study/search-index.json; sudo systemctl reload nginx || true; curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" \
+            "rm -f /var/www/danzhao-study/search-index.json; sudo systemctl reload nginx || true; curl -s $CURL_RETRY -o /dev/null -w 'HTTP %{http_code}\n' http://127.0.0.1/ || { echo '✗ 首页探测失败（重试已耗尽）'; exit 1; }"
           # 远程内容快照：**必须**在服务器本地探到 manifest 且是 JSON（不是 SPA 兜底的 text/html）。
           # 缺失/类型不对 → 部署视为失败，避免重现「网页端远程静默失效」（S4-4a 口径）。
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" \
             "test -f /var/www/danzhao-study/content-remote/manifest.json || { echo '✗ 线上缺 content-remote/manifest.json'; exit 1; }"
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o BatchMode=yes "$USER@$HOST" \
-            "curl -s -o /dev/null -w 'manifest HTTP %{http_code} type %{content_type}\n' http://127.0.0.1/content-remote/manifest.json | grep -q 'HTTP 200 type application/json' || { echo '✗ 线上 manifest 不可按 application/json 取到（可能落进 SPA 兜底）'; exit 1; }"
+            "curl -s $CURL_RETRY -o /dev/null -w 'manifest HTTP %{http_code} type %{content_type}\n' http://127.0.0.1/content-remote/manifest.json | grep -q 'HTTP 200 type application/json' || { echo '✗ 线上 manifest 不可按 application/json 取到（可能落进 SPA 兜底）'; exit 1; }"
 
   deploy-backend:
     name: 部署后端到服务器

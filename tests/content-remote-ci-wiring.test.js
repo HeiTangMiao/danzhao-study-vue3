@@ -34,6 +34,23 @@ function missingIn(text) {
   return Object.entries(NEEDLES).filter(([, needle]) => !text.includes(needle)).map(([k]) => k)
 }
 
+/**
+ * 部署后验证是否带「nginx reload 后的有限重试窗口」。
+ * 抽成纯函数是为了让反向锚能喂入变异文本，证明断言不是恒真。
+ *
+ * 背景（CI run 179）：rsync 全部成功、产物已上线，仅因 `reload nginx || true` 后立刻 curl
+ * 且无重试，重载瞬间连接被拒 → step 5 只跑 4 秒即失败（假红）。手动复跑三条验证全过。
+ * 这里要求：① 有 --retry-connrefused；② 首页与 manifest 两条探测**都**套用同一重试变量。
+ * 判据本身不放宽：200 / application/json 仍是硬要求，重试耗尽仍失败即 exit 1。
+ */
+function hasRetryWindow(text) {
+  const at = text.indexOf('- name: 部署后验证')
+  if (at < 0) return false
+  const verify = text.slice(at)
+  if (!verify.includes('--retry-connrefused')) return false
+  return (verify.match(/\$CURL_RETRY/g) || []).length >= 2
+}
+
 describe('S4-4b · quality job 显式挂接产物自检', () => {
   it('存在**具名**步骤「内容快照自检」并跑 check:content-remote', () => {
     expect(CI).toContain(NEEDLES.namedStep)
@@ -89,6 +106,14 @@ describe('S4-4a · deploy job 发布闭环（事故头号缺口）', () => {
     // 必须是「失败即退出」而不是只打印
     expect(CI).toMatch(/exit 1/)
   })
+
+  it('部署后验证带 reload 后重试窗口（防 CI run 179 式假红），且不放宽判据', () => {
+    expect(hasRetryWindow(CI)).toBe(true)
+    // 重试耗尽仍必须硬失败，不能把 exit 1 换成「只打印」
+    const verify = CI.slice(CI.indexOf('- name: 部署后验证'))
+    expect(verify).toMatch(/grep -q 'HTTP 200 type application\/json'/)
+    expect(verify).toMatch(/exit 1/)
+  })
 })
 
 describe('反向锚（变异）· 守卫真的会咬', () => {
@@ -110,6 +135,14 @@ describe('反向锚（变异）· 守卫真的会咬', () => {
     }
     expect(isBankBeforeManifest(CI)).toBe(true) // 真实文件满足
     expect(isBankBeforeManifest([NEEDLES.manifestSync, NEEDLES.bankSync].join('\n'))).toBe(false) // 反序 → 必失败
+  })
+
+  it('重试窗口的反向锚：删掉 --retry-connrefused / 只给一条探测套重试 → 判据必须否', () => {
+    expect(hasRetryWindow(CI)).toBe(true) // 真实文件满足
+    // 变异 1：删掉重试参数
+    expect(hasRetryWindow(CI.split('--retry-connrefused').join(''))).toBe(false)
+    // 变异 2：只剩一条探测用 $CURL_RETRY（另一条退回裸 curl）
+    expect(hasRetryWindow(CI.replace(/\$CURL_RETRY/g, 'NOPE').replace('NOPE', '$CURL_RETRY'))).toBe(false)
   })
 
   it('删掉具名自检步骤 → missingIn 必须报缺 namedStep', () => {
