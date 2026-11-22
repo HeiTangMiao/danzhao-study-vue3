@@ -117,6 +117,13 @@
           <span class="tool-desc">流程 · 步骤 · 材料 · 官方入口</span>
         </div>
       </router-link>
+      <router-link to="/function-graph" class="tool-card" style="border-top-color: #2f6fed">
+        <span class="tool-icon"><AppIcon name="calculator" :size="20" /></span>
+        <div class="tool-text">
+          <span class="tool-name">函数图像</span>
+          <span class="tool-desc">输入解析式画曲线</span>
+        </div>
+      </router-link>
       <router-link v-if="sprintUnit" :to="mockRoute" class="tool-card" style="border-top-color: #a855f7">
         <span class="tool-icon"><AppIcon name="crosshair" :size="20" /></span>
         <div class="tool-text">

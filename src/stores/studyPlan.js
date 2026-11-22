@@ -117,9 +117,37 @@ function migrateMilestoneDate(savedDate) {
   return LEGACY_DEFAULT_DATES.includes(date) ? '' : date
 }
 
-/** 远端同步行的 `date` 形状：`''`（清空 / 未设置）或 YYYY-MM-DD */
+/**
+ * 严格日历日期校验：形状必须是 YYYY-MM-DD，且月/日是真实存在的年月日。
+ * 月 1–12、日 1–该月实际天数（含闰年 2 月 29）；`''` 合法表示清空 / 未设置。
+ *
+ * 为什么不用 `new Date(y, m-1, d)` 回读校验：JS 会把 2026-13-45 溢出成 2027-02-14，
+ * 形状合法但语义非法的值会被静默接受；而 `<input type="date">` 的 `.value` 回读为 ''
+ * —— 两处矛盾正是本次要修的 bug。纯数学判定不引入时区/溢出解释，口径唯一。
+ *
+ * 本函数是本地写入（setMilestoneDate）与远端同步行（isValidMilestoneDate）共用的
+ * 唯一日期合法性判据 —— 同源，杜绝「本地拒、远端收」的口径漂移。
+ * @param {unknown} value 待校验值
+ * @returns {boolean}
+ */
+function isValidCalendarDate(value) {
+  if (value === '') return true
+  if (typeof value !== 'string') return false
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  if (!m) return false
+  const year = Number(m[1])
+  const month = Number(m[2])
+  const day = Number(m[3])
+  if (month < 1 || month > 12 || day < 1) return false
+  // 闰年：能被 4 整除但不能被 100 整除，或能被 400 整除
+  const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+  const daysInMonth = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  return day <= daysInMonth[month - 1]
+}
+
+/** 远端同步行的 `date` 合法性：`''`（清空 / 未设置）或真实存在的 YYYY-MM-DD */
 function isValidMilestoneDate(value) {
-  return value === '' || (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value))
+  return isValidCalendarDate(value)
 }
 
 /**
@@ -308,11 +336,13 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
    * 修改里程碑日期（**唯一写入口**，由 PlanView 的三条 `<input type="date">` 调用）。
    *
    * 契约（本轮授权放开「清空」）：
-   *  - `YYYY-MM-DD` → 设为该日期（格式校验口径与原实现一致，只校验形状、不校验真实月日）；
+   *  - `YYYY-MM-DD` → 设为该日期（校验真实日历日期：月 1–12、日 1–该月实际天数，
+   *    含闰年；形状合法但语义非法如 `2026-13-45` / `2026-02-30` 同样拒绝）；
    *  - **空值 `''` / `null` / `undefined` → 清回「未设置」（`''`）**：
    *    `<input type="date">` 清空时 `value` 即为 `''`，学员可撤销误填；
    *    `daysUntil('')` 返回 null，视图回到「待设置 · 以当年官方通知为准」空态；
-   *  - 其它非法值（非字符串 / 格式不符）→ **拒绝**：保持原值不变、不写盘、不改状态。
+   *  - 其它非法值（非字符串 / 形状不符 / 语义非法的月日）→ **拒绝**：保持原值不变、
+   *    不写盘、不改同步状态。与远端同步行共用 `isValidCalendarDate`（同源口径）。
    *
    * 清空写回的是空串 `''`，不是 `LEGACY_DEFAULT_DATES` 里的旧推定默认值；
    * `load()` 的 `migrateMilestoneDate('')` 不命中任何迁移键，故 reload 后仍是
@@ -326,8 +356,7 @@ export const useStudyPlanStore = defineStore('studyPlan', () => {
    */
   function setMilestoneDate(id, date) {
     const isEmpty = date === '' || date === null || date === undefined
-    const isValid = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)
-    if (!isEmpty && !isValid) return
+    if (!isEmpty && !isValidCalendarDate(date)) return
     const nextDate = isEmpty ? '' : date
     const current = milestones.value.find((m) => m.id === id)
     if (!current) return

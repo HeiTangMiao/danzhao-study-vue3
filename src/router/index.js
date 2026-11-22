@@ -75,6 +75,14 @@ const routes = [
     component: () => import('@/views/GuideView.vue')
   },
   {
+    // 函数图像计算器（独立入口）：数学工具二级页，无 meta.tab（与 /guide、/plan 同款）。
+    // 插在 /guide 之后、既有路由顺序不变；该页是唯一消费 FunctionPlayground 的路由，
+    // 依赖（jsxgraph + expr-eval）由此获得懒加载边界，不影响其它深链。
+    path: '/function-graph',
+    name: 'function-graph',
+    component: () => import('@/views/FunctionGraphView.vue')
+  },
+  {
     // 每日背诵（T04）：首页队列。**无 `meta.tab`** —— 一级导航仍是 4 个 Tab（B4），
     // 背诵是「学习」Tab 下的二级入口（与 /plan、/guide 同款：进入即隐藏底部 pill，
     // 避免与页面自己的底部动作条同屏）。

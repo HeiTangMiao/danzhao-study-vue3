@@ -206,3 +206,74 @@ describe('load() · 先无条件重置再套用（半残存档自愈 / 正常存
     expect(fresh.tasks.map((t) => t.title)).toContain('复习文言文')
   })
 })
+
+describe('里程碑日期严格日历校验（拒绝语义非法的年月日）', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('⑨ 形状合法但语义非法的日期被拒：保持原值 / 时间戳不变 / 存档字节不变', () => {
+    freezeTo('2026-10-09T10:00:00')
+    const store = useStudyPlanStore()
+    store.setMilestoneDate('op', '2026-12-01')
+    const beforeRaw = localStorage.getItem(STORAGE_KEY)
+    const beforeAt = store.milestones.find((m) => m.id === 'op').updatedAt
+
+    // 13 月 / 2 月 30 日 / 非闰年 2 月 29 日 / 0 月 / 4 月 31 日
+    for (const bad of ['2026-13-45', '2026-02-30', '2026-02-29', '2026-00-10', '2026-04-31']) {
+      store.setMilestoneDate('op', bad)
+      expect(store.milestones.find((m) => m.id === 'op').date).toBe('2026-12-01')
+      expect(store.milestones.find((m) => m.id === 'op').updatedAt).toBe(beforeAt)
+    }
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(beforeRaw)
+  })
+
+  it('⑩ 闰年 2028-02-29 合法；正常值不受影响；清空仍可用', () => {
+    freezeTo('2026-10-09T10:00:00')
+    const store = useStudyPlanStore()
+    store.setMilestoneDate('op', '2028-02-29')
+    expect(store.milestones.find((m) => m.id === 'op').date).toBe('2028-02-29')
+    store.setMilestoneDate('theory', '2027-01-15') // 常规合法值不受影响
+    expect(store.milestones.find((m) => m.id === 'theory').date).toBe('2027-01-15')
+    store.setMilestoneDate('op', '')
+    expect(store.milestones.find((m) => m.id === 'op').date).toBe('')
+    expect(savedDate('op')).toBe('')
+  })
+
+  it('⑪ 远端同步行同样拒绝语义非法日期（与 setMilestoneDate 同源）', () => {
+    freezeTo('2026-10-09T10:00:00')
+    const store = useStudyPlanStore()
+    store.setMilestoneDate('op', '2026-12-01')
+    const beforeRaw = localStorage.getItem(STORAGE_KEY)
+    const row = (date) => ({
+      key: 'op',
+      updatedAt: '2026-10-10T00:00:00.000Z',
+      payload: { id: 'op', label: '技能操作考', date, updatedAt: '2026-10-10T00:00:00.000Z' }
+    })
+
+    store.applySyncedMilestoneRows([row('2026-13-45'), row('2026-02-30'), row('2026-02-29')])
+    expect(store.milestones.find((m) => m.id === 'op').date).toBe('2026-12-01')
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(beforeRaw)
+
+    // 控制组：合法日期（含闰年日）仍可覆盖，证明拒绝来自校验而非整段失效
+    store.applySyncedMilestoneRows([row('2028-02-29')])
+    expect(store.milestones.find((m) => m.id === 'op').date).toBe('2028-02-29')
+  })
+
+  it('⑫ 不存在的 id：不写盘（存档字节严格相等），也不新建里程碑', () => {
+    freezeTo('2026-10-09T10:00:00')
+    const store = useStudyPlanStore()
+    store.setMilestoneDate('op', '2026-12-01') // 先造出非空存档，令「字节不变」可观测
+    const beforeRaw = localStorage.getItem(STORAGE_KEY)
+    expect(beforeRaw).toBeTruthy()
+
+    store.setMilestoneDate('__not_exist__', '2026-12-01')
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(beforeRaw)
+    expect(store.milestones.some((m) => m.id === '__not_exist__')).toBe(false)
+  })
+})
